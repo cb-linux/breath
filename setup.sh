@@ -17,8 +17,8 @@ echo "Installing Dependencies"
 which futility || sudo apt install -y vboot-kernel-utils git wget make gcc bison flex libelf-dev
 
 # Download the kernel bzImage and the kernel modules
-wget https://github.com/getgeometric/kernel/releases/download/0/bzImage -O bzImage
-wget https://github.com/getgeometric/kernel/releases/download/0/modules.tar.xz -O modules.tar.xz \
+wget https://github.com/MilkyDeveloper/cb-linux/releases/download/1/bzImage -O bzImage
+wget https://github.com/MilkyDeveloper/cb-linux/releases/download/1/modules.tar.xz -O modules.tar.xz \
      -q --show-progress
 
 # Download the Ubuntu rootfs
@@ -179,7 +179,9 @@ set -e
 
 # Extract the modules to /mnt
 sudo mkdir -p /mnt/lib/modules
-sudo tar xvpf modules.tar.xz -C /mnt
+mkdir -p modules || sudo rm -rf modules; sudo mkdir -p modules
+sudo tar xvpf modules.tar.xz -C modules
+sudo cp -r modules/lib/modules/* /mnt/lib/modules
 echo "Syncing, may take a few minutes"
 sync
 
