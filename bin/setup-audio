@@ -1,0 +1,38 @@
+#!/bin/bash
+
+set -e
+
+echo "Installing Audio (only works for KBL DA7219 max98357a Devices at the moment)"
+
+export SND_CARD=kblda7219max SND_BOARD=.nami
+export SND_MODULE=snd_soc_kbl_da7219_max98357a
+export SND_DEVICE=${SND_CARD}${SND_BOARD}
+
+sudo apt purge pulseaudio*
+sudo mount -t ext2 -o ro /dev/mmcblk0p3 /mnt
+sudo cp -r /mnt/lib/firmware/* /lib/firmware
+sudo cp -r /mnt/usr/share/alsa/ucm/${SND_DEVICE} /usr/share/alsa/ucm2/${SND_CARD}
+sudo umount /mnt
+sudo mv /usr/share/alsa/ucm2/${SND_CARD}/${SND_DEVICE}.conf /usr/share/alsa/ucm2/${SND_CARD}/${SND_CARD}.conf
+sudo sed -i '1s/^/Syntax 2\n/' /usr/share/alsa/ucm2/${SND_CARD}/${SND_CARD}.conf
+sudo sed -i '/Pin/{/Mux/ d}' /usr/share/alsa/ucm2/${SND_CARD}/HiFi.conf
+sudo apt alsa-base alsa-utils
+
+sudo tee /etc/systemd/system/alsa-reload.service <<EOF
+[Unit]
+Description="Reload ALSA and set the correct UCM"
+
+[Service]
+User=root
+WorkingDirectory=/
+ExecStart=/bin/bash -c 'modprobe ${SND_MODULE} && alsa reload && alsaucm -c ${SND_CARD} set _verb HiFi set _enadev Speaker'
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+sudo systemctl daemon-reload
+sudo systemctl enable alsa-reload
+
+sync
+echo "After rebooting, audio will work."
