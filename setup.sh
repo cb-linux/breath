@@ -8,6 +8,13 @@ echo $DESKTOP
 # Exit on errors
 set -e
 
+# Many much importance
+which toilet || sudo apt-get install -qq -y toilet
+
+# Show title message - I told you it was important
+toilet -f mono12 "Linux"     -F gay
+toilet -f mono9  "Installer" -F gay
+
 # Make a directory and CD into it
 mkdir -p ~/linux-build
 cd ~/linux-build
