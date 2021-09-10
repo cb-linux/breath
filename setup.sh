@@ -24,9 +24,8 @@ echo "Installing Dependencies"
 which futility || sudo apt install -y vboot-kernel-utils git wget make gcc bison flex libelf-dev
 
 # Download the kernel bzImage and the kernel modules
-wget https://github.com/MilkyDeveloper/cb-linux/releases/download/1/bzImage -O bzImage
-wget https://github.com/MilkyDeveloper/cb-linux/releases/download/1/modules.tar.xz -O modules.tar.xz \
-     -q --show-progress
+wget https://github.com/MilkyDeveloper/cb-linux/releases/download/1/bzImage -O bzImage -q --show-progress
+wget https://github.com/MilkyDeveloper/cb-linux/releases/download/1/modules.tar.xz -O modules.tar.xz -q --show-progress
 
 # Download the Ubuntu rootfs
 ls focal.tar.xz || wget http://cloud-images.ubuntu.com/releases/focal/release/ubuntu-20.04-server-cloudimg-amd64-root.tar.xz -O focal.tar.xz -q --show-progress
