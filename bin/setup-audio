@@ -4,10 +4,13 @@ set -e
 
 echo "Installing Audio (only works for KBL DA7219 max98357a / Nami Devices at the moment)"
 
+# Configuration
+# You can adapt these to support other devices
 export SND_CARD=kblda7219max SND_BOARD=.nami
 export SND_MODULE=snd_soc_kbl_da7219_max98357a
 export SND_DEVICE=${SND_CARD}${SND_BOARD}
 
+# Copy the firmware and create the correct UCM Files
 sudo apt purge pulseaudio*
 sudo mount -t ext2 -o ro /dev/mmcblk0p3 /mnt
 sudo cp -r /mnt/lib/firmware/* /lib/firmware
@@ -16,8 +19,9 @@ sudo umount /mnt
 sudo mv /usr/share/alsa/ucm2/${SND_CARD}/${SND_DEVICE}.conf /usr/share/alsa/ucm2/${SND_CARD}/${SND_CARD}.conf
 sudo sed -i '1s/^/Syntax 2\n/' /usr/share/alsa/ucm2/${SND_CARD}/${SND_CARD}.conf
 sudo sed -i '/Pin/{/Mux/ d}' /usr/share/alsa/ucm2/${SND_CARD}/HiFi.conf
-sudo apt alsa-base alsa-utils
+sudo apt alsa-base alsa-utils apulse
 
+# Add a systemd service to start sound
 sudo tee /etc/systemd/system/alsa-reload.service <<EOF
 [Unit]
 Description="Reload ALSA and set the correct UCM"
@@ -31,7 +35,22 @@ ExecStart=/bin/bash -c 'modprobe ${SND_MODULE} && alsa reload && alsaucm -c ${SN
 WantedBy=multi-user.target
 EOF
 
+# Refresh systemd
 sudo systemctl daemon-reload
 
+# Replace PulseAudio libraries with Apulse, which makes PulseAudio apps work with ALSA
+for lib in libpulse-mainloop-glib.so libpulse-simple.so libpulse.so; do
+
+    set +e
+	sudo rm /usr/lib/${lib} /usr/lib/${lib}.0 /usr/lib/x86_64-linux-gnu/${lib} /usr/lib/x86_64-linux-gnu/${lib}.0
+    set -e
+	
+	sudo ln -s /usr/lib/x86_64-linux-gnu/apulse/${lib}   "/usr/lib/${lib}"
+	sudo ln -s /usr/lib/x86_64-linux-gnu/apulse/${lib}.0 "/usr/lib/${lib}.0"
+	sudo ln -s /usr/lib/x86_64-linux-gnu/apulse/${lib}   "/usr/lib/x86_64-linux-gnu/${lib}"
+	sudo ln -s /usr/lib/x86_64-linux-gnu/apulse/${lib}.0 "/usr/lib/x86_64-linux-gnu/${lib}.0"
+	
+done
+
 sync
-echo "Done! Run sudo systemctl start alsa-reload to enable audio"
+echo 'Done! Run "sudo systemctl start alsa-reload" to enable audio'
