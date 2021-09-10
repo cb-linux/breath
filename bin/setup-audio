@@ -2,7 +2,7 @@
 
 set -e
 
-echo "Installing Audio (only works for KBL DA7219 max98357a Devices at the moment)"
+echo "Installing Audio (only works for KBL DA7219 max98357a / Nami Devices at the moment)"
 
 export SND_CARD=kblda7219max SND_BOARD=.nami
 export SND_MODULE=snd_soc_kbl_da7219_max98357a
