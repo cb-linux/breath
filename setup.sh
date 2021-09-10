@@ -28,7 +28,7 @@ wget https://github.com/MilkyDeveloper/cb-linux/releases/download/1/bzImage -O b
 wget https://github.com/MilkyDeveloper/cb-linux/releases/download/1/modules.tar.xz -O modules.tar.xz -q --show-progress
 
 # Download the Ubuntu rootfs
-ls focal.tar.xz || wget http://cloud-images.ubuntu.com/releases/focal/release/ubuntu-20.04-server-cloudimg-amd64-root.tar.xz -O focal.tar.xz -q --show-progress
+ls focal.tar.xz > /dev/null || wget http://cloud-images.ubuntu.com/releases/focal/release/ubuntu-20.04-server-cloudimg-amd64-root.tar.xz -O focal.tar.xz -q --show-progress
 
 # Download kernel parameters
 echo "console=tty1 root=/dev/sda2 i915.modeset=1 rootwait rw" > kernel.flags
