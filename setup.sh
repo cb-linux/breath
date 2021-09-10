@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Exit if the user did not specify the desktop
-[[ ! -z "$1" ]] || echo "No desktop specified"; exit
+[[ ! -z "$1" ]] || { echo "No desktop specified"; exit; }
 
 # Distro and desktop variables
 DESKTOP=$1
