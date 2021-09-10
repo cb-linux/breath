@@ -21,3 +21,9 @@ However, this project is being developed on `Nami`, so the following models will
 ## Running Breath
 
 Due to licensing restraints, you cannot just download an ISO of Breath and flash it. Instead, you *build* the bootable USB.
+> Currently, this project only works on Debian or Ubuntu. Arch and Fedora support is planned.
+
+Prerequisite: Git is installed
+
+1. `git clone https://github.com/MilkyDeveloper/cb-linux && cd cb-linux`
+2. `bash setup.sh`
