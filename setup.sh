@@ -1,9 +1,10 @@
 #!/bin/bash
 
+# Exit if the user did not specify the desktop
+[[ ! -z "$1" ]] || echo "No desktop specified"; exit
+
 # Distro and desktop variables
-DISTRO=$1
-DESKTOP=$2
-echo $DESKTOP
+DESKTOP=$1
 
 # Exit on errors
 set -e
