@@ -37,3 +37,9 @@ sudo crossystem dev_boot_usb=1; sudo crossystem dev_boot_signed_only=0; sync
 to enable USB and Custom Kernel Booting.
 
 Reboot, and with the USB plugged in, press <kbd>CTRL</kbd> <kbd>U</kbd>. After a black screen for 10 seconds, the system should display a login screen.
+
+## How does everything work?
+
+This project uses the ChromeOS Kernel and firmware. Touchscreen and all other peripherals *just work*.
+
+Audio, however, is different. Sound works [perfectly](bin/setup-audio) through ALSA, but not PulseAudio or Pipewire. In the future, I'll add a bit of code that replaces the PulseAudio libraries with APulse, so all PulseAudio Library calls are forwarded to Alsa.
