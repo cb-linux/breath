@@ -9,7 +9,7 @@ echo $DESKTOP
 set -e
 
 # Many much importance
-which toilet || sudo apt-get install -qq -y toilet
+which toilet > /dev/null || sudo apt-get install -qq -y toilet
 
 # Show title message - I told you it was important
 toilet -f mono12 "Linux"     -F gay
@@ -21,7 +21,7 @@ cd ~/linux-build
 
 # If the ChromeOS firmware utility doesn't exist, install it and other packages
 echo "Installing Dependencies"
-which futility || sudo apt install -y vboot-kernel-utils git wget make gcc bison flex libelf-dev
+which futility > /dev/null || sudo apt install -y vboot-kernel-utils git wget make gcc bison flex libelf-dev
 
 # Download the kernel bzImage and the kernel modules
 wget https://github.com/MilkyDeveloper/cb-linux/releases/download/1/bzImage -O bzImage -q --show-progress
