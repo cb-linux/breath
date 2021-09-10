@@ -28,7 +28,9 @@ Due to licensing restraints, you cannot just download an ISO of Breath and flash
 Prerequisite: Git is installed
 
 1. `git clone https://github.com/MilkyDeveloper/cb-linux && cd cb-linux`
-2. `bash setup.sh`
+2. `bash setup.sh mate`
+
+> Note: Instead of `mate` you can put in `kde`, `gnome`, `budgie`, `deepin`, `xfce`, `lxqt` or `openbox`)
 
 Done! Now just boot into ChromeOS and run:
 ```
