@@ -47,8 +47,8 @@ futility --debug vbutil_kernel \
 # Check if a USB Drive is plugged in
 while true; do
 	if [[ -z $(lsblk -o name,model,tran | grep --color=never "usb") ]]; then
-		echo "Please plug in a USB Drive (checking again in 1 second)"
-		sleep 1
+		echo "Please plug in a USB Drive (checking again in 5 seconds)"
+		sleep 5
 	else
 		break
 	fi
@@ -193,7 +193,7 @@ sync
 
 # Install all utility files in the bin directory
 sudo chmod +x bin/*
-sudo mv bin/* /mnt/usr/local/bin
+sudo cp bin/* /mnt/usr/local/bin
 sync
 
 echo "Done! Press CTRL C"
