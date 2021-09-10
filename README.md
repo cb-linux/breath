@@ -38,6 +38,14 @@ to enable USB and Custom Kernel Booting.
 
 Reboot, and with the USB plugged in, press <kbd>CTRL</kbd> <kbd>U</kbd>. After a black screen for 10 seconds, the system should display a login screen.
 
+### Audio
+
+If your device is one of the devices on the above list, you can enable audio.
+
+Run `setup-audio` once booted into Breath. Reboot. 
+
+Now, whenever you want audio, run `sudo systemctl start alsa-reload`.
+
 ## How does everything work?
 
 This project uses the ChromeOS Kernel and firmware. Touchscreen and all other peripherals *just work*.

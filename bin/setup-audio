@@ -32,7 +32,6 @@ WantedBy=multi-user.target
 EOF
 
 sudo systemctl daemon-reload
-sudo systemctl enable alsa-reload
 
 sync
-echo "After rebooting, audio will work."
+echo "Done! Run sudo systemctl start alsa-reload to enable audio"

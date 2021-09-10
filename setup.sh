@@ -181,7 +181,7 @@ set +e
 echo $DESKTOP_PACKAGE
 sudo chroot /mnt /bin/sh -c "$DESKTOP_PACKAGE"
 echo 'Ignore "libfprint-2-2 fprintd libpam-fprintd" errors'
-sudo chroot /mnt /bin/sh -c "apt remove gdm3"
+sudo chroot /mnt /bin/sh -c "apt remove gdm3 pulseaudio"
 echo 'Ignore "libfprint-2-2 fprintd libpam-fprintd" errors'
 echo "Syncing, may take a few minutes"
 sync
