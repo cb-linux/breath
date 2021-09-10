@@ -18,6 +18,8 @@ However, this project is being developed on `Nami`, so the following models will
 * HP Chromebook 15 G1
 * Dell Inspiron Chromebook 14 (7460)
 
+> Stock Ubuntu requires a change in firmware (UEFI or Legacy Boot) and has everything except touchscreen and audio working. This project requires no change in firmware and has all peripherals working on my HP Chromebook 14 x360.
+
 ## Running Breath
 
 Due to licensing restraints, you cannot just download an ISO of Breath and flash it. Instead, you *build* the bootable USB.
@@ -27,3 +29,11 @@ Prerequisite: Git is installed
 
 1. `git clone https://github.com/MilkyDeveloper/cb-linux && cd cb-linux`
 2. `bash setup.sh`
+
+Done! Now just boot into ChromeOS and run:
+```
+sudo crossystem dev_boot_usb=1; sudo crossystem dev_boot_signed_only=0; sync
+```
+to enable USB and Custom Kernel Booting.
+
+Reboot, and with the USB plugged in, press <kbd>CTRL</kbd> <kbd>U</kbd>. After a black screen for 10 seconds, the system should display a login screen.

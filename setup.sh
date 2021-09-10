@@ -15,6 +15,10 @@ which toilet > /dev/null || sudo apt-get install -qq -y toilet
 toilet -f mono12 "Linux"     -F gay
 toilet -f mono9  "Installer" -F gay
 
+# Ask for username
+echo "What would you like your username to be?"
+read BREATH_USER
+
 # Make a directory and CD into it
 mkdir -p ~/linux-build
 cd ~/linux-build
@@ -182,6 +186,9 @@ echo 'Ignore "libfprint-2-2 fprintd libpam-fprintd" errors'
 echo "Syncing, may take a few minutes"
 sync
 set -e
+
+# Create a new user and add it to the sudo group
+sudo chroot /mnt /bin/sh -c "adduser $BREATH_USER && usermod -aG sudo $BREATH_USER"
 
 # Extract the modules to /mnt
 sudo mkdir -p /mnt/lib/modules
