@@ -5,6 +5,7 @@
 
 # Distro and desktop variables
 DESKTOP=$1
+ORIGINAL_DIR=`pwd`
 
 # Exit on errors
 set -e
@@ -200,6 +201,7 @@ echo "Syncing, may take a few minutes"
 sync
 
 # Install all utility files in the bin directory
+cd $ORIGINAL_DIR
 sudo chmod +x bin/*
 sudo cp bin/* /mnt/usr/local/bin
 sync
