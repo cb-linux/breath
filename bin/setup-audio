@@ -29,7 +29,7 @@ Description="Reload ALSA and set the correct UCM"
 [Service]
 User=root
 WorkingDirectory=/
-ExecStart=/bin/bash -c 'modprobe ${SND_MODULE} && alsa reload && alsaucm -c ${SND_CARD} set _verb HiFi set _enadev Speaker'
+ExecStart=/bin/bash -c 'modprobe ${SND_MODULE} && alsa reload && sleep 1 && alsaucm -c ${SND_CARD} set _verb HiFi set _enadev Speaker'
 
 [Install]
 WantedBy=multi-user.target
