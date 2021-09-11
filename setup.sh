@@ -180,9 +180,17 @@ case $DESKTOP in
 esac
 
 set +e
-echo $DESKTOP_PACKAGE
 sudo chroot /mnt /bin/sh -c "$DESKTOP_PACKAGE"
 echo 'Ignore "libfprint-2-2 fprintd libpam-fprintd" errors'
+
+# GDM3 installs minimal GNOME
+# This makes the default session in LightDM GNOME,
+# instead of whatever the user chose.
+# We can fix this by removing the GNOME session
+if [ $DESKTOP_PACKAGE != "gnome" ]; then
+  sudo rm /mnt/usr/share/xsessions/ubuntu.desktop
+fi
+
 sudo chroot /mnt /bin/sh -c "apt remove gdm3 pulseaudio"
 echo 'Ignore "libfprint-2-2 fprintd libpam-fprintd" errors'
 echo "Syncing, may take a few minutes"
