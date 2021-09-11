@@ -42,7 +42,7 @@ sudo systemctl daemon-reload
 for lib in libpulse-mainloop-glib.so libpulse-simple.so libpulse.so; do
 
     set +e
-	sudo rm /usr/lib/${lib} /usr/lib/${lib}.0 /usr/lib/x86_64-linux-gnu/${lib} /usr/lib/x86_64-linux-gnu/${lib}.0
+	sudo rm -f /usr/lib/${lib} /usr/lib/${lib}.0 /usr/lib/x86_64-linux-gnu/${lib} /usr/lib/x86_64-linux-gnu/${lib}.0
     set -e
 	
 	sudo ln -s /usr/lib/x86_64-linux-gnu/apulse/${lib}   "/usr/lib/${lib}"
@@ -53,4 +53,4 @@ for lib in libpulse-mainloop-glib.so libpulse-simple.so libpulse.so; do
 done
 
 sync
-echo 'Done! Run "sudo systemctl start alsa-reload" to enable audio'
+echo 'Done! Reboot and run "sudo systemctl start alsa-reload" to enable audio'
