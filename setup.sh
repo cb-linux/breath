@@ -186,9 +186,10 @@ echo 'Ignore "libfprint-2-2 fprintd libpam-fprintd" errors'
 # GDM3 installs minimal GNOME
 # This makes the default session in LightDM GNOME,
 # instead of whatever the user chose.
-# We can fix this by removing the GNOME session
+# We can fix this by removing the GNOME session and deleting the shell.
 if [ $DESKTOP_PACKAGE != "gnome" ]; then
   sudo rm /mnt/usr/share/xsessions/ubuntu.desktop
+  sudo chroot /mnt /bin/sh -c "apt remove gnome-shell"
 fi
 
 sudo chroot /mnt /bin/sh -c "apt remove gdm3 pulseaudio"
