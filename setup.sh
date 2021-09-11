@@ -189,7 +189,7 @@ echo 'Ignore "libfprint-2-2 fprintd libpam-fprintd" errors'
 # We can fix this by removing the GNOME session and deleting the shell.
 if [ $DESKTOP_PACKAGE != "gnome" ]; then
   sudo rm /mnt/usr/share/xsessions/ubuntu.desktop
-  sudo chroot /mnt /bin/sh -c "apt remove gnome-shell"
+  sudo chroot /mnt /bin/sh -c "apt remove gnome-shell -y; apt autoremove -y"
 fi
 
 sudo chroot /mnt /bin/sh -c "apt remove gdm3 pulseaudio"
