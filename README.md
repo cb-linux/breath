@@ -52,4 +52,4 @@ Now, whenever you want audio, run `sudo systemctl start alsa-reload`.
 
 This project uses the ChromeOS Kernel and firmware. Touchscreen and all other peripherals *just work*.
 
-Audio, however, is different. Sound works [perfectly](bin/setup-audio) through ALSA, but not PulseAudio or Pipewire. In the future, I'll add a bit of code that replaces the PulseAudio libraries with APulse, so all PulseAudio Library calls are forwarded to Alsa.
+Audio, however, is different. Sound works [perfectly](bin/setup-audio) through ALSA, but not PulseAudio or Pipewire. All apps that use PulseAudio libraries (like Firefox) work as of 884bd03b8eef554bdbafd7b4d62f36690f472237.
