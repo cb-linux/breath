@@ -1,6 +1,6 @@
 <br>
 
-<img src="README.svg" width="800" height="400" alt="test">
+<img src="README.svg" width="800" height="100" alt="test">
 
 # 🙼 ＢＲＥＡＴＨ 
 
