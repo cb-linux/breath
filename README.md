@@ -1,5 +1,7 @@
 <br>
 
+<img src="README.svg" width="800" height="400" alt="test">
+
 # 🙼 ＢＲＥＡＴＨ 
 
 <p align="center">An experimental way to natively run 🅻🅸🅽🆄🆇 on modern Chromebooks without replacing firmware</p>
