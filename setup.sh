@@ -3,9 +3,30 @@
 # Exit if the user did not specify the desktop
 [[ ! -z "$1" ]] || { echo "No desktop specified"; exit; }
 
+# Sync Progress Function
+function syncStorage {
+
+  echo
+
+  # shellcheck disable=SC2016
+  sync & {
+    # If the unsynced data (in kB) is greater than 50MB, then show the sync progress
+    while [[ $(grep -e Dirty: /proc/meminfo | grep --color=never -o '[0-9]\+') -gt 5000 ]]; do
+      SYNC_MB=$(grep -e Dirty: /proc/meminfo | grep --color=never -o '[0-9]\+' | awk '{$1/=1024;printf "%.2fMB\n",$1}')
+      echo -en "\r${SYNC_MB}"
+      sleep 1
+    done
+  }
+
+  echo
+
+  #watch -n 1 'grep -e Dirty: /proc/meminfo | grep --color=never -o '\''[0-9]\+'\'' | awk '\''{$1/=1024;printf "%.2fMB\n",$1}'\'''
+  #grep -e Dirty: /proc/meminfo | grep --color=never -o '[0-9]\+' | awk '{$1/=1024;printf "%.2fMB\n",$1}'
+}
+
 # Distro and desktop variables
 DESKTOP=$1
-ORIGINAL_DIR=`pwd`
+ORIGINAL_DIR=$(pwd)
 
 # Exit on errors
 set -e
@@ -19,7 +40,7 @@ toilet -f mono9  "Installer" -F gay
 
 # Ask for username
 echo "What would you like your username to be?"
-read BREATH_USER
+read -r BREATH_USER
 
 # Make a directory and CD into it
 mkdir -p ~/linux-build
@@ -31,10 +52,18 @@ which futility > /dev/null || sudo apt install -y vboot-kernel-utils git wget ma
 
 # Download the kernel bzImage and the kernel modules
 wget https://github.com/MilkyDeveloper/cb-linux/releases/download/1/bzImage -O bzImage -q --show-progress
-wget https://github.com/MilkyDeveloper/cb-linux/releases/download/1/modules.tar.xz -O modules.tar.xz -q --show-progress
+[[ ! -f "modules.tar.xz" ]] && {
+  wget https://github.com/MilkyDeveloper/cb-linux/releases/download/1/modules.tar.xz -O modules.tar.xz -q --show-progress
+}
 
 # Download the Ubuntu rootfs
-ls focal.tar.xz > /dev/null || wget http://cloud-images.ubuntu.com/releases/focal/release/ubuntu-20.04-server-cloudimg-amd64-root.tar.xz -O focal.tar.xz -q --show-progress
+[[ ! -f "focal.tar.xz" ]] && {
+  wget http://cloud-images.ubuntu.com/releases/focal/release/ubuntu-20.04-server-cloudimg-amd64-root.tar.xz -O focal.tar.xz -q --show-progress
+}
+
+# Only do the below if the second stage has not been completed (format/write rootfs to USB)
+# For debugging purposes
+if [[ $STAGE != 2 ]]; then
 
 # Download kernel parameters
 echo "console=tty1 root=/dev/sda2 i915.modeset=1 rootwait rw" > kernel.flags
@@ -74,7 +103,7 @@ set +e; sudo umount ${USB}*; sudo umount /mnt; set -e
 # READ: https://wiki.gentoo.org/wiki/Creating_bootable_media_for_depthcharge_based_devices
 sudo parted $USB mklabel gpt
 echo "Syncing, may take a few minutes"
-sync
+syncStorage
 
 # Create a 65 Mb kernel partition
 # Our kernels are only ~10 Mb though
@@ -91,18 +120,20 @@ sudo dd if=bzImage.signed of=${USB}1
 
 # Format the root partition as ext4 and mount it to /mnt
 sudo mkfs.ext4 ${USB}2
-sync
+syncStorage
 sudo rm -rf /mnt/*
 sudo mount ${USB}2 /mnt
 
 # Extract the Ubuntu rootfs
 sudo tar xvpf focal.tar.xz -C /mnt
 
+fi
+
 # Add universe to /etc/apt/sources.list so we can install normal packages
 cat > sources.list << EOF
-deb http://archive.ubuntu.com/ubuntu focal main universe multiverse 
-deb http://archive.ubuntu.com/ubuntu focal-security main universe multiverse 
-deb http://archive.ubuntu.com/ubuntu focal-updates main universe multiverse
+deb http://us.archive.ubuntu.com/ubuntu  focal          main universe multiverse 
+deb http://us.archive.ubuntu.com/ubuntu  focal-security main universe multiverse 
+deb http://us.archive.ubuntu.com/ubuntu  focal-updates  main universe multiverse
 EOF
 
 sudo cp sources.list /mnt/etc/apt/
@@ -118,15 +149,12 @@ until sudo passwd --root /mnt root; do echo "Retrying Password"; sleep 1; done
 sudo mount --bind /dev /mnt/dev
 sudo chroot /mnt /bin/bash -x <<'EOF'
 apt update
-apt install -y network-manager linux-firmware \
-			   lightdm lightdm-gtk-greeter \
-			   fonts-roboto yaru-theme-icon materia-gtk-theme \
-			   budgie-wallpapers-focal \
-         tasksel software-properties-common
+apt install -y network-manager linux-firmware lightdm lightdm-gtk-greeter fonts-roboto yaru-theme-icon materia-gtk-theme budgie-wallpapers-focal tasksel software-properties-common
+
 fc-cache
 EOF
 sudo umount /mnt/dev || sudo umount -lf /mnt/dev
-sync
+syncStorage
 
 # We need to load the iwlmvm module at startup for WiFi
 sudo sh -c 'echo '\''iwlmvm'\'' >> /mnt/etc/modules'
@@ -144,8 +172,8 @@ EOT
 # Download the desktop that the user has selected
 case $DESKTOP in
 
-  kde)
-    export DESKTOP_PACKAGE="apt install -y kubuntu-desktop"
+  minimal)
+    export DESKTOP_PACKAGE="apt install -y xfce4 --no-install-recommends"
     ;;
 
   gnome)
@@ -181,25 +209,29 @@ esac
 
 set +e
 sudo chroot /mnt /bin/sh -c "$DESKTOP_PACKAGE"
-echo 'Ignore "libfprint-2-2 fprintd libpam-fprintd" errors'
+echo "Ignore libfprint-2-2 fprintd libpam-fprintd errors"
 
 # GDM3 installs minimal GNOME
 # This makes the default session in LightDM GNOME,
 # instead of whatever the user chose.
 # We can fix this by removing the GNOME session and deleting the shell.
-if [ $DESKTOP_PACKAGE != "gnome" ]; then
+if [[ $DESKTOP != "gnome" ]]; then
   sudo rm /mnt/usr/share/xsessions/ubuntu.desktop
   sudo chroot /mnt /bin/sh -c "apt remove gnome-shell -y; apt autoremove -y"
 fi
 
 sudo chroot /mnt /bin/sh -c "apt remove gdm3 pulseaudio"
-echo 'Ignore "libfprint-2-2 fprintd libpam-fprintd" errors'
+echo "Ignore libfprint-2-2 fprintd libpam-fprintd errors"
 echo "Syncing, may take a few minutes"
-sync
+syncStorage
 set -e
 
-# Create a new user and add it to the sudo group
-sudo chroot /mnt /bin/sh -c "adduser $BREATH_USER && usermod -aG sudo $BREATH_USER"
+# Only create a new user and add it to the sudo group if the user doesn't already exist
+if sudo chroot /mnt /bin/bash -c "id $BREATH_USER &>/dev/null"; then
+  true
+else
+  sudo chroot /mnt /bin/sh -c "adduser $BREATH_USER && usermod -aG sudo $BREATH_USER"
+fi
 
 # Extract the modules to /mnt
 sudo mkdir -p /mnt/lib/modules
@@ -207,15 +239,15 @@ mkdir -p modules || sudo rm -rf modules; sudo mkdir -p modules
 sudo tar xvpf modules.tar.xz -C modules
 sudo cp -r modules/lib/modules/* /mnt/lib/modules
 echo "Syncing, may take a few minutes"
-sync
+syncStorage
 
 # Install all utility files in the bin directory
 cd $ORIGINAL_DIR
 sudo chmod +x bin/*
 sudo cp bin/* /mnt/usr/local/bin
-sync
+syncStorage
 
-echo "Done! Press CTRL C"
+echo "Done!"
 
 # Getting sound working:
 # 
