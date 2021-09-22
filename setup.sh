@@ -154,6 +154,7 @@ apt install -y network-manager linux-firmware lightdm lightdm-gtk-greeter fonts-
 fc-cache
 EOF
 sudo umount /mnt/dev || sudo umount -lf /mnt/dev
+echo "Syncing, may take a few minutes"
 syncStorage
 
 # We need to load the iwlmvm module at startup for WiFi
@@ -173,7 +174,7 @@ EOT
 case $DESKTOP in
 
   minimal)
-    export DESKTOP_PACKAGE="apt install -y xfce4 --no-install-recommends"
+    export DESKTOP_PACKAGE="apt install -y xfce4 xfce4-terminal --no-install-recommends"
     ;;
 
   gnome)
@@ -237,7 +238,7 @@ fi
 sudo mkdir -p /mnt/lib/modules
 mkdir -p modules || sudo rm -rf modules; sudo mkdir -p modules
 sudo tar xvpf modules.tar.xz -C modules
-sudo cp -r modules/lib/modules/* /mnt/lib/modules
+sudo cp -rv modules/lib/modules/* /mnt/lib/modules
 echo "Syncing, may take a few minutes"
 syncStorage
 
