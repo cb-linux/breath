@@ -19,7 +19,7 @@ sudo umount /mnt
 sudo mv /usr/share/alsa/ucm2/${SND_CARD}/${SND_DEVICE}.conf /usr/share/alsa/ucm2/${SND_CARD}/${SND_CARD}.conf
 sudo sed -i '1s/^/Syntax 2\n/' /usr/share/alsa/ucm2/${SND_CARD}/${SND_CARD}.conf
 sudo sed -i '/Pin/{/Mux/ d}' /usr/share/alsa/ucm2/${SND_CARD}/HiFi.conf
-sudo apt alsa-base alsa-utils apulse
+sudo apt install alsa-base alsa-utils apulse
 
 # Enable Dmix (multiple app audio output)
 sudo tee /etc/asound.conf <<EOF
