@@ -38,7 +38,7 @@ sudo crossystem dev_boot_usb=1; sudo crossystem dev_boot_signed_only=0; sync
 ```
 to enable USB and Custom Kernel Booting.
 
-Reboot, and with the USB plugged in, press <kbd>CTRL</kbd> <kbd>U</kbd>. After a black screen for 10 seconds, the system should display a login screen.
+Reboot, and with the USB plugged in, press <kbd>CTRL</kbd> <kbd>U</kbd> instead of <kbd>CTRL</kbd> <kbd>D</kbd>. After a black screen for 10 seconds, the system should display a login screen.
 
 ### Audio
 
