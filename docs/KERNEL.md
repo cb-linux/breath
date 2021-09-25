@@ -12,14 +12,20 @@ The installer of this project, which you are currently on, downloads 2 things in
 Both of which require a powerful computer and at least an hour of compilation, which many users this project is made for don't have. The GPL permits distributing binaries, as long as you give the source code of them. The source of the kernel and modules is [here](https://chromium.googlesource.com/chromiumos/third_party/kernel). You can follow the bellow directions to compile your own kernel.
 
 1. Clone the repository with git by running:
-`git clone --branch chromeos-4.19 --depth 1 https://chromium.googlesource.com/chromiumos/third_party/kernel.git`
+```bash
+git clone --branch chromeos-4.19 --depth 1 https://chromium.googlesource.com/chromiumos/third_party/kernel.git
+```
 
 2. Download the kernel `.config` file, and update it, by running:
-`wget https://raw.githubusercontent.com/MilkyDeveloper/cb-linux/main/kernel.conf -O .config
-make olddefconfig`
+```bash
+wget https://raw.githubusercontent.com/MilkyDeveloper/cb-linux/main/kernel.conf -O .config
+make olddefconfig
+```
 
 3. Compile the kernel by running:
-`make -j$(nproc)`
+```bash
+make -j$(nproc)
+```
 
 The `bzImage` should be located in `arch/x86/boot/bzImage`.
 
