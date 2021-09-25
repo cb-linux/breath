@@ -1,26 +1,26 @@
 ## Building the Kernel
 
-Millions of lines of code have been poured into the Linux Kernel, along with thousands contributed by Google Engineers.  
+Millions of lines of code have been poured into the Linux Kernel, along with thousands contributed by Google Engineers.
 
-To honor their contributions and give to the open-source community, this project is free and open-source.  
+To honor their contributions and give to the open-source community, this project is free and open-source.
 
 The installer of this project, which you are currently on, downloads 2 things in binary format:
 
 * The Linux Kernel Executable (vmlinuz/bzImage)
 * A Tar Archive of the kernel modules
 
-Both of which require a powerful computer and at least an hour of compilation, which many users this project is made for don't have. The GPL permits distributing binaries, as long as you give the source code of them. The source of the kernel and modules is [here](https://chromium.googlesource.com/chromiumos/third_party/kernel). You can follow the bellow directions to compile your own kernel.  
+Both of which require a powerful computer and at least an hour of compilation, which many users this project is made for don't have. The GPL permits distributing binaries, as long as you give the source code of them. The source of the kernel and modules is [here](https://chromium.googlesource.com/chromiumos/third_party/kernel). You can follow the bellow directions to compile your own kernel.
 
-Clone the repository with git by running:  
-`git clone --branch chromeos-4.19 --depth 1 https://chromium.googlesource.com/chromiumos/third_party/kernel.git`  
+1. Clone the repository with git by running:
+`git clone --branch chromeos-4.19 --depth 1 https://chromium.googlesource.com/chromiumos/third_party/kernel.git`
 
-Download the kernel `.config` file, and update it, by running:  
-`wget https://raw.githubusercontent.com/getgeometric/kernel/main/config -O .config  
-make olddefconfig`  
+2. Download the kernel `.config` file, and update it, by running:
+`wget https://raw.githubusercontent.com/MilkyDeveloper/cb-linux/main/kernel.conf -O .config
+make olddefconfig`
 
-Compile the kernel by running:  
+3. Compile the kernel by running:
 `make -j$(nproc)`
 
-The `bzImage` should be located in `arch/x86/boot/bzImage`.  
+The `bzImage` should be located in `arch/x86/boot/bzImage`.
 
 Running `make -j$(nproc) modules INSTALL_MOD_PATH=[DIRECTORY]`, and then compressing the `[DIRECTORY]` should give you the compressed modules.
