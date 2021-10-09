@@ -1,0 +1,5 @@
+# Disable Shellcheck suggesting read -r
+disable=SC2162
+
+# Disable Shellcheck asking to double-quote all variables
+disable=SC2086

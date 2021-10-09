@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Exit if the user did not specify the desktop
-[[ ! -z "$1" ]] || { echo "No desktop specified"; exit; }
+[[ -n "$1" ]] || { echo "No desktop specified"; exit; }
 
 # Sync Progress Function
 function syncStorage {
@@ -70,7 +70,7 @@ echo "console=tty1 root=/dev/sda2 i915.modeset=1 rootwait rw" > kernel.flags
 
 # Sign the kernel
 # After this, the kernel can no longer be booted on non-depthcharge devices
-futility --debug vbutil_kernel \
+futility vbutil_kernel \
 	 --arch x86_64 --version 1 \
 	 --keyblock /usr/share/vboot/devkeys/kernel.keyblock \
 	 --signprivate /usr/share/vboot/devkeys/kernel_data_key.vbprivk \
@@ -80,14 +80,17 @@ futility --debug vbutil_kernel \
 	 --pack bzImage.signed
 
 # Check if a USB Drive is plugged in
+USBCOUNTER=1
 while true; do
-	if [[ -z $(lsblk -o name,model,tran | grep --color=never "usb") ]]; then
-		echo "Please plug in a USB Drive (checking again in 5 seconds)"
+	if ! lsblk -o name,model,tran | grep -q "usb"; then
+		echo -en "\rPlease plug in a USB Drive (Try ${USBCOUNTER}, trying every 5 seconds)"
 		sleep 5
-	else
+    (( USBCOUNTER++ ))
+else
 		break
 	fi
 done
+echo
 
 # Ask user which USB Device they would like to use
 echo "Which USB Drive would you like to use (e.g. /dev/sda)? All data on the drive will be wiped!"
