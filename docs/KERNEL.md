@@ -14,6 +14,7 @@ Both of which require a powerful computer and at least an hour of compilation, w
 1. Clone the repository with git by running:
 ```bash
 git clone --branch chromeos-4.19 --depth 1 https://chromium.googlesource.com/chromiumos/third_party/kernel.git
+cd kernel
 ```
 
 2. Download the kernel `.config` file, and update it, by running:
