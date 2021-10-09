@@ -30,4 +30,4 @@ make -j$(nproc)
 
 The `bzImage` should be located in `arch/x86/boot/bzImage`.
 
-Running `make -j$(nproc) modules INSTALL_MOD_PATH=[DIRECTORY]`, and then compressing the `[DIRECTORY]` should give you the compressed modules.
+Running `make -j$(nproc) modules_install INSTALL_MOD_PATH=[DIRECTORY]`, and then compressing the `[DIRECTORY]` should give you the compressed modules.
