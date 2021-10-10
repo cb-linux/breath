@@ -6,7 +6,9 @@
 # Sync Progress Function
 function syncStorage {
 
-  echo
+  echo "Writing storage, may take more than 5 minutes."
+  echo "Although it seems slow, consider this process like flashing an ISO to a USB Drive."
+  echo "Below is an innacurate indicator of mB left to write. It may decrease hundreds of megabytes in seconds."
 
   # shellcheck disable=SC2016
   sync & {
@@ -48,7 +50,7 @@ cd ~/linux-build
 
 # If the ChromeOS firmware utility doesn't exist, install it and other packages
 echo "Installing Dependencies"
-which futility > /dev/null || sudo apt install -y vboot-kernel-utils git wget make gcc bison flex libelf-dev
+which futility > /dev/null || sudo apt install -y vboot-kernel-utils git wget make gcc bison flex libelf-dev linux-firmware
 
 # Download the kernel bzImage and the kernel modules
 wget https://github.com/MilkyDeveloper/cb-linux/releases/download/1/bzImage -O bzImage -q --show-progress
@@ -105,7 +107,6 @@ set +e; sudo umount ${USB}*; sudo umount /mnt; set -e
 # Format the USB with GPT
 # READ: https://wiki.gentoo.org/wiki/Creating_bootable_media_for_depthcharge_based_devices
 sudo parted $USB mklabel gpt
-echo "Syncing, may take a few minutes"
 syncStorage
 
 # Create a 65 Mb kernel partition
@@ -124,13 +125,20 @@ sudo dd if=bzImage.signed of=${USB}1
 # Format the root partition as ext4 and mount it to /mnt
 sudo mkfs.ext4 ${USB}2
 syncStorage
+set +e; sudo umount /mnt; set -e
 sudo rm -rf /mnt/*
 sudo mount ${USB}2 /mnt
 
 # Extract the Ubuntu rootfs
 sudo tar xvpf focal.tar.xz -C /mnt
+syncStorage
 
 fi
+
+# Copy (hopefully up-to-date) firmware from the host to the USB
+sudo mkdir -p /mnt/lib/firmware
+sudo cp -Rv /lib/firmware/* /mnt/lib/firmware
+syncStorage
 
 # Add universe to /etc/apt/sources.list so we can install normal packages
 cat > sources.list << EOF
@@ -152,12 +160,11 @@ until sudo passwd --root /mnt root; do echo "Retrying Password"; sleep 1; done
 sudo mount --bind /dev /mnt/dev
 sudo chroot /mnt /bin/bash -x <<'EOF'
 apt update
-apt install -y network-manager linux-firmware lightdm lightdm-gtk-greeter fonts-roboto yaru-theme-icon materia-gtk-theme budgie-wallpapers-focal tasksel software-properties-common
+apt install -y network-manager lightdm lightdm-gtk-greeter fonts-roboto yaru-theme-icon materia-gtk-theme budgie-wallpapers-focal tasksel software-properties-common
 
 fc-cache
 EOF
 sudo umount /mnt/dev || sudo umount -lf /mnt/dev
-echo "Syncing, may take a few minutes"
 syncStorage
 
 # We need to load the iwlmvm module at startup for WiFi
@@ -226,7 +233,6 @@ fi
 
 sudo chroot /mnt /bin/sh -c "apt remove gdm3 pulseaudio"
 echo "Ignore libfprint-2-2 fprintd libpam-fprintd errors"
-echo "Syncing, may take a few minutes"
 syncStorage
 set -e
 
@@ -242,7 +248,6 @@ sudo mkdir -p /mnt/lib/modules
 mkdir -p modules || sudo rm -rf modules; sudo mkdir -p modules
 sudo tar xvpf modules.tar.xz -C modules
 sudo cp -rv modules/lib/modules/* /mnt/lib/modules
-echo "Syncing, may take a few minutes"
 syncStorage
 
 # Install all utility files in the bin directory
