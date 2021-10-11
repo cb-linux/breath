@@ -25,12 +25,13 @@ However, this project is being developed on `Nami`, so the following models will
 Due to licensing restraints, you cannot just download an ISO of Breath and flash it. Instead, you *build* the bootable USB.
 > Currently, this project only works on Debian or Ubuntu. Arch and Fedora support is planned.
 
-Prerequisite: Git is installed
+Prerequisite: Git is installed and you have a mainstream, fast USB plugged in
 
 1. `git clone https://github.com/MilkyDeveloper/cb-linux && cd cb-linux`
 2. `bash setup.sh minimal`
+(should take ~20 minutes on an Intel Core Processor or Ryzen with a decent USB)
 
-> Note: Instead of `minimal` you can put in `kde`, `gnome`, `budgie`, `deepin`, `xfce`, `lxqt`, `mate` or `openbox`)
+> Note: Instead of `minimal` you can put in `kde`, `gnome`, `budgie`, `deepin`, `xfce`, `lxqt`, `mate` or `openbox`
 
 Done! Now just boot into ChromeOS and run:
 ```
