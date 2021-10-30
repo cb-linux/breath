@@ -1,8 +1,8 @@
 #!/bin/bash
 
-read -p "What kernel version would you like?"
+read -p "What kernel version would you like? "
 
-echo "Cloning the $REPLY kernel with --depth 1"
+echo "Cloning kernel $REPLY with --depth 1"
 git clone --branch chromeos-$REPLY --depth 1 https://chromium.googlesource.com/chromiumos/third_party/kernel.git
 cd kernel
 
@@ -33,10 +33,10 @@ futility --debug vbutil_kernel \
     --arch x86_64 --version 1 \
     --keyblock /usr/share/vboot/devkeys/kernel.keyblock \
     --signprivate /usr/share/vboot/devkeys/kernel_data_key.vbprivk \
-    --bootloader kernel.flags \
-    --config kernel.flags \
-    --vmlinuz bzImage \
-    --pack bzImage.signed
+    --bootloader ../kernel.flags \
+    --config ../kernel.flags \
+    --vmlinuz ../bzImage \
+    --pack ../bzImage.signed
 echo "Signed bzImage created\!" # Shell expansion weirdness
 
 mkdir mod

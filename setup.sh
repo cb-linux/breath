@@ -1,7 +1,6 @@
 #!/bin/bash
 
 # Exit if the user did not specify the desktop
-echo $1
 [[ -n "$1" ]] || { echo "No desktop specified"; exit; }
 [[ -n "$2" ]] || { echo "No distro specified, using Ubuntu"; set -- $1 "ubuntu"; }
 
