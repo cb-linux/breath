@@ -1,0 +1,4 @@
+# Ignore kernel files built or downloaded by kernel/build.sh
+kernel/*
+!kernel/build.sh
+!kernel/kernel.flags

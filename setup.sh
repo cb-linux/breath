@@ -90,7 +90,7 @@ esac
 # For debugging purposes
 if [[ $STAGE != 2 ]]; then
 
-# Download kernel parameters
+# Write kernel parameters
 echo "console=tty1 root=/dev/sda2 i915.modeset=1 rootwait rw" > kernel.flags
 
 # Sign the kernel
