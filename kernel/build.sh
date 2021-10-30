@@ -23,7 +23,7 @@ cp arch/x86/boot/bzImage ../
 echo "bzImage created!"
 
 mkdir mod
-sudo make -j8 modules_install INSTALL_MOD_PATH=mod
+make -j8 modules_install INSTALL_MOD_PATH=mod
 
 tar cvfJ ../modules.tar.xz mod/lib
 echo "modules.tar.xz created!"
