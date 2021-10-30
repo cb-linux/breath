@@ -3,3 +3,4 @@
 <p align="center">Table of Contents</p>
 
 * [Building the Kernel](KERNEL.md)
+* [File Structure](FILE_STRUCTURE.md)
