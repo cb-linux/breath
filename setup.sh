@@ -1,7 +1,9 @@
 #!/bin/bash
 
 # Exit if the user did not specify the desktop
+echo $1
 [[ -n "$1" ]] || { echo "No desktop specified"; exit; }
+[[ -n "$2" ]] || { echo "No distro specified, using Ubuntu"; set -- $1 "ubuntu"; }
 
 # Sync Progress Function
 function syncStorage {
@@ -28,6 +30,7 @@ function syncStorage {
 
 # Distro and desktop variables
 DESKTOP=$1
+DISTRO=$2
 ORIGINAL_DIR=$(pwd)
 
 # Exit on errors
@@ -50,7 +53,7 @@ cd ~/linux-build
 
 # If the ChromeOS firmware utility doesn't exist, install it and other packages
 echo "Installing Dependencies"
-which futility > /dev/null || sudo apt install -y vboot-kernel-utils git wget make gcc bison flex libelf-dev linux-firmware
+which futility > /dev/null || sudo apt install -y vboot-kernel-utils arch-install-scripts git wget linux-firmware
 
 # Download the kernel bzImage and the kernel modules
 wget https://github.com/MilkyDeveloper/cb-linux/releases/download/1/bzImage -O bzImage -q --show-progress
@@ -58,10 +61,30 @@ wget https://github.com/MilkyDeveloper/cb-linux/releases/download/1/bzImage -O b
   wget https://github.com/MilkyDeveloper/cb-linux/releases/download/1/modules.tar.xz -O modules.tar.xz -q --show-progress
 }
 
-# Download the Ubuntu rootfs
-[[ ! -f "focal.tar.xz" ]] && {
-  wget http://cloud-images.ubuntu.com/releases/focal/release/ubuntu-20.04-server-cloudimg-amd64-root.tar.xz -O focal.tar.xz -q --show-progress
-}
+# Download the rootfs based on the distribution
+case $DISTRO in
+
+  ubuntu)
+    # Download the Ubuntu rootfs if it doesn't exist
+    DISTRO_ROOTFS="ubuntu-rootfs.tar.xz"
+    [[ ! -f $DISTRO_ROOTFS ]] && {
+      wget http://cloud-images.ubuntu.com/releases/focal/release/ubuntu-20.04-server-cloudimg-amd64-root.tar.xz -O ubuntu-rootfs.tar.xz -q --show-progress
+    }
+    ;;
+
+  arch)
+    # Download the Arch Bootstrap rootfs if it doesn't exist
+    DISTRO_ROOTFS="arch-rootfs.tar.gz"
+    [[ ! -f $DISTRO_ROOTFS ]] && {
+      wget https://mirror.rackspace.com/archlinux/iso/2021.10.01/archlinux-bootstrap-2021.10.01-x86_64.tar.gz -O arch-rootfs.tar.gz -q --show-progress
+    }
+    ;;
+
+  *)
+    echo "Unknown Distribution supplied, only arch and ubuntu (case-sensitive) are valid distros"
+    exit
+    ;;
+esac
 
 # Only do the below if the second stage has not been completed (format/write rootfs to USB)
 # For debugging purposes
@@ -129,119 +152,197 @@ set +e; sudo umount /mnt; set -e
 sudo rm -rf /mnt/*
 sudo mount ${USB}2 /mnt
 
-# Extract the Ubuntu rootfs
-sudo tar xvpf focal.tar.xz -C /mnt
+# Extract the rootfs
+case $DISTRO in
+
+  arch)
+    # Extract the Arch Bootstrap rootfs to /tmp/arch
+    # We need an absolute path (/home/user/thing) instead
+    # of a relative path (cd ~; thing) since we won't be in
+    # ~/linux-build anymore.
+    DISTRO_ROOTFS_ABSOLUTE=$(readlink -f $DISTRO_ROOTFS)
+    sudo rm -rf /tmp/arch || true
+    sudo mkdir /tmp/arch
+    cd /tmp/arch # The -c option doesn't work when using the command below
+    sudo tar xvpfz $DISTRO_ROOTFS_ABSOLUTE root.x86_64/ --strip-components=1
+    cd ~/linux-build
+    ;;
+
+  *)
+    # Assume any other distro has all the root files in the root of the archive
+    # Extract the Ubuntu rootfs to the USB Drive
+    sudo tar xvpf $DISTRO_ROOTFS -C /mnt
+    ;;
+    
+esac
 syncStorage
 
 fi
+
+# Post-install steps
+case $DISTRO in
+
+  ubuntu)
+
+    # Setup internet
+    sudo cp --remove-destination /etc/resolv.conf /mnt/etc/resolv.conf
+
+    # Add universe to /etc/apt/sources.list so we can install normal packages
+    cat > sources.list << EOF
+    deb http://us.archive.ubuntu.com/ubuntu  focal          main universe multiverse 
+    deb http://us.archive.ubuntu.com/ubuntu  focal-security main universe multiverse 
+    deb http://us.archive.ubuntu.com/ubuntu  focal-updates  main universe multiverse
+EOF
+
+    sudo cp sources.list /mnt/etc/apt/
+
+    # Chroot into the rootfs to install some packages
+    sudo mount --bind /dev /mnt/dev
+    sudo chroot /mnt /bin/bash -x <<'EOF'
+    apt update
+    apt install -y network-manager lightdm lightdm-gtk-greeter fonts-roboto yaru-theme-icon materia-gtk-theme budgie-wallpapers-focal tasksel software-properties-common
+    fc-cache
+EOF
+    sudo umount /mnt/dev || sudo umount -lf /mnt/dev
+    syncStorage
+
+    # Rice LightDM
+    # Use the Materia GTK theme, Yaru Icon theme, and Budgie Wallpapers
+    sudo tee -a /mnt/etc/lightdm/lightdm-gtk-greeter.conf > /dev/null <<EOT
+    theme-name=Materia
+    icon-theme-name=Yaru
+    font-name=Roboto
+    xft-dpi=120
+    background=/usr/share/backgrounds/budgie/blue-surface_by_gurjus_bhasin.jpg
+EOT
+
+    # We need to load the iwlmvm module at startup for WiFi
+    sudo sh -c 'echo '\''iwlmvm'\'' >> /mnt/etc/modules'
+
+    # Download the desktop that the user has selected
+    case $DESKTOP in
+
+      minimal)
+        export DESKTOP_PACKAGE="apt install -y xfce4 xfce4-terminal --no-install-recommends"
+        ;;
+
+      gnome)
+        export DESKTOP_PACKAGE="apt install -y ubuntu-desktop"
+        ;;
+
+      budgie)
+        export DESKTOP_PACKAGE="apt install -y ubuntu-budgie-desktop"
+        ;;
+      
+      deepin)
+        export DESKTOP_PACKAGE="add-apt-repository ppa:ubuntudde-dev/stable; apt update; apt install -y ubuntudde-dde"
+        ;;
+
+      mate)
+        export DESKTOP_PACKAGE="apt install -y ubuntu-mate-desktop"
+        ;;
+
+      xfce)
+        export DESKTOP_PACKAGE="apt install -y xubuntu-desktop"
+        ;;
+
+      lxqt)
+        export DESKTOP_PACKAGE="apt install -y lubuntu-desktop"
+        ;;
+
+      openbox)
+        # For debugging purposes
+        export DESKTOP_PACKAGE="apt install -y openbox xfce4-terminal"
+        ;;
+
+    esac
+
+    set +e
+    sudo chroot /mnt /bin/sh -c "$DESKTOP_PACKAGE"
+    echo "Ignore libfprint-2-2 fprintd libpam-fprintd errors"
+
+    # GDM3 installs minimal GNOME
+    # This makes the default session in LightDM GNOME,
+    # instead of whatever the user chose.
+    # We can fix this by removing the GNOME session and deleting the shell.
+    if [[ $DESKTOP != "gnome" ]]; then
+      sudo rm /mnt/usr/share/xsessions/ubuntu.desktop
+      sudo chroot /mnt /bin/sh -c "apt remove gnome-shell -y; apt autoremove -y"
+    fi
+
+    sudo chroot /mnt /bin/sh -c "apt remove gdm3 pulseaudio"
+    echo "Ignore libfprint-2-2 fprintd libpam-fprintd errors"
+    syncStorage
+    set -e
+
+    # Only create a new user and add it to the sudo group if the user doesn't already exist
+    if sudo chroot /mnt /bin/bash -c "id $BREATH_USER &>/dev/null"; then
+      true
+    else
+      sudo chroot /mnt /bin/sh -c "adduser $BREATH_USER && usermod -aG sudo $BREATH_USER"
+    fi
+
+  ;;
+
+  arch)
+
+    # Setup internet
+    sudo cp --remove-destination /etc/resolv.conf /tmp/arch/etc/resolv.conf
+
+    # Fixes pacman
+    sudo mount --bind /tmp/arch /tmp/arch
+
+    # We don't need nmtui since Arch has wifi-menu
+    # TODO: Add desktop functionality
+
+    # Change the Arch Mirror
+    sudo tee -a /tmp/arch/etc/pacman.d/mirrorlist > /dev/null <<EOT
+    Server = http://mirror.rackspace.com/archlinux/\$repo/os/\$arch
+EOT
+
+    # Generate the Pacman Keys
+    sudo arch-chroot /tmp/arch bash -c "pacman-key --init; pacman-key --populate archlinux"
+
+    # Pacstrap /mnt
+    sudo mount --bind /mnt /tmp/arch/mnt
+    sudo arch-chroot /tmp/arch bash -c "pacstrap /mnt base base-devel nano" # Vim is bad
+    sudo umount -f /tmp/arch/mnt || true
+
+    # We're done with our bootstrap arch install in /tmp/arch!
+    # NOTE: Use arch-chroot when installed packages, otherwise 
+
+    # Clean up the mess made in /tmp (if possible)
+    sudo umount -f /tmp/arch || true
+    sudo rm -rf /tmp/arch || true
+    
+    # Create a new user that isn't root
+    if sudo chroot /mnt /bin/bash -c "id $BREATH_USER &>/dev/null"; then
+      true
+    else
+      sudo chroot /mnt /bin/bash -c "useradd -m -G wheel -s /bin/bash $BREATH_USER"
+    fi
+
+    # Add the user to the sudoers group
+    sudo tee -a /mnt/etc/sudoers > /dev/null <<EOT
+    %wheel ALL=(ALL) ALL
+EOT
+
+    # Install nmcli for wifi
+    sudo arch-chroot /mnt bash -c "pacman -S networkmanager"
+
+  ;;
+    
+esac
+
+# The heredoc (<<EOT) method of running commands in a chroot isn't interactive,
+# but luckily passwd has an option to chroot
+echo "What would you like the root user's password to be?"
+until sudo chroot /mnt bash -c "passwd root"; do echo "Retrying Password"; sleep 1; done
 
 # Copy (hopefully up-to-date) firmware from the host to the USB
 sudo mkdir -p /mnt/lib/firmware
 sudo cp -Rv /lib/firmware/* /mnt/lib/firmware
 syncStorage
-
-# Add universe to /etc/apt/sources.list so we can install normal packages
-cat > sources.list << EOF
-deb http://us.archive.ubuntu.com/ubuntu  focal          main universe multiverse 
-deb http://us.archive.ubuntu.com/ubuntu  focal-security main universe multiverse 
-deb http://us.archive.ubuntu.com/ubuntu  focal-updates  main universe multiverse
-EOF
-
-sudo cp sources.list /mnt/etc/apt/
-
-# Setup internet
-sudo cp --remove-destination /etc/resolv.conf /mnt/etc/resolv.conf
-
-# The below method of running commands in a chroot isn't interactive
-echo "What would you like the root user's password to be?"
-until sudo passwd --root /mnt root; do echo "Retrying Password"; sleep 1; done
-
-# Chroot into the rootfs
-sudo mount --bind /dev /mnt/dev
-sudo chroot /mnt /bin/bash -x <<'EOF'
-apt update
-apt install -y network-manager lightdm lightdm-gtk-greeter fonts-roboto yaru-theme-icon materia-gtk-theme budgie-wallpapers-focal tasksel software-properties-common
-
-fc-cache
-EOF
-sudo umount /mnt/dev || sudo umount -lf /mnt/dev
-syncStorage
-
-# We need to load the iwlmvm module at startup for WiFi
-sudo sh -c 'echo '\''iwlmvm'\'' >> /mnt/etc/modules'
-
-# Rice LightDM
-# Use the Materia GTK theme, Yaru Icon theme, and Budgie Wallpapers
-sudo tee -a /mnt/etc/lightdm/lightdm-gtk-greeter.conf > /dev/null <<EOT
-theme-name=Materia
-icon-theme-name=Yaru
-font-name=Roboto
-xft-dpi=120
-background=/usr/share/backgrounds/budgie/blue-surface_by_gurjus_bhasin.jpg
-EOT
-
-# Download the desktop that the user has selected
-case $DESKTOP in
-
-  minimal)
-    export DESKTOP_PACKAGE="apt install -y xfce4 xfce4-terminal --no-install-recommends"
-    ;;
-
-  gnome)
-    export DESKTOP_PACKAGE="apt install -y ubuntu-desktop"
-    ;;
-
-  budgie)
-    export DESKTOP_PACKAGE="apt install -y ubuntu-budgie-desktop"
-    ;;
-  
-  deepin)
-    export DESKTOP_PACKAGE="add-apt-repository ppa:ubuntudde-dev/stable; apt update; apt install -y ubuntudde-dde"
-    ;;
-
-  mate)
-    export DESKTOP_PACKAGE="apt install -y ubuntu-mate-desktop"
-    ;;
-
-  xfce)
-    export DESKTOP_PACKAGE="apt install -y xubuntu-desktop"
-    ;;
-
-  lxqt)
-    export DESKTOP_PACKAGE="apt install -y lubuntu-desktop"
-    ;;
-
-  openbox)
-    # For debugging purposes
-    export DESKTOP_PACKAGE="apt install -y openbox xfce4-terminal"
-    ;;
-
-esac
-
-set +e
-sudo chroot /mnt /bin/sh -c "$DESKTOP_PACKAGE"
-echo "Ignore libfprint-2-2 fprintd libpam-fprintd errors"
-
-# GDM3 installs minimal GNOME
-# This makes the default session in LightDM GNOME,
-# instead of whatever the user chose.
-# We can fix this by removing the GNOME session and deleting the shell.
-if [[ $DESKTOP != "gnome" ]]; then
-  sudo rm /mnt/usr/share/xsessions/ubuntu.desktop
-  sudo chroot /mnt /bin/sh -c "apt remove gnome-shell -y; apt autoremove -y"
-fi
-
-sudo chroot /mnt /bin/sh -c "apt remove gdm3 pulseaudio"
-echo "Ignore libfprint-2-2 fprintd libpam-fprintd errors"
-syncStorage
-set -e
-
-# Only create a new user and add it to the sudo group if the user doesn't already exist
-if sudo chroot /mnt /bin/bash -c "id $BREATH_USER &>/dev/null"; then
-  true
-else
-  sudo chroot /mnt /bin/sh -c "adduser $BREATH_USER && usermod -aG sudo $BREATH_USER"
-fi
 
 # Extract the modules to /mnt
 sudo mkdir -p /mnt/lib/modules
@@ -256,6 +357,7 @@ sudo chmod +x bin/*
 sudo cp bin/* /mnt/usr/local/bin
 syncStorage
 
+sudo umount /mnt
 echo "Done!"
 
 # Getting sound working:

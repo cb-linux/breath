@@ -6,7 +6,8 @@
         "name": "Bash-Debug (hardcoded script name)",
         "cwd": "${workspaceFolder}",
         "program": "${workspaceFolder}/setup.sh",
-        "args": ["openbox"]
+        "args": ["minimal", "arch"],
+        "terminalKind": "integrated"
     }
     ]
 }
