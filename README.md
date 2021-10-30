@@ -2,7 +2,7 @@
 
 # 🙼 ＢＲＥＡＴＨ 
 
-<p align="center">An experimental way to natively run 🅻🅸🅽🆄🆇 on modern Chromebooks without replacing firmware</p>
+<p align="center">An experimental way to natively run <kbd><img width="25" height="30" src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/35/Tux.svg/1200px-Tux.svg.png"></img></kbd> Linux on modern Chromebooks without replacing firmware</p>
 
 ## Supported Devices
 
