@@ -218,6 +218,9 @@ EOT
     # We need to load the iwlmvm module at startup for WiFi
     sudo sh -c 'echo '\''iwlmvm'\'' >> /mnt/etc/modules'
 
+    # Desktop installation fails without this
+    sudo chroot /mnt /bin/sh -c "apt update -y"
+
     # Download the desktop that the user has selected
     case $DESKTOP in
 

@@ -70,4 +70,4 @@ tar cvfJ ../modules.tar.xz mod/lib
 echo "modules.tar.xz created!"
 
 echo "Command to extract modules to USB:"
-echo "sudo rm -rf /mnt/lib/modules/*; sudo cp -Rv kernel/mod/lib/modules/* /mnt/lib/modules; sync"
+echo "sudo rm -rf /mnt/lib/modules/* && sudo cp -Rv kernel/mod/lib/modules/* /mnt/lib/modules && sync"
