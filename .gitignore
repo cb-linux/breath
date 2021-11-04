@@ -2,3 +2,7 @@
 kernel/*
 !kernel/build.sh
 !kernel/kernel.flags
+!kernel/patches
+!kernel/logo
+kernel/logo/*
+!kernel/logo/logo.png

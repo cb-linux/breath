@@ -1,1 +1,1 @@
-console=tty1 root=/dev/sda2 i915.modeset=1 rootwait rw
+console=tty1 root=/dev/sda2 i915.modeset=1 rootwait rw fbcon=logo-pos:center

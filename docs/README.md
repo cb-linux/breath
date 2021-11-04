@@ -4,3 +4,4 @@
 
 * [Building the Kernel](KERNEL.md)
 * [File Structure](FILE_STRUCTURE.md)
+* [Boot Logo](BOOTLOGO.md)

@@ -1,10 +1,27 @@
 #!/bin/bash
 
-read -p "What kernel version would you like? "
+read -p "What kernel version would you like? (5.4) " KERNEL_VERSION
 
-echo "Cloning kernel $REPLY with --depth 1"
-git clone --branch chromeos-$REPLY --depth 1 https://chromium.googlesource.com/chromiumos/third_party/kernel.git
+read -p "Are you satisfied with the current logo? " -n 1 -r
+echo
+
+(
+    cd logo
+    mogrify -format ppm "logo.png"
+    ppmquant 224 logo.ppm > logo_224.ppm
+    pnmnoraw logo_224.ppm > logo_final.ppm
+)
+
+echo "Cloning kernel $KERNEL_VERSION with --depth 1"
+# Latest commit for 5.4: 533e47fa98690d0fe210e0a01777caf96b887a75
+git clone --branch chromeos-$KERNEL_VERSION --depth 1 https://chromium.googlesource.com/chromiumos/third_party/kernel.git
 cd kernel
+
+echo "Patching the kernel to add logo support"
+cp ../logo/logo_final.ppm drivers/video/logo/logo_linux_clut224.ppm
+echo "mod" >> .gitignore
+git apply ../patches/logo.patch
+touch .scmversion
 
 echo "Copying and updating kernel config"
 cp ../../kernel.conf .config || exit
@@ -23,7 +40,13 @@ if [[ $REPLY =~ ^[Yy]$ ]]; then
 fi
 
 echo "Building kernel"
-make -j$(nproc) || exit
+read -p "Would you like a full rebuild? (y/n) " -n 1 -r
+echo
+if [[ $REPLY =~ ^[Yy]$ ]]; then
+    make clean; make -j$(nproc) || exit
+else
+    make -j$(nproc) || exit
+fi
 echo "bzImage and modules built"
 
 cp arch/x86/boot/bzImage ../
@@ -42,6 +65,7 @@ echo "Signed bzImage created\!" # Shell expansion weirdness
 mkdir mod
 make -j8 modules_install INSTALL_MOD_PATH=mod
 
+# Creates an archive containing /lib/modules/...
 tar cvfJ ../modules.tar.xz mod/lib
 echo "modules.tar.xz created!"
 
