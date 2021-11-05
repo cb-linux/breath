@@ -284,6 +284,18 @@ EOT
       sudo chroot /mnt /bin/sh -c "adduser $BREATH_USER && usermod -aG sudo $BREATH_USER"
     fi
 
+    # At the moment, suspending to ram (mem) doesn't work,
+    # depthcharge says "Secure NVRAM (TPM) initialization error"
+    # Instead, we can use freeze which doesn't have great power savings,
+    # but for the user it functions the same.
+    # This is a stopgap solution. Suspend to RAM is the best when working.
+    # READ: https://www.kernel.org/doc/html/v4.18/admin-guide/pm/sleep-states.html
+    # READ: https://www.freedesktop.org/software/systemd/man/systemd-sleep.conf.html
+    # TODO: Find text modification command instead of redirecting echo
+    sudo chroot /mnt /bin/sh -c "echo 'SuspendState=freeze' >> /etc/systemd/sleep.conf"
+    # Hibernating shouldn't work, but fake it anyways
+    sudo chroot /mnt /bin/sh -c "echo 'HibernateState=freeze' >> /etc/systemd/sleep.conf"
+
   ;;
 
   arch)
