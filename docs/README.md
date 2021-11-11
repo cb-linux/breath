@@ -1,1 +1,1 @@
-/home/milkydeveloper/cb-linux/README.md
+../README.md
