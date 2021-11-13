@@ -1,5 +1,10 @@
 ## Building the Kernel
 
+### New build script
+In the kernel folder, you should run the `build.sh` for a guided kernel build.
+
+### Manually
+
 Millions of lines of code have been poured into the Linux Kernel, along with thousands contributed by Google Engineers.
 
 To honor their contributions and give to the open-source community, this project is free and open-source.
