@@ -21,7 +21,6 @@ cd kernel
 echo "Patching the kernel to add logo support"
 cp ../logo/logo_final.ppm drivers/video/logo/logo_linux_clut224.ppm
 echo "mod" >> .gitignore
-git apply ../patches/logo.patch
 touch .scmversion
 
 echo "Copying and updating kernel config"

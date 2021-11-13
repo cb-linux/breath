@@ -39,8 +39,7 @@ set -e
 which toilet > /dev/null || sudo apt-get install -qq -y toilet
 
 # Show title message - I told you it was important
-toilet -f mono12 "Linux"     -F gay
-toilet -f mono9  "Installer" -F gay
+toilet -f mono12 "Breath"    -F gay
 
 # Ask for username
 echo "What would you like your username to be?"
@@ -90,7 +89,7 @@ esac
 if [[ $STAGE != 2 ]]; then
 
 # Write kernel parameters
-echo "console=tty1 root=/dev/sda2 i915.modeset=1 rootwait rw" > kernel.flags
+wget https://raw.githubusercontent.com/MilkyDeveloper/cb-linux/main/kernel/kernel.flags -O kernel.flags
 
 # Sign the kernel
 # After this, the kernel can no longer be booted on non-depthcharge devices
@@ -195,25 +194,33 @@ EOF
 
     sudo cp sources.list /mnt/etc/apt/
 
+    case $DESKTOP in
+      cli)
+        BASECMD="apt install -y network-manager tasksel software-properties-common"
+        ;;
+
+      *)
+        BASECMD="apt install -y network-manager lightdm lightdm-gtk-greeter fonts-roboto yaru-theme-icon materia-gtk-theme budgie-wallpapers-focal tasksel software-properties-common; fc-cache"
+        ;;
+    esac
+
     # Chroot into the rootfs to install some packages
     sudo mount --bind /dev /mnt/dev
-    sudo chroot /mnt /bin/bash -x <<'EOF'
-    apt update
-    apt install -y network-manager lightdm lightdm-gtk-greeter fonts-roboto yaru-theme-icon materia-gtk-theme budgie-wallpapers-focal tasksel software-properties-common
-    fc-cache
-EOF
+    sudo chroot /mnt /bin/bash -c "apt update; $BASECMD"
     sudo umount /mnt/dev || sudo umount -lf /mnt/dev
     syncStorage
 
-    # Rice LightDM
-    # Use the Materia GTK theme, Yaru Icon theme, and Budgie Wallpapers
-    sudo tee -a /mnt/etc/lightdm/lightdm-gtk-greeter.conf > /dev/null <<EOT
-    theme-name=Materia
-    icon-theme-name=Yaru
-    font-name=Roboto
-    xft-dpi=120
-    background=/usr/share/backgrounds/budgie/blue-surface_by_gurjus_bhasin.jpg
+    if [ $DESKTOP != "cli" ]; then
+      # Rice LightDM
+      # Use the Materia GTK theme, Yaru Icon theme, and Budgie Wallpapers
+      sudo tee -a /mnt/etc/lightdm/lightdm-gtk-greeter.conf > /dev/null <<EOT
+      theme-name=Materia
+      icon-theme-name=Yaru
+      font-name=Roboto
+      xft-dpi=120
+      background=/usr/share/backgrounds/budgie/blue-surface_by_gurjus_bhasin.jpg
 EOT
+    fi
 
     # We need to load the iwlmvm module at startup for WiFi
     sudo sh -c 'echo '\''iwlmvm'\'' >> /mnt/etc/modules'
@@ -257,6 +264,10 @@ EOT
         export DESKTOP_PACKAGE="apt install -y openbox xfce4-terminal"
         ;;
 
+      cli)
+        export DESKTOP_PACKAGE="echo 'Using CLI, no need to install any desktop packages.'"
+        ;;
+
     esac
 
     set +e
@@ -268,8 +279,8 @@ EOT
     # instead of whatever the user chose.
     # We can fix this by removing the GNOME session and deleting the shell.
     if [[ $DESKTOP != "gnome" ]]; then
-      sudo rm /mnt/usr/share/xsessions/ubuntu.desktop
-      sudo chroot /mnt /bin/sh -c "apt remove gnome-shell -y; apt autoremove -y"
+      sudo rm /mnt/usr/share/xsessions/ubuntu.desktop || true
+      sudo chroot /mnt /bin/sh -c "apt remove gnome-shell -y; apt autoremove -y" || true
     fi
 
     sudo chroot /mnt /bin/sh -c "apt remove gdm3 pulseaudio"
