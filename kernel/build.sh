@@ -66,7 +66,9 @@ mkdir mod
 make -j8 modules_install INSTALL_MOD_PATH=mod
 
 # Creates an archive containing /lib/modules/...
-tar cvfJ ../modules.tar.xz mod/lib
+cd mod
+tar cvfJ ../../modules.tar.xz lib/
+cd ..
 echo "modules.tar.xz created!"
 
 echo "Command to extract modules to USB:"

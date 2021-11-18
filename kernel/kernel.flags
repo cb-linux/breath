@@ -1,1 +1,1 @@
-console=tty1 root=/dev/sda2 i915.modeset=1 rootwait rw fbcon=logo-pos:center
+console=tty1 root=/dev/sda2 i915.modeset=1 rootwait rw fbcon=logo-pos:center,logo-count:1 loglevel=0 splash
