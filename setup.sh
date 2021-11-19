@@ -55,9 +55,7 @@ which futility > /dev/null || sudo apt install -y vboot-kernel-utils arch-instal
 
 # Download the kernel bzImage and the kernel modules (wget)
 wget https://github.com/MilkyDeveloper/cb-linux/releases/latest/download/bzImage -O bzImage -q --show-progress
-[[ ! -f "modules.tar.xz" ]] && {
-  wget https://github.com/MilkyDeveloper/cb-linux/releases/latest/download/modules.tar.xz -O modules.tar.xz -q --show-progress
-}
+wget https://github.com/MilkyDeveloper/cb-linux/releases/latest/download/modules.tar.xz -O modules.tar.xz -q --show-progress
 
 # Download the rootfs based on the distribution
 case $DISTRO in
