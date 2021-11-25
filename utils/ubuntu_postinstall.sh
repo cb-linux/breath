@@ -78,6 +78,10 @@ EOT
         export DESKTOP_PACKAGE="apt install -y lubuntu-desktop"
         ;;
 
+      kde)
+        export DESKTOP_PACKAGE="apt install -y kde-standard"
+        ;;
+
       openbox)
         # For debugging purposes
         export DESKTOP_PACKAGE="apt install -y openbox xfce4-terminal"

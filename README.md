@@ -18,7 +18,14 @@ However, this project is being developed on `Nami`, so the following models will
 * HP Chromebook 15 G1
 * Dell Inspiron Chromebook 14 (7460)
 
-> Stock Ubuntu requires a change in firmware (UEFI or Legacy Boot) and has everything except touchscreen and audio working. This project requires no change in firmware and has all peripherals working on my HP Chromebook 14 x360.
+### Benefits
+
+**Stock Ubuntu:**
+* Requires a change in firmware (UEFI or Legacy Boot)
+* Has everything working except touchscreen and audio
+
+**Breath:**
+* Requires no change in firmware and has all peripherals working on my HP Chromebook 14 x360.
 
 ## Running Breath
 
