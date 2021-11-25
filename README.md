@@ -25,13 +25,14 @@ However, this project is being developed on `Nami`, so the following models will
 Due to licensing restraints, you cannot just download an ISO of Breath and flash it. Instead, you *build* the bootable USB.
 > Currently, this project only works on Debian or Ubuntu. Arch and Fedora support is planned.
 
-Prerequisite: Git is installed and you have a mainstream, fast USB plugged in
+**Prerequisite:** Git is installed and you have a mainstream, fast USB plugged in
 
 1. `git clone https://github.com/MilkyDeveloper/cb-linux && cd cb-linux`
-2. `bash setup.sh gnome`
+2. `bash setup.sh cli`
 (should take ~15 minutes on a 4-core mobile processor)
 
-> Note: Instead of `gnome` you can put in `kde`, `minimal`, `budgie`, `deepin`, `xfce`, `lxqt`, `mate` or `openbox`
+> * Using the CLI argument installs a minimal CLI environment on the USB, giving you the option to install a desktop on the Chromebook rather than the host. Instead of `cli` you can put in `gnome`, `kde`, `minimal`, `budgie`, `deepin`, `xfce`, `lxqt`, `mate` or `openbox` for a desktop.
+> * You can run `bash setup.sh cli arch` for Arch Linux support. Currently, desktops have to be manually installed on Arch.
 
 Done! Now just boot into ChromeOS and run:
 ```
@@ -45,9 +46,7 @@ Reboot, and with the USB plugged in, press <kbd>CTRL</kbd> <kbd>U</kbd> instead 
 
 If your device is one of the devices on the above list, you can enable audio.
 
-Run `setup-audio` once booted into Breath. Reboot. 
-
-Now, whenever you want audio, run `sudo systemctl start alsa-reload`.
+Run `setup-audio` once booted into Breath. Reboot and enjoy working audio.
 
 ## How does everything work?
 
