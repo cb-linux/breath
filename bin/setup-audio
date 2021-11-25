@@ -71,5 +71,7 @@ for lib in libpulse-mainloop-glib.so libpulse-simple.so libpulse.so; do
 	
 done
 
+sudo systemctl enable alsa-reload
+
 sync
-echo 'Done! Reboot and run "sudo systemctl start alsa-reload" to enable audio'
+echo 'Done! Reboot to enable audio'
