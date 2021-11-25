@@ -21,11 +21,22 @@ sudo sed -i '1s/^/Syntax 2\n/' /usr/share/alsa/ucm2/${SND_CARD}/${SND_CARD}.conf
 sudo sed -i '/Pin/{/Mux/ d}' /usr/share/alsa/ucm2/${SND_CARD}/HiFi.conf
 sudo apt install alsa-base alsa-utils apulse
 
-# Enable Dmix (multiple app audio output)
+# Enable Dmix (multiple app audio output) and software master volume control
 sudo tee /etc/asound.conf <<EOF
 pcm.!default {
-        type plug
-        slave.pcm "dmix"
+    type plug
+    slave.pcm "softvol"
+}
+
+pcm.softvol {
+    type softvol # Software volume control
+    slave {
+        pcm "dmix"
+    }
+    control {
+        name "Master"
+        card 0
+    }
 }
 EOF
 

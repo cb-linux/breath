@@ -24,7 +24,7 @@ echo "mod" >> .gitignore
 touch .scmversion
 
 echo "Copying and updating kernel config"
-cp ../../kernel.conf .config || exit
+ls .config || cp ../../kernel.conf .config || exit
 make olddefconfig
 
 read -p "Would you like to make edits to the kernel config? (y/n) " -n 1 -r
