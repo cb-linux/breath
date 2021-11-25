@@ -1,5 +1,11 @@
 #!/bin/bash
 
+# Import
+source utils/functions.sh # Functions
+source utils/bootstrap.sh # Bootstrap Function
+source utils/partition.sh # USB Partitioning
+source utils/extract.sh   # Extract Rootfs
+
 # Exit if the user did not specify the desktop
 [[ -n "$1" ]] || { printerr "No desktop specified"; exit; }
 [[ -n "$2" ]] || { printerr "No distro specified, using Ubuntu"; set -- $1 "ubuntu"; }
@@ -8,12 +14,6 @@
 export DESKTOP=$1
 export DISTRO=$2
 ORIGINAL_DIR=$(pwd)
-
-# Import
-source utils/functions.sh # Functions
-source utils/bootstrap.sh # Bootstrap Function
-source utils/partition.sh # USB Partitioning
-source utils/extract.sh   # Extract Rootfs
 
 # Import a seperate postinstall function depending on the distro
 # shellcheck source=utils/ubuntu_postinstall.sh
