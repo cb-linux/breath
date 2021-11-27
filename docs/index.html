@@ -1,25 +1,111 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-  <meta charset="UTF-8">
-  <title>Document</title>
-  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
-  <meta name="description" content="Description">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/docsify-themeable@0/dist/css/theme-simple.css">
-  <link rel="stylesheet" href="stylesheet.css">
+
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+
+    <link rel="stylesheet" href="https://unpkg.com/bootstrap@5.1.3/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://bootswatch.com/5/zephyr/bootstrap.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+    
+    <style>
+        #laptop {
+            max-width: 75%;
+            height: auto;
+            text-align: center;
+        }
+    </style>
+
 </head>
+
 <body>
-  <div id="app"></div>
-  <script>
-    window.$docsify = {
-      name: '',
-      repo: '',
-      loadSidebar: true,
-    }
-  </script>
-  <!-- Docsify v4 -->
-  <script src="//cdn.jsdelivr.net/npm/docsify@4"></script>
-  <script src="https://cdn.jsdelivr.net/npm/docsify-themeable@0/dist/js/docsify-themeable.min.js"></script>
+
+    <div class="container py-4">
+        <header class="pb-3 mb-4 border-bottom">
+            <a href="https://github.com/MilkyDeveloper/cb-linux"
+               class="d-flex align-items-center text-dark text-decoration-none">
+                <span class="fs-4">🔷 Breath</span>
+            </a>
+        </header>
+
+        <img src="assets/laptop.gif" class="mx-auto d-block" id="laptop"></img>
+
+        <div data-aos="fade-right" class="p-5 mb-4 bg-light rounded-3">
+            <div class="container-fluid py-5">
+                <h1 class="display-5 fw-bold">
+                    A new Linux for Chromebooks
+                </h1>
+                <p class="col-md-8 fs-4">
+                    Breath bootstraps Linux the way Chromebooks like it.
+                    It doesn't rely on ChromeOS or custom firmware and supports all drivers on modern (post 2018) Chromebooks.
+                </p>
+                <!-- <button class="btn btn-primary btn-lg" type="button">Example button</button> -->
+            </div>
+        </div>
+
+        <div class="row align-items-md-stretch">
+            <div data-aos="zoom-out-right" class="col-md-6">
+                <div class="p-5 bg-light border rounded-3">
+                    <h1>Stock Firmware</h1>
+                    <p>
+                        Depthcharge, the stock firmware of Chromebooks, is capable of booting a 2-partition USB containing the kernel and root filesystem.
+                        Depthcharge does not have the ability of using an initramfs, so all all neccessary features are built into the kernel.
+                    </p>
+                </div>
+            </div>
+            <div data-aos="zoom-out-left" class="col-md-6">
+                <div class="p-5 bg-light border rounded-3">
+                    <h1>Drivers</h1>
+                    <p>
+                        Breath uses the same forked Linux kernel as ChromeOS.
+                        Due to this, all devices supported in ChromeOS work in Breath.
+                        Breath is the <i>only</i> way to boot a full Linux distro with audio supported.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <img src="assets/gaming.png" class="mx-auto d-block mt-5" id="laptop"></img>
+
+        <div class="row align-items-md-stretch mt-5">
+            <div data-aos="zoom-out-right" class="col-md-6">
+                <div class="p-5 bg-light border rounded-3">
+                    <h1>Extensible and Stable</h1>
+                    <p>
+                        Breath is made from the ground up to be modular.
+                        It supports Ubuntu and Arch, but should support any distro given that it has a rootfs and a way to install packages.
+                        Breath doesn't "monkey-patch" Linux distros to be able to be chrooted, so it is more stable than alternatives like Crouton.
+                    </p>
+                </div>
+            </div>
+            <div data-aos="zoom-out-left" class="col-md-6">
+                <div class="p-5 bg-light border rounded-3">
+                    <h1>Gaming</h1>
+                    <p>
+                        Using Intel GVT-G, it is possible to passthrough the integrated graphics into a KVM-accelerated Windows virtual machine.
+                        i915 and amdgpu is fully supported
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <a href="docs.html" style="text-decoration: none">
+            <button class="btn btn-lg btn-success mx-auto d-block mt-5">Get Started ➜</button>
+        </a>
+
+        <footer class="pt-3 mt-4 text-muted border-top">
+            &copy; 2021 MilkyDeveloper
+        </footer>
+    </div>
+
+    <script src="https://unpkg.com/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+    <script>AOS.init()</script>
+
 </body>
+
 </html>

@@ -1,10 +1,12 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans&family=Inter&family=Ubuntu:ital,wght@0,400;1,400&display=swap');
 
 :root {
-    --base-font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+    --base-font-family: 'Ubuntu', -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
     --base-font-size: 18px;
     --heading-font-weight: 650;
     --blockquote-border-radius: 5px;
     --blockquote-border-color: var(--mono-tint2);;
     --blockquote-border-width: 1px;
+    --sidebar-background: #f6f6f6;
+    --sidebar-border-color: #f6f6f6;
 }
