@@ -34,6 +34,14 @@ function bootstrapFiles {
       }
       ;;
 
+    fedora)
+      # Download the Fedora rootfs if it doesn't exist
+      DISTRO_ROOTFS="fedora-rootfs.tar.xz"
+      [[ ! -f $DISTRO_ROOTFS ]] && {
+      wget "https://kojipkgs.fedoraproject.org//packages/Fedora-Container-Base/35/20211127.0/images/Fedora-Container-Base-35-20211127.0.x86_64.tar.xz" -O fedora-rootfs.tar.xz -q --show-progress
+      }
+      ;;
+
   *)
       printerr "Unknown Distribution supplied, only arch and ubuntu (case-sensitive) are valid distros"
       exit

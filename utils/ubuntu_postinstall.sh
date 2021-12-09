@@ -57,10 +57,6 @@ EOT
       gnome)
         export DESKTOP_PACKAGE="apt install -y ubuntu-desktop"
         ;;
-
-      budgie)
-        export DESKTOP_PACKAGE="apt install -y ubuntu-budgie-desktop"
-        ;;
       
       deepin)
         export DESKTOP_PACKAGE="add-apt-repository ppa:ubuntudde-dev/stable; apt update; apt install -y ubuntudde-dde"

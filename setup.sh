@@ -36,7 +36,7 @@ done
 toilet -f mono12 "Breath" -F gay
 
 # Ask for username
-printq "What would you like your username to be?"
+printq "What would you like your username to be? (no spaces, backslashes, or special characters)"
 read -r BREATH_USER
 export BREATH_USER
 
