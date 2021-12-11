@@ -2,7 +2,7 @@
 
 function postinstall {
 
-    # We are basically doing all the below in order to install NetworkManager
+    # We are basically doing all the below in order to install NetworkManager :(
 
     # Setup internet
     sudo cp --remove-destination /etc/resolv.conf /tmp/arch/etc/resolv.conf

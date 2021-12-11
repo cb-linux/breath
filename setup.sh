@@ -17,7 +17,7 @@ ORIGINAL_DIR=$(pwd)
 
 # Import a seperate postinstall function depending on the distro
 # shellcheck source=utils/ubuntu_postinstall.sh
-source utils/${DISTRO}_postinstall.sh
+source utils/distros/${DISTRO}.sh
 
 # Exit on errors
 set -e

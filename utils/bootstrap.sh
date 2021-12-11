@@ -14,15 +14,15 @@ function bootstrapFiles {
   wget https://github.com/MilkyDeveloper/cb-linux/releases/latest/download/bzImage -O bzImage -q --show-progress
   wget https://github.com/MilkyDeveloper/cb-linux/releases/latest/download/modules.tar.xz -O modules.tar.xz -q --show-progress
 
-  # Download the rootfs based on the distribution
-  # DISTRO is an environment variable
+  # READ: Distro dependent step
+  # Download the root file system based on the distribution
   case $DISTRO in
 
   ubuntu)
       # Download the Ubuntu rootfs if it doesn't exist
       DISTRO_ROOTFS="ubuntu-rootfs.tar.xz"
       [[ ! -f $DISTRO_ROOTFS ]] && {
-      wget http://cloud-images.ubuntu.com/releases/focal/release/ubuntu-20.04-server-cloudimg-amd64-root.tar.xz -O ubuntu-rootfs.tar.xz -q --show-progress
+      wget http://cloud-images.ubuntu.com/releases/focal/release/ubuntu-20.04-server-cloudimg-amd64-root.tar.xz -O $DISTRO_ROOTFS -q --show-progress
       }
       ;;
 
@@ -30,7 +30,7 @@ function bootstrapFiles {
       # Download the Arch Bootstrap rootfs if it doesn't exist
       DISTRO_ROOTFS="arch-rootfs.tar.gz"
       [[ ! -f $DISTRO_ROOTFS ]] && {
-      wget https://mirror.rackspace.com/archlinux/iso/2021.10.01/archlinux-bootstrap-2021.10.01-x86_64.tar.gz -O arch-rootfs.tar.gz -q --show-progress
+      wget https://mirror.rackspace.com/archlinux/iso/2021.10.01/archlinux-bootstrap-2021.10.01-x86_64.tar.gz -O $DISTRO_ROOTFS -q --show-progress
       }
       ;;
 
@@ -38,7 +38,7 @@ function bootstrapFiles {
       # Download the Fedora rootfs if it doesn't exist
       DISTRO_ROOTFS="fedora-rootfs.tar.xz"
       [[ ! -f $DISTRO_ROOTFS ]] && {
-      wget "https://kojipkgs.fedoraproject.org//packages/Fedora-Container-Base/35/20211127.0/images/Fedora-Container-Base-35-20211127.0.x86_64.tar.xz" -O fedora-rootfs.tar.xz -q --show-progress
+      wget "https://kojipkgs.fedoraproject.org//packages/Fedora-Container-Base/35/20211127.0/images/Fedora-Container-Base-35-20211127.0.x86_64.tar.xz" -O $DISTRO_ROOTFS -q --show-progress
       }
       ;;
 
