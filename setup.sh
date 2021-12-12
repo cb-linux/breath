@@ -10,9 +10,10 @@ source utils/extract.sh   # Extract Rootfs
 [[ -n "$1" ]] || { printerr "No desktop specified"; exit; }
 [[ -n "$2" ]] || { printerr "No distro specified, using Ubuntu"; set -- $1 "ubuntu"; }
 
-# Distro and desktop variables
+# Distro and desktop variables from arguments
 export DESKTOP=$1
 export DISTRO=$2
+export DISTRO_VERSION=$3
 ORIGINAL_DIR=$(pwd)
 
 # Import a seperate postinstall function depending on the distro
@@ -59,7 +60,7 @@ unmountUSB
 partitionUSB
 
 # Our USB has now been fully partitioned
-# (1) We can now write the kernel to a 64mb Partition
+# (1) Write the kernel to a 64mb Partition
 # (2) Write a Linux distro rootfs to a partition filling the rest of the storage
 
 # Flash the signed kernel to the kernel partition

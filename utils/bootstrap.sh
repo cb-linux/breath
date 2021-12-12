@@ -19,10 +19,16 @@ function bootstrapFiles {
   case $DISTRO in
 
   ubuntu)
+      # Split up the distro version
+      # Argument 3 / DISTRO_VERSION should be something like focal-20.04
+      [[ -n "$2" ]] || { printerr "No Ubuntu version specified, using focal-20.04"; export DISTRO_VERSION=focal-20.04 }
+      export DISTRO_CODENAME=$(echo "$DISTRO_VERSION" | cut -d- -f1) # e.g. focal
+      export DISTRO_RELEASE=$(echo "$DISTRO_VERSION" | cut -d- -f2) # e.g. 20.04
+
       # Download the Ubuntu rootfs if it doesn't exist
       DISTRO_ROOTFS="ubuntu-rootfs.tar.xz"
       [[ ! -f $DISTRO_ROOTFS ]] && {
-      wget http://cloud-images.ubuntu.com/releases/focal/release/ubuntu-20.04-server-cloudimg-amd64-root.tar.xz -O $DISTRO_ROOTFS -q --show-progress
+      wget http://cloud-images.ubuntu.com/releases/${DISTRO_CODENAME}/release/ubuntu-${DISTRO_RELEASE}-server-cloudimg-amd64-root.tar.xz -O $DISTRO_ROOTFS -q --show-progress || exit
       }
       ;;
 
@@ -36,6 +42,9 @@ function bootstrapFiles {
 
     fedora)
       # Download the Fedora rootfs if it doesn't exist
+      # Extracting a Fedora rootfs from koji is quite complicated
+      # I've hardcoded it, but otherwise you need to parse a json file
+      # TOOD: Implement versioning support in Fedora
       DISTRO_ROOTFS="fedora-rootfs.tar.xz"
       [[ ! -f $DISTRO_ROOTFS ]] && {
       wget "https://kojipkgs.fedoraproject.org//packages/Fedora-Container-Base/35/20211127.0/images/Fedora-Container-Base-35-20211127.0.x86_64.tar.xz" -O $DISTRO_ROOTFS -q --show-progress
