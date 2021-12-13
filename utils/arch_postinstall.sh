@@ -34,10 +34,10 @@ EOT
     sudo rm -rf /tmp/arch || true
     
     # Create a new user that isn't root
-    if sudo chroot /mnt /bin/bash -c "id $BREATH_USER &>/dev/null"; then
+    if runChrootCommand "id $BREATH_USER &>/dev/null"; then
       true
     else
-      sudo chroot /mnt /bin/bash -c "useradd -m -G wheel -s /bin/bash $BREATH_USER"
+      runChrootCommand "useradd -m -G wheel -s /bin/bash $BREATH_USER"
     fi
 
     # Add the user to the sudoers group

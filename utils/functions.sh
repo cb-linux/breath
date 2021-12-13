@@ -55,3 +55,8 @@ function waitForUSB {
 function unmountUSB {
   (sudo umount ${USB}*; sudo umount /mnt; sudo umount /media/*/*) || true
 }
+
+# Function for running a command in the chroot
+function runChrootCommand {
+  sudo chroot /mnt /bin/sh -c "$1"
+}

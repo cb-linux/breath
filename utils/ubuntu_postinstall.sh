@@ -25,7 +25,7 @@ EOF
 
     # Chroot into the rootfs to install some packages
     sudo mount --bind /dev /mnt/dev
-    sudo chroot /mnt /bin/bash -c "apt update; $BASECMD"
+    runChrootCommand "apt update; $BASECMD"
     sudo umount /mnt/dev || sudo umount -lf /mnt/dev
     syncStorage
 
@@ -45,7 +45,7 @@ EOT
     sudo sh -c 'echo '\''iwlmvm'\'' >> /mnt/etc/modules'
 
     # Desktop installation fails without this
-    sudo chroot /mnt /bin/sh -c "apt update -y"
+    runChrootCommand "apt update -y"
 
     # Download the desktop that the user has selected
     case $DESKTOP in
@@ -90,7 +90,7 @@ EOT
     esac
 
     set +e
-    sudo chroot /mnt /bin/sh -c "$DESKTOP_PACKAGE"
+    runChrootCommand "$DESKTOP_PACKAGE"
     printerr "Ignore libfprint-2-2 fprintd libpam-fprintd errors"
 
     # GDM3 installs minimal GNOME
@@ -99,19 +99,19 @@ EOT
     # We can fix this by removing the GNOME session and deleting the shell.
     if [[ $DESKTOP != "gnome" ]]; then
       sudo rm /mnt/usr/share/xsessions/ubuntu.desktop || true
-      sudo chroot /mnt /bin/sh -c "apt remove gnome-shell -y; apt autoremove -y" || true
+      runChrootCommand "apt remove gnome-shell -y; apt autoremove -y" || true
     fi
 
-    sudo chroot /mnt /bin/sh -c "apt remove gdm3 pulseaudio"
+    runChrootCommand "apt remove gdm3 pulseaudio"
     printerr "Ignore libfprint-2-2 fprintd libpam-fprintd errors"
     syncStorage
     set -e
 
     # Only create a new user and add it to the sudo group if the user doesn't already exist
-    if sudo chroot /mnt /bin/bash -c "id $BREATH_USER &>/dev/null"; then
+    if runChrootCommand "id $BREATH_USER &>/dev/null"; then
       true
     else
-      sudo chroot /mnt /bin/sh -c "adduser $BREATH_USER && usermod -aG sudo $BREATH_USER"
+      runChrootCommand "adduser $BREATH_USER && usermod -aG sudo $BREATH_USER"
     fi
 
     # At the moment, suspending to ram (mem) doesn't work,
@@ -122,7 +122,7 @@ EOT
     # READ: https://www.kernel.org/doc/html/v4.18/admin-guide/pm/sleep-states.html
     # READ: https://www.freedesktop.org/software/systemd/man/systemd-sleep.conf.html
     # TODO: Find text modification command instead of redirecting echo
-    sudo chroot /mnt /bin/sh -c "echo 'SuspendState=freeze' >> /etc/systemd/sleep.conf"
+    runChrootCommand "echo 'SuspendState=freeze' >> /etc/systemd/sleep.conf"
     # Hibernating shouldn't work, but fake it anyways
-    sudo chroot /mnt /bin/sh -c "echo 'HibernateState=freeze' >> /etc/systemd/sleep.conf"
+    runChrootCommand "echo 'HibernateState=freeze' >> /etc/systemd/sleep.conf"
 }
