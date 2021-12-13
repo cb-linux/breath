@@ -6,9 +6,9 @@ function postinstall {
 
     # Add universe to /etc/apt/sources.list so we can install normal packages
     cat > sources.list << EOF
-    deb http://us.archive.ubuntu.com/ubuntu  focal          main universe multiverse 
-    deb http://us.archive.ubuntu.com/ubuntu  focal-security main universe multiverse 
-    deb http://us.archive.ubuntu.com/ubuntu  focal-updates  main universe multiverse
+    deb http://us.archive.ubuntu.com/ubuntu  ${DISTRO_CODENAME}          main universe multiverse 
+    deb http://us.archive.ubuntu.com/ubuntu  ${DISTRO_CODENAME}-security main universe multiverse 
+    deb http://us.archive.ubuntu.com/ubuntu  ${DISTRO_CODENAME}-updates  main universe multiverse
 EOF
 
     sudo cp sources.list /mnt/etc/apt/
