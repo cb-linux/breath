@@ -2,6 +2,7 @@
 
 function extractRootfs {
 
+	# READ: Distro dependent step
 	case $DISTRO in
 
 		arch)

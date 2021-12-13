@@ -7,8 +7,8 @@ function postinstall {
 
     printq "Installing core packages"
     
-    # Install basic packages regardless of desktop (modprobe isn't installed in Fedora container????)
-    runChrootCommand "dnf group install 'Minimal Install' -y; dnf install NetworkManager-tui ncurses -y"
+    # Install basic packages regardless of desktop (modprobe isn't installed in Fedora container edition????)
+    sudo chroot /mnt /bin/sh -c "dnf group install 'Minimal Install' -y; dnf install NetworkManager-tui ncurses -y"
 
     # Download the desktop that the user has selected
     case $DESKTOP in
@@ -18,6 +18,7 @@ function postinstall {
         ;;
 
       gnome)
+        # Install minimal gnome
         # https://www.reddit.com/r/Fedora/comments/lobnfm/guide_fedora_gnome_minimal_install/
         export DESKTOP_PACKAGE="dnf install @base-x gnome-shell gnome-terminal nautilus firefox chrome-gnome-shell gnome-tweaks @development-tools gnome-terminal-nautilus xdg-user-dirs xdg-user-dirs-gtk gnome-calculator gnome-system-monitor gedit file-roller"
         ;;
