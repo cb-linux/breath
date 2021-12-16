@@ -34,7 +34,8 @@ do
 done
 
 # Show title message - I told you it was important
-toilet -f mono12 "Breath" -F gay
+toilet -f mono12 -F crop   "Breath"
+toilet -f term   -F border "Made by MilkyDeveloper"
 
 # Ask for username
 printq "What would you like your username to be? (no spaces, backslashes, or special characters)"
