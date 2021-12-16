@@ -11,8 +11,11 @@ function bootstrapFiles {
   which futility > /dev/null || sudo apt install -y vboot-kernel-utils arch-install-scripts git wget linux-firmware
 
   # Download the kernel bzImage and the kernel modules (wget)
-  wget https://github.com/MilkyDeveloper/cb-linux/releases/latest/download/bzImage -O bzImage -q --show-progress
-  wget https://github.com/MilkyDeveloper/cb-linux/releases/latest/download/modules.tar.xz -O modules.tar.xz -q --show-progress
+  {
+  wget https://github.com/MilkyDeveloper/cb-linux/releases/latest/download/bzImage -nc -O bzImage -q --show-progress
+  wget https://github.com/MilkyDeveloper/cb-linux/releases/latest/download/modules.tar.xz -nc -O modules.tar.xz -q --show-progress
+  wget https://raw.githubusercontent.com/MilkyDeveloper/cb-linux/main/kernel/kernel.flags -nc -O kernel.flags -q --show-progress
+  } || true # Wget has the wrong exit status with no clobber
 
   # READ: Distro dependent step
   # Download the root file system based on the distribution
@@ -56,9 +59,6 @@ function bootstrapFiles {
       exit
       ;;
   esac
-
-  # Write kernel parameters
-  wget https://raw.githubusercontent.com/MilkyDeveloper/cb-linux/main/kernel/kernel.flags -O kernel.flags -q --show-progress
 
   # Sign the kernel
   # After this, the kernel can no longer be booted on non-depthcharge devices
