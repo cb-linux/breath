@@ -5,6 +5,7 @@
 - 👨‍💻 Development (in progress)
     - [Linux Distros in Breath](/distros)
     - [Depthcharge (ChromeOS's Bootloader)](/depthcharge)
+    - [Sleep and "Bootlock"](/bootlock)
     - [File Structure](/file_structure)
     - [Building the kernel](/kernel)
     - [Limitations](/limitations)
