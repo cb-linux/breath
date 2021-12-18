@@ -19,6 +19,9 @@ However, this project is being developed on `Nami`, so the following models will
 * HP Chromebook 15 G1
 * Dell Inspiron Chromebook 14 (7460)
 
+> ### Is your Chromebook not on the list?
+> That's completely fine! As long as it's newer than 2017, chances are that most drivers will already be supported except audio. If you would like audio working, open up a Github Issue with your Chromebook model and post the output of the commands `lsmod` and `find /usr/share/alsa`.
+
 ## Running Breath
 
 Due to licensing restraints, you cannot just download an ISO of Breath and flash it. Instead, you *build* the bootable USB.
