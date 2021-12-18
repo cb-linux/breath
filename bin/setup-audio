@@ -6,9 +6,15 @@ echo "Installing Audio (OTB for KBL DA7219 max98357a, see $(which setup-audio) f
 
 # Configuration
 # You can adapt these to support other devices
-[[ -n "$SND_CARD"   ]] || { export SND_CARD=kblda7219max }
-[[ -n "$SND_BOARD"  ]] || { export SND_BOARD=.nami }
-[[ -n "$SND_MODULE" ]] || { export SND_MODULE=snd_soc_kbl_da7219_max98357a }
+
+# Apollo Lake / coral:
+# SND_CARD=bxtda7219max
+# SND_BOARD=.coral
+# SND_MODULE=snd_soc_sst_bxt_da7219_max98357a
+
+[[ -n "$SND_CARD"   ]] || { export SND_CARD=kblda7219max; }
+[[ -n "$SND_BOARD"  ]] || { export SND_BOARD=.nami; }
+[[ -n "$SND_MODULE" ]] || { export SND_MODULE=snd_soc_kbl_da7219_max98357a; }
 
 export SND_DEVICE=${SND_CARD}${SND_BOARD}
 

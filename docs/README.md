@@ -10,6 +10,8 @@
 **All x64 (non-tablet) Chromebooks released after 2018 are supported.**
 
 However, this project is being developed on `Nami`, so the following models will have audio support:
+
+Nami:
 * Acer Chromebook 13 / Spin 13
 * Dell Inspiron 14 2-in-1 Model 7486 
 * Yoga Chromebook C630
@@ -18,6 +20,19 @@ However, this project is being developed on `Nami`, so the following models will
 * Acer Chromebook 714
 * HP Chromebook 15 G1
 * Dell Inspiron Chromebook 14 (7460)
+
+Coral:
+* Acer Chromebook 11 (C732, C732T, C732L & C732LT)
+* Lenovo 100e Chromebook
+* Lenovo 500e Chromebook
+* Acer Chromebook 11 (CB311-8H & CB311-8HT)
+* Acer Chromebook Spin 11 (CP311-1H & CP311-1HN)
+* CTL Chromebook J41
+* CTL Chromebook NL7
+* CTL Chromebook NL7T-360
+* ASUS Chromebook C223
+* ASUS Chromebook C423
+* ASUS Chromebook C523
 
 > ### Is your Chromebook not on the list?
 > That's completely fine! As long as it's newer than 2017, chances are that most drivers will already be supported except audio. If you would like audio working, open up a Github Issue with your Chromebook model and post the output of the commands `lsmod` and `find /usr/share/alsa`.
@@ -46,7 +61,10 @@ Reboot, and with the USB plugged in, press <kbd>CTRL</kbd> <kbd>U</kbd> instead 
 
 If your device is one of the devices on the above list, you can enable audio.
 
-Run `setup-audio` once booted into Breath. Reboot and enjoy working audio.
+Once booted into Breath run the command depending on your device's board:
+
+- Nami: `setup-audio`
+- Coral: ```SND_CARD=bxtda7219max SND_BOARD=.coral SND_MODULE=snd_soc_sst_bxt_da7219_max98357a setup-audio```
 
 If it is not, that's completely expected! Open up a Github Issue with your Chromebook model and I'll  get audio working.
 
