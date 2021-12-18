@@ -30,7 +30,7 @@ Due to licensing restraints, you cannot just download an ISO of Breath and flash
 2. `bash setup.sh cli`
 (should take ~15 minutes on a 4-core mobile processor)
 
-> * Using the CLI argument installs a minimal CLI environment on the USB. If you would like to install a desktop, you can use `gnome`, `kde`, `minimal`, `deepin`, `xfce`, `lxqt`, `mate` or `openbox` instead of `cli`. You can use `cli` and install a desktop later on the Chromebook with `tasksel`.
+> * **Using the CLI argument installs a minimal CLI (no desktop!) environment on the USB.** If you would like to install a desktop, you can use `gnome`, `kde`, `minimal`, `deepin`, `xfce`, `lxqt`, `mate` or `openbox` instead of `cli`. You can use `cli`.
 > * You can run `bash setup.sh cli arch` to put Arch Linux on the USB. Currently, desktops have to be manually installed on Arch.
 
 3. Done! Now just boot into ChromeOS, enter the shell (<kbd>CTRL</kbd> <kbd>ALT</kbd> <kbd>T</kbd>, `shell`), and run:  
