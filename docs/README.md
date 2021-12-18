@@ -7,7 +7,7 @@
 
 ## Supported Devices
 
-**All x64 (not ARM at the moment) Chromebooks released after 2018 are supported.**
+**All x64 (non-tablet) Chromebooks released after 2018 are supported.**
 
 However, this project is being developed on `Nami`, so the following models will have audio support:
 * Acer Chromebook 13 / Spin 13
