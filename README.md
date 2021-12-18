@@ -2,7 +2,7 @@
 
 <img src="https://github.com/MilkyDeveloper/cb-linux/blob/main/docs/assets/banner.png?raw=true" alt="Breath Banner"></img>
 
-# 🙼 ＢＲＥＡＴＨ 
+# 🙼 ＢＲＥＡＴＨ
 
 <p align="center">An experimental way to natively run <kbd><img width="25" height="30" src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/35/Tux.svg/1200px-Tux.svg.png"></img></kbd> Linux on modern Chromebooks without replacing firmware</p>
 
@@ -22,6 +22,10 @@
 ## Running Breath
 
 <h3 align="center"><a href="https://milkydeveloper.github.io/cb-linux/docs.html#/">📄 Please visit the docs here 📄</a></h3>
+
+<p align="center">
+  <img src="https://img.shields.io/github/downloads/milkydeveloper/cb-linux/total?style=for-the-badge" />
+</p>
 
 ## How does everything work?
 
