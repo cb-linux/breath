@@ -30,9 +30,7 @@ function bootstrapFiles {
 
       # Download the Ubuntu rootfs if it doesn't exist
       DISTRO_ROOTFS="ubuntu-rootfs.tar.xz"
-      [[ ! -f $DISTRO_ROOTFS ]] && {
       wget http://cloud-images.ubuntu.com/releases/${DISTRO_CODENAME}/release/ubuntu-${DISTRO_RELEASE}-server-cloudimg-amd64-root.tar.xz -O $DISTRO_ROOTFS -q --show-progress || exit
-      }
       ;;
 
   arch)
