@@ -11,6 +11,9 @@
 
 However, this project is being developed on `Nami`, so the following models will have audio support:
 
+> ### Is your Chromebook not on the list?
+> That's completely fine! As long as it's newer than 2017, chances are that most drivers will already be supported except audio. If you would like audio working, open up a Github Issue with your Chromebook model and post the output of the commands `lsmod` and `find /usr/share/alsa`.
+
 Nami:
 * Acer Chromebook 13 / Spin 13
 * Dell Inspiron 14 2-in-1 Model 7486 
@@ -33,9 +36,6 @@ Coral:
 * ASUS Chromebook C223
 * ASUS Chromebook C423
 * ASUS Chromebook C523
-
-> ### Is your Chromebook not on the list?
-> That's completely fine! As long as it's newer than 2017, chances are that most drivers will already be supported except audio. If you would like audio working, open up a Github Issue with your Chromebook model and post the output of the commands `lsmod` and `find /usr/share/alsa`.
 
 ## Running Breath
 
