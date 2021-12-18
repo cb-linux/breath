@@ -37,6 +37,10 @@ Coral:
 * ASUS Chromebook C423
 * ASUS Chromebook C523
 
+Reef:
+* Asus Flip C213
+* Acer Chromebook Spin 11 R751T
+
 ## Running Breath
 
 Due to licensing restraints, you cannot just download an ISO of Breath and flash it. Instead, you *build* the bootable USB.
@@ -65,6 +69,7 @@ Once booted into Breath run the command depending on your device's board:
 
 - Nami: `setup-audio`
 - Coral: ```SND_CARD=bxtda7219max SND_BOARD=.coral SND_MODULE=snd_soc_sst_bxt_da7219_max98357a setup-audio```
+- Reef: ```SND_CARD=bxtda7219max SND_BOARD=.reef.ELECTRO SND_MODULE=snd_soc_sst_bxt_da7219_max98357a setup-audio```
 
 If it is not, that's completely expected! Open up a Github Issue with your Chromebook model and I'll  get audio working.
 
