@@ -47,6 +47,10 @@ Run `setup-audio` once booted into Breath. Reboot and enjoy working audio.
 
 If it is not, that's completely expected! Open up a Github Issue with your Chromebook model and I'll  get audio working.
 
+## Doesn't work? That's expected!
+
+Breath uses the exact ChromeOS Linux kernel. In other words, if the thing not working in Breath works in ChromeOS, it's a toggle away on my side. Just provide details like your **exact** Chromebook model name and your board name (shown on the bottom of the dev mode screen) and make a Github Issue. When you help me add support to your device, chances are 4+ more devices will become supported too!
+
 #### --Project Overview--
 
 [README.md](https://raw.githubusercontent.com/MilkyDeveloper/cb-linux/main/README.md ':include')
