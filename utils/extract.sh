@@ -31,6 +31,12 @@ function extractRootfs {
 			cd ~/linux-build
 			;;
 
+		debian)
+            # Debootstrap Debian Stable
+			# TODO: add versioning support to install unstable
+			sudo debootstrap stable /mnt http://deb.debian.org/debian/
+		    ;;
+
 		*)
 			# Assume any other distro has all the root files in the root of the archive
 			# Extract the rootfs to the USB Drive

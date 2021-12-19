@@ -52,13 +52,18 @@ function bootstrapFiles {
       }
       ;;
 
+  debian)
+      # Debian uses debootstrap rather than extracting a prebuilt rootfs
+      sudo apt install debootstrap -y
+      ;;
+
   *)
       printerr "Unknown Distribution supplied, only arch and ubuntu (case-sensitive) are valid distros"
       exit
       ;;
   esac
 
-  # Sign the kernel
+  # Sign the kudhddernel
   # After this, the kernel can no longer be booted on non-depthcharge devices
   futility vbutil_kernel \
     --arch x86_64 --version 1 \
