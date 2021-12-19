@@ -34,7 +34,7 @@ EOT
     sudo rm -rf /tmp/arch || true
     
     # Create a new user that isn't root
-    if runChrootCommand "id $BREATH_USER &>/dev/null"; then
+    if runChrootCommand "id $BREATH_USER"; then
       true
     else
       runChrootCommand "useradd -m -G wheel -s /bin/bash $BREATH_USER"
