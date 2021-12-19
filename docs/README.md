@@ -49,11 +49,11 @@ Due to licensing restraints, you cannot just download an ISO of Breath and flash
 **Prerequisite:** Git is installed and you have a mainstream, fast USB plugged in
 
 1. `git clone https://github.com/MilkyDeveloper/cb-linux && cd cb-linux`
-2. `bash setup.sh cli`
+2. `bash setup.sh cli ubuntu`
 (should take ~15 minutes on a 4-core mobile processor)
 
 > * **Using the CLI argument installs a minimal CLI (no desktop!) environment on the USB.** If you would like to install a desktop, you can use `gnome`, `kde`, `minimal`, `deepin`, `xfce`, `lxqt`, `mate` or `openbox` instead of `cli`.
-> * You can run `bash setup.sh cli arch` to put Arch Linux on the USB. Currently, desktops have to be manually installed on Arch.
+> * You can replace `ubuntu` with `arch` (you can only use `cli`) or `debian` (all desktops are supported)
 
 3. Done! Now just boot into ChromeOS, enter the shell (<kbd>CTRL</kbd> <kbd>ALT</kbd> <kbd>T</kbd>, `shell`), and run:  
 `sudo crossystem dev_boot_usb=1; sudo crossystem dev_boot_signed_only=0; sync`  
