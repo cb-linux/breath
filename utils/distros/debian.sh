@@ -23,23 +23,23 @@ function postinstall {
         ;;
       
       deepin)
-        echo "Deepin is not supported in Ubuntu"
+        echo "Deepin is not supported in Ubuntu"; exit
         ;;
 
       mate)
-        export DESKTOP_PACKAGE="apt install -y ubuntu-mate-desktop"
+        export DESKTOP_PACKAGE="apt install -y mate-desktop-environment"
         ;;
 
       xfce)
-        export DESKTOP_PACKAGE="apt install -y xubuntu-desktop"
+        export DESKTOP_PACKAGE="apt install -y task-xfce-desktop"
         ;;
 
       lxqt)
-        export DESKTOP_PACKAGE="apt install -y lubuntu-desktop"
+        export DESKTOP_PACKAGE="apt install -y task-lxqt-desktop"
         ;;
 
       kde)
-        export DESKTOP_PACKAGE="apt install -y kde-standard"
+        export DESKTOP_PACKAGE="apt install -y task-kde-desktop"
         ;;
 
       openbox)
