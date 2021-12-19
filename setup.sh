@@ -88,7 +88,7 @@ until sudo chroot /mnt bash -c "passwd root"; do printerr "Retrying Password"; s
 
 # Copy (hopefully up-to-date) firmware from the host to the USB
 sudo mkdir -p /mnt/lib/firmware
-sudo cp -Rv /lib/firmware/* /mnt/lib/firmware
+sudo cp -Rv /lib/firmware/* /mnt/lib/firmware || true
 syncStorage
 
 # Extract the modules to /mnt
