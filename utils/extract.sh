@@ -32,9 +32,8 @@ function extractRootfs {
 			;;
 
 		debian)
-            # Debootstrap Debian Stable
-			# TODO: add versioning support to install unstable
-			sudo debootstrap stable /mnt http://deb.debian.org/debian/
+            # Debootstrap Debian Unstable
+			sudo debootstrap unstable /mnt http://deb.debian.org/debian/
 		    ;;
 
 		*)
