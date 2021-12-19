@@ -108,7 +108,7 @@ EOT
     set -e
 
     # Only create a new user and add it to the sudo group if the user doesn't already exist
-    if runChrootCommand "id $BREATH_USER &>/dev/null"; then
+    if runChrootCommand "id $BREATH_USER"; then
       true
     else
       runChrootCommand "adduser $BREATH_USER && usermod -aG sudo $BREATH_USER"

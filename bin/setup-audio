@@ -19,8 +19,9 @@ echo "Installing Audio (OTB for KBL DA7219 max98357a, see $(which setup-audio) f
 export SND_DEVICE=${SND_CARD}${SND_BOARD}
 
 # Copy the firmware and create the correct UCM Files
+sudo apt purge pulseaudio
 sudo apt purge pulseaudio*
-sudo mount -t ext2 -o ro /dev/mmcblk0p3 /mnt
+sudo mount -t ext2 -o ro /dev/mmcblk0p3 /mnt || sudo mount -t ext2 -o ro /dev/mmcblk1p3 /mnt
 sudo cp -r /mnt/lib/firmware/* /lib/firmware
 sudo cp -r /mnt/usr/share/alsa/ucm/${SND_DEVICE} /usr/share/alsa/ucm2/${SND_CARD}
 sudo umount /mnt
