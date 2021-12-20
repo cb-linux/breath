@@ -22,8 +22,8 @@ export SND_DEVICE=${SND_CARD}${SND_BOARD}
 sudo apt purge pulseaudio
 sudo apt purge pulseaudio*
 sudo mount -t ext2 -o ro /dev/mmcblk0p3 /mnt || sudo mount -t ext2 -o ro /dev/mmcblk1p3 /mnt
-sudo cp -r /mnt/lib/firmware/* /lib/firmware
-sudo cp -r /mnt/usr/share/alsa/ucm/${SND_DEVICE} /usr/share/alsa/ucm2/${SND_CARD}
+sudo cp -rv /mnt/lib/firmware/* /lib/firmware
+sudo cp -rv /mnt/usr/share/alsa/ucm/${SND_DEVICE} /usr/share/alsa/ucm2/${SND_CARD}
 sudo umount /mnt
 sudo mv /usr/share/alsa/ucm2/${SND_CARD}/${SND_DEVICE}.conf /usr/share/alsa/ucm2/${SND_CARD}/${SND_CARD}.conf
 sudo sed -i '1s/^/Syntax 2\n/' /usr/share/alsa/ucm2/${SND_CARD}/${SND_CARD}.conf

@@ -6,9 +6,15 @@ function bootstrapFiles {
   mkdir -p ~/linux-build
   cd ~/linux-build
 
+  case "$(grep -ioP '^ID=\K.+' /etc/os-release)" in
+    ubuntu) FW_PACKAGE=linux-firmware ;;
+    debian) FW_PACKAGE="firmware-linux-free firmware-linux-nonfree" ;;
+  esac
+
   # If the ChromeOS firmware utility doesn't exist, install it and other packages
   printq "Installing Dependencies"
-  sudo apt install -y vboot-kernel-utils arch-install-scripts git wget linux-firmware cgpt
+  sudo apt install -y vboot-kernel-utils arch-install-scripts git wget cgpt $FW_PACKAGE
+
 
   # Download the kernel bzImage and the kernel modules (wget)
   {
