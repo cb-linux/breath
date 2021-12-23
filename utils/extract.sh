@@ -52,6 +52,7 @@ function extractModules {
 	sudo mkdir -p /mnt/lib/modules
 	mkdir -p modules || sudo rm -rf modules; sudo mkdir -p modules
 	sudo tar xvpf modules.tar.xz -C modules
+	sudo rm -rf /mnt/lib/modules/*
 	sudo cp -rv modules/lib/modules/* /mnt/lib/modules
 	syncStorage
 	

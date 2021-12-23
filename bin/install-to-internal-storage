@@ -40,4 +40,5 @@ futility vbutil_kernel --repack bzImage.signed --keyblock /usr/share/vboot/devke
 # Flash the kernel to the partition
 sudo dd if=bzImage.signed of=${USB}p1
 
+sync
 echo "Done! Use CTRL+D to boot from the internal storage next time."

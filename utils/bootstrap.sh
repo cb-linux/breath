@@ -75,7 +75,7 @@ function bootstrapFiles {
       ;;
   esac
 
-  # Sign the kudhddernel
+  # Sign the kernel
   # After this, the kernel can no longer be booted on non-depthcharge devices
   futility vbutil_kernel \
     --arch x86_64 --version 1 \
