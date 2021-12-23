@@ -44,7 +44,7 @@ printq "Where is your USB mounted? (e.g. /mnt/chromeos/removable/'USB Drive') "
 read MNT_FOLDER
 
 # Symlink it without spaces
-sudo ln -s "$MNT_FOLDER" /mnt/usb
+sudo ln -s "${MNT_FOLDER}/" /mnt/usb
 export MNT=/mnt/usb
 
 # Ask for username
