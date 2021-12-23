@@ -1,6 +1,6 @@
 #!/bin/bash
 
-read -p "What kernel version would you like? (5.4) " KERNEL_VERSION
+read -p "What kernel version would you like? (5.10) " KERNEL_VERSION
 
 read -p "Are you satisfied with the current logo? " -n 1 -r
 echo
