@@ -44,7 +44,7 @@ Reef:
 ## Running Breath
 
 Due to licensing restraints, you cannot just download an ISO of Breath and flash it. Instead, you *build* the bootable USB.
-> Currently, this project can only work on Debian or Ubuntu. Running this on Arch or Fedora is unsupported.
+> Currently, this project can only work on a **full install** of Debian or Ubuntu (**not Crouton or Crostini**). Running this on Arch or Fedora is unsupported.
 
 **Prerequisite:** Git is installed and you have a mainstream, fast USB plugged in
 
