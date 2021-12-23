@@ -38,13 +38,13 @@ toilet -f mono12 -F crop   "Breath"
 toilet -f term   -F border "Made by MilkyDeveloper"
 
 # Ask where the USB is mounted
-echo "Folders in /mnt/chromeos:"
-ls /mnt/chromeos/removable
-printq "Where is your USB mounted? (e.g. /mnt/chromeos/removable/'USB Drive') "
-read MNT_FOLDER
+# echo "Folders in /mnt/chromeos:"
+# ls /mnt/chromeos/removable
+# printq "Where is your USB mounted? (e.g. /mnt/chromeos/removable/'USB Drive') "
+# read MNT_FOLDER
 
 # Symlink it without spaces
-sudo ln -s "${MNT_FOLDER}/" /mnt/usb
+sudo ln -s /mnt/chromeos/removable/*/ /mnt/usb
 export MNT=/mnt/usb
 
 # Ask for username
