@@ -41,8 +41,11 @@ toilet -f term   -F border "Made by MilkyDeveloper"
 echo "Folders in /mnt/chromeos:"
 ls /mnt/chromeos/removable
 printq "Where is your USB mounted? (e.g. /mnt/chromeos/removable/'USB Drive') "
-read MNT
-export MNT
+read MNT_FOLDER
+
+# Symlink it without spaces
+sudo ln -s "$MNT_FOLDER" /mnt/usb
+export MNT=/mnt/usb
 
 # Ask for username
 printq "What would you like your username to be? (no spaces, backslashes, or special characters)"
