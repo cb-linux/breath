@@ -14,7 +14,6 @@ source utils/extract.sh   # Extract Rootfs
 export DESKTOP=$1
 export DISTRO=$2
 export DISTRO_VERSION=$3
-export MNT="/mnt"
 ORIGINAL_DIR=$(pwd)
 
 # Import a seperate postinstall function depending on the distro
@@ -38,6 +37,11 @@ done
 toilet -f mono12 -F crop   "Breath"
 toilet -f term   -F border "Made by MilkyDeveloper"
 
+# Ask where the USB is mounted
+echo "Folders in /mnt/chromeos:"
+ls /mnt/chromeos
+echo "Where is your USB mounted? (e.g. /mnt/chromeos/'USB Drive')"
+
 # Ask for username
 printq "What would you like your username to be? (no spaces, backslashes, or special characters)"
 read -r BREATH_USER
@@ -45,35 +49,6 @@ export BREATH_USER
 
 # Bootstrap files
 bootstrapFiles
-
-# Wait for a USB to be plugged in
-waitForUSB
-
-# Ask user which USB Device they would like to use
-printq "Which USB Drive or SD Card would you like to use (e.g. /dev/sda)? All data on the drive will be wiped!"
-lsblk -o name,model,tran | grep --color=never "usb"
-read USB
-printq "Ok, using $USB to install Linux"
-
-# Unmount all partitions on the USB and /mnt
-unmountUSB
-
-# Partition the USB
-partitionUSB
-
-# Our USB has now been fully partitioned
-# (1) Write the kernel to a 64mb Partition
-# (2) Write a Linux distro rootfs to a partition filling the rest of the storage
-
-# Flash the signed kernel to the kernel partition
-sudo dd if=bzImage.signed of=${USB}1
-
-# Format the root partition as ext4 and mount it to /mnt
-yes | sudo mkfs.ext4 ${USB}2
-syncStorage
-sudo umount $MNT || sudo umount -lf $MNT || true
-sudo rm -rf ${MNT}/*
-sudo mount ${USB}2 $MNT
 
 # Extract the rootfs
 extractRootfs

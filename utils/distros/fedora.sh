@@ -3,12 +3,13 @@
 function postinstall {
 
     # Setup internet
-    sudo cp --remove-destination /etc/resolv.conf /mnt/etc/resolv.conf
+    sudo cp --remove-destination /etc/resolv.conf ${MNT}/etc/resolv.conf
 
     printq "Installing core packages"
     
     # Install basic packages regardless of desktop (modprobe isn't installed in Fedora container edition????)
-    sudo chroot /mnt /bin/sh -c "dnf group install 'Minimal Install' -y; dnf install NetworkManager-tui ncurses -y"
+    sudo chroot $MNT /bin/sh -c "dnf update -y; dnf install linux-firmware -y"
+    sudo chroot $MNT /bin/sh -c "dnf group install 'Minimal Install' -y; dnf install NetworkManager-tui ncurses -y"
 
     # Download the desktop that the user has selected
     case $DESKTOP in
@@ -55,7 +56,7 @@ function postinstall {
     esac
 
     # Install nonfree repos
-    sudo chroot /mnt /bin/bash -c "sudo dnf install https://download1.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-\$(rpm -E %fedora).noarch.rpm -y"
+    sudo chroot $MNT /bin/bash -c "sudo dnf install https://download1.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-\$(rpm -E %fedora).noarch.rpm -y"
 
     # Disable plymouth (sometimes fails for no apparent reason)
     runChrootCommand "plymouth-set-default-theme details -R &> /dev/null" || true
@@ -84,10 +85,10 @@ function postinstall {
 
     # Set a password for the new user
     printq 'Ignore any errors reading "bad password"'
-    until sudo chroot /mnt bash -c "passwd $BREATH_USER"; do printerr "Retrying Password"; sleep 1; done
+    until sudo chroot $MNT bash -c "passwd $BREATH_USER"; do printerr "Retrying Password"; sleep 1; done
 
     # Add the user to the sudoers group
-    sudo tee -a /mnt/etc/sudoers > /dev/null <<EOT
+    sudo tee -a ${MNT}/etc/sudoers > /dev/null <<EOT
     %wheel ALL=(ALL) ALL
 EOT
 
@@ -95,10 +96,10 @@ EOT
     # TODO: Fix huuuge security hole
     # https://www.linuxquestions.org/questions/linux-security-4/su-bin-bash-permission-denied-458043/#post3844899
     {
-    sudo chmod -R 755 /mnt
-    sudo chmod -R 555 /mnt/proc
-    sudo chmod -R 750 /mnt/root
-    sudo chmod -R 777 /mnt/tmp
+    sudo chmod -R 755 ${MNT}
+    sudo chmod -R 555 ${MNT}/proc
+    sudo chmod -R 750 ${MNT}/root
+    sudo chmod -R 777 ${MNT}/tmp
     } || true
 
 }

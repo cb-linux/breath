@@ -22,7 +22,7 @@ EOT
     sudo arch-chroot /tmp/arch bash -c "pacman-key --init; pacman-key --populate archlinux"
 
     # Pacstrap /mnt
-    sudo mount --bind /mnt /tmp/arch/mnt
+    sudo mount --bind ${MNT} /tmp/arch/mnt
     sudo arch-chroot /tmp/arch bash -c "pacstrap /mnt base base-devel nano" # Vim is bad
     sudo umount -f /tmp/arch/mnt || true
 
@@ -41,10 +41,10 @@ EOT
     fi
 
     # Add the user to the sudoers group
-    sudo tee -a /mnt/etc/sudoers > /dev/null <<EOT
+    sudo tee -a ${MNT}/etc/sudoers > /dev/null <<EOT
     %wheel ALL=(ALL) ALL
 EOT
 
     # Install nmcli for wifi
-    sudo arch-chroot /mnt bash -c "pacman -S networkmanager"
+    sudo arch-chroot $MNT bash -c "pacman -S networkmanager"
 }

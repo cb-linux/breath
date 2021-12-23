@@ -53,10 +53,10 @@ function waitForUSB {
 # Function to unmount all partitions on the USB and /mnt
 # This command may fail, so use || true
 function unmountUSB {
-  (sudo umount ${USB}*; sudo umount /mnt; sudo umount /media/*/*) || true
+  (sudo umount ${USB}*; sudo umount $MNT; sudo umount /media/*/*) || true
 }
 
 # Function for running a command in the chroot
 function runChrootCommand {
-  sudo chroot /mnt /bin/sh -c "$1"
+  sudo chroot $MNT /bin/sh -c "$1"
 }

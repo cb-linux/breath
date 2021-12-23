@@ -26,20 +26,20 @@ function extractRootfs {
 			sudo tar xvpf $DISTRO_ROOTFS -C fedora
 			cp fedora/6c00560306a90bf0718a9a003defbc89a0d6441b8ec719a69416eba6a06c3218/layer.tar rootfs.tar
 			DISTRO_ROOTFS_ABSOLUTE=$(readlink -f rootfs.tar)
-			cd /mnt
+			cd $MNT
 			sudo tar --wildcards -xvpf "$DISTRO_ROOTFS_ABSOLUTE" "./*"
 			cd ~/linux-build
 			;;
 
 		debian)
             # Debootstrap Debian Unstable
-			sudo debootstrap unstable /mnt http://deb.debian.org/debian/
+			sudo debootstrap unstable $MNT http://deb.debian.org/debian/
 		    ;;
 
 		*)
 			# Assume any other distro has all the root files in the root of the archive
 			# Extract the rootfs to the USB Drive
-			sudo tar xvpf $DISTRO_ROOTFS -C /mnt
+			sudo tar xvpf $DISTRO_ROOTFS -C $MNT
 			;;
 			
 	esac
@@ -49,11 +49,11 @@ function extractRootfs {
 
 function extractModules {
 
-	sudo mkdir -p /mnt/lib/modules
+	sudo mkdir -p ${MNT}/lib/modules
 	mkdir -p modules || sudo rm -rf modules; sudo mkdir -p modules
 	sudo tar xvpf modules.tar.xz -C modules
-	sudo rm -rf /mnt/lib/modules/*
-	sudo cp -rv modules/lib/modules/* /mnt/lib/modules
+	sudo rm -rf ${MNT}/lib/modules/*
+	sudo cp -rv modules/lib/modules/* ${MNT}/lib/modules
 	syncStorage
 	
 }

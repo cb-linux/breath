@@ -3,13 +3,13 @@
 function postinstall {
     
     # Setup internet
-    sudo cp --remove-destination /etc/resolv.conf /mnt/etc/resolv.conf
+    sudo cp --remove-destination /etc/resolv.conf ${MNT}/etc/resolv.conf
 
     # We're installing the below packages for a cli environment and all desktops
-    BASECMD="apt install -y network-manager tasksel software-properties-common adduser sudo"
+    BASECMD="apt install -y network-manager tasksel software-properties-common adduser sudo firmware-linux-free firmware-linux-nonfree"
 
     # We need to load the iwlmvm module at startup for WiFi
-    sudo sh -c 'echo '\''iwlmvm'\'' >> /mnt/etc/modules'
+    sudo sh -c 'echo '\''iwlmvm'\'' >> ${MNT}/etc/modules'
 
     # Download the desktop that the user has selected
     case $DESKTOP in

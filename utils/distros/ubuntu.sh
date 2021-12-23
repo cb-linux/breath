@@ -2,7 +2,7 @@
 
 function postinstall {
     # Setup internet
-    sudo cp --remove-destination /etc/resolv.conf /mnt/etc/resolv.conf
+    sudo cp --remove-destination /etc/resolv.conf ${MNT}/etc/resolv.conf
 
     # Add universe to /etc/apt/sources.list so we can install normal packages
     cat > sources.list << EOF
@@ -11,28 +11,28 @@ function postinstall {
     deb http://us.archive.ubuntu.com/ubuntu  ${DISTRO_CODENAME}-updates  main universe multiverse
 EOF
 
-    sudo cp sources.list /mnt/etc/apt/
+    sudo cp sources.list ${MNT}/etc/apt/
 
     case $DESKTOP in
       cli)
-        BASECMD="apt install -y network-manager tasksel software-properties-common"
+        BASECMD="apt install -y linux-firmware network-manager tasksel software-properties-common"
         ;;
 
       *)
-        BASECMD="apt install -y network-manager lightdm lightdm-gtk-greeter fonts-roboto yaru-theme-icon materia-gtk-theme budgie-wallpapers-focal tasksel software-properties-common; fc-cache"
+        BASECMD="apt install -y linux-firmware network-manager lightdm lightdm-gtk-greeter fonts-roboto yaru-theme-icon materia-gtk-theme budgie-wallpapers-focal tasksel software-properties-common; fc-cache"
         ;;
     esac
 
     # Chroot into the rootfs to install some packages
-    sudo mount --bind /dev /mnt/dev
+    sudo mount --bind /dev ${MNT}/dev
     runChrootCommand "apt update; $BASECMD"
-    sudo umount /mnt/dev || sudo umount -lf /mnt/dev
+    sudo umount ${MNT}/dev || sudo umount -lf ${MNT}/dev
     syncStorage
 
     if [ $DESKTOP != "cli" ]; then
       # Rice LightDM
       # Use the Materia GTK theme, Yaru Icon theme, and Budgie Wallpapers
-      sudo tee -a /mnt/etc/lightdm/lightdm-gtk-greeter.conf > /dev/null <<EOT
+      sudo tee -a ${MNT}/etc/lightdm/lightdm-gtk-greeter.conf > /dev/null <<EOT
       theme-name=Materia
       icon-theme-name=Yaru
       font-name=Roboto
@@ -42,7 +42,7 @@ EOT
     fi
 
     # We need to load the iwlmvm module at startup for WiFi
-    sudo sh -c 'echo '\''iwlmvm'\'' >> /mnt/etc/modules'
+    sudo sh -c 'echo '\''iwlmvm'\'' >> ${MNT}/etc/modules'
 
     # Desktop installation fails without this
     runChrootCommand "apt update -y"
@@ -98,7 +98,7 @@ EOT
     # instead of whatever the user chose.
     # We can fix this by removing the GNOME session and deleting the shell.
     if [[ $DESKTOP != "gnome" ]]; then
-      sudo rm /mnt/usr/share/xsessions/ubuntu.desktop || true
+      sudo rm ${MNT}/usr/share/xsessions/ubuntu.desktop || true
       runChrootCommand "apt remove gnome-shell -y; apt autoremove -y" || true
     fi
 

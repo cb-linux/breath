@@ -4,18 +4,13 @@ function bootstrapFiles {
 
   # This doesn't have to do with bootstrapping, but helps later
   # Exit if there are files in /mnt
-  [ "$(ls -A /mnt)" ] && {
-    "There are files in /mnt! Please clear this directory of any valuable information!"; exit
+  [ "$(ls -A ${MNT})" ] && {
+    "There are files in ${MNT}! Please clear this directory of any valuable information!"; exit
   }
 
   # Make a directory and CD into it
   mkdir -p ~/linux-build
   cd ~/linux-build
-
-  case "$(grep -ioP '^ID=\K.+' /etc/os-release)" in
-    ubuntu) FW_PACKAGE=linux-firmware ;;
-    debian) FW_PACKAGE="firmware-linux-free firmware-linux-nonfree" ;;
-  esac
 
   # If the ChromeOS firmware utility doesn't exist, install it and other packages
   printq "Installing Dependencies"
