@@ -6,3 +6,4 @@ kernel/*
 !kernel/logo
 kernel/logo/*
 !kernel/logo/logo.png
+!kernel/genimg.sh
