@@ -5,6 +5,7 @@ function bootstrapFiles {
   # This doesn't have to do with bootstrapping, but helps later
   # Exit if there are files in /mnt
   [ "$(ls -A ${MNT})" ] && {
+    sudo rm -rf ${MNT}/lost+found
     "There are files in ${MNT}! Please clear this directory of any valuable information!"; exit
   }
 
