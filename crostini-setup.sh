@@ -39,8 +39,10 @@ toilet -f term   -F border "Made by MilkyDeveloper"
 
 # Ask where the USB is mounted
 echo "Folders in /mnt/chromeos:"
-ls /mnt/chromeos
-echo "Where is your USB mounted? (e.g. /mnt/chromeos/'USB Drive')"
+ls /mnt/chromeos/removable
+printq "Where is your USB mounted? (e.g. /mnt/chromeos/removable/'USB Drive') "
+read MNT
+export MNT
 
 # Ask for username
 printq "What would you like your username to be? (no spaces, backslashes, or special characters)"
