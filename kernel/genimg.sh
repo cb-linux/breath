@@ -38,6 +38,9 @@ sudo dd if=bzImage.signed of=${MAPPER}p1
 # Format the larger partition to ext4
 sudo mkfs.ext4 ${MAPPER}p2
 
+# Write storage
+sync
+
 # Unmount mapper devices
 sudo kpartx -dv $IMG
 
