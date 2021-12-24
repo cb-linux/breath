@@ -45,6 +45,7 @@ futility vbutil_kernel \
 sudo dd if=bzImage.signed of=${USB}1
 
 # Extract modules
+sudo rm -rf ~/linux-build/modules/lib/modules/*
 extractModules
 
 # Write Storage
