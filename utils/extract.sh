@@ -49,6 +49,9 @@ function extractRootfs {
 
 function extractModules {
 
+	# It is crucial to have MNT defined
+	set -u
+
 	sudo mkdir -p ${MNT}/lib/modules
 	mkdir -p modules || sudo rm -rf modules; sudo mkdir -p modules
 	sudo tar xvpf modules.tar.xz -C modules

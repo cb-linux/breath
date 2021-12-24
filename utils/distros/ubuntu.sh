@@ -42,7 +42,9 @@ EOT
     fi
 
     # We need to load the iwlmvm module at startup for WiFi
-    sudo sh -c 'echo '\''iwlmvm'\'' >> ${MNT}/etc/modules'
+    sudo tee -a ${MNT}/etc/modules > /dev/null <<EOT
+    iwlmvm
+EOT
 
     # Desktop installation fails without this
     runChrootCommand "apt update -y"
