@@ -3,6 +3,8 @@
 source utils/functions.sh
 source utils/extract.sh
 
+export MNT=/mnt
+
 [[ -n "$1" ]] && { export DIR=$1; }
 
 # Ask user which USB Device they would like to use
