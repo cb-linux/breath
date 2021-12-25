@@ -4,31 +4,19 @@ set -e
 
 echo "Installing Audio..."
 
-# Configuration
-# You can adapt these to support other KBL/SKL devices
+# With SOF, configuration becomes much easier
+# Everything is pretty much universal, like HD-Audio
+case $SOUNDCARD in # TODO: add realtek support for octopus
+    "rtk") SND_MODULES="snd_soc_max98357a snd_soc_rt5682"
+    ;;
+    *) SND_MODULES="snd_soc_max98357a snd_soc_da7219"
+    ;;
+esac
 
-# Apollo Lake / coral:
-# SND_CARD=bxtda7219max
-# SND_BOARD=.coral
-# SND_MODULE=snd_soc_sst_bxt_da7219_max98357a
-
-[[ -n "$SND_CARD"   ]] || { export SND_CARD=kblda7219max; }
-[[ -n "$SND_BOARD"  ]] || { export SND_BOARD=.nami; }
-[[ -n "$SND_MODULE" ]] || { export SND_MODULE=snd_soc_kbl_da7219_max98357a; }
-
-export SND_DEVICE=${SND_CARD}${SND_BOARD}
-
-# Copy the firmware and create the correct UCM Files
+# Remove PulseAudio (maybe not needed)
 sudo apt purge pulseaudio
 sudo apt purge pulseaudio*
-sudo mount -t ext2 -o ro /dev/mmcblk0p3 /mnt || sudo mount -t ext2 -o ro /dev/mmcblk1p3 /mnt
-sudo cp -rv /mnt/lib/firmware/* /lib/firmware
-sudo cp -rv /mnt/usr/share/alsa/ucm/${SND_DEVICE} /usr/share/alsa/ucm2/${SND_CARD}
-sudo umount /mnt
-sudo mv /usr/share/alsa/ucm2/${SND_CARD}/${SND_DEVICE}.conf /usr/share/alsa/ucm2/${SND_CARD}/${SND_CARD}.conf
-sudo sed -i '1s/^/Syntax 2\n/' /usr/share/alsa/ucm2/${SND_CARD}/${SND_CARD}.conf
-sudo sed -i '/Pin/{/Mux/ d}' /usr/share/alsa/ucm2/${SND_CARD}/HiFi.conf
-sudo apt install alsa-base alsa-utils apulse
+sudo apt install alsa-base alsa-utils apulse firmware-sof-signed
 
 # Enable Dmix (multiple app audio output) and software master volume control
 sudo tee /etc/asound.conf <<EOF
@@ -50,6 +38,7 @@ pcm.softvol {
 EOF
 
 # Add a systemd service to start sound
+# ${SND_MODULE} is expanded to the variable above
 sudo tee /etc/systemd/system/alsa-reload.service <<EOF
 [Unit]
 Description="Reload ALSA and set the correct UCM"
@@ -57,7 +46,7 @@ Description="Reload ALSA and set the correct UCM"
 [Service]
 User=root
 WorkingDirectory=/
-ExecStart=/bin/bash -c 'modprobe ${SND_MODULE} && alsa reload && sleep 2 && alsaucm -c ${SND_CARD} set _verb HiFi set _enadev Speaker'
+ExecStart=/bin/bash -c 'modprobe ${SND_MODULES} && alsa reload'
 
 [Install]
 WantedBy=multi-user.target
