@@ -6,40 +6,20 @@ function postinstall {
 
     # Add universe to /etc/apt/sources.list so we can install normal packages
     cat > sources.list << EOF
-    deb http://us.archive.ubuntu.com/ubuntu  ${DISTRO_CODENAME}          main universe multiverse restricted 
-    deb http://us.archive.ubuntu.com/ubuntu  ${DISTRO_CODENAME}-security main universe multiverse restricted
-    deb http://us.archive.ubuntu.com/ubuntu  ${DISTRO_CODENAME}-updates  main universe multiverse restricted
+    deb http://us.archive.ubuntu.com/ubuntu  ${DISTRO_CODENAME}          main universe multiverse 
+    deb http://us.archive.ubuntu.com/ubuntu  ${DISTRO_CODENAME}-security main universe multiverse
+    deb http://us.archive.ubuntu.com/ubuntu  ${DISTRO_CODENAME}-updates  main universe multiverse
 EOF
 
     sudo cp sources.list ${MNT}/etc/apt/
 
-    case $DESKTOP in
-      cli)
-        BASECMD="apt install -y linux-firmware network-manager tasksel software-properties-common"
-        ;;
-
-      *)
-        BASECMD="apt install -y linux-firmware network-manager lightdm lightdm-gtk-greeter fonts-roboto yaru-theme-icon materia-gtk-theme budgie-wallpapers-focal tasksel software-properties-common; fc-cache"
-        ;;
-    esac
+    BASECMD="apt install -y linux-firmware network-manager tasksel software-properties-common"
 
     # Chroot into the rootfs to install some packages
     sudo mount --bind /dev ${MNT}/dev
     runChrootCommand "apt update; $BASECMD"
     sudo umount ${MNT}/dev || sudo umount -lf ${MNT}/dev
     syncStorage
-
-    if [ $DESKTOP != "cli" ]; then
-      # Rice LightDM
-      # Use the Materia GTK theme, Yaru Icon theme, and Budgie Wallpapers
-      sudo tee -a ${MNT}/etc/lightdm/lightdm-gtk-greeter.conf > /dev/null <<EOT
-      theme-name=Materia
-      icon-theme-name=Yaru
-      font-name=Roboto
-      xft-dpi=120
-      background=/usr/share/backgrounds/budgie/blue-surface_by_gurjus_bhasin.jpg
-EOT
-    fi
 
     # We need to load the iwlmvm module at startup for WiFi
     sudo tee -a ${MNT}/etc/modules > /dev/null <<EOT
@@ -96,18 +76,21 @@ EOT
     printerr "Ignore libfprint-2-2 fprintd libpam-fprintd errors"
 
     # GDM3 installs minimal GNOME
-    # This makes the default session in LightDM GNOME,
-    # instead of whatever the user chose.
+    # instead of whatever the user choses.
     # We can fix this by removing the GNOME session and deleting the shell.
     if [[ $DESKTOP != "gnome" ]]; then
       sudo rm ${MNT}/usr/share/xsessions/ubuntu.desktop || true
       runChrootCommand "apt remove gnome-shell -y; apt autoremove -y" || true
     fi
 
-    runChrootCommand "apt remove gdm3 pulseaudio"
+    runChrootCommand "apt remove pulseaudio"
     printerr "Ignore libfprint-2-2 fprintd libpam-fprintd errors"
     syncStorage
     set -e
+
+    # Fix for GDM3
+    # https://askubuntu.com/questions/1239503/ubuntu-20-04-and-20-10-etc-securetty-no-such-file-or-directory
+    sudo cp ${MNT}/usr/share/doc/util-linux/examples/securetty ${MNT}/etc/securetty
 
     # Only create a new user and add it to the sudo group if the user doesn't already exist
     if runChrootCommand "id $BREATH_USER"; then
