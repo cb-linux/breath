@@ -23,10 +23,6 @@
 
 <h3 align="center"><a href="https://milkydeveloper.github.io/cb-linux/docs.html#/">📄 Please visit the docs here 📄</a></h3>
 
-<p align="center">
-  <img src="https://img.shields.io/github/downloads/milkydeveloper/cb-linux/total?style=for-the-badge" />
-</p>
-
 ## How does everything work?
 
 This project uses the ChromeOS Kernel and the firmware. Touchscreen and all other peripherals *just work*. Breath has been carefully designed not to have any legal issues, so you can't flash the ISO or have the audio firmware bundled.
