@@ -13,10 +13,11 @@ case $SOUNDCARD in # TODO: add realtek support for octopus
     ;;
 esac
 
-# Remove PulseAudio (maybe not needed)
+# Remove PulseAudio
 sudo apt purge pulseaudio
 sudo apt purge pulseaudio*
-sudo apt install alsa-base alsa-utils apulse firmware-sof-signed
+sudo apt install -y alsa-base alsa-utils apulse
+sudo apt install -y firmware-sof-signed || sudo apt-get -o Dpkg::Options::="--force-overwrite" install firmware-sof-signed
 
 # Enable Dmix (multiple app audio output) and software master volume control
 sudo tee /etc/asound.conf <<EOF
