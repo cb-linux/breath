@@ -12,7 +12,7 @@
 However, this project is being developed on `Nami`, so the following models will have audio support:
 
 > ### Is your Chromebook not on the list?
-> That's completely fine! As long as it's newer than 2017, chances are that most drivers will already be supported except audio. If you would like audio working, open up a Github Issue with your Chromebook model and post the output of the commands `lsmod` and `find /usr/share/alsa`.
+> That's completely fine! As long as it's newer than 2017, chances are that most drivers will already be supported except audio. **If it is newer than 2019, chances are that audio is already supported**. If you would like audio working, open up a Github Issue with your Chromebook model and post the output of the commands `lsmod` and `find /usr/share/alsa`.
 
 Nami:
 * Acer Chromebook 13 / Spin 13
@@ -24,22 +24,35 @@ Nami:
 * HP Chromebook 15 G1
 * Dell Inspiron Chromebook 14 (7460)
 
-Coral:
-* Acer Chromebook 11 (C732, C732T, C732L & C732LT)
-* Lenovo 100e Chromebook
-* Lenovo 500e Chromebook
-* Acer Chromebook 11 (CB311-8H & CB311-8HT)
-* Acer Chromebook Spin 11 (CP311-1H & CP311-1HN)
-* CTL Chromebook J41
-* CTL Chromebook NL7
-* CTL Chromebook NL7T-360
-* ASUS Chromebook C223
-* ASUS Chromebook C423
-* ASUS Chromebook C523
-
-Reef:
-* Asus Flip C213
-* Acer Chromebook Spin 11 R751T
+Octopus:
+* HP Chromebook x360 14b (Blooguard)
+* Acer Chromebook 311
+* Acer Chromebook Spin 511
+* Lenovo 300e Chromebook 2nd Gen (Intel)
+* Lenovo 100e Chromebook 2nd Gen (Intel)
+* Lenovo 500e Chromebook 2nd Gen
+* Acer Chromebook Spin 512 (R851TN)
+* Acer Chromebook 512 (C851/C851T)
+* ASUS Chromebook Flip C204
+* ASUS Chromebook Flip C214
+* HP Chromebook x360 11 G2 EE
+* HP Chromebook 11 G7 EE
+* Lenovo Chromebook C340-11
+* Lenovo Chromebook S340-14
+* Acer Chromebook 315 (CB315-3H/3HT)
+* Acer Chromebook 314 (CB314-1H/1HT)
+* Acer Chromebook Spin 311 (CP311-2H)
+* Acer Chromebook 311 (CB311-9HT/9H)
+* Samsung Chromebook 4
+* Samsung Chromebook+
+* HP Chromebook x360 11 G3 EE
+* HP Chromebook 14 G6
+* HP Chromebook 11 G8 EE
+* HP Chromebook 14a
+* Acer Chromebook 314 (C933L/LT)
+* Ideapad 3 Chromebook
+* ASUS Chromebook CX1101
+* ASUS Chromebook C424
 
 ## Running Breath
 
@@ -68,8 +81,8 @@ If your device is one of the devices on the above list, you can enable audio.
 Once booted into Breath run the command depending on your device's board:
 
 - Nami: `setup-audio`
-- Coral: ```SND_CARD=bxtda7219max SND_BOARD=.coral SND_MODULE=snd_soc_sst_bxt_da7219_max98357a setup-audio```
-- Reef: ```SND_CARD=bxtda7219max SND_BOARD=.reef.ELECTRO SND_MODULE=snd_soc_sst_bxt_da7219_max98357a setup-audio```
+- Octopus: `sof-setup-audio`
+  - Doesn't work? Try `SOUNDCARD=rtk sof-setup-audio`
 
 If it is not, that's completely expected! Open up a Github Issue with your Chromebook model and I'll  get audio working.
 
