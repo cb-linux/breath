@@ -38,7 +38,9 @@ function bootstrapFiles {
 
       # Download the Ubuntu rootfs if it doesn't exist
       DISTRO_ROOTFS="ubuntu-rootfs.tar.xz"
-      wget http://cloud-images.ubuntu.com/releases/${DISTRO_RELEASE}/release/ubuntu-${DISTRO_RELEASE}-server-cloudimg-amd64-root.tar.xz -O $DISTRO_ROOTFS -q --show-progress || exit
+      wget http://cloud-images.ubuntu.com/releases/${DISTRO_RELEASE}/release/ubuntu-${DISTRO_RELEASE}-server-cloudimg-amd64-root.tar.xz -O $DISTRO_ROOTFS -q --show-progress || {
+        echo "You have supplied an invalid Ubuntu version. It may not be released yet."; exit;
+      }
       ;;
 
   arch)
