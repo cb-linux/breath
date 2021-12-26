@@ -67,8 +67,9 @@ Due to licensing restraints, you cannot just download an ISO of Breath and flash
 
 > * **Using the CLI argument installs a minimal CLI (no desktop!) environment on the USB.** If you would like to install a desktop, you can use `gnome`, `kde`, `minimal`, `deepin`, `xfce`, `lxqt`, `mate` or `openbox` instead of `cli`.
 > * You can replace `ubuntu` with `arch` (you can only use `cli`) or `debian` (all desktops are supported)
+> * Ubuntu supports custom versions. If you want to install Ubuntu 22.04, just run: `bash setup.sh cli ubuntu jammy-22.04`, where `jammy` is the codename and `22.04` is the version.
 
-3. Done! Now just boot into ChromeOS, enter the shell (<kbd>CTRL</kbd> <kbd>ALT</kbd> <kbd>T</kbd>, `shell`), and run:  
+1. Done! Now just boot into ChromeOS, enter the shell (<kbd>CTRL</kbd> <kbd>ALT</kbd> <kbd>T</kbd>, `shell`), and run:  
 `sudo crossystem dev_boot_usb=1; sudo crossystem dev_boot_signed_only=0; sync`  
 to enable USB and Custom Kernel Booting.
 

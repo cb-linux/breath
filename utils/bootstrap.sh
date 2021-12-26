@@ -32,9 +32,9 @@ function bootstrapFiles {
   ubuntu)
       # Split up the distro version
       # Argument 3 / DISTRO_VERSION should be something like focal-20.04
-      [[ -n $DISTRO_VERSION ]] || { printerr "No Ubuntu version specified, using focal-20.04"; export DISTRO_VERSION=focal-20.04; }
-      export DISTRO_CODENAME=$(echo "$DISTRO_VERSION" | cut -d- -f1) # e.g. focal
-      export DISTRO_RELEASE=$(echo "$DISTRO_VERSION" | cut -d- -f2)  # e.g. 20.04
+      [[ -n $DISTRO_VERSION ]] || { printerr "No Ubuntu version specified, using hirsute-21.04"; export DISTRO_VERSION=hirsute-21.04; }
+      export DISTRO_CODENAME=$(echo "$DISTRO_VERSION" | cut -d- -f1) # e.g. hirsute
+      export DISTRO_RELEASE=$(echo "$DISTRO_VERSION" | cut -d- -f2)  # e.g. 21.04
 
       # Download the Ubuntu rootfs if it doesn't exist
       DISTRO_ROOTFS="ubuntu-rootfs.tar.xz"
