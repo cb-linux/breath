@@ -2,7 +2,7 @@
 
 set -e
 
-sudo apt install vboot-kernel-utils -y
+sudo apt install vboot-kernel-utils cgpt -y
 
 echo "What drive would you like to install to? (e.g. /dev/mmcblk0)"
 read -r USB
@@ -26,13 +26,13 @@ sudo cgpt add -i 1 -t kernel -S 1 -T 5 -P 15 $USB
 # Format the root partition as ext4 and mount it to /mnt
 sudo mkfs.ext4 ${USB}p2
 
-echo "Writing sotrage, will take a few minutes"
+echo "Writing storage, will take a few minutes"
 sync
 
 sudo mount ${USB}p2 /mnt
 
 # Copy all files from the USB to the internal storage drive
-sudo rsync -a --info=progress2  / /mnt --exclude proc --exclude sys --exclude dev --exclude mnt --exclude media
+sudo rsync -a --info=progress2  / /mnt --exclude proc --exclude sys --exclude dev --exclude mnt --exclude media --exclude run || true
 echo "Writing storage, will take a few minutes"
 sync
 
