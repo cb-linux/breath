@@ -15,7 +15,7 @@ echo
 
 echo "Cloning kernel $KERNEL_VERSION with --depth 1"
 # Latest commit for 5.4: 533e47fa98690d0fe210e0a01777caf96b887a75
-git clone --branch chromeos-$KERNEL_VERSION --depth 1 https://chromium.googlesource.com/chromiumos/third_party/kernel.git
+git clone --branch $KERNEL_VERSION --depth 1 https://chromium.googlesource.com/chromiumos/third_party/kernel.git
 cd kernel
 
 echo "Patching the kernel to add logo support"
