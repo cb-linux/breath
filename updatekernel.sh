@@ -27,9 +27,13 @@ wget https://raw.githubusercontent.com/MilkyDeveloper/cb-linux/main/kernel/kerne
     cp ${DIR}/bzImage .
     cp ${DIR}/modules.tar.xz .
 }
-[[ -n "$DIR" ]] || {
+[[ -n "$VERSION" ]] || {
     wget https://github.com/MilkyDeveloper/cb-linux/releases/latest/download/bzImage -O bzImage -q --show-progress
     wget https://github.com/MilkyDeveloper/cb-linux/releases/latest/download/modules.tar.xz -O modules.tar.xz -q --show-progress
+}
+[[ -n "$VERSION" ]] && {
+    wget https://github.com/MilkyDeveloper/cb-linux/releases/latest/download/54bzImage -O bzImage -q --show-progress
+    wget https://github.com/MilkyDeveloper/cb-linux/releases/latest/download/54modules.tar.xz -O modules.tar.xz -q --show-progress
 }
 
 # Sign the kernel
