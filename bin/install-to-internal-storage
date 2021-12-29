@@ -10,7 +10,7 @@ export USB
 
 # Format the USB with GPT
 sudo parted $USB mklabel gpt
-echo "Writing sotrage, will take a few minutes"
+echo "Writing storage, will take a few minutes"
 sync
 
 # Create a 65 Mb kernel partition
@@ -37,6 +37,9 @@ echo "Writing storage, will take a few minutes"
 sync
 
 bash <(curl -s https://raw.githubusercontent.com/MilkyDeveloper/cb-linux/main/kernel/kernel.emmc.flags.sh) > cmdline
+
+# Get the bzImage
+sudo dd if=/dev/sda1 of=bzImage
 
 # Repack the kernel
 futility vbutil_kernel --repack bzImage.signed --keyblock /usr/share/vboot/devkeys/kernel.keyblock --signprivate /usr/share/vboot/devkeys/kernel_data_key.vbprivk --oldblob bzImage --config cmdline
