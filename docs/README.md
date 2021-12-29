@@ -25,7 +25,7 @@ Nami:
 * Dell Inspiron Chromebook 14 (7460)
 
 Octopus:
-* HP Chromebook x360 14b (Blooguard)
+* HP Chromebook x360 14b (Blooguard) (unconfirmed)
 * Acer Chromebook 311
 * Acer Chromebook Spin 511
 * Lenovo 300e Chromebook 2nd Gen (Intel)
@@ -48,11 +48,57 @@ Octopus:
 * HP Chromebook x360 11 G3 EE
 * HP Chromebook 14 G6
 * HP Chromebook 11 G8 EE
-* HP Chromebook 14a
+* HP Chromebook 14a (unconfirmed)
 * Acer Chromebook 314 (C933L/LT)
 * Ideapad 3 Chromebook
 * ASUS Chromebook CX1101
 * ASUS Chromebook C424
+
+Volteer:
+* IdeaPad Flex 5i Chromebook
+* Acer Chromebook Spin 713 (CP713-3W)
+* Acer Chromebook 514 (CB514-1H) (Certain high end models?)
+* ASUS Chromebook Flip CX5 (CX5500)
+* HP Pro c640 G2 Chromebook
+* ASUS Chromebook CX9 (CX9400)
+* Acer Chromebook 515
+
+Reef:
+* Lenovo Thinkpad 11e Chromebook / Lenovo Thinkpad Yoga 11e Chromebook
+* HP Chromebook x360 11 G1 EE
+* Acer Chromebook Spin 11 R751T
+* Acer Chromebook 15 CB515-1HT/1H
+
+Zork:
+* Picasso/Dali
+  * Lenovo ThinkPad C13 Yoga Chromebook
+  * HP Pro c645 Chromebook Enterprise
+  * Acer Chromebook Spin 514
+  * ASUS Chromebook Flip CM5
+* Pollock (untested)
+  * Lenovo 300e Chromebook Gen 3 AMD
+  * Lenovo 100e Chromebook Gen 3 AMD
+  * HP Chromebook 14a-nd0097nr
+  * HP Chromebook x360 14a (AMD)
+  * ASUS Chromebook Flip CM1
+
+Coral:
+* Acer Chromebook 11 (C732, C732T, C732L & C732LT )
+* Lenovo 100e Chromebook
+* Lenovo 500e Chromebook
+* Acer Chromebook 11 (CB311-8H & CB311-8HT)
+* Acer Chromebook Spin 11 (CP311-1H & CP311-1HN)
+* CTL Chromebook J41
+* CTL Chromebook NL7
+* CTL Chromebook NL7T-360
+* ASUS Chromebook C223
+* Lenovo Chromebook C330
+* ASUS Chromebook C423
+* ASUS Chromebook C523
+* PCmerge Chromebook AL116
+* ASUS Chromebook C403
+
+Untested, but `dedede` should work
 
 ## Running Breath
 
@@ -82,7 +128,7 @@ If your device is one of the devices on the above list, you can enable audio.
 Once booted into Breath run the command depending on your device's board:
 
 - Nami: `setup-audio`
-- Octopus: `sof-setup-audio`
+- Everything else: `sof-setup-audio`
   - Doesn't work? Try `SOUNDCARD=rtk sof-setup-audio`
 
 If it is not, that's completely expected! Open up a Github Issue with your Chromebook model and I'll  get audio working.
