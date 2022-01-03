@@ -9,8 +9,8 @@ which kpartx > /dev/null || sudo apt install kpartx -y
 
 export IMG="breath.img"
 
-# Create a blank image file of ~1.8 GB
-dd if=/dev/zero of=$IMG bs=512 count=3500000
+# Create a blank image file of ~2.6 GB
+dd if=/dev/zero of=$IMG bs=512 count=5000000
 sync
 
 # GPT Partition it
