@@ -2,7 +2,7 @@
 
 <img src="https://github.com/MilkyDeveloper/cb-linux/blob/main/docs/assets/banner.png?raw=true" alt="Breath Banner"></img>
 
-# 🙼 ＢＲＥＡＴＨ
+# 🙼 ＢＲＥＡＴＨ [Looking for Maintainers!]
 
 <p align="center">An experimental way to natively run <kbd><img width="25" height="30" src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/35/Tux.svg/1200px-Tux.svg.png"></img></kbd> Linux on modern Chromebooks without replacing firmware</p>
 
