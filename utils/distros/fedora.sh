@@ -56,7 +56,7 @@ function postinstall {
     esac
 
     # Install nonfree repos
-    sudo chroot $MNT /bin/bash -c "sudo dnf install https://download1.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-\$(rpm -E %fedora).noarch.rpm -y"
+    sudo chroot $MNT /bin/bash -c "sudo dnf install https://download1.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm -y"
 
     # Disable plymouth (sometimes fails for no apparent reason)
     runChrootCommand "plymouth-set-default-theme details -R &> /dev/null" || true
