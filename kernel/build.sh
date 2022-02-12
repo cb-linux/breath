@@ -24,7 +24,7 @@ echo "mod" >> .gitignore
 touch .scmversion
 
 echo "Copying and updating kernel config"
-ls .config || cp ../../kernel.conf .config || exit
+ls .config || cp ../kernel.conf .config || exit
 make olddefconfig
 
 read -p "Would you like to make edits to the kernel config? (y/n) " -n 1 -r
@@ -36,7 +36,7 @@ fi
 read -p "Would you like to write the new config to github? (y/n) " -n 1 -r
 echo
 if [[ $REPLY =~ ^[Yy]$ ]]; then
-    cp .config ../../kernel.conf
+    cp .config ../kernel.conf
 fi
 
 echo "Building kernel"
