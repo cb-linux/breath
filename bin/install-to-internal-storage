@@ -36,7 +36,7 @@ sudo rsync -a --info=progress2  / /mnt --exclude proc --exclude sys --exclude de
 echo "Writing storage, will take a few minutes"
 sync
 
-bash <(curl -s https://raw.githubusercontent.com/MilkyDeveloper/cb-linux/main/kernel/kernel.emmc.flags.sh) > cmdline
+bash <(curl -s https://raw.githubusercontent.com/cb-linux/breath/main/kernel/kernel.emmc.flags.sh) > cmdline
 
 # Get the bzImage
 sudo dd if=/dev/sda1 of=bzImage

@@ -107,7 +107,7 @@ Due to licensing restraints, you cannot just download an ISO of Breath and flash
 
 **Prerequisite:** Git is installed and you have a mainstream, fast USB plugged in
 
-1. `git clone https://github.com/MilkyDeveloper/cb-linux && cd cb-linux`
+1. `git clone https://github.com/cb-linux/breath && cd cb-linux`
 2. `bash setup.sh cli ubuntu`
 (should take ~15 minutes on a 4-core mobile processor)
 
@@ -139,6 +139,6 @@ Breath uses the exact ChromeOS Linux kernel. In other words, if the thing not wo
 
 #### --Project Overview--
 
-[README.md](https://raw.githubusercontent.com/MilkyDeveloper/cb-linux/main/README.md ':include')
+[README.md](https://raw.githubusercontent.com/cb-linux/breath/main/README.md ':include')
 
 <!-- select:end -->

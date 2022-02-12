@@ -24,7 +24,7 @@ cd kernel
 
 2. Download the kernel `.config` file, and update it, by running:
 ```bash
-wget https://raw.githubusercontent.com/MilkyDeveloper/cb-linux/main/kernel/kernel.conf -O .config
+wget https://raw.githubusercontent.com/cb-linux/breath/main/kernel/kernel.conf -O .config
 make olddefconfig
 ```
 

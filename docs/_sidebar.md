@@ -1,7 +1,7 @@
 - **Docs**
 
 - [Breath](/)
-- [<img width=15px src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/91/Octicons-mark-github.svg/1024px-Octicons-mark-github.svg.png"> Github](https://github.com/MilkyDeveloper/cb-linux)
+- [<img width=15px src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/91/Octicons-mark-github.svg/1024px-Octicons-mark-github.svg.png"> Github](https://github.com/cb-linux/breath)
 - [📹 Demos](/demos)
 - 👨‍💻 Development (in progress)
     - [Installing to Internal Storage](/internalstorage)
