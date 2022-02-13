@@ -107,7 +107,7 @@ Due to licensing restraints, you cannot just download an ISO of Breath and flash
 
 **Prerequisite:** Git is installed and you have a mainstream, fast USB plugged in
 
-1. `git clone https://github.com/cb-linux/breath && cd cb-linux`
+1. `git clone --recurse-submodules https://github.com/cb-linux/breath && cd cb-linux`
 2. `bash setup.sh cli ubuntu`
 (should take ~15 minutes on a 4-core mobile processor)
 
