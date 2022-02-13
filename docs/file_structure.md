@@ -6,5 +6,5 @@
 | `bin`                | Utility scripts that are copied to the guest system      |
 | `docs`               | Extended Developer Documentation                         |
 | `.shellcheckrc`      | Shellcheck configuration file                            |
-| `kernel/kernel.conf` | Kernel Config file (.config)                             |
+| `kernel.conf`        | Kernel Config file (.config)                             |
 | `setup.sh`           | Main entrypoint script, may be broken into modules later |
