@@ -22,7 +22,7 @@ function bootstrapFiles {
   {
   wget https://github.com/cb-linux/breath/releases/latest/download/bzImage -nc -O bzImage -q --show-progress
   wget https://github.com/cb-linux/breath/releases/latest/download/modules.tar.xz -nc -O modules.tar.xz -q --show-progress
-  wget https://raw.githubusercontent.com/cb-linux/breath/main/kernel/kernel.flags -nc -O kernel.flags -q --show-progress
+  https://raw.githubusercontent.com/cb-linux/kernel/main/kernel.flags -nc -O kernel.flags -q --show-progress
   } || true # Wget has the wrong exit status with no clobber
 
   # READ: Distro dependent step
