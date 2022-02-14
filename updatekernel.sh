@@ -22,19 +22,17 @@ cd ~/linux-build || { mkdir ~/linux-build; cd ~/linux-build; }
 wget https://raw.githubusercontent.com/cb-linux/breath/main/kernel/kernel.flags -O kernel.flags -q --show-progress
 
 # Download kernel and modules
-[[ -n "$DIR" ]] && {
+if [ -n "$DIR" ]; then
     echo "Files supplied"
     cp ${DIR}/bzImage .
     cp ${DIR}/modules.tar.xz .
-}
-[[ -n "$VERSION" ]] || {
-    wget https://github.com/cb-linux/breath/releases/latest/download/bzImage -O bzImage -q --show-progress
-    wget https://github.com/cb-linux/breath/releases/latest/download/modules.tar.xz -O modules.tar.xz -q --show-progress
-}
-[[ -n "$VERSION" ]] && {
+elif [ -n "$VERSION" ]; then
     wget https://github.com/cb-linux/breath/releases/latest/download/54bzImage -O bzImage -q --show-progress
     wget https://github.com/cb-linux/breath/releases/latest/download/54modules.tar.xz -O modules.tar.xz -q --show-progress
-}
+else
+    wget https://github.com/cb-linux/breath/releases/latest/download/bzImage -O bzImage -q --show-progress
+    wget https://github.com/cb-linux/breath/releases/latest/download/modules.tar.xz -O modules.tar.xz -q --show-progress
+fi
 
 # Sign the kernel
 # After this, the kernel can no longer be booted on non-depthcharge devices
