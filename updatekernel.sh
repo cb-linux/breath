@@ -19,7 +19,7 @@ sudo mount ${USB}2 /mnt
 cd ~/linux-build || { mkdir ~/linux-build; cd ~/linux-build; }
 
 # Download kernel commandline
-wget https://raw.githubusercontent.com/cb-linux/kernel/main/kernel.flags -nc -O kernel.flags -q --show-progress
+wget https://raw.githubusercontent.com/cb-linux/kernel/main/kernel.flags -O kernel.flags -q --show-progress
 
 # Download kernel and modules
 if [ -n "$DIR" ]; then
