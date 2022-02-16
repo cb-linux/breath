@@ -47,7 +47,7 @@ function bootstrapFiles {
       # Download the Arch Bootstrap rootfs if it doesn't exist
       DISTRO_ROOTFS="arch-rootfs.tar.gz"
       [[ ! -f $DISTRO_ROOTFS ]] && {
-      wget https://mirror.rackspace.com/archlinux/iso/2021.10.01/archlinux-bootstrap-2021.10.01-x86_64.tar.gz -O $DISTRO_ROOTFS -q --show-progress
+      wget https://mirror.rackspace.com/archlinux/iso/2021.12.01/archlinux-bootstrap-2021.12.01-x86_64.tar.gz -O $DISTRO_ROOTFS -q --show-progress
       }
       ;;
 
