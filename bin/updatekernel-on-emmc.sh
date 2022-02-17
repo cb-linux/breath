@@ -1,0 +1,79 @@
+#!/bin/bash
+
+# Function for printing a bold, green question or info prompt
+function printq {
+  echo "$(tput setaf 114; tput bold)$1$(tput sgr0)"
+}
+
+# Sync Progress Function
+function syncStorage {
+
+  printq "Writing storage, may take more than 5 minutes."
+  printq "Although it seems slow, consider this process like flashing an ISO to a USB Drive."
+  printq "Below is an innacurate indicator of mB left to write. It may decrease hundreds of megabytes in seconds."
+
+  # shellcheck disable=SC2016
+  sync & {
+    # If the unsynced data (in kB) is greater than 50MB, then show the sync progress
+    while [[ $(grep -e Dirty: /proc/meminfo | grep --color=never -o '[0-9]\+') -gt 5000 ]]; do
+      SYNC_MB=$(grep -e Dirty: /proc/meminfo | grep --color=never -o '[0-9]\+' | awk '{$1/=1024;printf "%.2fMB\n",$1}')
+      echo -en "\r${SYNC_MB}"
+      sleep 1
+    done
+  }
+
+  echo
+
+  #watch -n 1 'grep -e Dirty: /proc/meminfo | grep --color=never -o '\''[0-9]\+'\'' | awk '\''{$1/=1024;printf "%.2fMB\n",$1}'\'''
+  #grep -e Dirty: /proc/meminfo | grep --color=never -o '[0-9]\+' | awk '{$1/=1024;printf "%.2fMB\n",$1}'
+}
+
+function extractModules {
+
+	sudo mkdir -p /lib/modules
+	mkdir -p modules || sudo rm -rf modules; sudo mkdir -p modules
+	sudo tar xvpf modules.tar.xz -C modules
+	sudo rm -rf /lib/modules/*
+	sudo cp -rv modules/lib/modules/* /lib/modules
+	syncStorage
+	
+}
+
+export USB=$(mount | sed -n 's|^\(.*\) on / .*|\1|p')
+printq "Using $USB to update the kernel and its modules"
+
+cd ~/linux-build || { mkdir ~/linux-build; cd ~/linux-build; }
+
+# Download kernel commandline
+bash <(curl -s https://raw.githubusercontent.com/cb-linux/kernel/main/kernel.emmc.flags.sh) > kernel.flags
+
+# Download kernel and modules
+if [ -n "$VERSION" ]; then
+    wget https://github.com/cb-linux/breath/releases/latest/download/54bzImage -O bzImage -q --show-progress
+    wget https://github.com/cb-linux/breath/releases/latest/download/54modules.tar.xz -O modules.tar.xz -q --show-progress
+else
+    wget https://github.com/cb-linux/breath/releases/latest/download/bzImage -O bzImage -q --show-progress
+    wget https://github.com/cb-linux/breath/releases/latest/download/modules.tar.xz -O modules.tar.xz -q --show-progress
+fi
+
+# Sign the kernel
+# After this, the kernel can no longer be booted on non-depthcharge devices
+futility vbutil_kernel \
+    --arch x86_64 --version 1 \
+    --keyblock /usr/share/vboot/devkeys/kernel.keyblock \
+    --signprivate /usr/share/vboot/devkeys/kernel_data_key.vbprivk \
+    --bootloader kernel.flags \
+    --config kernel.flags \
+    --vmlinuz bzImage \
+    --pack bzImage.signed
+
+# Flash kernel
+sudo dd if=bzImage.signed of=${USB}1
+
+# Extract modules
+sudo rm -rf ~/linux-build/modules/lib/modules/*
+extractModules
+
+# Write Storage
+echo "Writing storage..."
+sync
