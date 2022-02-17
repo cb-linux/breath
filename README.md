@@ -23,6 +23,9 @@
 
 <h3 align="center"><a href="https://cb-linux.github.io/breath/docs.html#/">📄 Please visit the docs here 📄</a></h3>
 
+<p align="center">Recently, my laptop's GPU was fried while compiling a root filesystem for this project. Since I don't charge anything for this project and have worked on it for months, you can donate here: <br><br><a href="https://www.paypal.com/donate/?business=7MW62DRD5PHYJ&no_recurring=0&item_name=Support+my+free+project+to+run+Linux+on+Chromebooks.+Recently+my+laptop%27s+GPU+was+fried+while+compiling%2C+so+any+donations+help%21&currency_code=USD"><img src="https://img.shields.io/badge/Donate-PayPal-green.svg?style=for-the-badge&logo=paypal" alt="Donate"></a>
+</p>
+
 ## How does everything work?
 
 This project uses the ChromeOS Kernel and the firmware. Touchscreen and all other peripherals *just work*. Breath has been carefully designed not to have any legal issues, so you can't flash the ISO or have the audio firmware bundled.
