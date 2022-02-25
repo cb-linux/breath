@@ -105,7 +105,7 @@ Untested, but `dedede` should work
 Due to licensing restraints, you cannot just download an ISO of Breath and flash it. Instead, you *build* the bootable USB.
 > Currently, this project can only work on a **full install** of Debian or Ubuntu (**not Crouton or Crostini**). Running this on Arch or Fedora is unsupported.
 
-**Prerequisite:** Git is installed and you have a mainstream, fast USB plugged in
+**Prerequisite:** Git is installed and you have a mainstream, fast 8GB or bigger USB plugged in
 
 1. `git clone --recurse-submodules https://github.com/cb-linux/breath && cd breath`
 2. `bash setup.sh cli ubuntu`
