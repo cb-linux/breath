@@ -51,7 +51,7 @@ function bootstrapFiles {
       }
       ;;
 
-    fedora)
+  fedora)
       # Download the Fedora rootfs if it doesn't exist
       # Extracting a Fedora rootfs from koji is quite complicated
       # I've hardcoded it, but otherwise you need to parse a json file
@@ -67,8 +67,15 @@ function bootstrapFiles {
       sudo apt install debootstrap -y
       ;;
 
+
+  bootloader)
+      # Download the minimal Alpine Linux rootfs
+      DISTRO_ROOTFS="alpine-rootfs.tar.xz"
+      wget "https://dl-cdn.alpinelinux.org/alpine/v3.15/releases/x86_64/alpine-minirootfs-3.15.0-x86_64.tar.gz" -O $DISTRO_ROOTFS -q --show-progress
+      ;;
+
   *)
-      printerr "Unknown Distribution supplied, only arch and ubuntu (case-sensitive) are valid distros"
+      printerr "Unknown Distribution supplied, only arch, ubuntu, fedora, debian, and bootloader (case-sensitive) are valid distros"
       exit
       ;;
   esac

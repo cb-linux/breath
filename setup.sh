@@ -85,7 +85,7 @@ postinstall
 # but luckily passwd has an option to chroot
 # In case a user mistypes the password confirmation, retry the password
 printq "What would you like the root user's password to be?"
-until sudo chroot $MNT bash -c "passwd root"; do printerr "Retrying Password"; sleep 1; done
+until sudo chroot $MNT sh -c "passwd root"; do printerr "Retrying Password"; sleep 1; done
 
 # Copy (hopefully up-to-date) firmware from the host to the USB
 sudo mkdir -p ${MNT}/lib/firmware
