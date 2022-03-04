@@ -113,7 +113,7 @@ Due to licensing restraints, you cannot just download an ISO of Breath and flash
 
 > * **Using the CLI argument installs a minimal CLI (no desktop!) environment on the USB.** If you would like to install a desktop, you can use `gnome`, `kde`, `minimal`, `deepin`, `xfce`, `lxqt`, `mate` or `openbox` instead of `cli`.
 > * You can replace `ubuntu` with `arch` (you can only use `cli`) or `debian` (all desktops are supported)
-> * Ubuntu supports custom versions. If you want to install Ubuntu 22.04, just run: `bash setup.sh cli ubuntu impish-21.10`, where `impish` is the codename and `21.10` is the version.
+> * Ubuntu supports custom versions. If you want to install Ubuntu 21.10 instead of the default Ubuntu 21.04, just run: `bash setup.sh cli ubuntu impish-21.10`, where `impish` is the codename and `21.10` is the version.
 
 1. Done! Now just boot into ChromeOS, enter the shell (<kbd>CTRL</kbd> <kbd>ALT</kbd> <kbd>T</kbd>, `shell`), and run:  
 `sudo crossystem dev_boot_usb=1; sudo crossystem dev_boot_signed_only=0; sync`  
