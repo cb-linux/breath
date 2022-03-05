@@ -27,7 +27,7 @@ EOT
     sudo umount -f /tmp/arch/mnt || true
 
     # We're done with our bootstrap arch install in /tmp/arch!
-    # NOTE: Use arch-chroot when installed packages, otherwise 
+    # NOTE: Use arch-chroot when installing packages 
 
     # Clean up the mess made in /tmp (if possible)
     sudo umount -f /tmp/arch || true
@@ -43,6 +43,12 @@ EOT
     # Add the user to the sudoers group
     sudo tee -a ${MNT}/etc/sudoers > /dev/null <<EOT
     %wheel ALL=(ALL) ALL
+EOT
+
+    # Load modules at boot
+    sudo tee -a ${MNT}/etc/modules-load.d/breath.conf > /dev/null <<EOT
+    iwlmvm
+    uvcvideo
 EOT
 
     # Install nmcli for wifi
