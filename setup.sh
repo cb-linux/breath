@@ -54,7 +54,7 @@ if [[ $FEATURES == ISO ]]; then
    # Create and mount a 6GB IMG File
    echo "Building ISO at ${PWD}/breath.img"
    sleep 10
-   fallocate -l 6G breath.img
+   fallocate -l 12G breath.img
    export USB=$(sudo losetup -f --show breath.img)
    export USB1="${USB}p1"
    export USB2="${USB}p2"
