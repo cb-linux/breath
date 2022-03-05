@@ -24,6 +24,7 @@ EOF
     # We need to load the iwlmvm module at startup for WiFi
     sudo tee -a ${MNT}/etc/modules > /dev/null <<EOT
     iwlmvm
+    uvcvideo
 EOT
 
     # Desktop installation fails without this

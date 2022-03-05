@@ -11,6 +11,7 @@ function postinstall {
     # We need to load the iwlmvm module at startup for WiFi
     sudo tee -a ${MNT}/etc/modules-load.d/modules.conf > /dev/null <<EOT
     iwlmvm
+    uvcvideo
 EOT
 
     # Download the desktop that the user has selected
