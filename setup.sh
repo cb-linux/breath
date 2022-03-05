@@ -37,6 +37,7 @@ done
 # Show title message - I told you it was important
 toilet -f mono12 -F crop   "Breath"
 toilet -f term   -F border "Made by MilkyDeveloper"
+echo " $FEATURES"
 
 # Ask for username
 printq "What would you like your username to be? (no spaces, backslashes, or special characters)"
@@ -46,14 +47,33 @@ export BREATH_USER
 # Bootstrap files
 bootstrapFiles
 
-# Wait for a USB to be plugged in
-waitForUSB
+# If the user wants to build an ISO, the partition numbers are different
+# (e.g.) /dev/sda2 or /dev/loop9p2 (notice the "p")
+if [[ $FEATURES == ISO ]]; then
 
-# Ask user which USB Device they would like to use
-printq "Which USB Drive or SD Card would you like to use (e.g. /dev/sda)? All data on the drive will be wiped!"
-lsblk -o name,model,tran | grep --color=never "usb"
-read USB
-printq "Ok, using $USB to install Linux"
+   # Create and mount a 6GB IMG File
+   echo "Building ISO at ${PWD}/breath.img"
+   sleep 10
+   fallocate -l 6G breath.img
+   export USB=$(sudo losetup -f --show breath.img)
+   export USB1="${USB}p1"
+   export USB2="${USB}p2"
+  
+else
+
+   # Wait for a USB to be plugged in
+   waitForUSB
+
+   # Ask user which USB Device they would like to use
+   printq "Which USB Drive or SD Card would you like to use (e.g. /dev/sda)? All data on the drive will be wiped!"
+   lsblk -o name,model,tran | grep --color=never "usb"
+   read USB
+   printq "Ok, using $USB to install Linux"
+
+   export USB1="${USB}1"
+   export USB2="${USB}2"
+
+fi
 
 # Unmount all partitions on the USB and /mnt
 unmountUSB
@@ -66,14 +86,14 @@ partitionUSB
 # (2) Write a Linux distro rootfs to a partition filling the rest of the storage
 
 # Flash the signed kernel to the kernel partition
-sudo dd if=bzImage.signed of=${USB}1
+sudo dd if=bzImage.signed of=${USB1}
 
 # Format the root partition as ext4 and mount it to /mnt
-yes | sudo mkfs.ext4 ${USB}2
+yes | sudo mkfs.ext4 ${USB2}
 syncStorage
 sudo umount $MNT || sudo umount -lf $MNT || true
 sudo rm -rf ${MNT}/*
-sudo mount ${USB}2 $MNT
+sudo mount ${USB2} $MNT
 
 # Extract the rootfs
 extractRootfs
@@ -102,4 +122,19 @@ sudo cp bin/* ${MNT}/usr/local/bin
 syncStorage
 
 sudo umount $MNT
-printq "Done!"
+
+if [[ $FEATURES == ISO ]]; then
+
+   printq "Done!"
+   echo "IMG built at ${PWD}/breath.img"
+   echo "You can flash this raw image using Etcher, Rufus, DD, or other ISO flashing tools"
+   echo "Once you have done that, you can plug in your $DISTRO USB with the $DESKTOP desktop into your Chromebook and boot it with CTRL+U"
+   echo "(Provided that you have enabled USB booting as documented)"
+
+else
+
+   printq "Done!"
+   echo "You can plug in your $DISTRO USB with the $DESKTOP desktop into your Chromebook and boot it with CTRL+U"
+   echo "(Provided that you have enabled USB booting as documented)"
+
+fi

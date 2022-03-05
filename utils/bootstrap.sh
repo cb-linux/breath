@@ -46,8 +46,9 @@ function bootstrapFiles {
   arch)
       # Download the Arch Bootstrap rootfs if it doesn't exist
       DISTRO_ROOTFS="arch-rootfs.tar.gz"
-      [[ ! -f $DISTRO_ROOTFS ]] && {
-      wget https://mirror.rackspace.com/archlinux/iso/2021.12.01/archlinux-bootstrap-2021.12.01-x86_64.tar.gz -O $DISTRO_ROOTFS -q --show-progress
+      ARCH_ROOTFS_URL=$(curl -s http://mirror.rackspace.com/archlinux/iso/latest/ | grep '<li><a href="archlinux-bootstrap-' | grep -v 'sig' | grep --color=never -o -P '(?<=").*(?=")')
+      wget http://mirror.rackspace.com/archlinux/iso/latest/${ARCH_ROOTFS_URL} -O $DISTRO_ROOTFS -q --show-progress || {
+        echo "The web scraper cannot retrieve the latest Arch Bootstrap version. Rackspace, the mirror for the Arch bootstrap, might be down."; exit;
       }
       ;;
 

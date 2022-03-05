@@ -68,7 +68,7 @@ futility vbutil_kernel \
     --pack bzImage.signed
 
 # Flash kernel
-sudo dd if=bzImage.signed of=${USB}1
+sudo dd if=bzImage.signed of=${USB1}
 
 # Extract modules
 sudo rm -rf ~/linux-build/modules/lib/modules/*
