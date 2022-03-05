@@ -1,5 +1,13 @@
 #!/bin/bash
 
+# Before we do anything, check if the user is on Crostini,
+# since /mnt will already be filled
+if [[ $FEATURES == *"CROSTINI"* ]]; then
+
+   mkdir /mnt/breath
+
+fi
+
 # Import
 source utils/functions.sh # Functions
 source utils/bootstrap.sh # Bootstrap Function
@@ -16,6 +24,14 @@ export DISTRO=$2
 export DISTRO_VERSION=$3
 export MNT="/mnt"
 ORIGINAL_DIR=$(pwd)
+
+# Crostini already has folders in /mnt
+if [[ $FEATURES == *"CROSTINI"* ]]; then
+
+   sudo mkdir /mnt/breath
+   export MNT="/mnt/breath"
+
+fi
 
 # Import a seperate postinstall function depending on the distro
 # shellcheck source=utils/ubuntu_postinstall.sh
@@ -49,7 +65,7 @@ bootstrapFiles
 
 # If the user wants to build an ISO, the partition numbers are different
 # (e.g.) /dev/sda2 or /dev/loop9p2 (notice the "p")
-if [[ $FEATURES == ISO ]]; then
+if [[ $FEATURES == *"ISO"* ]]; then
 
    # Create and mount a 6GB IMG File
    echo "Building ISO at ${PWD}/breath.img"
