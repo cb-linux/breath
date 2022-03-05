@@ -9,10 +9,12 @@
 
 **All x64 (non-tablet) Chromebooks released after 2018 are supported.**
 
-However, this project is being developed on `Nami`, so the following models will have audio support:
-
 > ### Is your Chromebook not on the list?
 > That's completely fine! As long as it's newer than 2017, chances are that most drivers will already be supported except audio. **If it is newer than 2019, chances are that audio is already supported**. If you would like audio working, open up a Github Issue with your Chromebook model and post the output of the commands `lsmod` and `find /usr/share/alsa`.
+
+<details>
+<summary>Expand List of tested devices with audio</summary>
+<br>
 
 Nami:
 * Acer Chromebook 13 / Spin 13
@@ -99,24 +101,26 @@ Coral:
 * ASUS Chromebook C403
 
 Untested, but `dedede` should work
+</details>
 
 ## Running Breath
 
-Due to licensing restraints, you cannot just download an ISO of Breath and flash it. Instead, you *build* the bootable USB.
+Due to licensing restraints, you cannot just download an ISO of Breath and flash it. Instead, you *build* the bootable USB or the ISO.
 > Currently, this project can only work on a **full install** of Debian or Ubuntu (**not Crouton or Crostini**). Running this on Arch or Fedora is unsupported.
 
 **Prerequisite:** Git is installed and you have a mainstream, fast 8GB or bigger USB plugged in
 
 1. `git clone --recurse-submodules https://github.com/cb-linux/breath && cd breath`
-2. `bash setup.sh cli ubuntu`
-(should take ~15 minutes on a 4-core mobile processor)
+2. `FEATURES=ISO bash setup.sh cli ubuntu`
+(should take ~30 minutes on a 4-core laptop processor)
 
 > * **Using the CLI argument installs a minimal CLI (no desktop!) environment on the USB.** If you would like to install a desktop, you can use `gnome`, `kde`, `minimal`, `deepin`, `xfce`, `lxqt`, `mate` or `openbox` instead of `cli`.
 > * You can replace `ubuntu` with `arch` (you can only use `cli`) or `debian` (all desktops are supported)
 > * Ubuntu supports custom versions. If you want to install Ubuntu 21.10 instead of the default Ubuntu 21.04, just run: `bash setup.sh cli ubuntu impish-21.10`, where `impish` is the codename and `21.10` is the version.
+> * You can remove the `FEATURES=ISO` to use the classic way which directly writes to a USB.
 
-1. Done! Now just boot into ChromeOS, enter the shell (<kbd>CTRL</kbd> <kbd>ALT</kbd> <kbd>T</kbd>, `shell`), and run:  
-`sudo crossystem dev_boot_usb=1; sudo crossystem dev_boot_signed_only=0; sync`  
+3. Done! Flash the IMG file to a USB using something like Etcher. Now just boot into ChromeOS, enter the shell (<kbd>CTRL</kbd> <kbd>ALT</kbd> <kbd>T</kbd>, `shell`), and run:  
+`sudo crossystem dev_boot_usb=1; sudo crossystem dev_boot_signed_only=0; sync`
 to enable USB and Custom Kernel Booting.
 
 Reboot, and with the USB plugged in, press <kbd>CTRL</kbd> <kbd>U</kbd> instead of <kbd>CTRL</kbd> <kbd>D</kbd>. After a short black screen, the system should display a login screen.
@@ -127,7 +131,8 @@ If your device is one of the devices on the above list, you can enable audio.
 
 Once booted into Breath run the command depending on your device's board:
 
-- Nami: `setup-audio`
+- `NAMI`: `setup-audio`
+- `BLOOG` or `BLOOGLET`: `setup-audio` and then `sof-setup-audio`
 - Everything else: `sof-setup-audio`
   - Doesn't work? Try `SOUNDCARD=rtk sof-setup-audio`
 
