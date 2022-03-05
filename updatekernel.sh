@@ -14,7 +14,7 @@ read USB
 printq "Ok, using $USB to update the kernel and its modules"
 
 # Mount the USB
-sudo mount ${USB2} /mnt
+sudo mount ${USB}2 /mnt
 
 cd ~/linux-build || { mkdir ~/linux-build; cd ~/linux-build; }
 
@@ -46,7 +46,7 @@ futility vbutil_kernel \
     --pack bzImage.signed
 
 # Flash kernel
-sudo dd if=bzImage.signed of=${USB1}
+sudo dd if=bzImage.signed of=${USB}1
 
 # Extract modules
 sudo rm -rf ~/linux-build/modules/lib/modules/*
