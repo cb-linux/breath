@@ -1,8 +1,9 @@
 #!/bin/bash
 
-sudo apt install vboot-kernel-utils cgpt gzip -y
-
 set -e
+
+sudo apt install vboot-kernel-utils cgpt gzip -y
+sudo apt install -y firmware-sof-signed || sudo apt-get -o Dpkg::Options::="--force-overwrite" install firmware-sof-signed
 
 echo "Downloading the Apollo Lake SOF Topology..."
 wget https://github.com/thesofproject/sof/files/8118500/sof-apl-da7219.tplg.gz -q -O sof.tplg.gz
@@ -91,3 +92,6 @@ extractModules
 # Write Storage
 echo "Writing storage..."
 sync
+
+sof-setup-audio
+echo "SOF APL setup audio script done!"
