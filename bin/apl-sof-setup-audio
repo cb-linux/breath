@@ -63,13 +63,8 @@ curl -s https://raw.githubusercontent.com/cb-linux/kernel/main/kernel.flags > ke
 echo -n ' snd-intel-dspcfg.dsp_driver=3 snd_sof_pci.fw_path="intel/sof"'   >> kernel.flags
 
 # Download kernel and modules
-if [ -n "$VERSION" ]; then
-    wget https://github.com/cb-linux/breath/releases/latest/download/54bzImage -O bzImage -q --show-progress
-    wget https://github.com/cb-linux/breath/releases/latest/download/54modules.tar.xz -O modules.tar.xz -q --show-progress
-else
-    wget https://github.com/cb-linux/breath/releases/latest/download/bzImage -O bzImage -q --show-progress
-    wget https://github.com/cb-linux/breath/releases/latest/download/modules.tar.xz -O modules.tar.xz -q --show-progress
-fi
+wget https://github.com/cb-linux/breath/releases/latest/download/bzImage -O bzImage -q --show-progress
+wget https://github.com/cb-linux/breath/releases/latest/download/modules.tar.xz -O modules.tar.xz -q --show-progress
 
 # Sign the kernel
 # After this, the kernel can no longer be booted on non-depthcharge devices
@@ -83,7 +78,7 @@ futility vbutil_kernel \
     --pack bzImage.signed
 
 # Flash kernel
-sudo dd if=bzImage.signed of=${USB1}
+sudo dd if=bzImage.signed of=${USB}1
 
 # Extract modules
 sudo rm -rf ~/linux-build/modules/lib/modules/*
