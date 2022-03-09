@@ -64,7 +64,7 @@ for x in "$@"; do
 done
 
 # We can get the overall block device of the USB from the root partition
-USB=$(lsblk -no pkname $USB_ROOT)
+USB=$(lsblk -pno pkname $USB_ROOT)
 if [[ $USB == *"sd"* ]]; then
   USB_KERNEL=${USB}1
 else
