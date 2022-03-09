@@ -53,7 +53,24 @@ function extractModules {
 	
 }
 
-export USB=$(mount | sed -n 's|^\(.*\) on / .*|\1|p')
+# Parse the arguments of the kernel command line to get the root device
+set -- $(cat /proc/cmdline)
+for x in "$@"; do
+    case "$x" in
+        root=*)
+        USB_ROOT="${x#root=}"
+        ;;
+    esac
+done
+
+# We can get the overall block device of the USB from the root partition
+USB=$(lsblk -no pkname $USB_ROOT)
+if [[ $USB == *"sd"* ]]; then
+  USB_KERNEL=${USB}1
+else
+  USB_KERNEL=${USB}p1
+fi
+
 printq "Using $USB to update the kernel and its modules"
 
 cd ~/linux-build || { mkdir ~/linux-build; cd ~/linux-build; }
@@ -78,7 +95,7 @@ futility vbutil_kernel \
     --pack bzImage.signed
 
 # Flash kernel
-sudo dd if=bzImage.signed of=${USB}1
+sudo dd if=bzImage.signed of=$USB_KERNEL
 
 # Extract modules
 sudo rm -rf ~/linux-build/modules/lib/modules/*
