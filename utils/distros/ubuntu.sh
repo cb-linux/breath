@@ -25,6 +25,9 @@ EOF
     sudo tee -a ${MNT}/etc/modules > /dev/null <<EOT
     iwlmvm
     uvcvideo
+    nls_iso8859-1
+    nls_cp437
+    vfat
 EOT
 
     # Desktop installation fails without this
