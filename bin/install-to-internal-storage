@@ -2,7 +2,7 @@
 
 set -e
 
-sudo apt install vboot-kernel-utils cgpt -y
+sudo apt install vboot-kernel-utils cgpt curl rsync -y
 
 echo "What drive would you like to install to? (e.g. /dev/mmcblk0)"
 read -r USB
