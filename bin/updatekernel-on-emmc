@@ -1,4 +1,5 @@
 #!/bin/bash
+#
 
 # Function for printing a bold, green question or info prompt
 function printq {
