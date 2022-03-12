@@ -26,9 +26,9 @@ if [ -n "$DIR" ]; then
     echo "Files supplied"
     cp ${DIR}/bzImage .
     cp ${DIR}/modules.tar.xz .
-elif [ -n "$VERSION" ]; then
-    wget https://github.com/cb-linux/breath/releases/latest/download/54bzImage -O bzImage -q --show-progress
-    wget https://github.com/cb-linux/breath/releases/latest/download/54modules.tar.xz -O modules.tar.xz -q --show-progress
+elif [ $VERSION == "ALT" ]; then
+    wget https://github.com/cb-linux/breath/releases/latest/download/bzImage.alt -O bzImage -q --show-progress
+    wget https://github.com/cb-linux/breath/releases/latest/download/modules.alt.tar.xz -O modules.tar.xz -q --show-progress
 else
     wget https://github.com/cb-linux/breath/releases/latest/download/bzImage -O bzImage -q --show-progress
     wget https://github.com/cb-linux/breath/releases/latest/download/modules.tar.xz -O modules.tar.xz -q --show-progress
