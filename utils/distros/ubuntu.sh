@@ -28,6 +28,8 @@ EOF
     nls_iso8859-1
     nls_cp437
     vfat
+    ipt_MASQUERADE
+    veth
 EOT
 
     # Desktop installation fails without this
