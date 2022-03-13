@@ -43,7 +43,7 @@ function extractModules {
 sudo apt install vboot-kernel-utils cgpt -y
 
 export USB_ROOTFS=$(mount | sed -n 's|^\(.*\) on / .*|\1|p')
-export USB=$(lsblk -no pkname $USB_ROOTFS)
+export USB=$(lsblk -pno pkname $USB_ROOTFS)
 printq "Using $USB to update the kernel and its modules"
 
 if [[ $USB == *"/dev/sd"* ]]; then
