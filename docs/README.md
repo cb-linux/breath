@@ -129,9 +129,9 @@ Reboot, and with the USB plugged in, press <kbd>CTRL</kbd> <kbd>U</kbd> instead 
 
 ### Audio
 
-If your device is one of the devices on the above list, you can enable audio.
-
 Once booted into Breath run the command depending on your device's board:
+
+**Connect to Wifi on your Chromebook!**
 
 - `NAMI`: `setup-audio`
 - `BLOOG` or `BLOOGLET`: `setup-audio` and then `sof-setup-audio`

@@ -42,8 +42,15 @@ function extractModules {
 
 sudo apt install vboot-kernel-utils cgpt -y
 
-export USB=$(mount | sed -n 's|^\(.*\) on / .*|\1|p')
+export USB_ROOTFS=$(mount | sed -n 's|^\(.*\) on / .*|\1|p')
+export USB=$(lsblk -no pkname $USB_ROOTFS)
 printq "Using $USB to update the kernel and its modules"
+
+if [[ $USB == *"/dev/sd"* ]]; then
+  export USB_KERNEL="${USB}1"
+else
+  export USB_KERNEL="${USB}p1"
+fi
 
 cd ~/linux-build || { mkdir ~/linux-build; cd ~/linux-build; }
 
@@ -71,7 +78,7 @@ futility vbutil_kernel \
     --pack bzImage.signed
 
 # Flash kernel
-sudo dd if=bzImage.signed of=${USB1}
+sudo dd if=bzImage.signed of=$USB_KERNEL
 
 # Extract modules
 sudo rm -rf ~/linux-build/modules/lib/modules/*
