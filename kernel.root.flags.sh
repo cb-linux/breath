@@ -1,0 +1,1 @@
+echo "console=tty1 root=${USB_ROOTFS} i915.modeset=1 rootwait rw fbcon=logo-pos:center,logo-count:1"

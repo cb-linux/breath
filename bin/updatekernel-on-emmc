@@ -55,7 +55,7 @@ fi
 cd ~/linux-build || { mkdir ~/linux-build; cd ~/linux-build; }
 
 # Download kernel commandline
-bash <(curl -s https://raw.githubusercontent.com/cb-linux/kernel/main/kernel.emmc.flags.sh) > kernel.flags
+bash <(curl -s https://raw.githubusercontent.com/cb-linux/kernel/main/kernel.root.flags.sh) > kernel.flags
 
 # Download kernel and modules
 if [ -n "$VERSION" ]; then
