@@ -139,7 +139,8 @@ syncStorage
 
 sudo umount $MNT
 
-if [[ $FEATURES == ISO ]]; then
+set +u
+if [[ $FEATURES == *"ISO"* ]]; then
 
    printq "Done!"
    echo "IMG built at ~/linux-build/breath.img"
@@ -154,3 +155,4 @@ else
    echo "(Provided that you have enabled USB booting as documented)"
 
 fi
+set -u
