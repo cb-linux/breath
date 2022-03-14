@@ -59,13 +59,13 @@ set -- $(cat /proc/cmdline)
 for x in "$@"; do
     case "$x" in
         root=*)
-        USB_ROOT="${x#root=}"
+        USB_ROOTFS="${x#root=}"s
         ;;
     esac
 done
 
 # We can get the overall block device of the USB from the root partition
-USB=$(lsblk -pno pkname $USB_ROOT)
+USB=$(lsblk -pno pkname $USB_ROOTFS)
 if [[ $USB == *"sd"* ]]; then
   USB_KERNEL=${USB}1
 else
@@ -77,7 +77,7 @@ printq "Using $USB to update the kernel and its modules"
 cd ~/linux-build || { mkdir ~/linux-build; cd ~/linux-build; }
 
 # Download kernel commandline
-curl -s https://raw.githubusercontent.com/cb-linux/kernel/main/kernel.flags > kernel.flags
+bash <(curl -s https://raw.githubusercontent.com/cb-linux/breath/main/kernel.root.flags.sh) > kernel.flags
 echo -n ' snd-intel-dspcfg.dsp_driver=3 snd_sof_pci.fw_path="intel/sof"'   >> kernel.flags
 
 # Download kernel and modules

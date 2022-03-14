@@ -31,11 +31,12 @@ function syncStorage {
 
 function extractModules {
 
-	sudo mkdir -p /lib/modules
-	mkdir -p modules || sudo rm -rf modules; sudo mkdir -p modules
+	sudo rm -rf /lib/modules
+  sync
+  sudo mkdir /lib/modules
+	mkdir -p modules || sudo rm -rf modules; mkdir -p modules
 	sudo tar xvpf modules.tar.xz -C modules
-	sudo rm -rf /lib/modules/*
-	sudo cp -rv modules/lib/modules/* /lib/modules
+	sudo cp -rv modules/lib/modules /lib
   echo "Please be patient, this will take 5+ minutess"
 	sync
 	
@@ -85,6 +86,4 @@ sudo dd if=bzImage.signed of=$USB_KERNEL
 sudo rm -rf ~/linux-build/modules/lib/modules/*
 extractModules
 
-# Write Storage
-echo "Writing storage..."
-sync
+echo "Done!"
