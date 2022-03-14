@@ -133,7 +133,9 @@ Once booted into Breath run the command depending on your device's board:
 
 **Connect to Wifi on your Chromebook!**
 
-- `NAMI`: `setup-audio`
+- `NAMI`:
+  - `VERSION=ALT bash updatekernel.sh` on the PC you built Breath with
+  - `setup-audio` on your Chromebook that has booted Breath
 - `BLOOG` or `BLOOGLET`: `setup-audio` and then `sof-setup-audio`
 - All Apollo Lake Devices (`CORAL` and `REEF`): `apl-sof-setup-audio`
 - Everything else: `sof-setup-audio`
