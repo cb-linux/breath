@@ -22,11 +22,11 @@ cd ~/linux-build || { mkdir ~/linux-build; cd ~/linux-build; }
 wget https://raw.githubusercontent.com/cb-linux/kernel/main/kernel.flags -O kernel.flags -q --show-progress
 
 # Download kernel and modules
-if [ -n "$DIR" ]; then
+if [[ -n "$DIR" ]]; then
     echo "Files supplied"
     cp ${DIR}/bzImage .
     cp ${DIR}/modules.tar.xz .
-elif [ $VERSION == "ALT" ]; then
+elif [[ $VERSION == "ALT" ]]; then
     wget https://github.com/cb-linux/breath/releases/latest/download/bzImage.alt -O bzImage -q --show-progress
     wget https://github.com/cb-linux/breath/releases/latest/download/modules.alt.tar.xz -O modules.tar.xz -q --show-progress
 else
