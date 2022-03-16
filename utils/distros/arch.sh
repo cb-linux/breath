@@ -49,6 +49,9 @@ EOT
     sudo tee -a ${MNT}/etc/modules-load.d/breath.conf > /dev/null <<EOT
     iwlmvm
     uvcvideo
+    nls_iso8859-1
+    nls_cp437
+    vfat
 EOT
 
     # Install nmcli for wifi
