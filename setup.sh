@@ -133,7 +133,7 @@ extractModules
 
 # Install all utility files in the bin directory
 cd $ORIGINAL_DIR
-sudo chmod +x bin/*
+sudo chmod 755 bin/*
 sudo cp bin/* ${MNT}/usr/local/bin
 syncStorage
 
