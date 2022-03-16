@@ -13,7 +13,8 @@ EOF
 
     sudo cp sources.list ${MNT}/etc/apt/
 
-    BASECMD="apt install -y linux-firmware network-manager tasksel software-properties-common"
+    BASECMD="apt install -y linux-firmware network-manager tasksel software-properties-common; "
+    BASECMD+="apt reinstall -y dbus"
 
     # Chroot into the rootfs to install some packages
     sudo mount --bind /dev ${MNT}/dev
