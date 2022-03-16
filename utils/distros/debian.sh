@@ -12,6 +12,9 @@ function postinstall {
     sudo tee -a ${MNT}/etc/modules-load.d/modules.conf > /dev/null <<EOT
     iwlmvm
     uvcvideo
+    nls_iso8859-1
+    nls_cp437
+    vfat
 EOT
 
     # Download the desktop that the user has selected
@@ -72,7 +75,7 @@ EOT
     runChrootCommand "apt update -y; $BASECMD; $DESKTOP_PACKAGE; $SYSTEMD_TARGET"
     printerr "Ignore libfprint-2-2 fprintd libpam-fprintd errors"
 
-    runChrootCommand "apt remove pulseaudio"
+    runChrootCommand "apt remove -y pulseaudio"
     printerr "Ignore libfprint-2-2 fprintd libpam-fprintd errors"
     syncStorage
     set -e
