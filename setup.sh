@@ -112,9 +112,11 @@ sudo rm -rf ${MNT}/*
 sudo mount ${USB2} $MNT
 
 # Extract the rootfs
+printq "Extract root FS"
 extractRootfs
 
 # Post-install for specific distros (located in utils/$DISTRO_postinstall.sh)
+printq "Postinstall (${DISTRO} ${DISTRO_CODENAME} ${DISTRO_VERSION})"
 postinstall
 
 # The heredoc (<<EOT) method of running commands in a chroot isn't interactive,
