@@ -127,19 +127,21 @@ to enable USB and Custom Kernel Booting.
 
 Reboot, and with the USB plugged in, press <kbd>CTRL</kbd> <kbd>U</kbd> instead of <kbd>CTRL</kbd> <kbd>D</kbd>. After a short black screen, the system should display a login screen.
 
+NetworkManager is installed by default on all distros. You can connect to the Wifi by using `nmtui` (for a terminal user interface) or `nmcli`.
+
 ### Audio
 
 Once booted into Breath run the command depending on your device's board:
 
-**Connect to Wifi on your Chromebook!**
-
-- `NAMI`:
-  1. `VERSION=ALT bash updatekernel.sh` on the PC you built Breath with
-  2. `setup-audio` on your Chromebook that has booted Breath
-- `BLOOG` or `BLOOGLET`: `setup-audio` and then `sof-setup-audio`
-- All Apollo Lake Devices (`CORAL` and `REEF`): `apl-sof-setup-audio`
-- Everything else: `sof-setup-audio`
-  - Doesn't work? Try `SOUNDCARD=rtk sof-setup-audio`
+1. Connect to Wifi on your Chromebook! You can use a GUI for this or `nmcli`/`nmtui`
+   
+2. - `NAMI`:
+     1. `VERSION=ALT bash updatekernel.sh` on the PC you built Breath with
+     2. `setup-audio` on your Chromebook that has booted Breath
+   - `BLOOG` or `BLOOGLET`: `setup-audio` and then `sof-setup-audio`
+   - All Apollo Lake Devices (`CORAL` and `REEF`): `apl-sof-setup-audio`
+   - Everything else: `sof-setup-audio`
+     - Doesn't work? Try `SOUNDCARD=rtk sof-setup-audio`
 
 If it is not, that's completely expected! Open up a Github Issue with your Chromebook model and I'll  get audio working.
 
