@@ -2,6 +2,8 @@
 
 function extractRootfs {
 
+	printq "Extracting the Root Filesystem"
+
 	# READ: Distro dependent step
 	case $DISTRO in
 

@@ -115,6 +115,7 @@ sudo mount ${USB2} $MNT
 extractRootfs
 
 # Post-install for specific distros (located in utils/$DISTRO_postinstall.sh)
+printq "Running post-installation steps for $DISTRO"
 postinstall
 
 # The heredoc (<<EOT) method of running commands in a chroot isn't interactive,
