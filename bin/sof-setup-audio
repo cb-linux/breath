@@ -15,8 +15,8 @@ case $SOUNDCARD in # TODO: add realtek support for octopus
 esac
 
 # Remove PulseAudio
-sudo apt purge pulseaudio
-sudo apt purge pulseaudio*
+sudo apt purge -y pulseaudio
+sudo apt purge -y pulseaudio*
 sudo apt install -y apulse alsa-*
 sudo apt install -y firmware-sof-signed || sudo apt-get -o Dpkg::Options::="--force-overwrite" install firmware-sof-signed
 
