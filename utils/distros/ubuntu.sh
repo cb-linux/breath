@@ -4,11 +4,21 @@ function postinstall {
     # Setup internet
     sudo cp --remove-destination /etc/resolv.conf ${MNT}/etc/resolv.conf
 
+    # Determine server based upon build system locale
+    TEMP=$(locale | grep LANG=)
+    LANG=${TEMP:5:-1}
+    printf "\>${LANG}\<\n"
+
+    LOC=${LANG:3:2}
+    PREFIX=${LOC,,}
+    SOURCE="deb http://${PREFIX}.archive.ubuntu.com/ubuntu ${DISTRO_CODENAME}"
+    printq "${SOURCE}"
+
     # Add universe to /etc/apt/sources.list so we can install normal packages
     cat > sources.list << EOF
-    deb http://archive.ubuntu.com/ubuntu  ${DISTRO_CODENAME}          main universe multiverse 
-    deb http://archive.ubuntu.com/ubuntu  ${DISTRO_CODENAME}-security main universe multiverse
-    deb http://archive.ubuntu.com/ubuntu  ${DISTRO_CODENAME}-updates  main universe multiverse
+    ${SOURCE}          main universe multiverse
+    ${SOURCE}-security main universe multiverse
+    ${SOURCE}-updates  main universe multiverse
 EOF
 
     sudo cp sources.list ${MNT}/etc/apt/
@@ -44,7 +54,7 @@ EOT
       gnome)
         export DESKTOP_PACKAGE="apt install -y ubuntu-desktop"
         ;;
-      
+
       deepin)
         export DESKTOP_PACKAGE="add-apt-repository ppa:ubuntudde-dev/stable; apt update; apt install -y ubuntudde-dde"
         ;;
