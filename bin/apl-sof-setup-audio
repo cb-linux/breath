@@ -59,7 +59,7 @@ set -- $(cat /proc/cmdline)
 for x in "$@"; do
     case "$x" in
         root=*)
-        USB_ROOTFS="${x#root=}"
+        export USB_ROOTFS="${x#root=}"
         ;;
     esac
 done
