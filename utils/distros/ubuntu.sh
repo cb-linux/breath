@@ -7,12 +7,11 @@ function postinstall {
     # Determine server based upon build system locale
     TEMP=$(locale | grep LANG=)
     LANG=${TEMP:5:-1}
-    printf "\>${LANG}\<\n"
-
+    
     # Get the two-character region and set to lower-case
     LOC=${LANG:3:2}
     PREFIX=${LOC,,}
-    
+
     # Designate main server for the region
     SOURCE="deb http://${PREFIX}.archive.ubuntu.com/ubuntu ${DISTRO_CODENAME}"
     printq "${SOURCE}"
