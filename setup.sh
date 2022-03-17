@@ -145,7 +145,7 @@ if [[ $FEATURES == *"ISO"* ]]; then
 
    printq "Done!"
    echo "IMG built at ~/linux-build/breath.img"
-   echo "You can flash this raw image using Etcher, Rufus, DD, or other ISO flashing tools"
+   echo "You can flash this raw image using Etcher, Rufus, DD, or other ISO flash tools"
    echo "Once you have done that, you can plug in your $DISTRO USB with the $DESKTOP desktop into your Chromebook and boot it with CTRL+U"
    echo "(Provided that you have enabled USB booting as documented)"
 

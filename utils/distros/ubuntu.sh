@@ -4,11 +4,24 @@ function postinstall {
     # Setup internet
     sudo cp --remove-destination /etc/resolv.conf ${MNT}/etc/resolv.conf
 
+    # Determine server based upon build system locale
+    TEMP=$(locale | grep LANG=)
+    LANG=${TEMP:5:-1}
+    printf "\>${LANG}\<\n"
+
+    # Get the two-character region and set to lower-case
+    LOC=${LANG:3:2}
+    PREFIX=${LOC,,}
+    
+    # Designate main server for the region
+    SOURCE="deb http://${PREFIX}.archive.ubuntu.com/ubuntu ${DISTRO_CODENAME}"
+    printq "${SOURCE}"
+
     # Add universe to /etc/apt/sources.list so we can install normal packages
     cat > sources.list << EOF
-    deb http://archive.ubuntu.com/ubuntu  ${DISTRO_CODENAME}          main universe multiverse 
-    deb http://archive.ubuntu.com/ubuntu  ${DISTRO_CODENAME}-security main universe multiverse
-    deb http://archive.ubuntu.com/ubuntu  ${DISTRO_CODENAME}-updates  main universe multiverse
+    ${SOURCE}          main universe multiverse
+    ${SOURCE}-security main universe multiverse
+    ${SOURCE}-updates  main universe multiverse
 EOF
 
     sudo cp sources.list ${MNT}/etc/apt/
@@ -44,7 +57,7 @@ EOT
       gnome)
         export DESKTOP_PACKAGE="apt install -y ubuntu-desktop"
         ;;
-      
+
       deepin)
         export DESKTOP_PACKAGE="add-apt-repository ppa:ubuntudde-dev/stable; apt update; apt install -y ubuntudde-dde"
         ;;
@@ -85,10 +98,10 @@ EOT
     # We can fix this by removing the GNOME session and deleting the shell.
     if [[ $DESKTOP != "gnome" ]]; then
       sudo rm ${MNT}/usr/share/xsessions/ubuntu.desktop || true
-      runChrootCommand "apt remove gnome-shell -y; apt autoremove -y" || true
+      runChrootCommand "apt remove -y gnome-shell; apt autoremove -y" || true
     fi
 
-    runChrootCommand "apt remove pulseaudio needrestart" || true
+    runChrootCommand "apt remove -y pulseaudio needrestart" || true
     printerr "Ignore libfprint-2-2 fprintd libpam-fprintd errors"
     syncStorage
     set -e
