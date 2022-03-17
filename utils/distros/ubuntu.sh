@@ -95,10 +95,10 @@ EOT
     # We can fix this by removing the GNOME session and deleting the shell.
     if [[ $DESKTOP != "gnome" ]]; then
       sudo rm ${MNT}/usr/share/xsessions/ubuntu.desktop || true
-      runChrootCommand "apt remove gnome-shell -y; apt autoremove -y" || true
+      runChrootCommand "apt remove -y gnome-shell; apt autoremove -y" || true
     fi
 
-    runChrootCommand "apt remove pulseaudio needrestart" || true
+    runChrootCommand "apt remove -y pulseaudio needrestart" || true
     printerr "Ignore libfprint-2-2 fprintd libpam-fprintd errors"
     syncStorage
     set -e
