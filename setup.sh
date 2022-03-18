@@ -56,9 +56,16 @@ toilet -f term   -F border "Made by MilkyDeveloper"
 echo " $FEATURES"
 
 # Ask for username
-printq "What would you like your username to be? (no spaces, backslashes, or special characters)"
+printq "What would you like your *username* to be?"
+printq "NOTE: No spaces, backslashes, or special characters"
 read -r BREATH_USER
 export BREATH_USER
+
+# Ask for hostname
+printq "What would you like the *hostname* to be?"
+printq "NOTE: No spaces, backslashes, or special characters"
+read -r BREATH_HOST
+export BREATH_HOST
 
 # Bootstrap files
 bootstrapFiles
@@ -74,7 +81,7 @@ if [[ $FEATURES == *"ISO"* ]]; then
    export USB=$(sudo losetup -f --show breath.img)
    export USB1="${USB}p1"
    export USB2="${USB}p2"
-  
+
 else
 
    # Wait for a USB to be plugged in
@@ -114,6 +121,13 @@ sudo mount ${USB2} $MNT
 # Extract the rootfs
 extractRootfs
 
+# Set the hostname
+cat > hostname << EOF
+  ${BREATH_HOST}
+EOF
+
+sudo cp hostname ${MNT}/etc/
+
 # Post-install for specific distros (located in utils/$DISTRO_postinstall.sh)
 printq "Running post-installation steps for $DISTRO"
 postinstall
@@ -141,19 +155,16 @@ syncStorage
 sudo umount $MNT
 
 set +u
+
+printq "Done!"
 if [[ $FEATURES == *"ISO"* ]]; then
 
-   printq "Done!"
    echo "IMG built at ~/linux-build/breath.img"
-   echo "You can flash this raw image using Etcher, Rufus, DD, or other ISO flash tools"
-   echo "Once you have done that, you can plug in your $DISTRO USB with the $DESKTOP desktop into your Chromebook and boot it with CTRL+U"
-   echo "(Provided that you have enabled USB booting as documented)"
-
-else
-
-   printq "Done!"
-   echo "You can plug in your $DISTRO USB with the $DESKTOP desktop into your Chromebook and boot it with CTRL+U"
-   echo "(Provided that you have enabled USB booting as documented)"
+   echo "You can flash this raw image using Etcher, Rufus, DD, or other ISO flash tools."
 
 fi
+echo "Plug the $DISTRO USB with the $DESKTOP desktop into the Chromebook."
+echo "Boot with CTRL+U from the OS verification screen."
+echo "(Provided that you have enabled USB booting as documented)"
+
 set -u
