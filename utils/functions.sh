@@ -14,8 +14,8 @@ function printerr {
 function syncStorage {
 
   printq "Writing storage, may take more than 5 minutes."
-  printq "Although it seems slow, consider this process like flashing an ISO to a USB Drive."
-  printq "Below is an innacurate indicator of mB left to write. It may decrease hundreds of megabytes in seconds."
+  printq "It may seem slow; consider this process like flashing an ISO to a USB Drive."
+  printq "Below is an innacurate indicator of mB left to write; it may decrease hundreds of megabytes in seconds."
 
   # shellcheck disable=SC2016
   sync & {
@@ -47,7 +47,7 @@ function waitForUSB {
     fi
   done
   echo
-  
+
 }
 
 # Function to unmount all partitions on the USB and /mnt
