@@ -55,6 +55,11 @@ toilet -f mono12 -F crop   "Breath"
 toilet -f term   -F border "Made by MilkyDeveloper"
 echo " $FEATURES"
 
+# Ask for hostname
+printq "What would you like the hostname to be?"
+read -r BREATH_HOST
+export BREATH_HOST
+
 # Ask for username
 printq "What would you like your username to be? (no spaces, backslashes, or special characters)"
 read -r BREATH_USER
@@ -74,7 +79,7 @@ if [[ $FEATURES == *"ISO"* ]]; then
    export USB=$(sudo losetup -f --show breath.img)
    export USB1="${USB}p1"
    export USB2="${USB}p2"
-  
+
 else
 
    # Wait for a USB to be plugged in
@@ -113,6 +118,9 @@ sudo mount ${USB2} $MNT
 
 # Extract the rootfs
 extractRootfs
+
+# Set the hostname
+runChrootCommand "hostnamectl set-hostname '$BREATH_HOST'"
 
 # Post-install for specific distros (located in utils/$DISTRO_postinstall.sh)
 printq "Running post-installation steps for $DISTRO"
