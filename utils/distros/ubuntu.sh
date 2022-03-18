@@ -4,17 +4,17 @@ function postinstall {
     # Setup internet
     sudo cp --remove-destination /etc/resolv.conf ${MNT}/etc/resolv.conf
 
-    # Determine server based upon build system locale
-    TEMP=$(locale | grep LANG=)
-    LANG=${TEMP:5:-1}
-    
-    # Get the two-character region and set to lower-case
-    LOC=${LANG:3:2}
-    PREFIX=${LOC,,}
+    # Get build system locale
+    LOC=$(locale | grep LANG=)
+    LANG=${LOC:5:-1}
+
+    # Get two-character region and create lower-case, two-character PREFIX
+    REGION=${LANG:3:2}
+    PREFIX=${REGION,,}
 
     # Designate main server for the region
+    # Canonical has DNS entries for every region
     SOURCE="deb http://${PREFIX}.archive.ubuntu.com/ubuntu ${DISTRO_CODENAME}"
-    printq "${SOURCE}"
 
     # Add universe to /etc/apt/sources.list so we can install normal packages
     cat > sources.list << EOF
