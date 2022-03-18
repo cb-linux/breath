@@ -55,15 +55,15 @@ toilet -f mono12 -F crop   "Breath"
 toilet -f term   -F border "Made by MilkyDeveloper"
 echo " $FEATURES"
 
-# Ask for hostname
-printq "What would you like the hostname to be?"
-read -r BREATH_HOST
-export BREATH_HOST
-
 # Ask for username
 printq "What would you like your username to be? (no spaces, backslashes, or special characters)"
 read -r BREATH_USER
 export BREATH_USER
+
+# Ask for hostname
+printq "What would you like the hostname to be?"
+read -r BREATH_HOST
+export BREATH_HOST
 
 # Bootstrap files
 bootstrapFiles
