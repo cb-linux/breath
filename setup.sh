@@ -122,7 +122,11 @@ sudo mount ${USB2} $MNT
 extractRootfs
 
 # Set the hostname
-runChrootCommand "hostnamectl set-hostname '$BREATH_HOST'"
+cat > hostname << EOF
+  ${BREATH_HOST}
+EOF
+
+sudo cp hostname ${MNT}/etc/
 
 # Post-install for specific distros (located in utils/$DISTRO_postinstall.sh)
 printq "Running post-installation steps for $DISTRO"
