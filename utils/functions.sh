@@ -13,10 +13,10 @@ function printerr {
 # Sync Progress Function
 function syncStorage {
 
-  printq "Writing storage, may take more than 5 minutes."
-  printq "It may seem slow; consider this process like flashing an ISO to a USB Drive."
-  printq "Below is an innacurate indicator of MB left to write (may decrease 100s of MB in seconds)."
-  
+  printq "Writing storage, may take more than 5 minutes.  It may seem slow; consider"
+  printq "this process like flashing an ISO to a USB Drive.  Below is an innacurate"
+  printq "indicator of MB left to write (may decrease hundreds of MB in seconds)."
+
   # shellcheck disable=SC2016
   sync & {
     # If the unsynced data (in kB) is greater than 50MB, then show the sync progress
