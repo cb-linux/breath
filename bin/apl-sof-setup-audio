@@ -104,7 +104,7 @@ extractModules
 
 # Write Storage
 echo "Writing storage..."
-sync
+syncStorage
 
 # Clean up
 sudo rm -rf ~/linux-build
