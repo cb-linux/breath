@@ -90,6 +90,11 @@ EOT
         export DESKTOP_PACKAGE="echo 'Using CLI, no need to install any desktop packages.'"
         ;;
 
+      *)
+        printq "${DEKSTOP} is not currently available or is not a recognzied desktop."
+        exit
+        ;;
+
     esac
 
     set +e
