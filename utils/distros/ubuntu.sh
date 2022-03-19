@@ -91,7 +91,7 @@ EOT
         ;;
 
       *)
-        printq "${DESKTOP} is not currently available or is not a recognzied desktop."
+        printq "'${DESKTOP}' is not currently available or is not a recognzied desktop."
         exit
         ;;
 
