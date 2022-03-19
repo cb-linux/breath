@@ -65,6 +65,10 @@ EOT
         export DESKTOP_PACKAGE="apt install -y ubuntu-mate-desktop"
         ;;
 
+      budgie)
+        export DESKTOP_PACKAGE="apt install -y ubuntu-budgie-desktop; sudo dpkg-reconfigure lightdm"
+        ;;
+
       xfce)
         export DESKTOP_PACKAGE="apt install -y xubuntu-desktop"
         ;;
