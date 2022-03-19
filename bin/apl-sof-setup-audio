@@ -106,5 +106,8 @@ extractModules
 echo "Writing storage..."
 sync
 
+# Clean up
+sudo rm -rf ~/linux-build
+
 sof-setup-audio
 echo "SOF APL setup audio script done!"
