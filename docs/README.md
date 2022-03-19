@@ -16,89 +16,72 @@
 <summary>Expand List of tested devices with audio</summary>
 <br>
 
-Nami:
-* Acer Chromebook 13 / Spin 13
-* Dell Inspiron 14 2-in-1 Model 7486 
-* Yoga Chromebook C630
-* HP Chromebook x360 14 (i3 8130u)
-* Acer Chromebook 715
-* Acer Chromebook 714
-* HP Chromebook 15 G1
-* Dell Inspiron Chromebook 14 (7460)
+**Supported Boards**: `["nami", "octopus", "volteer", "coral", "reef", "hatch", "puff"]`
 
-Octopus:
-* HP Chromebook x360 14b (Blooguard) (unconfirmed)
+* IdeaPad Flex 5i Chromebook (13", 5)
+* IdeaPad Flex 5i Chromebook
+* HP Chromebook x360 14b / HP Chromebook x360 14a
+* Acer Chromebook 712
+* Lenovo Thinkpad 11e Chromebook / Lenovo Thinkpad Yoga 11e Chromebook
+* HP Chromebook x360 11 G1 EE
+* Acer Chromebook  Spin 11 R751T
+* Chromebook 15 CB515-1HT/1H
+* Acer Chromebook 11 (C732, C732T, C732L & C732LT )
+* Lenovo 500e Chromebook
+* Lenovo 100e Chromebook
+* AcerChromebook 11 (CB311-8H & CB311-8HT)
+* Acer Chromebook Spin 11 (CP311-1H & CP311-1HN)
+* CTL Chromebook J41
+* CTL Chromebook NL7T-360
+* CTL Chromebook NL7
+* ASUS Chromebook C223
+* ASUS Chromebook C423
+* ASUS Chromebook C523
+* Acer Chromebook 514
+* Acer Chromebook 13 / Spin 13
+* Dell Inspiron 14 2-in-1 Model 7486
+* Yoga Chromebook C630
+* PCmerge Chromebook AL116
+* ASUS Chromebook C403
 * Acer Chromebook 311
 * Acer Chromebook Spin 511
-* Lenovo 300e Chromebook 2nd Gen (Intel)
 * Lenovo 100e Chromebook 2nd Gen (Intel)
-* Lenovo 500e Chromebook 2nd Gen
-* Acer Chromebook Spin 512 (R851TN)
-* Acer Chromebook 512 (C851/C851T)
+* Lenovo 300e Chromebook 2nd Gen (Intel)
+* Acer Chromebook Spin 512(R851TN)
+* Acer Chromebook 512(C851/C851T)
+* ASUS-Chromebook-Flip-C214
 * ASUS Chromebook Flip C204
-* ASUS Chromebook Flip C214
-* HP Chromebook x360 11 G2 EE
 * HP Chromebook 11 G7 EE
+* HP Chromebook x360 11 G2 EE
 * Lenovo Chromebook C340-11
 * Lenovo Chromebook S340-14
-* Acer Chromebook 315 (CB315-3H/3HT)
-* Acer Chromebook 314 (CB314-1H/1HT)
+* Lenovo Chromebook C340-15
 * Acer Chromebook Spin 311 (CP311-2H)
-* Acer Chromebook 311 (CB311-9HT/9H)
+* Acer Chromebook 314 (CB314-1H/1HT)
+* Acer Chromebook 315 (CB315-3H/3HT)
+* Acer Chromebook 311 (CB311-9HT/9H) )
 * Samsung Chromebook 4
 * Samsung Chromebook+
+* Samsung Galaxy Chromebook
+* ASUS Chromebook Flip C436FA
+* HP Chromebook 11 G8 EE
 * HP Chromebook x360 11 G3 EE
 * HP Chromebook 14 G6
-* HP Chromebook 11 G8 EE
-* HP Chromebook 14a (unconfirmed)
+* HP Chromebook 14a
 * Acer Chromebook 314 (C933L/LT)
-* Ideapad 3 Chromebook
-* ASUS Chromebook CX1101
-* ASUS Chromebook C424
-
-Volteer:
-* IdeaPad Flex 5i Chromebook
+* HP Chromebox G3
+* ASUS Chromebox 4
+* Acer Chromebox CXI4
+* ASUS Fanless Chromebox
+* Samsung Galaxy Chromebook 2
+* The Acer Chromebook 514 (CB514-1H)
 * Acer Chromebook Spin 713 (CP713-3W)
-* Acer Chromebook 514 (CB514-1H) (Certain high end models?)
 * ASUS Chromebook Flip CX5 (CX5500)
 * HP Pro c640 G2 Chromebook
 * ASUS Chromebook CX9 (CX9400)
+* ASUS Chromebook CX1101
+* ASUS Chromebook C424
 * Acer Chromebook 515
-
-Reef:
-* Lenovo Thinkpad 11e Chromebook / Lenovo Thinkpad Yoga 11e Chromebook
-* HP Chromebook x360 11 G1 EE
-* Acer Chromebook Spin 11 R751T
-* Acer Chromebook 15 CB515-1HT/1H
-
-Zork:
-* Picasso/Dali
-  * Lenovo ThinkPad C13 Yoga Chromebook
-  * HP Pro c645 Chromebook Enterprise
-  * Acer Chromebook Spin 514
-  * ASUS Chromebook Flip CM5
-* Pollock (untested)
-  * Lenovo 300e Chromebook Gen 3 AMD
-  * Lenovo 100e Chromebook Gen 3 AMD
-  * HP Chromebook 14a-nd0097nr
-  * HP Chromebook x360 14a (AMD)
-  * ASUS Chromebook Flip CM1
-
-Coral:
-* Acer Chromebook 11 (C732, C732T, C732L & C732LT )
-* Lenovo 100e Chromebook
-* Lenovo 500e Chromebook
-* Acer Chromebook 11 (CB311-8H & CB311-8HT)
-* Acer Chromebook Spin 11 (CP311-1H & CP311-1HN)
-* CTL Chromebook J41
-* CTL Chromebook NL7
-* CTL Chromebook NL7T-360
-* ASUS Chromebook C223
-* Lenovo Chromebook C330
-* ASUS Chromebook C423
-* ASUS Chromebook C523
-* PCmerge Chromebook AL116
-* ASUS Chromebook C403
 
 Untested, but `dedede` should work
 </details>
