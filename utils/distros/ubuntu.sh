@@ -4,11 +4,23 @@ function postinstall {
     # Setup internet
     sudo cp --remove-destination /etc/resolv.conf ${MNT}/etc/resolv.conf
 
+    # Get build system locale
+    LOC=$(locale | grep LANG=)
+    LANG=${LOC:5:-1}
+
+    # Get two-character region and create lower-case, two-character PREFIX
+    REGION=${LANG:3:2}
+    PREFIX=${REGION,,}
+
+    # Designate main server for the region
+    # Canonical has DNS entries for every region
+    SOURCE="deb http://${PREFIX}.archive.ubuntu.com/ubuntu ${DISTRO_CODENAME}"
+
     # Add universe to /etc/apt/sources.list so we can install normal packages
     cat > sources.list << EOF
-    deb http://archive.ubuntu.com/ubuntu  ${DISTRO_CODENAME}          main universe multiverse 
-    deb http://archive.ubuntu.com/ubuntu  ${DISTRO_CODENAME}-security main universe multiverse
-    deb http://archive.ubuntu.com/ubuntu  ${DISTRO_CODENAME}-updates  main universe multiverse
+    ${SOURCE}          main universe multiverse
+    ${SOURCE}-security main universe multiverse
+    ${SOURCE}-updates  main universe multiverse
 EOF
 
     sudo cp sources.list ${MNT}/etc/apt/
@@ -85,10 +97,10 @@ EOT
     # We can fix this by removing the GNOME session and deleting the shell.
     if [[ $DESKTOP != "gnome" ]]; then
       sudo rm ${MNT}/usr/share/xsessions/ubuntu.desktop || true
-      runChrootCommand "apt remove gnome-shell -y; apt autoremove -y" || true
+      runChrootCommand "apt remove -y gnome-shell; apt autoremove -y" || true
     fi
 
-    runChrootCommand "apt remove pulseaudio needrestart" || true
+    runChrootCommand "apt remove -y pulseaudio needrestart" || true
     printerr "Ignore libfprint-2-2 fprintd libpam-fprintd errors"
     syncStorage
     set -e
