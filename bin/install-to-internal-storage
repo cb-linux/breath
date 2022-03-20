@@ -3,7 +3,23 @@
 
 set -e
 
-sudo apt install vboot-kernel-utils cgpt curl rsync -y
+# Arch support
+if [[ -f "/etc/arch-version" ]] || [[ -f "/etc/arch-release" ]]; then
+    git clone https://aur.archlinux.org/flashrom-git.git
+    git clone https://aur.archlinux.org/trousers.git
+    git clone https://aur.archlinux.org/vboot-utils.git
+
+    cd ./flashrom-git  && makepkg -cis 
+    cd ../trousers     && makepkg -cis
+    cd ../vboot-utils  && makepkg -cis 
+
+    pacman -Syu rsync curl
+
+    cd ../
+    rm -rf ./flashrom-git ./trousers ./vboot-utils
+else
+    sudo apt install vboot-kernel-utils cgpt curl rsync -y
+fi
 
 echo "What drive would you like to install to? (e.g. /dev/mmcblk0)"
 read -r USB
