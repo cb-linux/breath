@@ -65,6 +65,10 @@ EOT
         export DESKTOP_PACKAGE="apt install -y ubuntu-mate-desktop"
         ;;
 
+      budgie)
+        export DESKTOP_PACKAGE="apt install -y ubuntu-budgie-desktop; sudo dpkg-reconfigure lightdm"
+        ;;
+
       xfce)
         export DESKTOP_PACKAGE="apt install -y xubuntu-desktop"
         ;;
@@ -84,6 +88,11 @@ EOT
 
       cli)
         export DESKTOP_PACKAGE="echo 'Using CLI, no need to install any desktop packages.'"
+        ;;
+
+      *)
+        printq "'${DESKTOP}' is not currently available or is not a recognzied desktop."
+        exit
         ;;
 
     esac
