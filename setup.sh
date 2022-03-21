@@ -128,7 +128,7 @@ postinstall
 # The heredoc (<<EOT) method of running commands in a chroot isn't interactive,
 # but luckily passwd has an option to chroot
 # In case a user mistypes the password confirmation, retry the password
-printq "What would you like the root user's password to be?"
+printq "What would you like the *root* user's password to be?"
 until sudo chroot $MNT sh -c "passwd root"; do printerr "Retrying Password"; sleep 1; done
 
 # Copy (hopefully up-to-date) firmware from the host to the USB
