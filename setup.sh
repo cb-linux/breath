@@ -56,9 +56,16 @@ toilet -f term   -F border "Made by MilkyDeveloper"
 echo " $FEATURES"
 
 # Ask for username
-printq "What would you like your username to be? (no spaces, backslashes, or special characters)"
+printq "What would you like the *username* to be?"
+printq "NOTE: No spaces, backslashes, or special characters"
 read -r BREATH_USER
 export BREATH_USER
+
+# Ask for hostname
+printq "What would you like the *hostname* to be?"
+printq "NOTE: No spaces, backslashes, or special characters"
+read -r BREATH_HOST
+export BREATH_HOST
 
 # Bootstrap files
 bootstrapFiles
@@ -121,7 +128,7 @@ postinstall
 # The heredoc (<<EOT) method of running commands in a chroot isn't interactive,
 # but luckily passwd has an option to chroot
 # In case a user mistypes the password confirmation, retry the password
-printq "What would you like the root user's password to be?"
+printq "What would you like the *root* user's password to be?"
 until sudo chroot $MNT sh -c "passwd root"; do printerr "Retrying Password"; sleep 1; done
 
 # Copy (hopefully up-to-date) firmware from the host to the USB
@@ -131,6 +138,13 @@ syncStorage
 
 # Extract the modules to /mnt
 extractModules
+
+# Set the hostname
+cat > hostname << EOF
+  ${BREATH_HOST}
+EOF
+
+sudo cp hostname ${MNT}/etc/
 
 # Install all utility files in the bin directory
 cd $ORIGINAL_DIR
