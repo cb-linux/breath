@@ -62,9 +62,12 @@ read -r BREATH_USER
 export BREATH_USER
 
 # Ask for hostname
-printq "What would you like the *hostname* to be?"
+printq "What would you like the *hostname* to be? (default is '${DISTRO}')"
 printq "NOTE: No spaces, backslashes, or special characters"
 read -r BREATH_HOST
+if [ -z $BREATH_HOST ]; then
+  BREATH_HOST=$DISTRO
+fi
 export BREATH_HOST
 
 # Bootstrap files
