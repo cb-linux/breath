@@ -121,13 +121,6 @@ sudo mount ${USB2} $MNT
 # Extract the rootfs
 extractRootfs
 
-# Set the hostname
-cat > hostname << EOF
-  ${BREATH_HOST}
-EOF
-
-sudo cp hostname ${MNT}/etc/
-
 # Post-install for specific distros (located in utils/$DISTRO_postinstall.sh)
 printq "Running post-installation steps for $DISTRO"
 postinstall
@@ -145,6 +138,13 @@ syncStorage
 
 # Extract the modules to /mnt
 extractModules
+
+# Set the hostname
+cat > hostname << EOF
+  ${BREATH_HOST}
+EOF
+
+sudo cp hostname ${MNT}/etc/
 
 # Install all utility files in the bin directory
 cd $ORIGINAL_DIR
