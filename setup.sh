@@ -60,6 +60,12 @@ printq "What would you like your username to be? (no spaces, backslashes, or spe
 read -r BREATH_USER
 export BREATH_USER
 
+# Ask for hostname
+printq "What would you like the *hostname* to be?"
+printq "NOTE: No spaces, backslashes, or special characters"
+read -r BREATH_HOST
+export BREATH_HOST
+
 # Bootstrap files
 bootstrapFiles
 
@@ -113,6 +119,13 @@ sudo mount ${USB2} $MNT
 
 # Extract the rootfs
 extractRootfs
+
+# Set the hostname
+cat > hostname << EOF
+  ${BREATH_HOST}
+EOF
+
+sudo cp hostname ${MNT}/etc/
 
 # Post-install for specific distros (located in utils/$DISTRO_postinstall.sh)
 printq "Running post-installation steps for $DISTRO"
