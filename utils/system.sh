@@ -53,9 +53,14 @@ function installDependencies () {
                 case $var in
 
                     # vboot-utils
-                    # TODO: Yay fails to install because of permission error(128)
                     vboot-kernel-utils)
                         var=vboot-utils;
+                        ;;
+
+                    # cgpt
+                    cgpt)
+                        unset var; # Included in vboot-utils
+                        ;;
 
                 esac
                 yay -S --noconfirm $var

@@ -15,7 +15,6 @@ function bootstrapFiles {
 
   # If the ChromeOS firmware utility doesn't exist, install it and other packages
   printq "Installing Dependencies"
-  # sudo apt install -y vboot-kernel-utils arch-install-scripts git wget cgpt $FW_PACKAGE
   installDependencies vboot-kernel-utils arch-install-scripts git wget cgpt $FW_PACKAGE
 
 
@@ -66,7 +65,7 @@ function bootstrapFiles {
 
   debian)
       # Debian uses debootstrap rather than extracting a prebuilt rootfs
-      sudo apt install debootstrap -y
+      installDependencies debootstrap
       ;;
 
 
