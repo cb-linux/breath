@@ -45,7 +45,7 @@ set -e
 whichOperatingSystem
 
 # Many much importance
-sudo apt install -y toilet
+installDependencies toilet
 
 # Print 15 lines to "fake" clear the screen
 # shellcheck disable=SC2034

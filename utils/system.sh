@@ -2,10 +2,9 @@
 
 function whichOperatingSystem {
 
-    # TODO: Finish work here!
+    OS=$(uname -s)
 
-    OS=$(uname -s) # Determine operating system
-    
+    # Determine operating system and distro
     if [[ $OS == Linux ]]; then
         
         # Debian
@@ -32,7 +31,22 @@ function whichOperatingSystem {
 function installDependencies () {
 
     # TODO: Implement installDependencies
-    # NOTE: Use "$*" to call all arguments
-    exit
+    # NOTE: Use "$*" to call all function arguments
+    
+    # Download dependencies based on distribution
+    case $DIST in
+
+    Debian)
+        # Install dependencies on a Debian host OS
+        sudo apt install -y $*
+        ;;
+
+    Arch)
+        # Install dependencies on a Arch host OS
+        # TODO: Implement arch install
+        exit
+        ;;
+
+    esac
 
 }
