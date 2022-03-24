@@ -34,9 +34,9 @@ function installDependencies () {
 
     # TODO: Implement installDependencies
     # NOTE: Use "$*" to call all function arguments
-    
+
     # Download dependencies based on distribution
-    case  $DIST in
+    case $DIST in
 
     Debian)
         # Install dependencies on a Debian host OS
@@ -47,10 +47,21 @@ function installDependencies () {
         # Install dependencies on a Arch host OS
         if [[ -f /usr/bin/yay ]]; then
             # Install dependencies if yay is found
-            yay -S --noconfirm $*
+            for var in "$@"
+            do
+                # replace package names relevant to distro
+                case $var in
 
+                    # vboot-utils
+                    # TODO: Yay fails to install because of permission error(128)
+                    vboot-kernel-utils)
+                        var=vboot-utils;
+
+                esac
+                yay -S --noconfirm $var
+            done
         else
-            # Yay not istalled, exiy
+            # Yay not istalled, exit
             printerr "Please install yay(https://aur.archlinux.org/yay.git) to continue installation, exiting!"
             exit
         fi
