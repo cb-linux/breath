@@ -60,12 +60,3 @@ function unmountUSB {
 function runChrootCommand {
   sudo chroot $MNT /bin/sh -c "$1"
 }
-
-# Function for running command without root priveleges
-# TODO: FIX root user issues(whoami reports as root)
-function runUnRootedCommand () {
-    su $(whoami) -c bash <<EOF
-    whoami
-    $*
-EOF
-} 

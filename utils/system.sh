@@ -50,12 +50,9 @@ function installDependencies () {
             yay -S --noconfirm $*
 
         else
-            # Install yay if not on host OS
-            printq "Installing yay..."
-            git clone https://aur.archlinux.org/yay.git && cd yay
-            runUnRootedCommand makepkg -si
-            cd .. && rm -rf yay
-            yay -Syyu --noconfirm
+            # Yay not istalled, exiy
+            printerr "Please install yay(https://aur.archlinux.org/yay.git) to continue installation, exiting!"
+            exit
         fi
         ;;
 
