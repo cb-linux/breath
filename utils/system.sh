@@ -29,7 +29,7 @@ function whichOperatingSystem {
 
 }
 
-# INstall dependencies based on distro
+# Install dependencies based on distro
 function installDependencies () {
 
     # TODO: Implement installDependencies
@@ -45,25 +45,20 @@ function installDependencies () {
 
     Arch)
         # Install dependencies on a Arch host OS
+        if [[ -f /usr/bin/yay ]]; then
+            # Install dependencies if yay is found
+            yay -S --noconfirm $*
 
-        # Install yay
-        installYay
-
-        yay -Syy --noconfirm $*
+        else
+            # Install yay if not on host OS
+            printq "Installing yay..."
+            git clone https://aur.archlinux.org/yay.git && cd yay
+            runUnRootedCommand makepkg -si
+            cd .. && rm -rf yay
+            yay -Syyu --noconfirm
+        fi
         ;;
 
     esac
-
-}
-
-# Install yay aur helper if not on system
-function installYay {
-    if [[ -f /usr/bin/yay ]]; then
-        echo "Yay already installed, moving on..."
-
-    else
-        git clone https://aur.archlinux.org/yay.git
-        cd yay && makepkg -si
-    fi
 
 }
