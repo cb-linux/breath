@@ -1,5 +1,6 @@
 #!/bin/bash
 
+# Determine host system 
 function whichOperatingSystem {
 
     OS=$(uname -s)
@@ -28,13 +29,14 @@ function whichOperatingSystem {
 
 }
 
+# INstall dependencies based on distro
 function installDependencies () {
 
     # TODO: Implement installDependencies
     # NOTE: Use "$*" to call all function arguments
     
     # Download dependencies based on distribution
-    case $DIST in
+    case  $DIST in
 
     Debian)
         # Install dependencies on a Debian host OS
@@ -43,10 +45,25 @@ function installDependencies () {
 
     Arch)
         # Install dependencies on a Arch host OS
-        # TODO: Implement arch install
-        exit
+
+        # Install yay
+        installYay
+
+        yay -Syy --noconfirm $*
         ;;
 
     esac
+
+}
+
+# Install yay aur helper if not on system
+function installYay {
+    if [[ -f /usr/bin/yay ]]; then
+        echo "Yay already installed, moving on..."
+
+    else
+        git clone https://aur.archlinux.org/yay.git
+        cd yay && makepkg -si
+    fi
 
 }
