@@ -103,7 +103,7 @@ Due to licensing restraints, you cannot just download an ISO of Breath and flash
 > * You can remove the `FEATURES=ISO` to use the classic way which directly writes to a USB.
 
 3. Done! Flash the IMG file to a USB using something like Etcher.
-4. [**OPTIONAL**] Resize the partition of your USB by running `bash extract.sh`. Otherwise, your USB will run out of space very quickly.
+4. [**OPTIONAL**] Resize the partition of your USB by running `bash expand.sh`. This will expand your USB image to use the entire available space.
 5. Now just boot into ChromeOS, enter the shell (<kbd>CTRL</kbd> <kbd>ALT</kbd> <kbd>T</kbd>, `shell`), and run:  
 `sudo crossystem dev_boot_usb=1; sudo crossystem dev_boot_signed_only=0; sync`
 to enable USB and Custom Kernel Booting.
