@@ -13,6 +13,7 @@ source utils/functions.sh # Functions
 source utils/bootstrap.sh # Bootstrap Function
 source utils/partition.sh # USB Partitioning
 source utils/extract.sh   # Extract Rootfs
+source utils/system.sh    # Host OS Abstraction
 
 # Exit if the user did not specify the desktop
 [[ -n "$1" ]] || { printerr "No desktop specified"; exit; }
@@ -39,6 +40,9 @@ source utils/distros/${DISTRO}.sh
 
 # Exit on errors
 set -e
+
+# Determine host system
+whichOperatingSystem
 
 # Many much importance
 sudo apt install -y toilet
