@@ -56,13 +56,13 @@ toilet -f term   -F border "Made by MilkyDeveloper"
 echo " $FEATURES"
 
 # Ask for username
-printq "What would you like the *username* to be?"
+printq "What would you like the username to be?"
 printq "NOTE: No spaces, backslashes, or special characters"
 read -r BREATH_USER
 export BREATH_USER
 
 # Ask for hostname
-printq "What would you like the *hostname* to be? (default is '${DISTRO}')"
+printq "What would you like the hostname to be? (default is '${DISTRO}')"
 printq "NOTE: No spaces, backslashes, or special characters"
 read -r BREATH_HOST
 if [ -z $BREATH_HOST ]; then
@@ -131,7 +131,7 @@ postinstall
 # The heredoc (<<EOT) method of running commands in a chroot isn't interactive,
 # but luckily passwd has an option to chroot
 # In case a user mistypes the password confirmation, retry the password
-printq "What would you like the *root* user's password to be?"
+printq "What would you like the root user's password to be?"
 until sudo chroot $MNT sh -c "passwd root"; do printerr "Retrying Password"; sleep 1; done
 
 # Copy (hopefully up-to-date) firmware from the host to the USB
