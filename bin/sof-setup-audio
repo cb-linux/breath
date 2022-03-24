@@ -20,6 +20,15 @@ sudo apt purge -y pulseaudio*
 sudo apt install -y apulse alsa-*
 sudo apt install -y firmware-sof-signed || sudo apt-get -o Dpkg::Options::="--force-overwrite" install firmware-sof-signed
 
+# On newer GNOME installs, Pipewire is a dependency of GNOME.
+# We can't remove it, but we can mask (completely disable) the systemd service
+{
+    systemctl --user mask pipewire.socket
+    systemctl --user mask pipewire.service
+    systemctl --user mask pulseaudio.socket
+    systemctl --user mask pulseaudio.service
+} || true
+
 # Enable Dmix (multiple app audio output) and software master volume control
 sudo tee /etc/asound.conf <<EOF
 pcm.!default {
