@@ -60,9 +60,19 @@ toilet -f term   -F border "Made by MilkyDeveloper"
 echo " $FEATURES"
 
 # Ask for username
-printq "What would you like your username to be? (no spaces, backslashes, or special characters)"
+printq "What would you like the username to be?"
+printq "NOTE: No spaces, backslashes, or special characters"
 read -r BREATH_USER
 export BREATH_USER
+
+# Ask for hostname
+printq "What would you like the hostname to be? (default is '${DISTRO}')"
+printq "NOTE: No spaces, backslashes, or special characters"
+read -r BREATH_HOST
+if [ -z $BREATH_HOST ]; then
+  BREATH_HOST=$DISTRO
+fi
+export BREATH_HOST
 
 # Bootstrap files
 bootstrapFiles
@@ -135,6 +145,13 @@ syncStorage
 
 # Extract the modules to /mnt
 extractModules
+
+# Set the hostname
+cat > hostname << EOF
+  ${BREATH_HOST}
+EOF
+
+sudo cp hostname ${MNT}/etc/
 
 # Install all utility files in the bin directory
 cd $ORIGINAL_DIR

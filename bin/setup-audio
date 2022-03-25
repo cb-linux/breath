@@ -19,9 +19,20 @@ echo "Installing Audio..."
 
 export SND_DEVICE=${SND_CARD}${SND_BOARD}
 
-# Copy the firmware and create the correct UCM Files
+# Remove PulseAudio
 sudo apt purge pulseaudio
 sudo apt purge pulseaudio*
+
+# On newer GNOME installs, Pipewire is a dependency of GNOME.
+# We can't remove it, but we can mask (completely disable) the systemd service
+{
+    systemctl --user mask pipewire.socket
+    systemctl --user mask pipewire.service
+    systemctl --user mask pulseaudio.socket
+    systemctl --user mask pulseaudio.service
+} || true
+
+# Copy the firmware and create the correct UCM Files
 sudo mount -t ext2 -o ro /dev/mmcblk0p3 /mnt || sudo mount -t ext2 -o ro /dev/mmcblk1p3 /mnt
 sudo cp -rv /mnt/lib/firmware/* /lib/firmware
 sudo cp -rv /mnt/usr/share/alsa/ucm/${SND_DEVICE} /usr/share/alsa/ucm2/${SND_CARD}
