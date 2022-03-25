@@ -41,9 +41,6 @@ source utils/distros/${DISTRO}.sh
 # Exit on errors
 set -e
 
-# Determine host system
-whichOperatingSystem
-
 # Many much importance
 installDependencies toilet
 

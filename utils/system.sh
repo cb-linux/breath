@@ -1,5 +1,10 @@
 #!/bin/bash
 
+# Source other files to simplify importing this script on more minimal bash scripts
+# (e.g. expand.sh or genimg.sh)
+DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
+source ${DIR}/functions.sh
+
 # Determine host system 
 function whichOperatingSystem {
 
@@ -38,12 +43,19 @@ function installDependencies () {
 
     # NOTE: "$*" is used to call all function arguments
 
+    # Identify the distro if it is undefined
+    if [[ -z $DIST ]]; then
+        whichOperatingSystem
+    fi
+
+    echo "Installing $*"
+
     # Download dependencies based on distribution
     case $DIST in
 
     Debian)
         # Install dependencies on a Debian host system
-        sudo apt install -y $*
+        sudo apt install -y "$@"
         ;;
 
     Arch)
@@ -58,6 +70,11 @@ function installDependencies () {
                     # vboot-utils
                     vboot-kernel-utils)
                         var=vboot-utils;
+                        ;;
+
+                    # growpart
+                    cloud-guest-utils)
+                        var=growpartfs;
                         ;;
 
                     # cgpt
@@ -85,6 +102,11 @@ function installDependencies () {
                 # vboot-utils
                 vboot-kernel-utils)
                     var=vboot-utils;
+                    ;;
+
+                # growpart
+                cloud-guest-utils)
+                    var=cloud-utils-growpart;
                     ;;
 
                 # cgpt

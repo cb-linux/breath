@@ -1,6 +1,8 @@
 #!/bin/bash
 
-sudo apt install -y cloud-guest-utils fdisk e2fsck-static || true
+source utils/system.sh
+
+installDependencies cloud-guest-utils e2fsprogs
 
 lsblk | grep -v loop
 
