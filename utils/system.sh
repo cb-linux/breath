@@ -76,26 +76,31 @@ function installDependencies () {
         ;;
 
     Fedora)
-    # Install dependencies on a Fedora host system
-    for var in "$@"
-    do
-        # Replace package names relevant to distro
-        case $var in
+        # Install dependencies on a Fedora host system
+        for var in "$@"
+        do
+            # Replace package names relevant to distro
+            case $var in
 
-            # vboot-utils
-            vboot-kernel-utilities)
-                var=vboot-utils;
-                ;;
+                # vboot-utils
+                vboot-kernel-utils)
+                    var=vboot-utils;
+                    ;;
 
-            # cgpt
-            cgpt)
-               unset var; # Included in vboot-utils
-               ;;
+                # cgpt
+                cgpt)
+                    unset var; # Included in vboot-utils
+                    ;;
         
-        esac
-        sudo dnf install $* --assumeyes
-    done
-    ;;
+            esac
+            # dnf doesn't like $FW_PACKAGE, do nothing on null $var
+            if [[ -z "$var" ]]; then
+                :
+            else
+                sudo dnf install $var --assumeyes
+            fi
+        done
+        ;;
 
     esac
 
