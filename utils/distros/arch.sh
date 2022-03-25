@@ -55,5 +55,5 @@ EOT
 EOT
 
     # Install nmcli for wifi
-    sudo arch-chroot $MNT bash -c "yes | pacman -S networkmanager"
+    sudo arch-chroot $MNT bash -c "yes | pacman -S --noconfirm networkmanager"
 }
