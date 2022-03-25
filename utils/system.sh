@@ -16,6 +16,10 @@ function whichOperatingSystem {
         elif [[ -f /etc/arch-release ]]; then
             DIST="Arch"
 
+	# Fedora
+        elif [[ -f /etc/fedora-release ]]; then
+	    DIST="Fedora"
+
         # Other
         else
             printerr "This distribution is not supported, exiting!"
@@ -32,19 +36,18 @@ function whichOperatingSystem {
 # Install dependencies based on distro
 function installDependencies () {
 
-    # TODO: Implement installDependencies
-    # NOTE: Use "$*" to call all function arguments
+    # NOTE: "$*" is used to call all function arguments
 
     # Download dependencies based on distribution
     case $DIST in
 
     Debian)
-        # Install dependencies on a Debian host OS
+        # Install dependencies on a Debian host system
         sudo apt install -y $*
         ;;
 
     Arch)
-        # Install dependencies on a Arch host OS
+        # Install dependencies on a Arch host system
         if [[ -f /usr/bin/yay ]]; then
             # Install dependencies if yay is found
             for var in "$@"
@@ -71,6 +74,11 @@ function installDependencies () {
             exit
         fi
         ;;
+
+    Fedora)
+    # Install dependencies on a Fedora host system
+    sudo dnf install $* --assumeyes
+    ;;
 
     esac
 
