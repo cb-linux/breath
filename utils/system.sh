@@ -52,7 +52,7 @@ function installDependencies () {
             # Install dependencies if yay is found
             for var in "$@"
             do
-                # replace package names relevant to distro
+                # Replace package names relevant to distro
                 case $var in
 
                     # vboot-utils
@@ -77,7 +77,24 @@ function installDependencies () {
 
     Fedora)
     # Install dependencies on a Fedora host system
-    sudo dnf install $* --assumeyes
+    for var in "$@"
+    do
+        # Replace package names relevant to distro
+        case $var in
+
+            # vboot-utils
+            vboot-kernel-utilities)
+                var=vboot-utils;
+                ;;
+
+            # cgpt
+            cgpt)
+               unset var; # Included in vboot-utils
+               ;;
+        
+        esac
+        sudo dnf install $* --assumeyes
+    done
     ;;
 
     esac
