@@ -4,7 +4,7 @@
 
 # 🙼 ＢＲＥＡＴＨ
 
-<p align="center">An way to natively run <kbd><img width="25" height="30" src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/35/Tux.svg/1200px-Tux.svg.png"></img></kbd> Linux on modern Chromebooks without replacing firmware</p>
+<p align="center">A way to natively run <kbd><img width="25" height="30" src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/35/Tux.svg/1200px-Tux.svg.png"></img></kbd> Linux on modern Chromebooks without replacing firmware</p>
 
 ## Supported Devices
 
@@ -25,7 +25,7 @@
 
 ## How does everything work?
 
-This project uses the ChromeOS Kernel and the firmware. Touchscreen and all other peripherals *just work*. Breath has been carefully designed not to have any legal issues, so you can't flash the ISO or have the audio firmware bundled.
+This project uses the ChromeOS Kernel and firmware. Touchscreen and all other peripherals *just work*. Breath has been carefully designed to not have any legal issues, so you can't flash the ISO or have the audio firmware bundled.
 
 Audio works [perfectly](bin/setup-audio) through ALSA, but not PulseAudio or Pipewire. All apps that use PulseAudio libraries (like Firefox) work as of [this commit](https://github.com/cb-linux/breath/commit/884bd03b8eef554bdbafd7b4d62f36690f472237). You can follow further audio progress [here](https://github.com/cb-linux/breath/projects/1).
 
