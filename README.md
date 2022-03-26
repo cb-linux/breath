@@ -2,7 +2,7 @@
 
 # This project has been archived for an indefinite amount of time
 
-I will no longer be pursuing this whole for an indefinite amount of time. PulseAudio (clearly the worst "software" to ever exist) burnt my speakers on my personal Chromebook once I got it working. My personal laptop's personal GPU was already fried. I see no personal gain in maintaining this project. Be satisfied with the current state of this project.
+I will no longer be pursuing this whole for an indefinite amount of time. PulseAudio (clearly the worst "software" to ever exist) burnt my speakers on my personal Chromebook once I got it working. My personal laptop's eGPU was already fried because of this project. I see no personal gain in maintaining this project. Be satisfied with the current state of this project. Get a *real* laptop.
 
 In case you also would like to fry your own speakers, you can follow the instructions I have documented here:
 <br>
