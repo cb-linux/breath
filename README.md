@@ -2,7 +2,7 @@
 
 # This project's general development has been stalled to focus on audio-related issues
 
-I will no longer be pursuing this whole project for an indefinite amount of time. PulseAudio burnt my speakers on my personal Chromebook once I got it working. My personal laptop's eGPU was already fried because of this project. Therefore, I want to prevent any issues like this before working on the rest if thus project.
+I will no longer be pursuing this whole project for an indefinite amount of time. PulseAudio burnt my speakers on my personal Chromebook once I got it working. My personal laptop's eGPU was already fried because of this project. Therefore, I want to prevent any issues like this before working on the rest of this project.
 
 In case you also would like to follow my progress on SKL/KBL devices, you can follow the instructions I have documented here:
 <br>
