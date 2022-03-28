@@ -74,9 +74,6 @@ EOT
     set +e
     runChrootCommand "apt update -y; $BASECMD; $DESKTOP_PACKAGE; $SYSTEMD_TARGET"
     printerr "Ignore libfprint-2-2 fprintd libpam-fprintd errors"
-
-    runChrootCommand "apt remove -y pulseaudio"
-    printerr "Ignore libfprint-2-2 fprintd libpam-fprintd errors"
     syncStorage
     set -e
 
