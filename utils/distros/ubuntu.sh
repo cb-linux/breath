@@ -109,6 +109,7 @@ EOT
       runChrootCommand "apt remove -y gnome-shell; apt autoremove -y" || true
     fi
 
+    runChrootCommand "apt remove -y needrestart"
     syncStorage
     set -e
 
