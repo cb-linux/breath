@@ -38,6 +38,51 @@ function whichOperatingSystem {
 
 }
 
+# Store root passwd in $PASSWD
+function getPassword {
+
+    # TODO: Polish and move updates away to updateSystemPackages
+
+    case $DIST in
+
+        # The yay aur helper cannot be run with sudo priveleges,
+        # so instead of reading passwd, we enable '--sudo-loop'.
+        Arch)
+            yay -Syyu --save --sudoloop --noconfirm
+            ;;
+
+        # Every other distro can have $PASSWD silently read
+        *)
+            read -s -p "[sudo] password for $(whoami): " PASSWD
+            ;;
+    esac
+
+}
+
+# Update system packages
+function updateSystemPackages () {
+
+    #TODO: Implement updateSystemPackages
+
+    printq "Updating system packages"
+
+    case $DIST in
+
+        Debian)
+            :
+            ;;
+
+        Arch)
+            :
+            ;;
+
+        Fedora)
+            :
+            ;;
+    esac
+
+}      
+
 # Install dependencies based on distro
 function installDependencies () {
 
@@ -46,6 +91,12 @@ function installDependencies () {
     # Identify the distro if it is undefined
     if [[ -z $DIST ]]; then
         whichOperatingSystem
+    fi
+
+    # Cache root passwd for the entirety of the installation
+    # NOTE: Arch does not make u
+    if [[ -z $PASSWD ]]; then
+        getPassword 
     fi
 
     echo "Installing $*"
