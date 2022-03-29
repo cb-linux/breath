@@ -58,5 +58,5 @@ function unmountUSB {
 
 # Function for running a command in the chroot
 function runChrootCommand {
-  echo $PASSWD || sudo -S chroot $MNT /bin/sh -c "$1"
+  read -s $PASSWD || sudo -S chroot $MNT /bin/sh -c "$1"
 }
