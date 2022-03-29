@@ -39,45 +39,33 @@ function whichOperatingSystem {
 }
 
 # Store root passwd in $PASSWD
-function getPassword {
-
-    # TODO: Polish and move updates away to updateSystemPackages
-
-    case $DIST in
-
-        # The yay aur helper cannot be run with sudo priveleges,
-        # so instead of reading passwd, we enable '--sudo-loop'.
-        Arch)
-            yay -Syyu --save --sudoloop --noconfirm
-            ;;
-
-        # Every other distro can have $PASSWD silently read
-        *)
-            read -s -p "[sudo] password for $(whoami): " PASSWD
-            ;;
-    esac
-
+function getPassword {   
+    read -s -p "[sudo] password for $(whoami): " PASSWD
 }
 
 # Update system packages
 function updateSystemPackages () {
-
-    #TODO: Implement updateSystemPackages
 
     printq "Updating system packages"
 
     case $DIST in
 
         Debian)
-            :
+            # Update && upgrade packages for debian-based distro's
+            read -s $PASSWD || sudo -S apt update --noconfirm && read -s $PASSWD || sudo -S apt upgrade --noconfirm
             ;;
 
         Arch)
-            :
+            # Upgrade && update arch-based distro's
+            # NOTE: Due to yay not being able to run as root,
+            # '--save --sudoloop' is in essence bypassing 
+            # getPassword.
+            yay -Syy --save --sudoloop --noconfirm
             ;;
 
         Fedora)
-            :
+            # Update && upgrade packages for fedora-based distro's
+            read -s $PASSWD || sudo -S dnf upgrade --assumeyes
             ;;
     esac
 
@@ -94,9 +82,13 @@ function installDependencies () {
     fi
 
     # Cache root passwd for the entirety of the installation
-    # NOTE: Arch does not make u
-    if [[ -z $PASSWD ]]; then
-        getPassword 
+    # NOTE: Arch does not make use of $PASSWD
+    # NOTE: $COUNTER exists to prevent getPassword or updateSystemPackages
+    # from running twice
+    if [[ -z $PASSWD && $DIST != "Arch" && -z $COUNTER ]]; then
+        getPassword && updateSystemPackages && set COUNTER=1
+    else
+        updateSystemPackages && COUNTER=1
     fi
 
     echo "Installing $*"
