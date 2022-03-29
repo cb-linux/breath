@@ -39,7 +39,7 @@ function whichOperatingSystem {
 }
 
 # Store root passwd in $PASSWD
-function getPassword {   
+function getPassword {  
     read -s -p "[sudo] password for $(whoami): " PASSWD
 }
 
@@ -58,8 +58,10 @@ function updateSystemPackages () {
         Arch)
             # Upgrade && update arch-based distro's
             # NOTE: Due to yay not being able to run as root,
-            # '--save --sudoloop' is in essence bypassing 
-            # getPassword.
+            # '--save --sudoloop' is in essence doing what getPassword
+            # is doing for chrooted commands
+            printq "Yay requires a root password as well to run."
+            printq "You will only be asked once throughout this install."
             yay -Syy --save --sudoloop --noconfirm
             ;;
 
@@ -82,13 +84,9 @@ function installDependencies () {
     fi
 
     # Cache root passwd for the entirety of the installation
-    # NOTE: Arch does not make use of $PASSWD
-    # NOTE: $COUNTER exists to prevent getPassword or updateSystemPackages
-    # from running twice
-    if [[ -z $PASSWD && $DIST != "Arch" && -z $COUNTER ]]; then
-        getPassword && updateSystemPackages && set COUNTER=1
-    else
-        updateSystemPackages && COUNTER=1
+    if [[ -z $PASSWD ]]; then
+        getPassword
+        updateSystemPackages
     fi
 
     echo "Installing $*"
