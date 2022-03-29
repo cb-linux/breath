@@ -21,9 +21,9 @@ function whichOperatingSystem {
         elif [[ -f /etc/arch-release ]]; then
             DIST="Arch"
 
-	# Fedora
+	    # Fedora
         elif [[ -f /etc/fedora-release ]]; then
-	    DIST="Fedora"
+	        DIST="Fedora"
 
         # Other
         else
@@ -55,7 +55,7 @@ function installDependencies () {
 
     Debian)
         # Install dependencies on a Debian host system
-        sudo apt install -y "$@"
+        read -s $PASSWD || sudo -S apt install -y "$@"
         ;;
 
     Arch)
@@ -119,7 +119,7 @@ function installDependencies () {
             if [[ -z "$var" ]]; then
                 :
             else
-                sudo dnf install $var --assumeyes
+                read -s $PASSWD || sudo -S dnf install $var --assumeyes
             fi
         done
         ;;

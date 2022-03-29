@@ -41,6 +41,10 @@ source utils/distros/${DISTRO}.sh
 # Exit on errors
 set -e
 
+# Get root passwd
+# NOTE: Used to allow for less user intervention during install
+getPassword
+
 # Many much importance
 installDependencies toilet
 

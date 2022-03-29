@@ -60,3 +60,30 @@ function unmountUSB {
 function runChrootCommand {
   sudo chroot $MNT /bin/sh -c "$1"
 }
+
+# Function for storing passwd as temporary variable $PASSWD
+function getPassword {
+
+    # Define DIST if not defined
+    # NOTE: Although this is if statement is being reused from
+    # system.sh, in the future if any functions are moved around
+    # it will be handy to have this check in both places to prevent
+    # silent failure to save passwd.
+    if [[ -z $DIST ]]; then
+        whichOperatingSystem
+    fi
+
+    case $DIST in
+
+        # The yay aur helper cannot be run with sudo priveleges,
+        # so instead of reading passwd, we enable '--sudo-loop'.
+        Arch)
+            yay -Syyu --save --sudoloop --noconfirm
+            ;;
+
+        # Every other distro can have $PASSWD silently read
+        *)
+            read -s -p "[sudo] password for $(whoami): " PASSWD
+            ;;
+    esac
+}
