@@ -57,11 +57,6 @@ function updateSystemPackages () {
 
         Arch)
             # Upgrade && update arch-based distro's
-            # NOTE: Due to yay not being able to run as root,
-            # '--save --sudoloop' is in essence doing what getPassword
-            # is doing for chrooted commands
-            printq "Yay requires a root password as well to run."
-            printq "You will only be asked once throughout this install."
             yay -Syy --save --sudoloop --noconfirm
             ;;
 
@@ -86,7 +81,6 @@ function installDependencies () {
     # Cache root passwd for the entirety of the installation
     if [[ -z $PASSWD ]]; then
         getPassword
-        updateSystemPackages
     fi
 
     echo "Installing $*"
@@ -97,7 +91,7 @@ function installDependencies () {
     Debian)
         # Install dependencies on a Debian host system
         read -s $PASSWD || sudo -S apt install -y "$@"
-        ;;
+        ;; 
 
     Arch)
         # Install dependencies on a Arch host system
@@ -124,7 +118,7 @@ function installDependencies () {
                         ;;
 
                 esac
-                yay -S --noconfirm $var
+                yay -S --save --sudoloop --noconfirm $var
             done
         else
             # Yay not istalled, exit
