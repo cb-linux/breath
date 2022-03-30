@@ -21,9 +21,13 @@ function whichOperatingSystem {
         elif [[ -f /etc/arch-release ]]; then
             DIST="Arch"
 
-	# Fedora
+	    # Fedora
         elif [[ -f /etc/fedora-release ]]; then
-	    DIST="Fedora"
+	        DIST="Fedora"
+
+        # Manjaro
+        elif [[ -f /etc/manjaro-release ]]; then
+            DIST="Manjaro"
 
         # Other
         else
@@ -122,6 +126,11 @@ function installDependencies () {
                 sudo dnf install $var --assumeyes
             fi
         done
+        ;;
+    
+    Manjaro)
+        # TODO: Implement manjaro installation
+        :
         ;;
 
     esac
