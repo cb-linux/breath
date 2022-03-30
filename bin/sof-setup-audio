@@ -86,6 +86,25 @@ if [[ ! -v ONLY_ALSA ]]; then
         
     done
 
+elif ! command -v pulseaudio &> /dev/null; then
+
+    # In the case that PulseAudio is not installed for whatever reason,
+    # install it and unmask it
+
+    sudo apt install -y pulseaudio pulseaudio-module-bluetooth pulseaudio-utils
+
+    {
+
+        systemctl --user unmask pipewire.socket
+        systemctl --user unmask pipewire.service
+        systemctl --user unmask pulseaudio.socket
+        systemctl --user unmask pulseaudio.service
+
+        systemctl --user enable pulseaudio.socket
+        systemctl --user enable pulseaudio.service
+
+    } || true
+
 fi
 
 sudo systemctl enable alsa-reload
