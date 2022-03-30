@@ -27,7 +27,7 @@ function whichOperatingSystem {
 
         # Manjaro
         elif [[ -f /etc/manjaro-release ]]; then
-            DIST="Manjaro"
+            DIST="Arch" # Manjaro is Arch-based
 
         # Other
         else
@@ -127,12 +127,6 @@ function installDependencies () {
             fi
         done
         ;;
-    
-    Manjaro)
-        # TODO: Implement manjaro installation
-        :
-        ;;
-
     esac
 
 }
