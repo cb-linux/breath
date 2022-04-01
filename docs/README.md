@@ -99,9 +99,10 @@ Due to licensing restraints, you cannot just download an ISO of Breath and flash
 > * You can replace `ubuntu` with `arch` (you can only use `cli`) or `debian` (all desktops are supported)
 > * Ubuntu supports custom versions. If you want to install Ubuntu 21.10 instead of the default Ubuntu 21.04, just run: `bash setup.sh cli ubuntu impish-21.10`, where `impish` is the codename and `21.10` is the version.
 > * You can remove the `FEATURES=ISO` to use the classic way which directly writes to a USB.
+> * You can add `KEYMAP` to `FEATURES` to map the keys to Chromebook actions; e.g., `FEATURES=ISO,KEYMAP`.
 
 3. Done! Flash the IMG file to a USB using something like Etcher.
-4. [**OPTIONAL**] Resize the partition of your USB by running `bash expand.sh`. This will expand your USB image to use the entire available space.
+4. [**RECOMMENDED**] Resize the partition of your USB by running `bash expand.sh`. This will expand your USB image to use the entire available space.
 5. Now just boot into ChromeOS, enter the shell (<kbd>CTRL</kbd> <kbd>ALT</kbd> <kbd>T</kbd>, `shell`), and run:  
 `sudo crossystem dev_boot_usb=1; sudo crossystem dev_boot_signed_only=0; sync`
 to enable USB and Custom Kernel Booting.
@@ -115,7 +116,7 @@ NetworkManager is installed by default on all distros. You can connect to the Wi
 Once booted into Breath run the command depending on your device's board:
 
 1. Connect to Wifi on your Chromebook! You can use a GUI for this or `nmcli`/`nmtui`
-   
+
 2. - `NAMI`:
      1. `VERSION=ALT bash updatekernel.sh` on the PC you built Breath with
      2. `setup-audio` on your Chromebook that has booted Breath
