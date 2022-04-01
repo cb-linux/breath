@@ -58,7 +58,7 @@ echo " $FEATURES"
 
 # Ask for username
 printq "What would you like the username to be?"
-printq "NOTE: No spaces, backslashes, or special characters"
+printq "NOTE: No UPPERCASE letters, spaces, backslashes, or special characters"
 read -r BREATH_USER
 export BREATH_USER
 
