@@ -14,7 +14,7 @@ case $SOUNDCARD in # TODO: add realtek support for octopus
     ;;
 esac
 
-if [[ ! -v ONLY_ALSA ]]; then
+if [[ -v ONLY_ALSA ]]; then
 
     # Remove PulseAudio
     sudo apt purge -y pulseaudio
@@ -70,7 +70,7 @@ EOF
 # Refresh systemd
 sudo systemctl daemon-reload
 
-if [[ ! -v ONLY_ALSA ]]; then
+if [[ -v ONLY_ALSA ]]; then
 
     # Replace PulseAudio libraries with Apulse, which makes PulseAudio apps work with ALSA
     for lib in libpulse-mainloop-glib.so libpulse-simple.so libpulse.so; do
@@ -78,12 +78,12 @@ if [[ ! -v ONLY_ALSA ]]; then
         set +e
         sudo rm -f /usr/lib/${lib} /usr/lib/${lib}.0 /usr/lib/x86_64-linux-gnu/${lib} /usr/lib/x86_64-linux-gnu/${lib}.0
         set -e
-        
+
         sudo ln -s /usr/lib/x86_64-linux-gnu/apulse/${lib}   "/usr/lib/${lib}"
         sudo ln -s /usr/lib/x86_64-linux-gnu/apulse/${lib}.0 "/usr/lib/${lib}.0"
         sudo ln -s /usr/lib/x86_64-linux-gnu/apulse/${lib}   "/usr/lib/x86_64-linux-gnu/${lib}"
         sudo ln -s /usr/lib/x86_64-linux-gnu/apulse/${lib}.0 "/usr/lib/x86_64-linux-gnu/${lib}.0"
-        
+
     done
 
 elif ! command -v pulseaudio &> /dev/null; then
