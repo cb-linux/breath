@@ -10,6 +10,8 @@ jobs:
     steps:
       - name: Check out repository code
         uses: actions/checkout@v3
+        with:
+          submodules: true
       - run: echo "💡 The ${{ github.repository }} repository has been cloned."
       - name: Running build.sh
         run: cd kernel; bash build.sh
