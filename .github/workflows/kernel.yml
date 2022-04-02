@@ -1,0 +1,16 @@
+name: 🐧 Build Linux Kernel
+on: push:
+    paths:
+      - 'kernel/*'
+      - '**.conf'
+jobs:
+  BuildKernel:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v3
+      - run: echo "💡 The ${{ github.repository }} repository has been cloned."
+      - name: Running build.sh
+        run: |
+          bash build.sh
+      - run: echo "🎉 Done!"

@@ -2,7 +2,8 @@
 
 # Function for printing a bold, green question or info prompt
 function printq {
-  echo "$(tput setaf 114; tput bold)$1$(tput sgr0)"
+  # We're using the e flag for possible newlines
+  echo -e "$(tput setaf 114; tput bold)$1$(tput sgr0)"
 }
 
 # Function for printing a bold, red error
