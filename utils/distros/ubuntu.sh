@@ -109,8 +109,7 @@ EOT
       runChrootCommand "apt remove -y gnome-shell; apt autoremove -y" || true
     fi
 
-    runChrootCommand "apt remove -y pulseaudio needrestart" || true
-    printerr "Ignore libfprint-2-2 fprintd libpam-fprintd errors"
+    runChrootCommand "apt remove -y needrestart"
     syncStorage
     set -e
 

@@ -14,20 +14,24 @@ case $SOUNDCARD in # TODO: add realtek support for octopus
     ;;
 esac
 
-# Remove PulseAudio
-sudo apt purge -y pulseaudio
-sudo apt purge -y pulseaudio*
-sudo apt install -y apulse alsa-*
-sudo apt install -y firmware-sof-signed || sudo apt-get -o Dpkg::Options::="--force-overwrite" install firmware-sof-signed
+if [[ -v ONLY_ALSA ]]; then
 
-# On newer GNOME installs, Pipewire is a dependency of GNOME.
-# We can't remove it, but we can mask (completely disable) the systemd service
-{
-    systemctl --user mask pipewire.socket
-    systemctl --user mask pipewire.service
-    systemctl --user mask pulseaudio.socket
-    systemctl --user mask pulseaudio.service
-} || true
+    # Remove PulseAudio
+    sudo apt purge -y pulseaudio
+    sudo apt purge -y pulseaudio*
+    sudo apt install -y apulse alsa-*
+    sudo apt install -y firmware-sof-signed || sudo apt-get -o Dpkg::Options::="--force-overwrite" install firmware-sof-signed
+
+    # On newer GNOME installs, Pipewire is a dependency of GNOME.
+    # We can't remove it, but we can mask (completely disable) the systemd service
+    {
+        systemctl --user mask pipewire.socket
+        systemctl --user mask pipewire.service
+        systemctl --user mask pulseaudio.socket
+        systemctl --user mask pulseaudio.service
+    } || true
+
+fi
 
 # Enable Dmix (multiple app audio output) and software master volume control
 sudo tee /etc/asound.conf <<EOF
@@ -66,19 +70,42 @@ EOF
 # Refresh systemd
 sudo systemctl daemon-reload
 
-# Replace PulseAudio libraries with Apulse, which makes PulseAudio apps work with ALSA
-for lib in libpulse-mainloop-glib.so libpulse-simple.so libpulse.so; do
+if [[ -v ONLY_ALSA ]]; then
 
-    set +e
-	sudo rm -f /usr/lib/${lib} /usr/lib/${lib}.0 /usr/lib/x86_64-linux-gnu/${lib} /usr/lib/x86_64-linux-gnu/${lib}.0
-    set -e
-	
-	sudo ln -s /usr/lib/x86_64-linux-gnu/apulse/${lib}   "/usr/lib/${lib}"
-	sudo ln -s /usr/lib/x86_64-linux-gnu/apulse/${lib}.0 "/usr/lib/${lib}.0"
-	sudo ln -s /usr/lib/x86_64-linux-gnu/apulse/${lib}   "/usr/lib/x86_64-linux-gnu/${lib}"
-	sudo ln -s /usr/lib/x86_64-linux-gnu/apulse/${lib}.0 "/usr/lib/x86_64-linux-gnu/${lib}.0"
-	
-done
+    # Replace PulseAudio libraries with Apulse, which makes PulseAudio apps work with ALSA
+    for lib in libpulse-mainloop-glib.so libpulse-simple.so libpulse.so; do
+
+        set +e
+        sudo rm -f /usr/lib/${lib} /usr/lib/${lib}.0 /usr/lib/x86_64-linux-gnu/${lib} /usr/lib/x86_64-linux-gnu/${lib}.0
+        set -e
+
+        sudo ln -s /usr/lib/x86_64-linux-gnu/apulse/${lib}   "/usr/lib/${lib}"
+        sudo ln -s /usr/lib/x86_64-linux-gnu/apulse/${lib}.0 "/usr/lib/${lib}.0"
+        sudo ln -s /usr/lib/x86_64-linux-gnu/apulse/${lib}   "/usr/lib/x86_64-linux-gnu/${lib}"
+        sudo ln -s /usr/lib/x86_64-linux-gnu/apulse/${lib}.0 "/usr/lib/x86_64-linux-gnu/${lib}.0"
+
+    done
+
+elif ! command -v pulseaudio &> /dev/null; then
+
+    # In the case that PulseAudio is not installed for whatever reason,
+    # install it and unmask it
+
+    sudo apt install -y pulseaudio pulseaudio-module-bluetooth pulseaudio-utils
+
+    {
+
+        systemctl --user unmask pipewire.socket
+        systemctl --user unmask pipewire.service
+        systemctl --user unmask pulseaudio.socket
+        systemctl --user unmask pulseaudio.service
+
+        systemctl --user enable pulseaudio.socket
+        systemctl --user enable pulseaudio.service
+
+    } || true
+
+fi
 
 sudo systemctl enable alsa-reload
 

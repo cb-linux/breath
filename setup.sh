@@ -58,7 +58,7 @@ echo " $FEATURES"
 
 # Ask for username
 printq "What would you like the username to be?"
-printq "NOTE: No spaces, backslashes, or special characters"
+printq "NOTE: No UPPERCASE letters, spaces, backslashes, or special characters"
 read -r BREATH_USER
 export BREATH_USER
 
@@ -89,7 +89,7 @@ if [[ $FEATURES == *"ISO"* ]]; then
    export USB=$(sudo losetup -f --show breath.img)
    export USB1="${USB}p1"
    export USB2="${USB}p2"
-  
+
 else
 
    # Wait for a USB to be plugged in
@@ -159,6 +159,18 @@ cd $ORIGINAL_DIR
 sudo chmod 755 bin/*
 sudo cp bin/* ${MNT}/usr/local/bin
 syncStorage
+
+if [[ $FEATURES == *"KEYMAP"* ]]; then
+  # Set keymap
+  # Backup the default keymap and copy in the new map
+  sudo cp -n ${MNT}/usr/share/X11/xkb/symbols/pc ${MNT}/usr/share/X11/xkb/symbols/pc.org
+  sudo cp xkb/xkb.chromebook ${MNT}/usr/share/X11/xkb/symbols/pc
+
+  # Make the Search key a Caps_Lock key
+  # Backup the default event definitions and copy in the new one
+  sudo cp -n ${MNT}/usr/share/X11/xkb/keycodes/evdev ${MNT}/usr/share/X11/xkb/keycodes/evdev.org
+  sudo cp xkb/evdev.chromebook ${MNT}/usr/share/X11/xkb/keycodes/evdev
+fi
 
 sudo umount $MNT
 
