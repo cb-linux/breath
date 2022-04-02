@@ -1,5 +1,6 @@
 name: 🐧 Build Linux Kernel
-on: push:
+on: 
+  push:
     paths:
       - 'kernel/*'
       - '**.conf'
