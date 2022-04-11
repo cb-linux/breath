@@ -23,7 +23,7 @@ class CustomHelpFormatter(argparse.HelpFormatter):
     - Allows for extending the default column size for help variables.
     """
     def __init__(self, prog):
-        super().__init__(prog, max_help_position=40, width=80)
+        super().__init__(prog, max_help_position=80, width=150)
 
     def _format_action_invocation(self, action):
         if not action.option_strings or action.nargs == 0:
@@ -36,7 +36,7 @@ fmt = lambda prog: CustomHelpFormatter(prog)
 
 parser = argparse.ArgumentParser(
     prog=__title__,
-    usage='%(prog)s [options]',
+    usage='%(prog)s [options...]',
     description=__summary__,
     formatter_class=fmt
 )
@@ -45,8 +45,15 @@ def define_arguments():
     """
     Define command-line arguments.
     """
-    parser.add_argument('-t', '--type', required=True, default='usb', choices=['usb', 'iso'], help='choose installation type (default: %(default)s)') 
-    parser.add_argument('-v', '--version', required=False, help='output version information and exit', action='store_true')
+    parser.add_argument('-t', '--type', default='usb', choices=['usb', 'iso'], help='choose installation type (default: %(default)s)')
+    parser.add_argument('-k', '--keymap', help='map keys to chromebook actions', metavar='')
+    parser.add_argument('-d', '--distro', default='ubuntu', choices=['arch', 'debian', 'fedora', 'ubuntu'], help='choose distro (default: %(default)s)')
+    parser.add_argument('-de', '--desktop', default='cli', choices=['cli', 'gnome', 'kde', 'minimal', 'deepin', 'budgie', 'fce', 'lxqt', 'mate', 'openbox'], help='choose desktop environment (default: %(default)s)')
+    parser.add_argument('-hn', '--hostname', default='chromebook', help='set hostname (default: %(default)s)')
+    parser.add_argument('-u', '--username', default='breath_user', help='set username (default: %(default)s)')
+    parser.add_argument('-p', '--password', default='breath_passwd', help='set password (default: %(default)s)')
+    parser.add_argument('-vv', '--verbose', help='set installer output to verbose', metavar='')
+    parser.add_argument('-v', '--version', help='output version information and exit', action='store_true')
 
 def parse_arguments():
     """
