@@ -1,23 +1,8 @@
-"""
-Handy host system handler
-"""
-
+import subprocess
 import platform
 import sys
 
-class System:
-    """
-    This class represents the host 
-    system that will build Breath
-    """
+def logo():
+    subprocess.run(['toilet', '-f', 'mono12', '-F', 'crop', 'Breath'])
+    subprocess.run(['toilet', '-f', 'term', '-F', 'border', 'Made by MilkyDeveloper'])
 
-    def __init__(self):
-        self.system = platform.system()
-
-
-class BreathSystem:
-    """
-    This class represents the Breath
-    system that will be built
-    """
-    pass

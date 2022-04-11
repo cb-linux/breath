@@ -1,9 +1,4 @@
-from __future__ import annotations
-
-from pathlib import Path
-import argparse
-import sys
-
 import breath
 
-
+if __name__ == '__main__':
+    breath.run_as_a_module()
