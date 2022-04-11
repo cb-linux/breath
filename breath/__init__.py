@@ -5,24 +5,48 @@ Python Breath adaptation
 """
 
 __title__ = 'breath'
+__summary__ = 'A way to natively run Linux on modern Chromebooks without replacing firmware'
 __author__ = 'MilkyDeveloper'
 __license__ = 'MIT'
 __copyright__ = 'Copyright 2021-present MilkyDeveloper'
 __version__ = '4.1.1-port/python'
 
-from argparse import ArgumentParser
+import argparse
 import sys
 
 from .system import *
 
+class CustomHelpFormatter(argparse.HelpFormatter):
+    """
+    Custom argparse help formatter. Currently this allows for the following:
+    - Disables metavar for short args. Example without(-t {usb, iso} --type {usb, iso}) | Example with(-t --type {usb, iso})
+    - Allows for extending the default column size for help variables.
+    """
+    def __init__(self, prog):
+        super().__init__(prog, max_help_position=40, width=80)
+
+    def _format_action_invocation(self, action):
+        if not action.option_strings or action.nargs == 0:
+            return super()._format_action_invocation(action)
+        default = self._get_default_metavar_for_optional(action)
+        args_string = self._format_args(action, default)
+        return ', '.join(action.option_strings) + ' ' + args_string
+
+fmt = lambda prog: CustomHelpFormatter(prog)
+
+parser = argparse.ArgumentParser(
+    prog=__title__,
+    usage='%(prog)s [options]',
+    description=__summary__,
+    formatter_class=fmt
+)
 
 def define_arguments():
     """
     Define command-line arguments.
     """
-    parser = ArgumentParser(description=logo())
+    parser.add_argument('-t', '--type', required=True, default='usb', choices=['usb', 'iso'], help='choose installation type (default: %(default)s)') 
     parser.add_argument('-v', '--version', required=False, help='output version information and exit', action='store_true')
-
 
 def parse_arguments():
     """
@@ -30,6 +54,8 @@ def parse_arguments():
     """
     args = parser.parse_args(args=None if sys.argv[1:] else ['--help'])
 
+    if args.version:
+        print(f'{__title__} v{__version__}')
 
 define_arguments()
 parse_arguments()
