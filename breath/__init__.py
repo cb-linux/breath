@@ -16,6 +16,8 @@ import sys
 
 from .system import *
 
+installation_options = dict() # This dict will hold all the install options for the breath installer to use
+
 class CustomHelpFormatter(argparse.HelpFormatter):
     """
     Custom argparse help formatter. Currently this allows for the following:
@@ -45,13 +47,14 @@ def define_arguments():
     """
     Define command-line arguments.
     """
-    parser.add_argument('-t', '--type', default='usb', choices=['usb', 'iso'], help='choose installation type (default: %(default)s)')
-    parser.add_argument('-k', '--keymap', help='map keys to chromebook actions', metavar='')
+    parser.add_argument('-t', '--installtype', default='usb', choices=['usb', 'iso'], help='choose installation type (default: %(default)s)')
+    parser.add_argument('-k', '--keymap', help='map keys to chromebook actions', action='store_true')
     parser.add_argument('-d', '--distro', default='ubuntu', choices=['arch', 'debian', 'fedora', 'ubuntu'], help='choose distro (default: %(default)s)')
     parser.add_argument('-de', '--desktop', default='cli', choices=['cli', 'gnome', 'kde', 'minimal', 'deepin', 'budgie', 'fce', 'lxqt', 'mate', 'openbox'], help='choose desktop environment (default: %(default)s)')
     parser.add_argument('-hn', '--hostname', default='chromebook', help='set hostname (default: %(default)s)')
     parser.add_argument('-u', '--username', default='breath_user', help='set username (default: %(default)s)')
     parser.add_argument('-p', '--password', default='breath_passwd', help='set password (default: %(default)s)')
+    parser.add_argument('-sp', '--systempasswd', help='input system password for root access, needed to run breath!')
     parser.add_argument('-vv', '--verbose', help='set installer output to verbose', metavar='')
     parser.add_argument('-v', '--version', help='output version information and exit', action='store_true')
 
@@ -59,10 +62,14 @@ def parse_arguments():
     """
     Parse arguments. If none inputted, default to '--help'.
     """
-    args = parser.parse_args(args=None if sys.argv[1:] else ['--help'])
+    args = parser.parse_args()
+
+    # Update argparse.Namespace() contents to dict(installation_options)
+    installation_options.update(vars(args))
 
     if args.version:
         print(f'{__title__} v{__version__}')
+        sys.exit()
 
 define_arguments()
 parse_arguments()
@@ -73,6 +80,9 @@ def run_as_a_module():
 	or a nuitka3 compiled version of the project, this function 
     and the file '__main__.py' acts as a entry point.
 	"""
-    pass
-    
+
+    # TODO: Implement breath installer!
+
+    #print(installation_options['var'])
+    print(installation_options)
 
