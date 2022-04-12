@@ -14,12 +14,31 @@ __version__ = '4.1.1-port/python'
 import argparse
 import sys
 
-#from .errors import *
+from .errors import *
 from .system import *
-from .input import *
 from .settings import *
+from .interactions import *
 
-options = dict() # This dict will hold all the install options for the breath installer to use
+# The default configuration options for Breath.
+# Used for comparison between user options and defaults
+# to determine if user interaction is necessary.
+# NOTE: Changing these values changes Breath defaults!
+defaults = {
+    'installtype': 'usb', 
+    'keymap': False, 
+    'distro': 'ubuntu', 
+    'desktop': 'cli', 
+    'hostname': 'chromebook', 
+    'username': 'breath_user', 
+    'password': 'breath_passwd', 
+    'systempasswd': None,
+    'crostini': False,
+    'forcedefaults': False,
+    'verbose': None, 
+    'version': False
+}
+
+user_input = dict() # This dict will hold all the install options for the breath installer to use
 
 class CustomHelpFormatter(argparse.HelpFormatter):
     """
@@ -46,31 +65,31 @@ parser = argparse.ArgumentParser(
     formatter_class=fmt
 )
 
-def define_arguments():
+def define_arguments(): #TODO: Fix command-line formatting
     """
     Define command-line arguments.
     """
-    parser.add_argument('-t', '--installtype', default='usb', choices=['usb', 'iso'], help='choose installation type (default: %(default)s)')
-    parser.add_argument('-k', '--keymap', help='map keys to chromebook actions', action='store_true')
-    parser.add_argument('-d', '--distro', default='ubuntu', choices=['arch', 'debian', 'fedora', 'ubuntu'], help='choose distro (default: %(default)s)')
-    parser.add_argument('-de', '--desktop', default='cli', choices=['cli', 'gnome', 'kde', 'minimal', 'deepin', 'budgie', 'fce', 'lxqt', 'mate', 'openbox'], help='choose desktop environment (default: %(default)s)')
-    parser.add_argument('-hn', '--hostname', default='chromebook', help='set hostname (default: %(default)s)')
-    parser.add_argument('-u', '--username', default='breath_user', help='set username (default: %(default)s)')
-    parser.add_argument('-p', '--password', default='breath_passwd', help='set password (default: %(default)s)')
-    parser.add_argument('-sp', '--systempasswd', help='input system password for root access, needed to run breath!')
-    parser.add_argument('-c', '--crostini', help='add this flag if installing on a chrome-based system!', action='store_true')
-    parser.add_argument('-f', '--forcedefaults', help='forces breath to install without any configuration (see default in [options])', action='store_true')
-    parser.add_argument('-vv', '--verbose', help='set installer output to verbose', action='store_true')
-    parser.add_argument('-v', '--version', help='output version information and exit', action='store_true')
+    parser.add_argument('-t', '--installtype', default=defaults['installtype'], choices=['usb', 'iso'], help='choose installation type (default: %(default)s)')
+    parser.add_argument('-k', '--keymap', default=defaults['keymap'], help='map keys to chromebook actions', action='store_true')
+    parser.add_argument('-d', '--distro', default=defaults['distro'], choices=['arch', 'debian', 'fedora', 'ubuntu'], help='choose distro (default: %(default)s)')
+    parser.add_argument('-de', '--desktop', default=defaults['desktop'], choices=['cli', 'gnome', 'kde', 'minimal', 'deepin', 'budgie', 'fce', 'lxqt', 'mate', 'openbox'], help='choose desktop environment (default: %(default)s)')
+    parser.add_argument('-hn', '--hostname', default=defaults['hostname'], help='set hostname (default: %(default)s)')
+    parser.add_argument('-u', '--username', default=defaults['username'], help='set username (default: %(default)s)')
+    parser.add_argument('-p', '--password', default=defaults['password'], help='set password (default: %(default)s)')
+    parser.add_argument('-sp', '--systempasswd', default=defaults['systempasswd'], help='input system password for root access, needed to run breath!')
+    parser.add_argument('-c', '--crostini', default=defaults['crostini'], help='add this flag if installing on a chrome-based system!', action='store_true')
+    parser.add_argument('-f', '--forcedefaults', default=defaults['forcedefaults'], help='forces breath to install without any configuration (see default in [options])', action='store_true')
+    parser.add_argument('-vv', '--verbose', default=defaults['verbose'], help='set installer output to verbose', action='store_true')
+    parser.add_argument('-v', '--version', default=defaults['version'], help='output version information and exit', action='store_true')
 
 def parse_arguments():
     """
-    Parse arguments. If none inputted, use defaults.
+    Parse arparse args and append to dict.
     """
     args = parser.parse_args()
 
     # Update argparse.Namespace() contents to dict(installation_options)
-    options.update(vars(args))
+    user_input.update(vars(args))
 
     if args.version:
         print(f'{__title__} v{__version__}')
@@ -87,7 +106,7 @@ def run_as_a_module():
 	"""
 
     # Set verbosity level of traceback
-    set_verbosity_level(options['verbose'])
+    set_verbosity_level(user_input['verbose'])
 
     # Check what type of operating system is being used, if it 
     # is Windows or Darwin, exit. This also sets up any os abstraction
@@ -98,12 +117,7 @@ def run_as_a_module():
     # did not specify any flags, assume the user needs to set everything.
     # This brings up installation inputs, after which installation proceeds with set flags. 
     # NOTE: If --forcedefaults is used, then use default args.
-    if options['forcedefaults'] == False:
-        new_options = input_options(options)
-
-    else:
-        pass
-    
+    options = determine_configuration(defaults, user_input)
 
 
 
