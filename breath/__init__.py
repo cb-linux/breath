@@ -19,7 +19,7 @@ from .system import *
 from .input import *
 from .settings import *
 
-installation_options = dict() # This dict will hold all the install options for the breath installer to use
+options = dict() # This dict will hold all the install options for the breath installer to use
 
 class CustomHelpFormatter(argparse.HelpFormatter):
     """
@@ -28,7 +28,7 @@ class CustomHelpFormatter(argparse.HelpFormatter):
     - Allows for extending the default column size for help variables.
     """
     def __init__(self, prog):
-        super().__init__(prog, max_help_position=80, width=150)
+        super().__init__(prog, max_help_position=100, width=180)
 
     def _format_action_invocation(self, action):
         if not action.option_strings or action.nargs == 0:
@@ -59,6 +59,7 @@ def define_arguments():
     parser.add_argument('-p', '--password', default='breath_passwd', help='set password (default: %(default)s)')
     parser.add_argument('-sp', '--systempasswd', help='input system password for root access, needed to run breath!')
     parser.add_argument('-c', '--crostini', help='add this flag if installing on a chrome-based system!', action='store_true')
+    parser.add_argument('-f', '--forcedefaults', help='forces breath to install without any configuration (see default in [options])', action='store_true')
     parser.add_argument('-vv', '--verbose', help='set installer output to verbose', action='store_true')
     parser.add_argument('-v', '--version', help='output version information and exit', action='store_true')
 
@@ -69,7 +70,7 @@ def parse_arguments():
     args = parser.parse_args()
 
     # Update argparse.Namespace() contents to dict(installation_options)
-    installation_options.update(vars(args))
+    options.update(vars(args))
 
     if args.version:
         print(f'{__title__} v{__version__}')
@@ -86,10 +87,25 @@ def run_as_a_module():
 	"""
 
     # Set verbosity level of traceback
-    set_verbosity_level(installation_options['verbose'])
+    set_verbosity_level(options['verbose'])
 
     # Check what type of operating system is being used, if it 
     # is Windows or Darwin, exit. This also sets up any os abstraction
     # for the installer later on.
-    system, distro = system_details() 
+    system, distro = system_details()
+
+    # If the system and/or distribution is supported, but the user
+    # did not specify any flags, assume the user needs to set everything.
+    # This brings up installation inputs, after which installation proceeds with set flags. 
+    # NOTE: If --forcedefaults is used, then use default args.
+    if options['forcedefaults'] == False:
+        new_options = input_options(options)
+
+    else:
+        pass
+    
+
+
+
+
 
