@@ -10,8 +10,7 @@ def system_details():
 
     if system in ('Linux'):
         # Determine linux distribution
-        #dist = distro.id()
-        dist = 'slackware'
+        dist = distro.id()
 
         # Raise error if distro not supported
         if dist not in ('arch', 'debian', 'fedora', 'ubuntu'):

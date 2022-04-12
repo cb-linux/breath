@@ -57,7 +57,8 @@ def define_arguments():
     parser.add_argument('-u', '--username', default='breath_user', help='set username (default: %(default)s)')
     parser.add_argument('-p', '--password', default='breath_passwd', help='set password (default: %(default)s)')
     parser.add_argument('-sp', '--systempasswd', help='input system password for root access, needed to run breath!')
-    parser.add_argument('-vv', '--verbose', help='set installer output to verbose', metavar='')
+    parser.add_argument('-c', '--crostini', help='add this flag if installing on a chrome-based system!', action='store_true')
+    parser.add_argument('-vv', '--verbose', help='set installer output to verbose', action='store_true')
     parser.add_argument('-v', '--version', help='output version information and exit', action='store_true')
 
 def parse_arguments():
