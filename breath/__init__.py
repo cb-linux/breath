@@ -17,6 +17,7 @@ import sys
 #from .errors import *
 from .system import *
 from .input import *
+from .settings import *
 
 installation_options = dict() # This dict will hold all the install options for the breath installer to use
 
@@ -83,6 +84,9 @@ def run_as_a_module():
 	or a nuitka3 compiled version of the project, this function 
     and the file '__main__.py' acts as a entry point.
 	"""
+
+    # Set verbosity level of traceback
+    set_verbosity_level(installation_options['verbose'])
 
     # Check what type of operating system is being used, if it 
     # is Windows or Darwin, exit. This also sets up any os abstraction
