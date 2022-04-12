@@ -7,3 +7,9 @@ kernel/*
 kernel/logo/*
 !kernel/logo/logo.png
 !kernel/genimg.sh
+
+# [port/python] Temporary ignore files to prevent accidentally pushing bloat
+__pycache__/
+breath.egg-info/
+build/
+dist/
