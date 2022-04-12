@@ -14,7 +14,9 @@ __version__ = '4.1.1-port/python'
 import argparse
 import sys
 
+#from .errors import *
 from .system import *
+from .input import *
 
 installation_options = dict() # This dict will hold all the install options for the breath installer to use
 
@@ -60,7 +62,7 @@ def define_arguments():
 
 def parse_arguments():
     """
-    Parse arguments. If none inputted, default to '--help'.
+    Parse arguments. If none inputted, use defaults.
     """
     args = parser.parse_args()
 
@@ -81,8 +83,8 @@ def run_as_a_module():
     and the file '__main__.py' acts as a entry point.
 	"""
 
-    # TODO: Implement breath installer!
-
-    #print(installation_options['var'])
-    print(installation_options)
+    # Check what type of operating system is being used, if it 
+    # is Windows or Darwin, exit. This also sets up any os abstraction
+    # for the installer later on.
+    system, distro = system_details() 
 
