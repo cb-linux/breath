@@ -5,7 +5,7 @@ import sys
 
 from .errors import *
 
-def system_details():
+def determine_system():
     system = platform.system()
 
     if system in ('Linux'):

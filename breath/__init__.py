@@ -27,16 +27,16 @@ from .interactions import *
 # to determine if user interaction is necessary.
 # NOTE: Changing these values changes Breath defaults!
 defaults = {
-    'installtype': 'usb', 
-    'keymap': False, 
+    'install_type': 'usb', 
     'distro': 'ubuntu', 
     'desktop': 'cli', 
     'hostname': 'chromebook', 
     'username': 'breath_user', 
-    'password': 'breath_passwd', 
-    'systempasswd': None,
+    'password': 'breath_passwd',
+    'system_passwd': None,
+    'keymap': False,
     'crostini': False,
-    'forcedefaults': False,
+    'force_defaults': False,
     'verbose': False, 
     'version': False
 }
@@ -72,16 +72,16 @@ def define_arguments(): #TODO: Fix command-line formatting
     """
     Define command-line arguments.
     """
-    parser.add_argument('-t', '--installtype', default=defaults['installtype'], choices=['usb', 'iso'], help='choose installation type (default: %(default)s)')
-    parser.add_argument('-k', '--keymap', default=defaults['keymap'], help='map keys to chromebook actions', action='store_true')
+    parser.add_argument('-t', '--install_type', default=defaults['install_type'], choices=['usb', 'iso'], help='choose installation type (default: %(default)s)')
     parser.add_argument('-d', '--distro', default=defaults['distro'], choices=['arch', 'debian', 'fedora', 'ubuntu'], help='choose distro (default: %(default)s)')
     parser.add_argument('-de', '--desktop', default=defaults['desktop'], choices=['cli', 'gnome', 'kde', 'minimal', 'deepin', 'budgie', 'fce', 'lxqt', 'mate', 'openbox'], help='choose desktop environment (default: %(default)s)')
     parser.add_argument('-hn', '--hostname', default=defaults['hostname'], help='set hostname (default: %(default)s)')
     parser.add_argument('-u', '--username', default=defaults['username'], help='set username (default: %(default)s)')
     parser.add_argument('-p', '--password', default=defaults['password'], help='set password (default: %(default)s)')
-    parser.add_argument('-sp', '--systempasswd', default=defaults['systempasswd'], help='input system password for root access, needed to run breath!')
+    parser.add_argument('-sp', '--system_passwd', default=defaults['system_passwd'], help='input system password for root access, needed to run breath!')
+    parser.add_argument('-k', '--keymap', default=defaults['keymap'], help='map keys to chromebook actions', action='store_true')
     parser.add_argument('-c', '--crostini', default=defaults['crostini'], help='add this flag if installing on a chrome-based system!', action='store_true')
-    parser.add_argument('-f', '--forcedefaults', default=defaults['forcedefaults'], help='forces breath to install without any configuration (see default in [options])', action='store_true')
+    parser.add_argument('-f', '--force_defaults', default=defaults['force_defaults'], help='forces breath to install without any configuration (see default in [options])', action='store_true')
     parser.add_argument('-vv', '--verbose', default=defaults['verbose'], help='set installer output to verbose', action='store_true')
     parser.add_argument('-v', '--version', default=defaults['version'], help='output version information and exit', action='store_true')
 
@@ -120,7 +120,7 @@ def run_as_a_module():
 
         # Check what type of operating system is being used.
         # This also sets up any os abstraction for the installer later on.
-        system, distro = system_details()
+        system, distro = determine_system()
 
     except BreathException:
         """
