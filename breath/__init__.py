@@ -5,7 +5,7 @@ Python Breath adaptation
 """
 
 __title__ = 'breath'
-__summary__ = 'A way to natively run Linux on modern Chromebooks without replacing firmware'
+__summary__ = 'A way to natively run Linux on modern Chromebooks without replacing firmware.'
 __author__ = 'MilkyDeveloper'
 __license__ = 'MIT'
 __copyright__ = 'Copyright 2021-present MilkyDeveloper'
@@ -15,7 +15,6 @@ import traceback
 import argparse
 import sys
 
-from cprint import *
 from .bling import * 
 from .errors import *
 from .system import *
@@ -64,7 +63,7 @@ fmt = lambda prog: CustomHelpFormatter(prog)
 parser = argparse.ArgumentParser(
     prog=__title__,
     usage='%(prog)s [options...]',
-    description=__summary__,
+    description=logo(),
     formatter_class=fmt
 )
 
@@ -124,11 +123,11 @@ def run_as_a_module():
 
     except BreathException:
         """
-        CPrint exceptions defined in Breath if caught.
+        Print exceptions defined in Breath if caught.
         NOTE: sys.exit() is used to prevent python from
         Catching BreathException as Exception.
         """
-        cprint.fatal(traceback.format_exc())
+        error(traceback.format_exc())
         sys.exit()
 
     except Exception:
@@ -137,8 +136,8 @@ def run_as_a_module():
         NOTE: Verbosity levels ignored since an exception
         thrown by python is usually a bug.
         """
-        cprint("Breath has ran into a fatal error.") # TODO: Supply user with log file to give to maintainers and debug.
-        cprint.fatal(traceback.format_exc())
+        fatal(f"Breath has ran into a fatal error!\n\n{traceback.format_exc()}")
+
 
 
 

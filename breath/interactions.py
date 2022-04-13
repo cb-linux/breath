@@ -2,6 +2,8 @@
 Breath user interactions
 """
 
+from .bling import *
+
 def determine_configuration(defaults, user_input):
     """
     Determine if the user has set any flags.
@@ -11,13 +13,17 @@ def determine_configuration(defaults, user_input):
     """
 
     # Keep user_input the same if forcedefaults is set
-    if user_input['forcedefaults'] == True:
+    if user_input['force_defaults'] == True:
         return user_input
 
     # Guide user through a cli installer if defaults match user_input
     if user_input == defaults:
-        # TODO: Guide user through a cli installer.
-        pass
+
+        # Ask user for installation type. Possible choices(usb, iso).
+        install_type = ask_for_install_type(user_input['-install_type'])
+
+        return 
+        
 
     # If the user configured installation via argparse, skip cli config
     else:
