@@ -7,7 +7,7 @@ __all__ = (
     'SystemNotSupported',
     'DistributionNotSupported',
     'UndeterminedSystem'
-)
+    )
 
 class BreathException(Exception):
     """

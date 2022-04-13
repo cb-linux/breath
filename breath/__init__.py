@@ -11,9 +11,12 @@ __license__ = 'MIT'
 __copyright__ = 'Copyright 2021-present MilkyDeveloper'
 __version__ = '4.1.1-port/python'
 
+import traceback
 import argparse
 import sys
 
+from cprint import *
+from .bling import * 
 from .errors import *
 from .system import *
 from .settings import *
@@ -34,7 +37,7 @@ defaults = {
     'systempasswd': None,
     'crostini': False,
     'forcedefaults': False,
-    'verbose': None, 
+    'verbose': False, 
     'version': False
 }
 
@@ -105,19 +108,37 @@ def run_as_a_module():
     and the file '__main__.py' acts as a entry point.
 	"""
 
-    # Set verbosity level of traceback
-    set_verbosity_level(user_input['verbose'])
+    try:
+        # If the system and/or distribution is supported, but the user
+        # did not specify any flags, assume the user needs to set everything.
+        # This brings up installation inputs, after which installation proceeds with set flags. 
+        # NOTE: If --forcedefaults is set, then default args are used.
+        options = determine_configuration(defaults, user_input)
 
-    # Check what type of operating system is being used, if it 
-    # is Windows or Darwin, exit. This also sets up any os abstraction
-    # for the installer later on.
-    system, distro = system_details()
+        # Set verbosity level of traceback
+        set_verbosity_level(options['verbose'])
 
-    # If the system and/or distribution is supported, but the user
-    # did not specify any flags, assume the user needs to set everything.
-    # This brings up installation inputs, after which installation proceeds with set flags. 
-    # NOTE: If --forcedefaults is used, then use default args.
-    options = determine_configuration(defaults, user_input)
+        # Check what type of operating system is being used.
+        # This also sets up any os abstraction for the installer later on.
+        system, distro = system_details()
+
+    except BreathException:
+        """
+        CPrint exceptions defined in Breath if caught.
+        NOTE: sys.exit() is used to prevent python from
+        Catching BreathException as Exception.
+        """
+        cprint.fatal(traceback.format_exc())
+        sys.exit()
+
+    except Exception:
+        """
+        CPrint any exception not defined in Breath if caught.
+        NOTE: Verbosity levels ignored since an exception
+        thrown by python is usually a bug.
+        """
+        cprint("Breath has ran into a fatal error.") # TODO: Supply user with log file to give to maintainers and debug.
+        cprint.fatal(traceback.format_exc())
 
 
 

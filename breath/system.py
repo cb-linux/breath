@@ -38,14 +38,3 @@ def system_details():
 
 
     
-    
-
-
-
-
-
-
-def logo():
-    subprocess.run(['toilet', '-f', 'mono12', '-F', 'crop', 'Breath'])
-    subprocess.run(['toilet', '-f', 'term', '-F', 'border', 'Made by MilkyDeveloper'])
-

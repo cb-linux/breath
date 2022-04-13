@@ -7,7 +7,7 @@ import sys
 
 def set_verbosity_level(verbosity):
     """
-    Hides traceback if --verbose flas is not set.
+    Hides traceback if --verbose flag is not set.
     """
 
     if verbosity == False:
@@ -15,15 +15,4 @@ def set_verbosity_level(verbosity):
 
     else:
         pass
-
-
-def input_options(options):
-    """
-    Installation inputs if --forcedefaults 
-    was not used and no defaults were changed.
-    """
-
-    # TODO: Implement input_options
-
-
 
