@@ -2,9 +2,29 @@
 Breath user interactions
 """
 
+from blessed import Terminal
 from .bling import *
+import inquirer
+import re
+import os
 
-def determine_configuration(defaults, user_input):
+term = Terminal() # Required for BreathInquirerTheme()
+
+class BreathInquirerTheme(inquirer.themes.Theme):
+    """
+    Breath theming for inquirer cli menu.
+    """
+    def __init__(self):
+        super().__init__()
+        self.Question.mark_color = term.yellow
+        self.Question.brackets_color = term.bright_green
+        self.Question.default_color = term.yellow
+        self.List.selection_color = term.bright_green
+        self.List.selection_cursor = "❯"
+        self.List.unselected_color = term.normal
+
+
+def configure(defaults, user_input):
     """
     Determine if the user has set any flags.
     If the flags are all default and '--forcedefaults'
@@ -17,93 +37,54 @@ def determine_configuration(defaults, user_input):
         return user_input
 
     # Guide user through a cli installer if defaults match user_input
-    if user_input == defaults:
+    elif user_input == defaults:
+        questions = [
+            inquirer.List('install_type',
+                message='Installation type',
+                choices=['usb', 'iso'],
+                default=defaults['install_type'],
+            ),
+            inquirer.List('distro',
+                message='Distro of choice',
+                choices=['arch', 'debian', 'fedora', 'ubuntu'],
+                default=defaults['distro'],
+            ),
+            inquirer.List('desktop',
+                message='Desktop environment',
+                choices=['cli', 'gnome', 'kde', 'minimal', 'deepin', 'budgie', 'xfce', 'lxqt', 'mate', 'openbox'],
+                default=defaults['desktop'],
+            ),
+            inquirer.Text('hostname',
+                message='Breath Hostname',
+                validate=lambda _, x: re.match('(?:^|\\s)[a-z]+(?:\\s|$)', x),
+                default=defaults['hostname'],
+            ),
+            inquirer.Text('username',
+                message='Breath Username',
+                validate=lambda _, x: re.match('(?:^|\\s)[a-z]+(?:\\s|$)', x),
+                default=defaults['username'],
+            ),
+            inquirer.Password('password',
+                message='Breath Password',
+                validate=lambda _, x: re.match('^\S+$', x),
+            ),
+            inquirer.Password('system_passwd',
+                message=f'Root password for {os.getlogin()}',
+                validate=lambda _, x: re.match('^\S+$', x),
+            ),
+            inquirer.Confirm('keymap',
+                message='Map keys to chromebook actions?',
+                default=defaults['keymap'],
+            ),
+            inquirer.Confirm('verbose',
+                message='Set verbose installation output?',
+                default=defaults['verbose'],
+            ),
+        ]
 
-        # Ask user for installation type. Possible choices(usb, iso).
-        install_type = ask_for_install_type(user_input['-install_type'])
-
-        return 
-        
+        user_input = inquirer.prompt(questions, theme=BreathInquirerTheme())
+        return user_input
 
     # If the user configured installation via argparse, skip cli config
     else:
         return user_input
-
-
-def get_password():
-    """
-    Password prompt with password validity check.
-    """
-    pass
-
-
-def ask_for_install_type(install_type):
-    """
-    Ask user for install_type.
-    Options: ['usb', 'iso']
-    """
-    pass
-
-
-def ask_for_distro(distro):
-   """
-   Ask user for distro to install.
-   Options: ['arch', 'debian', 'fedora', 'ubuntu']
-   """
-   pass
-
-
-def ask_for_desktop(desktop):
-    """
-    Ask user for desktop environment.
-    Options; ['cli', 'gnome', 'kde', 'minimal', 'deepin', 'budgie', 'fce', 'lxqt', 'mate', 'openbox']
-    """
-    pass
-
-
-def ask_for_hostname(hostname):
-    """
-    Ask user for breath install hostname.
-    Must be 2 characters minimum; 63 characters max.
-    Can contain digits, lower case letters, hyphens, and dots.
-    """
-    pass
-
-
-def ask_for_username(username):
-    """
-    Ask user for breath root username.
-    Must begin with a lowercase letter or underscore,
-    followed by lower case letters, digits, underscores,
-    or dashes.
-    """
-    pass
-
-
-def ask_for_system_password(system_password):
-    """
-    Ask user for root(host system) password.
-    Needed to run certain commands and installation steps.
-    """
-    pass
-
-
-def ask_to_set_keymap(keymap):
-    """
-    Ask user to map keys to Chromebook standard.
-    """
-    pass
-
-
-def ask_if_running_crostini(crostini):
-    """
-    Ask user if host system is running crostini(chrome-based).
-    """
-    pass
-
-
-def ask_verbosity_level(verbose):
-    """
-    Ask user if the installer should run with verbose flag set.
-    """
-    pass

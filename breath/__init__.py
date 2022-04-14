@@ -18,7 +18,6 @@ import sys
 from .bling import * 
 from .errors import *
 from .system import *
-from .settings import *
 from .interactions import *
 
 # The default configuration options for Breath.
@@ -30,7 +29,7 @@ defaults = {
     'distro': 'ubuntu', 
     'desktop': 'cli', 
     'hostname': 'chromebook', 
-    'username': 'breath_user', 
+    'username': 'breath', 
     'password': 'breath_passwd',
     'system_passwd': None,
     'keymap': False,
@@ -81,7 +80,7 @@ def define_arguments(): #TODO: Fix command-line formatting
     parser.add_argument('-k', '--keymap', default=defaults['keymap'], help='map keys to chromebook actions', action='store_true')
     parser.add_argument('-c', '--crostini', default=defaults['crostini'], help='add this flag if installing on a chrome-based system!', action='store_true')
     parser.add_argument('-f', '--force_defaults', default=defaults['force_defaults'], help='forces breath to install without any configuration (see default in [options])', action='store_true')
-    parser.add_argument('-vv', '--verbose', default=defaults['verbose'], help='set installer output to verbose', action='store_true')
+    parser.add_argument('-vv', '--verbose', default=defaults['verbose'], help='set error output to verbose', action='store_true')
     parser.add_argument('-v', '--version', default=defaults['version'], help='output version information and exit', action='store_true')
 
 def parse_arguments():
@@ -112,10 +111,11 @@ def run_as_a_module():
         # did not specify any flags, assume the user needs to set everything.
         # This brings up installation inputs, after which installation proceeds with set flags. 
         # NOTE: If --forcedefaults is set, then default args are used.
-        options = determine_configuration(defaults, user_input)
+        options = configure(defaults, user_input)
 
         # Set verbosity level of traceback
-        set_verbosity_level(options['verbose'])
+        if options['verbose'] == False:
+            sys.tracebacklimit = 0
 
         # Check what type of operating system is being used.
         # This also sets up any os abstraction for the installer later on.

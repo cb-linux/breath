@@ -18,14 +18,6 @@ class Bling:
     BOLD = '\033[1m'
 
 
-def logo():
-    """
-    Outputs Breath logo
-    """
-    subprocess.run(['toilet', '-f', 'mono12', '-F', 'crop', 'Breath'])
-    subprocess.run(['toilet', '-f', 'term', '-F', 'border', 'Made by MilkyDeveloper'])
-
-
 def warning(message):
     """
     Print Breath warning(orange, bold).
@@ -63,7 +55,7 @@ def logo():
     Note: Wacky indentation prevents python from double-tabbing,
     the breath logo, as this is treated as a multiline string.
     """
-    cyan('''
+    print('''
 ▄▄▄▄▄▄                                            ▄▄      
 ██▀▀▀▀██                                  ██      ██      
 ██    ██   ██▄████   ▄████▄    ▄█████▄  ███████   ██▄████▄

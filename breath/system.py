@@ -16,7 +16,7 @@ def determine_system():
         if dist not in ('arch', 'debian', 'fedora', 'ubuntu'):
             raise DistributionNotSupported(f"{dist} is not currently supported!")
 
-    # [backlog] TODO: Add support for Windows and Darwin systems
+    # Windows and Darwin unsupported
     elif system in ('Windows', 'Darwin'):
         raise SystemNotSupported(f"{system} is not currently supported!")
 
