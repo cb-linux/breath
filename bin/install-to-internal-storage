@@ -12,8 +12,8 @@ if [[ -f "/etc/arch-version" ]] || [[ -f "/etc/arch-release" ]]; then
     cd ./flashrom-git  && makepkg -cis 
     cd ../trousers     && makepkg -cis
     cd ../vboot-utils  && makepkg -cis 
-
-    pacman -Syu rsync curl
+   
+    sudo pacman -Syu rsync curl parted
 
     cd ../
     rm -rf ./flashrom-git ./trousers ./vboot-utils
