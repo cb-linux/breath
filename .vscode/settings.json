@@ -1,5 +1,10 @@
 {
     "files.associations": {
         "types.h": "c"
-    }
+    },
+    "yaml.schemas": {
+        "https://raw.githubusercontent.com/ansible-community/schemas/main/f/ansible.json#/definitions/playbook": "file:///home/milkydeveloper/breath/ansible/main.yml"
+    },
+    "powershell.scriptAnalysis.settingsPath": ".vscode/analyzer.psd1",
+    "powershell.scriptAnalysis.enable": true,
 }

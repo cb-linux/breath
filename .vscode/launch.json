@@ -1,13 +1,13 @@
-{
-    "configurations": [
-    {
-        "type": "bashdb",
-        "request": "launch",
-        "name": "Bash-Debug (hardcoded script name)",
-        "cwd": "${workspaceFolder}",
-        "program": "${workspaceFolder}/setup.sh",
-        "args": ["minimal", "arch"],
-        "terminalKind": "integrated"
-    }
-    ]
-}
+// {
+//     "configurations": [
+//     {
+//         "type": "bashdb",
+//         "request": "launch",
+//         "name": "Bash-Debug (hardcoded script name)",
+//         "cwd": "${workspaceFolder}",
+//         "program": "${workspaceFolder}/setup.sh",
+//         "args": ["minimal", "arch"],
+//         "terminalKind": "integrated"
+//     }
+//     ]
+// }
