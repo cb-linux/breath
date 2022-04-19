@@ -5,36 +5,14 @@ import sys
 
 from .errors import *
 
-def determine_system():
-    system = platform.system()
+# Define platform and system to be used throughout system.py
+platform = platform.system()
+distro = distro.id()
 
-    if system in ('Linux'):
-        # Determine linux distribution
-        dist = distro.id()
+# Raise error if distro not supported
+if distro not in ('arch', 'debian', 'fedora', 'ubuntu'):
+    raise DistributionNotSupported(f"{distro} is not currently supported!")
 
-        # Raise error if distro not supported
-        if dist not in ('arch', 'debian', 'fedora', 'ubuntu'):
-            raise DistributionNotSupported(f"{dist} is not currently supported!")
-
-    # Windows and Darwin unsupported
-    elif system in ('Windows', 'Darwin'):
-        raise SystemNotSupported(f"{system} is not currently supported!")
-
-    # Undetermined systems unsupported
-    elif system is None:
-        raise UndeterminedSystem("The host system platform could not be determined!")
-
-    return system, dist
-
-
-
-
-
-
-
-
-        
-
-
-
-    
+# Windows and Darwin unsupported
+elif platform in ('Windows', 'Darwin'):
+    raise PlatformNotSupported(f"{platform} is not currently supported!")

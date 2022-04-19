@@ -4,7 +4,7 @@ Exeption handler for Breath
 
 __all__ = (
     'BreathException',
-    'SystemNotSupported',
+    'PlatformNotSupported',
     'DistributionNotSupported',
     'UndeterminedSystem'
 )
@@ -18,10 +18,10 @@ class BreathException(Exception):
     pass
 
 
-class SystemNotSupported(BreathException):
+class PlatformNotSupported(BreathException):
     """
     Exception that is raised when the detected
-    host system is not supported.
+    host system platform is not supported.
     """
 
     pass
@@ -30,7 +30,7 @@ class SystemNotSupported(BreathException):
 class DistributionNotSupported(BreathException):
     """
     Exception that is raised when the detected
-    host distribution is not supported.
+    host system distribution is not supported.
     """
 
     pass

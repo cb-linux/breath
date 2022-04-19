@@ -11,6 +11,7 @@ __license__ = 'MIT'
 __copyright__ = 'Copyright 2021-present MilkyDeveloper'
 __version__ = '4.1.1-port/python'
 
+import subprocess
 import traceback
 import argparse
 import sys
@@ -57,19 +58,22 @@ class CustomHelpFormatter(argparse.HelpFormatter):
         args_string = self._format_args(action, default)
         return ', '.join(action.option_strings) + ' ' + args_string
 
-fmt = lambda prog: CustomHelpFormatter(prog)
 
-parser = argparse.ArgumentParser(
-    prog=__title__,
-    usage='%(prog)s [options...]',
-    description=logo(),
-    formatter_class=fmt
-)
-
-def define_arguments(): #TODO: Fix command-line formatting
+def define_and_parse_args():
+    # TODO: Fix command-line formatting(Several wacky things like indentation between long and short args).
+    # TODO: Add nargs for short help.
     """
     Define command-line arguments.
     """
+    fmt = lambda prog: CustomHelpFormatter(prog)
+
+    parser = argparse.ArgumentParser(
+        prog=__title__,
+        usage='&(prog)s [options...]',
+        description=logo(),
+        formatter_class=fmt
+    )
+
     parser.add_argument('-t', '--install_type', default=defaults['install_type'], choices=['usb', 'iso'], help='choose installation type (default: %(default)s)')
     parser.add_argument('-d', '--distro', default=defaults['distro'], choices=['arch', 'debian', 'fedora', 'ubuntu'], help='choose distro (default: %(default)s)')
     parser.add_argument('-de', '--desktop', default=defaults['desktop'], choices=['cli', 'gnome', 'kde', 'minimal', 'deepin', 'budgie', 'fce', 'lxqt', 'mate', 'openbox'], help='choose desktop environment (default: %(default)s)')
@@ -83,10 +87,7 @@ def define_arguments(): #TODO: Fix command-line formatting
     parser.add_argument('-vv', '--verbose', default=defaults['verbose'], help='set error output to verbose', action='store_true')
     parser.add_argument('-v', '--version', default=defaults['version'], help='output version information and exit', action='store_true')
 
-def parse_arguments():
-    """
-    Parse arparse args and append to dict.
-    """
+    # Parse args
     args = parser.parse_args()
 
     # Update argparse.Namespace() contents to dict(installation_options)
@@ -96,15 +97,17 @@ def parse_arguments():
         print(f'{__title__} v{__version__}')
         sys.exit()
 
-define_arguments()
-parse_arguments()
 
 def run_as_a_module():
     """
 	Since we're running this as a 'python -m archinstall' module
-	or a nuitka3 compiled version of the project, this function 
+	or a compiled version of the project, this function 
     and the file '__main__.py' acts as a entry point.
 	"""
+
+    # Argparse command-line parsers
+    # NOTE: Runs only if ran as a module
+    define_and_parse_args()
 
     try:
         # If the system and/or distribution is supported, but the user
@@ -119,7 +122,8 @@ def run_as_a_module():
 
         # Check what type of operating system is being used.
         # This also sets up any os abstraction for the installer later on.
-        system, distro = determine_system()
+        system = system
+
 
     except BreathException:
         """
