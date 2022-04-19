@@ -4,7 +4,7 @@
 # since /mnt will already be filled
 if [[ $FEATURES == *"CROSTINI"* ]]; then
 
-   mkdir /mnt/breath
+   sudo mkdir /mnt/breath
 
 fi
 

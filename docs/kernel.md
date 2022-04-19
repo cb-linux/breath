@@ -1,5 +1,14 @@
 ## Building the Kernel
 
+### Requirements
+The following must be installed in order to successfully build the kernel:
+* linux-generic (headers)
+* bison (parser, replacement for yacc)
+* flex (lexical scanner)
+* libelf-dev (for Ubuntu; possibly libelf-devel or elfutils-libelf-devel for other distros)
+* imagemagick (provides mogrify command)
+* libssl-dev (supports openssl development)
+
 ### New build script
 In the kernel folder, you should run the `build.sh` for a guided kernel build.
 
