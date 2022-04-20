@@ -17,13 +17,20 @@ function bootstrapFiles {
   printq "Installing Dependencies"
   installDependencies vboot-kernel-utils arch-install-scripts git wget cgpt $FW_PACKAGE
 
-
+if [[ $FEATURES == *"LOCAL_KERNEL"* ]]; then
+  cp $ORIGINAL_DIR/kernel/bzImage .
+  cp $ORIGINAL_DIR/kernel/modules.tar.xz .
+  cp $ORIGINAL_DIR/kernel/kernel.flags .
+  printq "Copied kernel files from breath/kernel"
+else
+  printq "Downloading kernel files from cb-lines/breath"
   # Download the kernel bzImage and the kernel modules (wget)
   {
   wget https://github.com/cb-linux/breath/releases/latest/download/bzImage -O bzImage -q --show-progress
   wget https://github.com/cb-linux/breath/releases/latest/download/modules.tar.xz -O modules.tar.xz -q --show-progress
   wget https://raw.githubusercontent.com/cb-linux/kernel/main/kernel.flags -O kernel.flags -q --show-progress
   } || true # Wget has the wrong exit status with no clobber
+fi
 
   # READ: Distro dependent step
   # Download the root file system based on the distribution
