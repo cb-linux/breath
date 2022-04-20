@@ -100,6 +100,7 @@ Due to licensing restraints, you cannot just download an ISO of Breath and flash
 > * Ubuntu supports custom versions. If you want to install Ubuntu 21.10 instead of the default Ubuntu 21.04, just run: `bash setup.sh cli ubuntu impish-21.10`, where `impish` is the codename and `21.10` is the version.
 > * You can remove the `FEATURES=ISO` to use the classic way which directly writes to a USB.
 > * You can add `KEYMAP` to `FEATURES` to map the keys to Chromebook actions; e.g., `FEATURES=ISO,KEYMAP`.
+> * You can add `LOCAL_KERNEL` to instruct it to use a local kernel generated from `build.sh`; e.g., `FEATURES=ISO,LOCAL_KERNEL`.
 
 3. Done! Flash the IMG file to a USB using something like Etcher.
 4. [**RECOMMENDED**] Resize the partition of your USB by running `bash expand.sh`. This will expand your USB image to use the entire available space.
