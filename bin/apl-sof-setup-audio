@@ -3,6 +3,8 @@
 
 set -e
 
+[[ -n "$1" ]] && { export DIR=$1; }
+
 sudo apt install vboot-kernel-utils cgpt gzip -y
 sudo apt install -y firmware-sof-signed || sudo apt-get -o Dpkg::Options::="--force-overwrite" install firmware-sof-signed
 
@@ -51,7 +53,7 @@ function extractModules {
 	sudo rm -rf /lib/modules/*
 	sudo cp -rv modules/lib/modules/* /lib/modules
 	syncStorage
-	
+
 }
 
 # Parse the arguments of the kernel command line to get the root device
@@ -81,8 +83,17 @@ bash <(curl -s https://raw.githubusercontent.com/cb-linux/breath/main/kernel.roo
 echo -n ' snd-intel-dspcfg.dsp_driver=3 snd_sof_pci.fw_path="intel/sof"'   >> kernel.flags
 
 # Download kernel and modules
-wget https://github.com/cb-linux/breath/releases/latest/download/bzImage -O bzImage -q --show-progress
-wget https://github.com/cb-linux/breath/releases/latest/download/modules.tar.xz -O modules.tar.xz -q --show-progress
+if [[ -n "$DIR" ]]; then
+    echo "Files supplied"
+    cp ${DIR}/bzImage .
+    cp ${DIR}/modules.tar.xz .
+elif [[ $VERSION == "ALT" ]]; then
+    wget https://github.com/cb-linux/breath/releases/latest/download/bzImage.alt -O bzImage -q --show-progress
+    wget https://github.com/cb-linux/breath/releases/latest/download/modules.alt.tar.xz -O modules.tar.xz -q --show-progress
+else
+    wget https://github.com/cb-linux/breath/releases/latest/download/bzImage -O bzImage -q --show-progress
+    wget https://github.com/cb-linux/breath/releases/latest/download/modules.tar.xz -O modules.tar.xz -q --show-progress
+fi
 
 # Sign the kernel
 # After this, the kernel can no longer be booted on non-depthcharge devices
