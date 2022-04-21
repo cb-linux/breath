@@ -4,18 +4,13 @@ Breath color's, logo and other fun stuff!
 
 import subprocess
 
-class Bling:
-    """
-    Collection of ANSII
-    escape characters 
-    and color codes.
-    """
-    CYAN = '\033[96m'
-    ERROR = '\033[91m'
-    WARNING = '\033[93m'
-    FATAL = '\u001b[31m'
-    ENDC = '\033[0m'
-    BOLD = '\033[1m'
+# Collection of ANSII escape characters and color codes.
+CYAN = '\033[96m'
+ERROR = '\033[91m'
+WARNING = '\033[93m'
+FATAL = '\u001b[31m'
+ENDC = '\033[0m'
+BOLD = '\033[1m'
 
 
 def warning(message):

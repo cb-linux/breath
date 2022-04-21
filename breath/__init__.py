@@ -16,7 +16,7 @@ import traceback
 import argparse
 import sys
 
-from .bling import * 
+from .output import *
 from .errors import *
 from .system import *
 from .interactions import *
@@ -122,8 +122,6 @@ def run_as_a_module():
 
         # Check what type of operating system is being used.
         # This also sets up any os abstraction for the installer later on.
-        system = system
-
 
     except BreathException:
         """
