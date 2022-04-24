@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e
+
 source utils/functions.sh
 source utils/extract.sh
 

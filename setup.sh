@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e
+
 # Import
 source utils/functions.sh # Functions
 source utils/bootstrap.sh # Bootstrap Function

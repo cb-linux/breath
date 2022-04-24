@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e
+
 function postinstall {
     # Setup internet
     sudo cp --remove-destination /etc/resolv.conf ${MNT}/etc/resolv.conf

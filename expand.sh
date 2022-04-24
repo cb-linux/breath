@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e
+
 source utils/system.sh
 
 installDependencies cloud-guest-utils e2fsprogs

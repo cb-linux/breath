@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e
+
 # Function for partitioning the USB
 function partitionUSB {
 

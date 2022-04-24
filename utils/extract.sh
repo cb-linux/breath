@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e
+
 function extractRootfs {
 
 	printq "Extracting the Root Filesystem"

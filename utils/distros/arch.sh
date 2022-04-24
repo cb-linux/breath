@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e 
+
 function postinstall {
 
     # We are basically doing all the below in order to install NetworkManager :(

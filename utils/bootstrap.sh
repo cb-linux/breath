@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e
+
 function bootstrapFiles {
 
   # This doesn't have to do with bootstrapping, but helps later

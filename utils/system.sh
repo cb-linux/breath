@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e
+
 # Source other files to simplify importing this script on more minimal bash scripts
 # (e.g. expand.sh or genimg.sh)
 DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )

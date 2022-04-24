@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e
+
 function postinstall {
     
     # Setup internet

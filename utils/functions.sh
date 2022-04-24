@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e
+
 # Function for printing a bold, green question or info prompt
 function printq {
   # We're using the e flag for possible newlines
