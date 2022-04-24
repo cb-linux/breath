@@ -8,7 +8,7 @@ function postinstall {
     sudo cp --remove-destination /etc/resolv.conf ${MNT}/etc/resolv.conf
 
     # We're installing the below packages for a cli environment and all desktops
-    BASECMD="apt install -y network-manager tasksel software-properties-common adduser sudo firmware-linux-free firmware-linux-nonfree"
+    BASECMD="apt install -y network-manager tasksel software-properties-common adduser sudo firmware-linux-free firmware-linux-nonfree firmware-iwlwifi iw"
 
     # We need to load the iwlmvm module at startup for WiFi
     sudo tee -a ${MNT}/etc/modules-load.d/modules.conf > /dev/null <<EOT
@@ -18,6 +18,9 @@ function postinstall {
     nls_cp437
     vfat
 EOT
+
+    # we have to add the non-free repository for non-free firmware
+    sed -i -e 's/ main/ main contrib non-free/g' ${MNT}/etc/apt/sources.list
 
     # Download the desktop that the user has selected
     case $DESKTOP in
