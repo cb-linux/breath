@@ -34,8 +34,9 @@ function extractRootfs {
 			;;
 
 		debian)
-            # Debootstrap Debian stable
-			sudo debootstrap stable $MNT http://deb.debian.org/debian/
+			# Debootstrap Debian
+			[[ -n $DISTRO_VERSION ]] || { printerr "No Debian version specified, using unstable"; export DISTRO_VERSION=unstable; }
+			sudo debootstrap $DISTRO_VERSION $MNT http://deb.debian.org/debian/
 		    ;;
 
 		*)
