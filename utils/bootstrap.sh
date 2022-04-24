@@ -26,9 +26,9 @@ else
   printq "Downloading kernel files from cb-lines/breath"
   # Download the kernel bzImage and the kernel modules (wget)
   {
-  wget https://github.com/cb-linux/breath/releases/latest/download/bzImage -O bzImage -q --show-progress
-  wget https://github.com/cb-linux/breath/releases/latest/download/modules.tar.xz -O modules.tar.xz -q --show-progress
-  wget https://raw.githubusercontent.com/cb-linux/kernel/main/kernel.flags -O kernel.flags -q --show-progress
+  wget https://github.com/cb-linux/breath/releases/latest/download/bzImage -N -q --show-progress
+  wget https://github.com/cb-linux/breath/releases/latest/download/modules.tar.xz -N -q --show-progress
+  wget https://raw.githubusercontent.com/cb-linux/kernel/main/kernel.flags -N -q --show-progress
   } || true # Wget has the wrong exit status with no clobber
 fi
 
