@@ -15,7 +15,7 @@ function bootstrapFiles {
 
   # If the ChromeOS firmware utility doesn't exist, install it and other packages
   printq "Installing Dependencies"
-  installDependencies vboot-kernel-utils arch-install-scripts git wget cgpt $FW_PACKAGE
+  installDependencies sudo vboot-kernel-utils arch-install-scripts git parted wget cgpt $FW_PACKAGE
 
 if [[ $FEATURES == *"LOCAL_KERNEL"* ]]; then
   cp $ORIGINAL_DIR/kernel/bzImage .
