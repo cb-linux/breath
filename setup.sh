@@ -81,6 +81,10 @@ if [[ $FEATURES == *"ISO"* ]]; then
    sleep 10
    fallocate -l 12G breath.img
    export USB=$(sudo losetup -f --show breath.img)
+	 if [[ -z "$USB" ]]
+      echo "ERROR: no loop device"
+      exit 1
+	 fi
    export USB1="${USB}p1"
    export USB2="${USB}p2"
 
