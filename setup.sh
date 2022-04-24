@@ -1,13 +1,5 @@
 #!/bin/bash
 
-# Before we do anything, check if the user is on Crostini,
-# since /mnt will already be filled
-if [[ $FEATURES == *"CROSTINI"* ]]; then
-
-   sudo mkdir /mnt/breath
-
-fi
-
 # Import
 source utils/functions.sh # Functions
 source utils/bootstrap.sh # Bootstrap Function
