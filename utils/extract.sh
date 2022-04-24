@@ -36,8 +36,8 @@ function extractRootfs {
 			;;
 
 		debian)
-            # Debootstrap Debian Unstable
-			sudo debootstrap unstable $MNT http://deb.debian.org/debian/
+            # Debootstrap Debian stable
+			sudo debootstrap stable $MNT http://deb.debian.org/debian/
 		    ;;
 
 		*)
