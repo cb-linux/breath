@@ -114,14 +114,16 @@ def run_as_a_module():
         # did not specify any flags, assume the user needs to set everything.
         # This brings up installation inputs, after which installation proceeds with set flags. 
         # NOTE: If --forcedefaults is set, then default args are used.
-        options = configure(defaults, user_input)
+        options = BreathInquirer(defaults, user_input)
 
         # Set verbosity level of traceback
         if options['verbose'] == False:
             sys.tracebacklimit = 0
 
-        # Check what type of operating system is being used.
-        # This also sets up any os abstraction for the installer later on.
+
+
+
+
 
     except BreathException:
         """

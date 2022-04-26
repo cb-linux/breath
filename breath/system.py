@@ -5,7 +5,7 @@ import sys
 
 from .interactions import *
 from .errors import *
-from .bling import *
+from .output import *
 
 # Define platform and system to be used throughout system.py
 platform = platform.system()

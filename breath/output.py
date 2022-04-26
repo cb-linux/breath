@@ -2,8 +2,6 @@
 Breath color's, logo and other fun stuff!
 """
 
-import subprocess
-
 # Collection of ANSII escape characters and color codes.
 CYAN = '\033[96m'
 ERROR = '\033[91m'
@@ -17,27 +15,27 @@ def warning(message):
     """
     Print Breath warning(orange, bold).
     """
-    return print(Bling.WARNING + Bling.BOLD + message + Bling.ENDC)
+    return print(WARNING + BOLD + message + ENDC)
 
 def error(message):
     """
     Print Breath error(orange, bold).
     """
-    return print(Bling.ERROR + Bling.BOLD + message + Bling.ENDC)
+    return print(ERROR + BOLD + message + ENDC)
 
 
 def fatal(message):
     """
     Print Breath fatal error(red, bold).
     """
-    return print(Bling.FATAL + Bling.BOLD + message + Bling.ENDC)
+    return print(FATAL + BOLD + message + ENDC)
 
 
 def cyan(message):
     """
     Print Breath cyan colored message(cyan, bold).
     """
-    return print(Bling.CYAN + Bling.BOLD + message + Bling.ENDC)
+    return print(CYAN + BOLD + message + ENDC)
 
 
 
