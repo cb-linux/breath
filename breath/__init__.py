@@ -11,15 +11,14 @@ __license__ = 'MIT'
 __copyright__ = 'Copyright 2021-present MilkyDeveloper'
 __version__ = '4.1.1-port/python'
 
-import subprocess
 import traceback
 import argparse
 import sys
 
+from .interactions import *
 from .output import *
 from .errors import *
 from .system import *
-from .interactions import *
 
 # The default configuration options for Breath.
 # Used for comparison between user options and defaults
@@ -110,15 +109,28 @@ def run_as_a_module():
     define_and_parse_args()
 
     try:
+        # Exit if running as root.
+        if os.geteuid() == 0:
+            sys.tracebacklimit = 0 # set as options is not yet defined
+            raise DontRunAsRoot('Please do not run Breath as root!')
+
         # If the system and/or distribution is supported, but the user
         # did not specify any flags, assume the user needs to set everything.
         # This brings up installation inputs, after which installation proceeds with set flags. 
         # NOTE: If --forcedefaults is set, then default args are used.
         options = BreathInquirer(defaults, user_input)
 
-        # Set verbosity level of traceback
+        # Set verbosity level of traceback.
         if options['verbose'] == False:
             sys.tracebacklimit = 0
+
+        # Define host system the Breath installer is running on.
+        system = BreathSystem(options['system_passwd'])
+
+        # Update host system packages
+        system.update_packages()
+        
+        
 
 
 

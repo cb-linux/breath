@@ -6,7 +6,9 @@ __all__ = (
     'BreathException',
     'PlatformNotSupported',
     'DistributionNotSupported',
-    'UndeterminedSystem'
+    'UndeterminedSystem',
+    'YayNotFound',
+    'DontRunAsRoot'
 )
 
 class BreathException(Exception):
@@ -40,6 +42,24 @@ class UndeterminedSystem(BreathException):
     """
     Exception that is raised when the host
     system name cannot be detected.
+    """
+
+    pass
+
+
+class YayNotFound(BreathException):
+    """
+    Exception that is raised when an arch-based host
+    system does not have the yay aur helper installed.
+    """
+
+    pass
+
+
+class DontRunAsRoot(BreathException):
+    """
+    Exception that is raised when the Breath
+    installer is run as root.
     """
 
     pass
