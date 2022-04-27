@@ -61,7 +61,8 @@ class BreathSystem:
 
         # Ask user for root password for host system if system_passwd is None
         elif system_passwd is None:
-            self.system_passwd = get_password()
+            pass # Disabled as this is properly working yet.
+            #self.system_passwd = get_password()
 
 
     def update_packages(self):

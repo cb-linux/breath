@@ -9,6 +9,5 @@ class BreathInstaller:
         self.hostname = options['hostname']
         self.username = options['username']
         self.password = options['password']
-        self.system_passwd = options['system_passwd']
         self.keymap = options['keymap']
         self.crostini = options['crostini']

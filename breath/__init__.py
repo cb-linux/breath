@@ -32,7 +32,6 @@ defaults = {
     'hostname': 'chromebook', 
     'username': 'breath', 
     'password': 'breath_passwd',
-    'system_passwd': None,
     'keymap': False,
     'crostini': False,
     'force_defaults': False,
@@ -80,7 +79,6 @@ def define_and_parse_args():
     parser.add_argument('-hn', '--hostname', default=defaults['hostname'], help='set hostname (default: %(default)s)')
     parser.add_argument('-u', '--username', default=defaults['username'], help='set username (default: %(default)s)')
     parser.add_argument('-p', '--password', default=defaults['password'], help='set password (default: %(default)s)')
-    parser.add_argument('-sp', '--system_passwd', default=defaults['system_passwd'], help='input system password for root access, needed to run breath!')
     parser.add_argument('-k', '--keymap', default=defaults['keymap'], help='map keys to chromebook actions', action='store_true')
     parser.add_argument('-c', '--crostini', default=defaults['crostini'], help='add this flag if installing on a chrome-based system!', action='store_true')
     parser.add_argument('-f', '--force_defaults', default=defaults['force_defaults'], help='forces breath to install without any configuration (see default in [options])', action='store_true')
@@ -125,12 +123,8 @@ def run_as_a_module():
         if options['verbose'] == False:
             sys.tracebacklimit = 0
 
-        # Get root system password if None.
-        if options['system_passwd'] is None:
-            options.update({'system_passwd': get_password()})
-
         # Define host system the Breath installer is running on.
-        system = BreathSystem(options['system_passwd'])
+        system = BreathSystem()
 
         # Update host system packages.
         system.update_packages()
@@ -139,8 +133,11 @@ def run_as_a_module():
         system.install_dependencies(['vboot-kernel-utils', 'arch-install-scripts', 'git', 'wget', 'cgpt'])
 
         # Define and run BreathInstaller().
-        #installer = BreathInstaller(options, defaults)
-        #installer.run()
+        installer = BreathInstaller(options, defaults)
+        # installer.run()
+
+        # Clean up after installation.
+        # installer.cleanup()
 
     except BreathException:
         """
