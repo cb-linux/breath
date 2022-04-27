@@ -19,6 +19,13 @@ def get_password():
     return pwinput.pwinput(prompt=f'Root password for {os.getlogin()}: ', mask='*')
 
 
+def run_cmd(command):
+    """
+    Run a command.
+    """
+    subprocess.run(command.split())
+
+
 def run_root_cmd(command, system_passwd):
     """
     Run a command as root.
