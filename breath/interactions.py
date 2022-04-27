@@ -10,6 +10,7 @@ import re
 import os
 
 
+
 class BreathInquirerTheme(inquirer.themes.Theme):
     """
     Breath theming for inquirer cli menu.
@@ -25,7 +26,7 @@ class BreathInquirerTheme(inquirer.themes.Theme):
         self.List.unselected_color = self.term.normal
 
 
-def BreathInquirer(defaults, user_input):
+def BreathInquirer(defaults, user_input, version):
     """
     Determine if the user has set any flags.
     If the flags are all default and '--forcedefaults'
@@ -80,6 +81,14 @@ def BreathInquirer(defaults, user_input):
                 message='Is this a crostini(chrome) system?',
                 default=defaults['crostini'],
             ),
+            inquirer.Confirm('local_kernel',
+                message='Use local kernel build from previous installations?',
+                default=defaults['local_kernel'],
+            ),
+            inquirer.Confirm('cleanup',
+                message='Remove installation build files afterwards?',
+                default=defaults['cleanup'],
+            ),
             inquirer.Confirm('verbose',
                 message='Set verbose installation output?',
                 default=defaults['verbose'],
@@ -87,6 +96,8 @@ def BreathInquirer(defaults, user_input):
         ]
 
         user_input = inquirer.prompt(questions, theme=BreathInquirerTheme())
+        info(f'Running Breath v{version}')
+        run_cmd('sleep 1')
         return user_input
 
     # If the user configured installation via argparse, skip cli config

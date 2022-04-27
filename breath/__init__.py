@@ -34,8 +34,11 @@ defaults = {
     'password': 'breath_passwd',
     'keymap': False,
     'crostini': False,
+    'local_kernel': False,
     'force_defaults': False,
-    'verbose': False, 
+    'cleanup': False,
+    'verbose': False,
+    'view_defaults': False,
     'version': False
 }
 
@@ -69,7 +72,7 @@ def define_and_parse_args():
     parser = argparse.ArgumentParser(
         prog=__title__,
         usage='&(prog)s [options...]',
-        description=logo(),
+        description=cli_format(),
         formatter_class=fmt
     )
 
@@ -79,10 +82,13 @@ def define_and_parse_args():
     parser.add_argument('-hn', '--hostname', default=defaults['hostname'], help='set hostname (default: %(default)s)')
     parser.add_argument('-u', '--username', default=defaults['username'], help='set username (default: %(default)s)')
     parser.add_argument('-p', '--password', default=defaults['password'], help='set password (default: %(default)s)')
-    parser.add_argument('-k', '--keymap', default=defaults['keymap'], help='map keys to chromebook actions', action='store_true')
-    parser.add_argument('-c', '--crostini', default=defaults['crostini'], help='add this flag if installing on a chrome-based system!', action='store_true')
-    parser.add_argument('-f', '--force_defaults', default=defaults['force_defaults'], help='forces breath to install without any configuration (see default in [options])', action='store_true')
-    parser.add_argument('-vv', '--verbose', default=defaults['verbose'], help='set error output to verbose', action='store_true')
+    parser.add_argument('-k', '--keymap', default=defaults['keymap'], help='map keys to chromebook actions (default: %(default)s)', action='store_true')
+    parser.add_argument('-c', '--crostini', default=defaults['crostini'], help='installer using a chrome-based system (default: %(default)s)', action='store_true')
+    parser.add_argument('-lk', '--local_kernel', default=defaults['local_kernel'], help='use a local build of the kernel bzImage (default: %(default)s)', action='store_true')
+    parser.add_argument('-f', '--force_defaults', default=defaults['force_defaults'], help='install with default configuration (see defaults)', action='store_true')
+    parser.add_argument('-cl', '--cleanup', default=defaults['cleanup'], help='remove build files after install (default: %(default)s)', action='store_true')
+    parser.add_argument('-vv', '--verbose', default=defaults['verbose'], help='set error output to verbose (default: %(default)s)', action='store_true')
+    parser.add_argument('-vd', '--view_defaults', default=defaults['view_defaults'], help='view default configuration options', action='store_true')
     parser.add_argument('-v', '--version', default=defaults['version'], help='output version information and exit', action='store_true')
 
     # Parse args
@@ -91,8 +97,12 @@ def define_and_parse_args():
     # Update argparse.Namespace() contents to dict(installation_options)
     user_input.update(vars(args))
 
-    if args.version:
-        print(f'{__title__} v{__version__}')
+    if args.view_defaults:
+        info(defaults)
+        sys.exit()
+
+    elif args.version:
+        info(f'{__title__} v{__version__}')
         sys.exit()
 
 
@@ -117,7 +127,7 @@ def run_as_a_module():
         # did not specify any flags, assume the user needs to set everything.
         # This brings up installation inputs, after which installation proceeds with set flags. 
         # NOTE: If --forcedefaults is set, then default args are used.
-        options = BreathInquirer(defaults, user_input)
+        options = BreathInquirer(defaults, user_input, __version__)
 
         # Set verbosity level of traceback.
         if options['verbose'] == False:
@@ -133,8 +143,19 @@ def run_as_a_module():
         system.install_dependencies(['vboot-kernel-utils', 'arch-install-scripts', 'git', 'wget', 'cgpt'])
 
         # Define and run BreathInstaller().
-        installer = BreathInstaller(options, defaults)
-        # installer.run()
+        installer = BreathInstaller()
+
+        # Before we do anything, check if the user is on Crostini,
+        # since /mnt will already be filled.
+        installer.check_crostini(options['crostini'])
+
+        # Bootstrap files.
+        installer.bootstrap_files(options['local_kernel'], options['distro'])
+
+        # Configure install_type.
+        # NOTE: # If the user wants to build an ISO, the partition numbers are different,
+        # (e.g.) /dev/sda2 or /dev/loop9p2 (notice the "p").
+        # usb, usb1, usb2 = installer.configure_install_type(options['install_type'])
 
         # Clean up after installation.
         # installer.cleanup()

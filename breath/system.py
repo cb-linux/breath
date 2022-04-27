@@ -38,7 +38,7 @@ class BreathSystem:
             raise YayNotFound(f'Breath requires the yay aur helper to be installed!')
 
         # Ask user for root password for host system if system_passwd is None
-        elif system_passwd is None:
+        if system_passwd is None:
             pass # Disabled as this is properly working yet.
             #self.system_passwd = get_password()
 

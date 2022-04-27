@@ -5,17 +5,48 @@ Breath installation process
 from .functions import *
 from .errors import *
 
+system_passwd = None # Necessary for run_root_cmd()
+
+
 class BreathInstaller:
-    def __init__(self, options, defaults, system_passwd=None):
-        self.system_passwd = system_passwd
-        self.install_type = options['install_type']
-        self.distro = options['distro']
-        self.desktop = options['desktop']
-        self.hostname = options['hostname']
-        self.username = options['username']
-        self.password = options['password']
-        self.keymap = options['keymap']
-        self.crostini = options['crostini']
+    """
+    Breath installer abstraction.
+    NOTE: The below functions do not require a class,
+    but as of now this structure makes more sense
+    when looing at the project topology currently.
+    """
+
+
+    @staticmethod
+    def check_crostini(crostini):
+        # crostini -> True
+        if crostini == True:
+            run_root_cmd('sudo mkdir /mnt/breath', system_passwd)
+        
+        # crostini -> False
+        elif crostini == False:
+            pass
+
+
+    @staticmethod
+    def bootstrap_files(local_kernel, distro):
+        pass
+
+
+    @staticmethod
+    def configure_install_type(install_type):
+        # install_type -> usb
+        if install_type == 'iso':
+            status(f'Building ISO at {os.pwd()}/breath.img')
+            run_cmd('sleep 10')
+            run_cmd('fallocate -l 12G breath.img')
+            
+
+        # install_type -> iso
+        elif install_type == 'usb':
+            pass
+
+
 
 
         

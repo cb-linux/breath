@@ -6,7 +6,6 @@ import subprocess
 import pwinput
 import sys
 
-
 def get_password():
     """
     Get root host system password.
@@ -63,6 +62,14 @@ def fatal(message):
     Print Breath fatal error(red, bold, program interrupt).
     """
     return cprint.fatal(message, bold=True, interrupt=True)
+
+
+def cli_format():
+    """
+    A nice way to format the cli menu and logo.
+    """
+    run_cmd('clear')
+    logo()
 
 
 def logo():
