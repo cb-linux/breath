@@ -2,9 +2,9 @@
 Breath user interactions
 """
 
-from .output import *
 from blessed import Terminal
 from getpass import getpass
+from .functions import *
 import inquirer
 import re
 import os

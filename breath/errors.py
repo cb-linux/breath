@@ -1,5 +1,5 @@
 """
-Exeption handler for Breath
+Breath Exceptions
 """
 
 __all__ = (

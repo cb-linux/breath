@@ -16,10 +16,10 @@ import argparse
 import sys
 
 from .interactions import *
+from .functions import *
 from .installer import *
-from .output import *
-from .errors import *
 from .system import *
+from .errors import *
 
 # The default configuration options for Breath.
 # Used for comparison between user options and defaults
@@ -154,7 +154,7 @@ def run_as_a_module():
         NOTE: Verbosity levels ignored since an exception
         thrown by python is usually a bug.
         """
-        fatal(f"Breath has ran into a fatal error!\n\n{traceback.format_exc()}")
+        fatal(traceback.format_exc())
 
 
 

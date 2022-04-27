@@ -1,42 +1,68 @@
 """
-Breath color's, logo and other fun stuff!
+Breath functions
 """
+from cprint import *
+import subprocess
+import pwinput
+import sys
 
-# Collection of ANSII escape characters and color codes.
-CYAN = '\033[96m'
-ERROR = '\033[91m'
-WARNING = '\033[93m'
-FATAL = '\u001b[31m'
-ENDC = '\033[0m'
-BOLD = '\033[1m'
+
+def get_password():
+    """
+    Get root host system password.
+    """
+    # TODO: Add password validation
+    return pwinput.pwinput(prompt=f'Root password for {os.getlogin()}: ', mask='*')
+
+
+def run_cmd(command):
+    """
+    Run a command.
+    """
+    subprocess.run(command.split())
+
+
+def run_root_cmd(command, system_passwd):
+    """
+    Run a command as root.
+    """
+    proc = subprocess.Popen(command.split(), stdin=subprocess.PIPE, stdout=sys.stdout, stderr=subprocess.PIPE)
+    proc.communicate(input=b'{system_password}\n')
+
+
+def status(message):
+    """
+    Print Breath ok(blue, bold).
+    """
+    return cprint.ok(message, bold=True)
+
+
+def info(message):
+    """
+    Print Breath info(green, bold).
+    """
+    return cprint.info(message, bold=True)
 
 
 def warning(message):
     """
-    Print Breath warning(orange, bold).
+    Print Breath warning(yellow, bold).
     """
-    return print(WARNING + BOLD + message + ENDC)
+    return cprint.warn(message, bold=True)
+
 
 def error(message):
     """
-    Print Breath error(orange, bold).
+    Print Breath error(orange, bold, program interrupt[handled by installer to suppress cprint extra output]).
     """
-    return print(ERROR + BOLD + message + ENDC)
+    return cprint.err(message, bold=True)
 
 
 def fatal(message):
     """
-    Print Breath fatal error(red, bold).
+    Print Breath fatal error(red, bold, program interrupt).
     """
-    return print(FATAL + BOLD + message + ENDC)
-
-
-def cyan(message):
-    """
-    Print Breath cyan colored message(cyan, bold).
-    """
-    return print(CYAN + BOLD + message + ENDC)
-
+    return cprint.fatal(message, bold=True, interrupt=True)
 
 
 def logo():
@@ -60,3 +86,4 @@ def logo():
 │Made by MilkyDeveloper│          
 └──────────────────────┘
     ''')
+
