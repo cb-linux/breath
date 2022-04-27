@@ -16,6 +16,7 @@ import argparse
 import sys
 
 from .interactions import *
+from .installer import *
 from .output import *
 from .errors import *
 from .system import *
@@ -124,18 +125,22 @@ def run_as_a_module():
         if options['verbose'] == False:
             sys.tracebacklimit = 0
 
+        # Get root system password if None.
+        if options['system_passwd'] is None:
+            options.update({'system_passwd': get_password()})
+
         # Define host system the Breath installer is running on.
         system = BreathSystem(options['system_passwd'])
 
-        # Update host system packages
+        # Update host system packages.
         system.update_packages()
-        
-        
 
+        # Install dependencies onto host system.
+        system.install_dependencies(['vboot-kernel-utils', 'arch-install-scripts', 'git', 'wget', 'cgpt'])
 
-
-
-
+        # Define and run BreathInstaller().
+        #installer = BreathInstaller(options, defaults)
+        #installer.run()
 
     except BreathException:
         """
