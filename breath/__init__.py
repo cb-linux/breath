@@ -113,6 +113,9 @@ def run_as_a_module():
     and the file '__main__.py' acts as a entry point.
 	"""
 
+    # Breath start dir
+    original_dir = os.getcwd()
+
     # Argparse command-line parsers
     # NOTE: Runs only if ran as a module
     define_and_parse_args()
@@ -147,15 +150,15 @@ def run_as_a_module():
 
         # Before we do anything, check if the user is on Crostini,
         # since /mnt will already be filled.
-        installer.check_crostini(options['crostini'])
+        mnt = installer.check_crostini(options['crostini'])
 
         # Bootstrap files.
-        installer.bootstrap_files(options['local_kernel'], options['distro'])
+        build_dir = installer.bootstrap_files(options['local_kernel'], options['distro'], mnt, original_dir)
 
         # Configure install_type.
         # NOTE: # If the user wants to build an ISO, the partition numbers are different,
         # (e.g.) /dev/sda2 or /dev/loop9p2 (notice the "p").
-        # usb, usb1, usb2 = installer.configure_install_type(options['install_type'])
+        # partitions = installer.configure_install_type(options['install_type'])
 
         # Clean up after installation.
         # installer.cleanup()

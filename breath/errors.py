@@ -8,7 +8,9 @@ __all__ = (
     'DistributionNotSupported',
     'UndeterminedSystem',
     'YayNotFound',
-    'DontRunAsRoot'
+    'DontRunAsRoot',
+    'DirectoryNotEmpty',
+    'FileNotFound'
 )
 
 class BreathException(Exception):
@@ -60,6 +62,24 @@ class DontRunAsRoot(BreathException):
     """
     Exception that is raised when the Breath
     installer is run as root.
+    """
+
+    pass
+
+
+class DirectoryNotEmpty(BreathException):
+    """
+    Exception that is raised when the Breath
+    installer conflicts with existing system files.
+    """
+
+    pass
+
+
+class FileNotFound(BreathException):
+    """
+    Exception that is raised when the Breath
+    installer cannot find a needed file.
     """
 
     pass

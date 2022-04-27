@@ -5,6 +5,7 @@ from cprint import *
 import subprocess
 import pwinput
 import sys
+import os
 
 def get_password():
     """
@@ -18,15 +19,40 @@ def run_cmd(command):
     """
     Run a command.
     """
-    subprocess.run(command.split())
+    try:
+        subprocess.check_output(command.split(), stderr=subprocess.STDOUT)
+
+    except subprocess.CalledProcessError:
+        raise BreathException
 
 
-def run_root_cmd(command, system_passwd):
+def run_root_cmd(command, system_passwd=None):
     """
     Run a command as root.
     """
     proc = subprocess.Popen(command.split(), stdin=subprocess.PIPE, stdout=sys.stdout, stderr=subprocess.PIPE)
     proc.communicate(input=b'{system_password}\n')
+
+
+def export(var_name, var_contents):
+    """
+    Export an environment variable.
+    """
+    os.environ[var_name] = var_contents
+
+
+def view_export(var_name):
+    """
+    View the contents of an environment variable and return'
+    """
+    return os.getenv(var_name)
+
+
+def change_dir(directory):
+    """
+    Change breath current directory.
+    """
+    os.chdir(directory)
 
 
 def status(message):
