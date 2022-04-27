@@ -10,7 +10,6 @@ from .interactions import *
 from .errors import *
 from .output import *
 
-from subprocess import Popen, PIPE
 
 def get_password():
     """
@@ -24,9 +23,9 @@ def run_as_root(command, system_password):
     """
     Run a command as root.
     """
-    # TODO: Fix stdin not reading password properly.
-    proc = Popen(command, stdin=PIPE, stdout=PIPE)
-    proc.communicate(system_password.encode())
+    proc = subprocess.Popen(command.split(), stdin=subprocess.PIPE, stdout=sys.stdout, stderr=subprocess.PIPE)
+    proc.communicate(input=b'{system_passwd}\n')
+
 
 
 class BreathSystem:
@@ -62,12 +61,12 @@ class BreathSystem:
         cyan('Updating system packages...')
 
         if self.distro == 'debian' or self.distro == 'ubuntu':
-            run_as_root(['sudo', 'apt', 'update' '&&' 'upgrade'], self.system_password)
+            run_as_root('sudo apt update -y && sudo apt upgrade -y', self.system_password)
 
         elif self.distro == 'arch':
-            run_as_root(['yay', '-Syyu'], self.system_password)
+            run_as_root('yay -Syyu', self.system_password)
 
         elif self.distro == 'fedora':
-            run_as_root(['sudo', 'dnf', 'upgrade'], self.system_password)
+            run_as_root('sudo dnf upgrade -y', self.system_password)
 
 
