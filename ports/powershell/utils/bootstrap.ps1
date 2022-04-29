@@ -4,7 +4,7 @@ function bootstrapFiles {
 	# Exit if there are files in /mnt
 	if ((ls -A ${MNT})) {
 		sudo rm -rf "${MNT}/lost+found"
-		printerr "There are files in ${MNT}! Please clear this directory of any valuable information!"; exit
+		#printerr "There are files in ${MNT}! Please clear this directory of any valuable information!"; exit
 	}
 
 	# Make our build directory and CD into it
