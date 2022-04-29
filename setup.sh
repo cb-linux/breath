@@ -24,7 +24,7 @@ export DESKTOP=$1
 export DISTRO=$2
 export DISTRO_VERSION=$3
 export MNT="/mnt"
-ORIGINAL_DIR=$(pwd)
+export ORIGINAL_DIR=$(pwd)
 
 # Crostini already has folders in /mnt
 if [[ $FEATURES == *"CROSTINI"* ]]; then
