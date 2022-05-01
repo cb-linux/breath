@@ -5,6 +5,7 @@ set -e
 
 [[ -n "$1" ]] && { export DIR=$1; }
 
+sudo add-apt-repository restricted
 sudo apt install vboot-kernel-utils cgpt gzip -y
 sudo apt install -y firmware-sof-signed || sudo apt-get -o Dpkg::Options::="--force-overwrite" install firmware-sof-signed
 
