@@ -7,8 +7,8 @@ if ($env:FEATURES -like "*CROSTINI*") {
 }
 
 # Import functions
-. utils/functions.sh # Functions
-# source utils/bootstrap.sh # Bootstrap Function
-# source utils/partition.sh # USB Partitioning
-# source utils/extract.sh   # Extract Rootfs
-# source utils/system.sh    # Host OS Abstraction
+. utils/functions.ps1 # Functions
+. utils/bootstrap.ps1 # Bootstrap Function
+. utils/partition.sh # USB Partitioning
+. utils/extract.sh   # Extract Rootfs
+. utils/system.sh    # Host OS Abstraction
