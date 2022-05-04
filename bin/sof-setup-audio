@@ -7,7 +7,7 @@ echo "Installing Audio..."
 
 # With SOF, configuration becomes much easier
 # Everything is pretty much universal, like HD-Audio
-case $SOUNDCARD in # TODO: add realtek support for octopus
+case $SOUNDCARD in
     "rtk") SND_MODULES="snd_soc_max98357a snd_soc_rt5682"
     ;;
     *) SND_MODULES="snd_soc_max98357a snd_soc_da7219"
