@@ -48,7 +48,7 @@ function installDependencies () {
         whichOperatingSystem
     fi
 
-    echo "Installing $*"
+    printq "Installing $*"
 
     # Download dependencies based on distribution
     case $DIST in
@@ -124,6 +124,37 @@ function installDependencies () {
         done
         ;;
 
+    esac
+
+}
+
+# Create a root Breath user with disabled password
+# for a headless install
+function createBreathUser {
+    
+    # Identify the distro if it is undefined
+    if [[ -z $DIST ]]; then
+        whichOperatingSystem
+    fi
+
+    printq "Creating Breath User"
+
+    # Distro dependent step: Create breath user
+    case $DIST in
+
+        Debian)
+            exit
+            ;;
+
+        Arch)
+            sudo cp /etc/sudoers /etc/sudoers.backup
+            sudo useradd breath
+            echo 'breath ALL=(ALL) NOPASSWD:ALL' | sudo EDITOR='tee -a' visudo
+            ;;
+
+        Fedora)
+            exit
+            ;;
     esac
 
 }
