@@ -2,8 +2,8 @@
 
 # Source other files to simplify importing this script on more minimal bash scripts
 # (e.g. expand.sh or genimg.sh)
-DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
-source ${DIR}/functions.sh
+#DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
+#source ${DIR}/functions.sh
 
 # Determine host system 
 function whichOperatingSystem {
@@ -48,7 +48,7 @@ function installDependencies () {
         whichOperatingSystem
     fi
 
-    printq "Installing $*"
+    echo "Installing $*"
 
     # Download dependencies based on distribution
     case $DIST in

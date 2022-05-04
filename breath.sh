@@ -1,19 +1,17 @@
 #!/bin/bash
 
-source utils/system.sh # Host OS Abstraction
+source utils/functions.sh # Functions
+source utils/system.sh    # Host OS Abstraction
 
 # Distro and desktop variables from arguments
 export DESKTOP=$1
 export DISTRO=$2
 export DISTRO_VERSION=$3
-export MNT="/mnt"
-export ORIGINAL_DIR=$(pwd)
 
-# Exit on errors
-set -e
-
-# Many much importance
-installDependencies toilet
+# Install dependencies
+# NOTE: Done in breath.sh without root because some package managers(yay) won't run as root.
+printq "Installing Dependencies"
+#installDependencies toilet vboot-kernel-utils arch-install-scripts git wget cgpt $FW_PACKAGE
 
 # Print 15 lines to "fake" clear the screen
 # shellcheck disable=SC2034
@@ -29,8 +27,14 @@ echo " $FEATURES"
 
 # Ask for username
 printq "What would you like the username to be?"
-printq "NOTE: No UPPERCASE letters, spaces, backslashes, or special characters"
+printq "NOTE: No UPPERCASE letters, spaces, backslashes, or special characters (default: breath)"
+
 read -r BREATH_USER
+# If the output is null, set default as breath
+if [ -z $BREATH_USER ]; then
+    BREATH_USER="breath"
+    echo "Using the default username, breath"
+fi
 export BREATH_USER
 
 # Ask for hostname
@@ -46,7 +50,13 @@ fi
 
 export BREATH_HOST
 
+# Create a root user with no password for headless installation called breath
 createBreathUser
 
-printq "Running Breath"
-sudo su breath -c "bash setup.sh $1 $2 $3"
+# Run the breath installer(setup.sh)
+sudo -H -u breath bash -c "FEATURES=${FEATURES} sudo bash setup.sh ${DESKTOP} ${DISTRO} ${DISTRO_VERSION} ${BREATH_USER} ${BREATH_HOST}"
+
+# Delete's the breath user, as well as removes any files in /mnt
+#printq "Cleaning up"
+#sudo su breath -c "sudo rm -rf /mnt/./*" # Run as breath to avoid prompt
+#deleteBreathUser

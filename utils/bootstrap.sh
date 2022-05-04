@@ -13,17 +13,13 @@ function bootstrapFiles {
   mkdir -p ~/linux-build
   cd ~/linux-build
 
-  # If the ChromeOS firmware utility doesn't exist, install it and other packages
-  printq "Installing Dependencies"
-  installDependencies vboot-kernel-utils arch-install-scripts git wget cgpt $FW_PACKAGE
-
 if [[ $FEATURES == *"LOCAL_KERNEL"* ]]; then
   cp $ORIGINAL_DIR/kernel/bzImage .
   cp $ORIGINAL_DIR/kernel/modules.tar.xz .
   cp $ORIGINAL_DIR/kernel/kernel.flags .
   printq "Copied kernel files from breath/kernel"
 else
-  printq "Downloading kernel files from cb-lines/breath"
+  printq "Downloading kernel files from cb-linux/breath"
   # Download the kernel bzImage and the kernel modules (wget)
   {
   wget https://github.com/cb-linux/breath/releases/latest/download/bzImage -O bzImage -q --show-progress
