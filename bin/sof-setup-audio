@@ -19,7 +19,7 @@ if [[ -v ONLY_ALSA ]]; then
     # Remove PulseAudio
     sudo apt purge -y pulseaudio
     sudo apt purge -y pulseaudio*
-    sudo apt install -y apulse alsa-*
+    sudo apt install -y apulse alsa-* rsync
     sudo apt install -y firmware-sof-signed || sudo apt-get -o Dpkg::Options::="--force-overwrite" install firmware-sof-signed
 
     # On newer GNOME installs, Pipewire is a dependency of GNOME.
@@ -108,6 +108,14 @@ elif ! command -v pulseaudio &> /dev/null; then
 fi
 
 sudo systemctl enable alsa-reload
+
+cd # to home directory
+git clone https://github.com/thesofproject/sof-bin —depth 1
+cd sof-bin/v2.1.x
+sudo rsync -a sof*v2.1.1   /lib/firmware/intel/
+sudo ln -s sof-v2.1.1      /lib/firmware/intel/sof
+sudo ln -s sof-tplg-v2.1.1 /lib/firmware/intel/sof-tplg
+sudo rsync tools-v2.1.1/*  /usr/local/bin
 
 sync
 echo 'Done! Reboot to enable audio'
