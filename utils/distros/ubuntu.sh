@@ -58,7 +58,7 @@ EOT
       gnome)
         export DESKTOP_PACKAGE="apt install -y ubuntu-desktop"
         ;;
-      
+
       deepin)
         export DESKTOP_PACKAGE="add-apt-repository ppa:ubuntudde-dev/stable; apt update; apt install -y ubuntudde-dde"
         ;;
@@ -117,7 +117,13 @@ EOT
 
     # Fix for GDM3
     # https://askubuntu.com/questions/1239503/ubuntu-20-04-and-20-10-etc-securetty-no-such-file-or-directory
-    sudo cp ${MNT}/usr/share/doc/util-linux/examples/securetty ${MNT}/etc/securetty
+    SURETTY=${MNT}/usr/share/doc/util-linux/examples/securetty
+    if [ -f "$SURETTY" ]; then
+      printq "Copying securetty"
+      sudo cp ${SURETTY} ${MNT}/etc/securetty
+    else
+      printq "Did not find securetty"
+    fi
 
     # Only create a new user and add it to the sudo group if the user doesn't already exist
     if runChrootCommand "id $BREATH_USER"; then
