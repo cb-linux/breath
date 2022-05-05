@@ -1,0 +1,15 @@
+#!/bin/sh
+
+set -e 
+
+cd /usr/share/X11/xkb/
+if patch -f --dry-run -p1 < /usr/local/lib/xkb-patch/xkb.modern.patch
+then
+  patch -f -p1 < /usr/local/lib/xkb-patch/xkb.modern.patch
+else
+  # "-e" for echo seems not consistent on /bin/sh shells
+  echo
+  echo
+  echo "The patch won't apply correctly, please review it by hand."
+  echo
+fi

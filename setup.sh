@@ -176,6 +176,8 @@ if [[ $FEATURES == *"moDErn"* ]]; then
 	# (PageUp/Down, Pos1, End)
 	[ -e ${MNT}/usr/share/X11/xkb/ ] &&
 	(cd ${MNT}/usr/share/X11/xkb/ && patch -p1) < xkb/xkb.modern.patch
+	mkdir -p ${MNT}/usr/local/lib/xkb-patch
+	cp xkb/xkb.modern.patch ${MNT}/usr/local/lib/xkb-patch
 
   # activate these layouts and options via your key setup
 	# with gnome for example activate two layouts in the gnome-control-center
