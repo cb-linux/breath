@@ -53,7 +53,10 @@ export BREATH_HOST
 trap cleanup INT
 
 # Create user 'breath' with disabled password for headless installation
-createBreathUser
+printq "Creating Breath User"
+sudo cp /etc/sudoers /etc/sudoers.backup
+sudo useradd --create-home --shell /bin/bash breath
+echo 'breath ALL=(ALL) NOPASSWD:ALL' | sudo EDITOR='tee -a' visudo
 
 # Run the breath installer(setup.sh)
 sudo -H -u breath bash -c "FEATURES=${FEATURES} bash setup.sh ${DESKTOP} ${DISTRO} ${DISTRO_VERSION} ${BREATH_USER} ${BREATH_HOST}"

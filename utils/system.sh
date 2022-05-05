@@ -130,38 +130,6 @@ function installDependencies () {
 
 }
 
-# Create a root Breath user with disabled password
-# for a headless install
-function createBreathUser {
-    
-    # Identify the distro if it is undefined
-    if [[ -z $DIST ]]; then
-        whichOperatingSystem
-    fi
-
-    printq "Creating Breath User"
-
-    # Distro dependent step: Create breath user
-    case $DIST in
-
-        # Debian
-        Debian)
-            sudo cp /etc/sudoers /etc/sudoers.backup
-            sudo adduser --home --disabled-password --shell /bin/bash --gecos "breath"
-            echo 'breath ALL=(ALL) NOPASSWD:ALL' | sudo EDITOR='tee -a' visudo
-            ;;
-
-        # Arch/Fedora
-        *)
-            sudo cp /etc/sudoers /etc/sudoers.backup
-            sudo useradd -m breath
-            echo 'breath ALL=(ALL) NOPASSWD:ALL' | sudo EDITOR='tee -a' visudo
-            ;;
-
-    esac
-
-}
-
 # Delete's the breath user as well as all files in /mnt
 # NOTE: This function is identical to the last several lines in
 # breath.sh, but exists to trap ctrl-c without running the cleanup twice.
