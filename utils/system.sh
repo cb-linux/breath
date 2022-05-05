@@ -2,8 +2,10 @@
 
 # Source other files to simplify importing this script on more minimal bash scripts
 # (e.g. expand.sh or genimg.sh)
-#DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
-#source ${DIR}/functions.sh
+# NOTE: Permission errors occur when being sourced by the breath user, but they
+# do not hinder the installer.
+DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
+source ${DIR}/functions.sh
 
 # Determine host system 
 function whichOperatingSystem {
@@ -148,7 +150,7 @@ function createBreathUser {
 
         Arch)
             sudo cp /etc/sudoers /etc/sudoers.backup
-            sudo useradd breath
+            sudo useradd -m breath
             echo 'breath ALL=(ALL) NOPASSWD:ALL' | sudo EDITOR='tee -a' visudo
             ;;
 

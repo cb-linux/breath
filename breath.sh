@@ -11,7 +11,7 @@ export DISTRO_VERSION=$3
 # Install dependencies
 # NOTE: Done in breath.sh without root because some package managers(yay) won't run as root.
 printq "Installing Dependencies"
-#installDependencies toilet vboot-kernel-utils arch-install-scripts git wget cgpt $FW_PACKAGE
+installDependencies toilet vboot-kernel-utils arch-install-scripts git wget cgpt $FW_PACKAGE
 
 # Print 15 lines to "fake" clear the screen
 # shellcheck disable=SC2034
@@ -35,6 +35,7 @@ if [ -z $BREATH_USER ]; then
     BREATH_USER="breath"
     echo "Using the default username, breath"
 fi
+
 export BREATH_USER
 
 # Ask for hostname
@@ -54,9 +55,10 @@ export BREATH_HOST
 createBreathUser
 
 # Run the breath installer(setup.sh)
-sudo -H -u breath bash -c "FEATURES=${FEATURES} sudo bash setup.sh ${DESKTOP} ${DISTRO} ${DISTRO_VERSION} ${BREATH_USER} ${BREATH_HOST}"
+sudo -H -u breath bash -c "FEATURES=${FEATURES} bash setup.sh ${DESKTOP} ${DISTRO} ${DISTRO_VERSION} ${BREATH_USER} ${BREATH_HOST}"
 
 # Delete's the breath user, as well as removes any files in /mnt
-#printq "Cleaning up"
-#sudo su breath -c "sudo rm -rf /mnt/./*" # Run as breath to avoid prompt
-#deleteBreathUser
+printq "Cleaning up"
+sudo -H -u breath bash -c "sudo rm -rf /mnt/./*" # Run as breath to avoid prompt
+sudo mv /etc/sudoers.backup /etc/sudoers
+sudo userdel breath
