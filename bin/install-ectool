@@ -1,0 +1,8 @@
+#!/bin/bash
+
+# Rough script to install ectool to control fan speed
+
+set -xe
+
+git clone https://chromium.googlesource.com/chromiumos/platform/ec --depth 1
+sudo apt update; sudo apt install git libftdi-dev libusb-dev libncurses5-dev pkgconf -y

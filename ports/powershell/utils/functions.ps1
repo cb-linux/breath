@@ -96,3 +96,11 @@ function unmountUSB {
 function runChrootCommand([string]$text) {
   sudo chroot $MNT /bin/sh -c "$text"
 }
+
+function checkMNT() {
+  # We have to flip this if statement for PSScriptAnalyzer
+  if ($null -eq $MNT) {
+    printerr "The MNT variable ($MNT) is not defined. This is a programming error. Aborting."
+    exit 1
+  }
+}
