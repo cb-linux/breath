@@ -62,8 +62,4 @@ echo 'breath ALL=(ALL) NOPASSWD:ALL' | sudo EDITOR='tee -a' visudo
 sudo -H -u breath bash -c "FEATURES=${FEATURES} bash setup.sh ${DESKTOP} ${DISTRO} ${DISTRO_VERSION} ${BREATH_USER} ${BREATH_HOST}"
 
 # Deletes the breath user as well as all files in /mnt
-printq "Cleaning up"
-sudo umount -l -f /mnt # Just in case
-sudo -H -u breath bash -c "sudo rm -rf /mnt/./*" # Run as breath to avoid prompt
-sudo mv /etc/sudoers.backup /etc/sudoers
-sudo userdel breath
+cleanup
