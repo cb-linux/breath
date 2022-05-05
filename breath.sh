@@ -8,10 +8,8 @@ export DESKTOP=$1
 export DISTRO=$2
 export DISTRO_VERSION=$3
 
-# Install dependencies
-# NOTE: Done in breath.sh without root because some package managers(yay) won't run as root.
-printq "Installing Dependencies"
-installDependencies toilet vboot-kernel-utils arch-install-scripts git wget cgpt $FW_PACKAGE
+# Many much importance
+installDependencies toilet
 
 # Print 15 lines to "fake" clear the screen
 # shellcheck disable=SC2034

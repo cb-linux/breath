@@ -13,6 +13,12 @@ function bootstrapFiles {
   mkdir -p ~/linux-build
   cd ~/linux-build
 
+  # Install dependencies
+  printq "Installing Dependencies"
+  installDependencies vboot-kernel-utils arch-install-scripts git wget cgpt $FW_PACKAGE
+
+
+
 if [[ $FEATURES == *"LOCAL_KERNEL"* ]]; then
   cp $ORIGINAL_DIR/kernel/bzImage .
   cp $ORIGINAL_DIR/kernel/modules.tar.xz .
