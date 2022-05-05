@@ -3,7 +3,7 @@
 # Source other files to simplify importing this script on more minimal bash scripts
 # (e.g. expand.sh or genimg.sh)
 # NOTE: Permission errors occur when being sourced by the breath user, but they
-# do not hinder the installer.
+# do not hinder the installation.
 DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 source ${DIR}/functions.sh
 
@@ -160,4 +160,16 @@ function createBreathUser {
 
     esac
 
+}
+
+# Delete's the breath user as well as all files in /mnt
+# NOTE: This function is identical to the last several lines in
+# breath.sh, but exists to trap ctrl-c without running the cleanup twice.
+function cleanup() {
+    printq "Cleaning up"
+    sudo umount -l -f /mnt # Just in case
+    sudo -H -u breath bash -c "sudo rm -rf /mnt/./*" # Run as breath to avoid prompt
+    sudo mv /etc/sudoers.backup /etc/sudoers
+    sudo userdel breath
+    exit
 }

@@ -49,14 +49,18 @@ fi
 
 export BREATH_HOST
 
-# Create a root user with no password for headless installation called breath
+# Trap ctrl-c to allow for cleanup to execute regardless of execution state below
+trap cleanup INT
+
+# Create user 'breath' with disabled password for headless installation
 createBreathUser
 
 # Run the breath installer(setup.sh)
 sudo -H -u breath bash -c "FEATURES=${FEATURES} bash setup.sh ${DESKTOP} ${DISTRO} ${DISTRO_VERSION} ${BREATH_USER} ${BREATH_HOST}"
 
-# Delete's the breath user, as well as removes any files in /mnt
+# Deletes the breath user as well as all files in /mnt
 printq "Cleaning up"
+sudo umount -l -f /mnt # Just in case
 sudo -H -u breath bash -c "sudo rm -rf /mnt/./*" # Run as breath to avoid prompt
 sudo mv /etc/sudoers.backup /etc/sudoers
 sudo userdel breath
