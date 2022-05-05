@@ -144,19 +144,20 @@ function createBreathUser {
     # Distro dependent step: Create breath user
     case $DIST in
 
+        # Debian
         Debian)
-            exit
+            sudo cp /etc/sudoers /etc/sudoers.backup
+            sudo adduser --home --disabled-password --shell /bin/bash --gecos "breath"
+            echo 'breath ALL=(ALL) NOPASSWD:ALL' | sudo EDITOR='tee -a' visudo
             ;;
 
-        Arch)
+        # Arch/Fedora
+        *)
             sudo cp /etc/sudoers /etc/sudoers.backup
             sudo useradd -m breath
             echo 'breath ALL=(ALL) NOPASSWD:ALL' | sudo EDITOR='tee -a' visudo
             ;;
 
-        Fedora)
-            exit
-            ;;
     esac
 
 }
