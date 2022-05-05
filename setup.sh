@@ -174,6 +174,7 @@ if [[ $FEATURES == *"moDErn"* ]]; then
   # Create a key layout for F-Keys on modern Chromebooks (currently for "de" only)
 	# and an option to symbols/inet for navigating via arrow keys
 	# (PageUp/Down, Pos1, End)
+	[ -e ${MNT}/usr/share/X11/xkb/ ] &&
 	(cd ${MNT}/usr/share/X11/xkb/ && patch -p1) < xkb/xkb.modern.patch
 
   # activate these layouts and options via your key setup
