@@ -7,4 +7,5 @@
 | `docs`               | Extended Developer Documentation                         |
 | `.shellcheckrc`      | Shellcheck configuration file                            |
 | `kernel.conf`        | Kernel Config file (.config)                             |
-| `setup.sh`           | Main entrypoint script, may be broken into modules later |
+| `breath.sh`          | Entrypoint wrapper for setup.sh                          |
+| `setup.sh`           | Core of the installer                                    |

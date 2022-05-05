@@ -92,12 +92,12 @@ Due to licensing restraints, you cannot just download an ISO of Breath and flash
 **Prerequisite:** Git is installed and you have a mainstream, fast 12GB or bigger USB plugged in
 
 1. `git clone --recurse-submodules https://github.com/cb-linux/breath && cd breath`
-2. `FEATURES=ISO bash setup.sh cli ubuntu`
+2. `FEATURES=ISO bash breath.sh cli ubuntu`
 (should take ~30 minutes on a 4-core laptop processor)
 
 > * **Using the CLI argument installs a minimal CLI (no desktop!) environment on the USB.** If you would like to install a desktop, you can use `gnome`, `kde`, `minimal`, `deepin`, `budgie`, `xfce`, `lxqt`, `mate` or `openbox` instead of `cli`.
 > * You can replace `ubuntu` with `arch` (you can only use `cli`) or `debian` (all desktops are supported)
-> * Ubuntu supports custom versions. If you want to install Ubuntu 21.10 instead of the default Ubuntu 21.04, just run: `bash setup.sh cli ubuntu impish-21.10`, where `impish` is the codename and `21.10` is the version.
+> * Ubuntu supports custom versions. If you want to install Ubuntu 21.10 instead of the default Ubuntu 21.04, just run: `bash breath.sh cli ubuntu impish-21.10`, where `impish` is the codename and `21.10` is the version.
 > * You can remove the `FEATURES=ISO` to use the classic way which directly writes to a USB.
 > * You can add `KEYMAP` to `FEATURES` to map the keys to Chromebook actions; e.g., `FEATURES=ISO,KEYMAP`.
 > * You can add `LOCAL_KERNEL` to instruct it to use a local kernel generated from `build.sh`; e.g., `FEATURES=ISO,LOCAL_KERNEL`.
