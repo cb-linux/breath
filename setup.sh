@@ -170,6 +170,25 @@ if [[ $FEATURES == *"KEYMAP"* ]]; then
   sudo cp xkb/evdev.chromebook ${MNT}/usr/share/X11/xkb/keycodes/evdev
 fi
 
+if [[ $FEATURES == *"moDErn"* ]]; then
+  # Create a key layout for F-Keys on modern Chromebooks (currently for "de" only)
+	# and an option to symbols/inet for navigating via arrow keys
+	# (PageUp/Down, Pos1, End)
+	(cd ${MNT}/usr/share/X11/xkb/ && patch -p1) < xkb/xkb.modern.patch
+
+  # activate these layouts and options via your key setup
+	# with gnome for example activate two layouts in the gnome-control-center
+	# and the additional options via gnome-tweaks
+	# I do typically enable the following additional layout options:
+	# - Key to choose the 3rd level
+	#   * Right Alt (Alt Gr)
+	# - Switching to another Layout
+	#   * Alt+Space
+	# - Special Key Overlays for Chromebooks
+	#   * Chromebook Function Key Overlay
+	# ... YMMV
+fi
+
 sudo umount $MNT
 
 set +u
