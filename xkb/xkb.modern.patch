@@ -1,6 +1,6 @@
-diff --no-dereference -rupN xkb.ori/keycodes/evdev xkb.cbflex/keycodes/evdev
+diff -rupN xkb.ori/keycodes/evdev xkb/keycodes/evdev
 --- xkb.ori/keycodes/evdev	2020-02-29 12:32:57.000000000 +0100
-+++ xkb.cbflex/keycodes/evdev	2022-05-03 08:53:30.000000000 +0200
++++ xkb/keycodes/evdev	2022-05-08 09:28:55.525042672 +0200
 @@ -2,7 +2,8 @@
  
  default xkb_keycodes "evdev" {
@@ -11,9 +11,9 @@ diff --no-dereference -rupN xkb.ori/keycodes/evdev xkb.cbflex/keycodes/evdev
  
          # Added for pc105 compatibility
          <LSGT> = 94;
-diff --no-dereference -rupN xkb.ori/keycodes/xfree86 xkb.cbflex/keycodes/xfree86
+diff -rupN xkb.ori/keycodes/xfree86 xkb/keycodes/xfree86
 --- xkb.ori/keycodes/xfree86	2020-02-29 12:32:57.000000000 +0100
-+++ xkb.cbflex/keycodes/xfree86	2022-04-29 14:41:28.000000000 +0200
++++ xkb/keycodes/xfree86	2022-05-08 09:28:55.525042672 +0200
 @@ -11,7 +11,8 @@ default xkb_keycodes "xfree86" {
  xkb_keycodes "basic" {
  
@@ -24,9 +24,9 @@ diff --no-dereference -rupN xkb.ori/keycodes/xfree86 xkb.cbflex/keycodes/xfree86
  
      <TLDE> =  49;
      alias <AE00> = <TLDE>;	// Some geometries use AE00
-diff --no-dereference -rupN xkb.ori/rules/base xkb.cbflex/rules/base
+diff -rupN xkb.ori/rules/base xkb/rules/base
 --- xkb.ori/rules/base	2020-02-29 12:32:57.000000000 +0100
-+++ xkb.cbflex/rules/base	2022-04-27 20:06:45.000000000 +0200
++++ xkb/rules/base	2022-05-08 09:28:55.525042672 +0200
 @@ -1241,6 +1241,7 @@
    shift:lshift_both_shiftlock        =       +shift(lshift_both_shiftlock)
    shift:rshift_both_shiftlock        =       +shift(rshift_both_shiftlock)
@@ -35,9 +35,9 @@ diff --no-dereference -rupN xkb.ori/rules/base xkb.cbflex/rules/base
    lv3:caps_switch                    =       +level3(caps_switch)
    lv3:bksl_switch                    =       +level3(bksl_switch)
    lv3:lsgt_switch                    =       +level3(lsgt_switch)
-diff --no-dereference -rupN xkb.ori/rules/base.extras.xml xkb.cbflex/rules/base.extras.xml
+diff -rupN xkb.ori/rules/base.extras.xml xkb/rules/base.extras.xml
 --- xkb.ori/rules/base.extras.xml	2020-02-29 12:32:57.000000000 +0100
-+++ xkb.cbflex/rules/base.extras.xml	2022-04-29 21:30:07.000000000 +0200
++++ xkb/rules/base.extras.xml	2022-05-08 09:28:55.525042672 +0200
 @@ -172,6 +172,12 @@
          </variant>
          <variant>
@@ -51,9 +51,9 @@ diff --no-dereference -rupN xkb.ori/rules/base.extras.xml xkb.cbflex/rules/base.
              <name>ru-recom</name>
              <!-- Keyboard indicator for Russian layouts -->
              <shortDescription>ru</shortDescription>
-diff --no-dereference -rupN xkb.ori/rules/base.lst xkb.cbflex/rules/base.lst
+diff -rupN xkb.ori/rules/base.lst xkb/rules/base.lst
 --- xkb.ori/rules/base.lst	2020-02-29 12:32:57.000000000 +0100
-+++ xkb.cbflex/rules/base.lst	2022-04-27 20:07:54.000000000 +0200
++++ xkb/rules/base.lst	2022-05-08 09:28:55.525042672 +0200
 @@ -970,5 +970,6 @@
    esperanto:colemak    To the corresponding key in a Colemak layout
    solaris              Maintain key compatibility with old Solaris keycodes
@@ -61,9 +61,9 @@ diff --no-dereference -rupN xkb.ori/rules/base.lst xkb.cbflex/rules/base.lst
 +  chromeb:cboverlay    Chromebook Function Keys Overlay
    terminate            Key sequence to kill the X server
    terminate:ctrl_alt_bksp Ctrl+Alt+Backspace
-diff --no-dereference -rupN xkb.ori/rules/base.xml xkb.cbflex/rules/base.xml
+diff -rupN xkb.ori/rules/base.xml xkb/rules/base.xml
 --- xkb.ori/rules/base.xml	2020-02-29 12:32:57.000000000 +0100
-+++ xkb.cbflex/rules/base.xml	2022-04-27 20:10:03.000000000 +0200
++++ xkb/rules/base.xml	2022-05-08 09:28:55.529042612 +0200
 @@ -7598,6 +7598,18 @@
      </group>
      <group allowMultipleSelection="true">
@@ -83,9 +83,9 @@ diff --no-dereference -rupN xkb.ori/rules/base.xml xkb.cbflex/rules/base.xml
          <name>terminate</name>
          <description>Key sequence to kill the X server</description>
        </configItem>
-diff --no-dereference -rupN xkb.ori/rules/evdev xkb.cbflex/rules/evdev
+diff -rupN xkb.ori/rules/evdev xkb/rules/evdev
 --- xkb.ori/rules/evdev	2020-02-29 12:32:57.000000000 +0100
-+++ xkb.cbflex/rules/evdev	2022-04-27 20:06:34.000000000 +0200
++++ xkb/rules/evdev	2022-05-08 09:28:55.529042612 +0200
 @@ -1127,6 +1127,7 @@
    shift:lshift_both_shiftlock        =       +shift(lshift_both_shiftlock)
    shift:rshift_both_shiftlock        =       +shift(rshift_both_shiftlock)
@@ -94,9 +94,9 @@ diff --no-dereference -rupN xkb.ori/rules/evdev xkb.cbflex/rules/evdev
    lv3:caps_switch                    =       +level3(caps_switch)
    lv3:bksl_switch                    =       +level3(bksl_switch)
    lv3:lsgt_switch                    =       +level3(lsgt_switch)
-diff --no-dereference -rupN xkb.ori/rules/evdev.extras.xml xkb.cbflex/rules/evdev.extras.xml
+diff -rupN xkb.ori/rules/evdev.extras.xml xkb/rules/evdev.extras.xml
 --- xkb.ori/rules/evdev.extras.xml	2020-02-29 12:32:57.000000000 +0100
-+++ xkb.cbflex/rules/evdev.extras.xml	2022-04-29 21:30:54.000000000 +0200
++++ xkb/rules/evdev.extras.xml	2022-05-08 09:28:55.529042612 +0200
 @@ -172,6 +172,12 @@
          </variant>
          <variant>
@@ -110,9 +110,9 @@ diff --no-dereference -rupN xkb.ori/rules/evdev.extras.xml xkb.cbflex/rules/evde
              <name>ru-recom</name>
              <!-- Keyboard indicator for Russian layouts -->
              <shortDescription>ru</shortDescription>
-diff --no-dereference -rupN xkb.ori/rules/evdev.lst xkb.cbflex/rules/evdev.lst
+diff -rupN xkb.ori/rules/evdev.lst xkb/rules/evdev.lst
 --- xkb.ori/rules/evdev.lst	2020-02-29 12:32:57.000000000 +0100
-+++ xkb.cbflex/rules/evdev.lst	2022-04-27 20:07:39.000000000 +0200
++++ xkb/rules/evdev.lst	2022-05-08 09:28:55.529042612 +0200
 @@ -970,5 +970,6 @@
    esperanto:colemak    To the corresponding key in a Colemak layout
    solaris              Maintain key compatibility with old Solaris keycodes
@@ -120,9 +120,9 @@ diff --no-dereference -rupN xkb.ori/rules/evdev.lst xkb.cbflex/rules/evdev.lst
 +  chromeb:cboverlay    Chromebook Function Keys Overlay
    terminate            Key sequence to kill the X server
    terminate:ctrl_alt_bksp Ctrl+Alt+Backspace
-diff --no-dereference -rupN xkb.ori/rules/evdev.xml xkb.cbflex/rules/evdev.xml
+diff -rupN xkb.ori/rules/evdev.xml xkb/rules/evdev.xml
 --- xkb.ori/rules/evdev.xml	2020-02-29 12:32:57.000000000 +0100
-+++ xkb.cbflex/rules/evdev.xml	2022-04-27 20:09:46.000000000 +0200
++++ xkb/rules/evdev.xml	2022-05-08 09:28:55.529042612 +0200
 @@ -7598,6 +7598,18 @@
      </group>
      <group allowMultipleSelection="true">
@@ -142,9 +142,95 @@ diff --no-dereference -rupN xkb.ori/rules/evdev.xml xkb.cbflex/rules/evdev.xml
          <name>terminate</name>
          <description>Key sequence to kill the X server</description>
        </configItem>
-diff --no-dereference -rupN xkb.ori/symbols/de xkb.cbflex/symbols/de
+diff -rupN xkb.ori/rules/xfree86 xkb/rules/xfree86
+--- xkb.ori/rules/xfree86	2020-02-29 12:32:57.000000000 +0100
++++ xkb/rules/xfree86	2022-05-08 09:28:55.525042672 +0200
+@@ -1241,6 +1241,7 @@
+   shift:lshift_both_shiftlock        =       +shift(lshift_both_shiftlock)
+   shift:rshift_both_shiftlock        =       +shift(rshift_both_shiftlock)
+   solaris:sun_compat				 =		 +sun_vndr/solaris(sun_compat)
++  chromeb:cboverlay                  =       +inet(cboverlay)
+   lv3:caps_switch                    =       +level3(caps_switch)
+   lv3:bksl_switch                    =       +level3(bksl_switch)
+   lv3:lsgt_switch                    =       +level3(lsgt_switch)
+diff -rupN xkb.ori/rules/xfree86.lst xkb/rules/xfree86.lst
+--- xkb.ori/rules/xfree86.lst	2020-02-29 12:32:57.000000000 +0100
++++ xkb/rules/xfree86.lst	2022-05-08 09:28:55.525042672 +0200
+@@ -970,5 +970,6 @@
+   esperanto:colemak    To the corresponding key in a Colemak layout
+   solaris              Maintain key compatibility with old Solaris keycodes
+   solaris:sun_compat   Sun Key compatibility
++  chromeb:cboverlay    Chromebook Function Keys Overlay
+   terminate            Key sequence to kill the X server
+   terminate:ctrl_alt_bksp Ctrl+Alt+Backspace
+diff -rupN xkb.ori/rules/xfree86.xml xkb/rules/xfree86.xml
+--- xkb.ori/rules/xfree86.xml	2020-02-29 12:32:57.000000000 +0100
++++ xkb/rules/xfree86.xml	2022-05-08 09:28:55.529042612 +0200
+@@ -7598,6 +7598,18 @@
+     </group>
+     <group allowMultipleSelection="true">
+       <configItem>
++        <name>chromeb</name>
++        <description>Special Key Overlays for Chromebooks</description>
++      </configItem>
++      <option>
++        <configItem>
++          <name>chromeb:cboverlay</name>
++          <description>Chromebook Function Key Overlay</description>
++        </configItem>
++      </option>
++    </group>
++    <group allowMultipleSelection="true">
++      <configItem>
+         <name>terminate</name>
+         <description>Key sequence to kill the X server</description>
+       </configItem>
+diff -rupN xkb.ori/rules/xorg xkb/rules/xorg
+--- xkb.ori/rules/xorg	2020-02-29 12:32:57.000000000 +0100
++++ xkb/rules/xorg	2022-05-08 09:28:55.525042672 +0200
+@@ -1241,6 +1241,7 @@
+   shift:lshift_both_shiftlock        =       +shift(lshift_both_shiftlock)
+   shift:rshift_both_shiftlock        =       +shift(rshift_both_shiftlock)
+   solaris:sun_compat				 =		 +sun_vndr/solaris(sun_compat)
++  chromeb:cboverlay                  =       +inet(cboverlay)
+   lv3:caps_switch                    =       +level3(caps_switch)
+   lv3:bksl_switch                    =       +level3(bksl_switch)
+   lv3:lsgt_switch                    =       +level3(lsgt_switch)
+diff -rupN xkb.ori/rules/xorg.lst xkb/rules/xorg.lst
+--- xkb.ori/rules/xorg.lst	2020-02-29 12:32:57.000000000 +0100
++++ xkb/rules/xorg.lst	2022-05-08 09:28:55.525042672 +0200
+@@ -970,5 +970,6 @@
+   esperanto:colemak    To the corresponding key in a Colemak layout
+   solaris              Maintain key compatibility with old Solaris keycodes
+   solaris:sun_compat   Sun Key compatibility
++  chromeb:cboverlay    Chromebook Function Keys Overlay
+   terminate            Key sequence to kill the X server
+   terminate:ctrl_alt_bksp Ctrl+Alt+Backspace
+diff -rupN xkb.ori/rules/xorg.xml xkb/rules/xorg.xml
+--- xkb.ori/rules/xorg.xml	2020-02-29 12:32:57.000000000 +0100
++++ xkb/rules/xorg.xml	2022-05-08 09:28:55.529042612 +0200
+@@ -7598,6 +7598,18 @@
+     </group>
+     <group allowMultipleSelection="true">
+       <configItem>
++        <name>chromeb</name>
++        <description>Special Key Overlays for Chromebooks</description>
++      </configItem>
++      <option>
++        <configItem>
++          <name>chromeb:cboverlay</name>
++          <description>Chromebook Function Key Overlay</description>
++        </configItem>
++      </option>
++    </group>
++    <group allowMultipleSelection="true">
++      <configItem>
+         <name>terminate</name>
+         <description>Key sequence to kill the X server</description>
+       </configItem>
+diff -rupN xkb.ori/symbols/de xkb/symbols/de
 --- xkb.ori/symbols/de	2020-02-29 12:32:57.000000000 +0100
-+++ xkb.cbflex/symbols/de	2022-05-05 17:18:02.839578088 +0200
++++ xkb/symbols/de	2022-05-08 09:28:55.529042612 +0200
 @@ -1106,3 +1106,51 @@ partial alphanumeric_keys
      key <AD10> { [ p, P, ediaeresis, Ediaeresis ] };
  
@@ -197,10 +283,10 @@ diff --no-dereference -rupN xkb.ori/symbols/de xkb.cbflex/symbols/de
 +        symbols[Group1]= [ F10, F10, F10, F10, XF86_Switch_VT_10 ]
 +    };
 +};
-diff --no-dereference -rupN xkb.ori/symbols/inet xkb.cbflex/symbols/inet
+diff -rupN xkb.ori/symbols/inet xkb/symbols/inet
 --- xkb.ori/symbols/inet	2020-02-29 12:32:57.000000000 +0100
-+++ xkb.cbflex/symbols/inet	2022-05-05 17:10:31.002726441 +0200
-@@ -1897,3 +1897,17 @@ xkb_symbols "teck229" {
++++ xkb/symbols/inet	2022-05-08 09:30:40.639720368 +0200
+@@ -1897,3 +1897,18 @@ xkb_symbols "teck229" {
      include "inet(teck227)"
  };
  
@@ -212,60 +298,10 @@ diff --no-dereference -rupN xkb.ori/symbols/inet xkb.cbflex/symbols/inet
 +    // an overlay but a Level3_shift-function
 +    key <BKSP> { [BackSpace, BackSpace, Delete, Insert ] };
 +    key <I150> { [Delete, Delete, Insert, Insert ] };
-+    key <UP>   {    [ Up, Up, Prior, Up ] };
-+    key <DOWN> {    [ Down, Down, Next, Down ] };
-+    key <LEFT> {    [ Left, Left, Home, Left ] };
-+    key <RGHT> {    [ Right, Right, End, Right ] };
++    key <LWIN> { [ Super_L, Super_L, Caps_Lock, Super_L ] };
++    key <UP>   { [ Up, Up, Prior, Prior ] };
++    key <DOWN> { [ Down, Down, Next, Next ] };
++    key <LEFT> { [ Left, Left, Home, Home ] };
++    key <RGHT> { [ Right, Right, End, End ] };
 +};
-+
-diff --no-dereference -rupN xkb.ori/symbols/pc xkb.cbflex/symbols/pc
---- xkb.ori/symbols/pc	2020-02-29 12:32:57.000000000 +0100
-+++ xkb.cbflex/symbols/pc	2022-04-27 22:37:42.000000000 +0200
-@@ -14,6 +14,7 @@ xkb_symbols "pc105" {
-     include "pc(editing)"
-     include "keypad(x11)"
- 
-+    //key <BKSP> {    [ BackSpace, BackSpace, Delete ] };
-     key <BKSP> {	[ BackSpace, BackSpace	]	};
- 
-     key  <TAB> {	[ Tab,	ISO_Left_Tab	]	};
-@@ -60,6 +61,7 @@ xkb_symbols "pc105" {
-     key <KITG> { [ XF86KbdLightOnOff ] };
-     key <KIDN> { [ XF86KbdBrightnessDown ] };
-     key <KIUP> { [ XF86KbdBrightnessUp ] };
-+	
- };
- 
- hidden partial alphanumeric_keys
-@@ -80,8 +82,31 @@ xkb_symbols "editing" {
-     key  <END> {	[  End			]	};
-     key <PGDN> {	[  Next			]	};
- 
-+    // added for ChromeBook
-+    //key <I167> { 	[XF86Back, NoSymbol, NoSymbol, NoSymbol, F1] 			};
-+    //key <I166> { 	[XF86Forward, NoSymbol, NoSymbol, NoSymbol, F2] 		};
-+    // key <FK03> { 	[XF86Refresh, NoSymbol, NoSymbol, NoSymbol, F3] 		};
-+    // key <FK04> { 	[Print, NoSymbol, NoSymbol, NoSymbol, F4] 			};
-+    // key <FK05> { 	[Super_L, NoSymbol, NoSymbol, NoSymbol, F5] 			};
-+    // key <FK06> { 	[XF86MonBrightnessDown, NoSymbol, NoSymbol, NoSymbol, F6] 	};
-+    // key <FK07> { 	[XF86MonBrightnessUp, NoSymbol, NoSymbol, NoSymbol, F7] 	};
-+    // key <FK08> { 	[XF86AudioMute, NoSymbol, NoSymbol, NoSymbol, F8] 		};
-+    // key <FK09> { 	[XF86AudioLowerVolume, NoSymbol, NoSymbol, NoSymbol, F9] 	};
-+    // key <FK10> { 	[XF86AudioRaiseVolume, NoSymbol, NoSymbol, NoSymbol, F10] 	};
-+    // //key <LWIN> { 	[Caps_Lock] };
-+
-+    // added for ChromeBook
-+    //key <UP>   {    [ Up, Up, Prior, Up ] };
-+    //key <DOWN> {    [ Down, Down, Next, Down ] };
-+    //key <LEFT> {    [ Left, Left, Home, Left ] };
-+    //key <RGHT> {    [ Right, Right, End, Right ] };
-+    //key <LWIN> {    [ Super_L, Super_L, Caps_Lock ] };
-     key   <UP> {	[  Up			]	};
-     key <LEFT> {	[  Left			]	};
-     key <DOWN> {	[  Down			]	};
-     key <RGHT> {	[  Right		]	};
-+		
- };
-+
-+
 +
