@@ -10,8 +10,3 @@
     --sidebar-background: #f6f6f6;
     --sidebar-border-color: #f6f6f6;
 }
-
-html, body {
-    max-width: 100%;
-    overflow-x: hidden;
-}

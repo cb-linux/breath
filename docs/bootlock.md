@@ -1,5 +1,7 @@
 # Bootlock
 
+> Bootlock is currently borked. This might be because of a kernel regression or a Depthcharge issue.
+
 Breath uses an extremely simple mechanism to prevent the system from shutting down when the lid is closed.
 
 When the lid closes or the system is idle for a long time, Linux distributions tend to sleep to S1. This triggers an NVRAM reset and makes you need to boot into an operating system with a signed kernel (only ChromeOS has one). Once you've booted into this OS, you can re-enable USB and unsigned kernel booting.
