@@ -26,12 +26,12 @@ diff -rupN xkb.ori/keycodes/xfree86 xkb/keycodes/xfree86
      alias <AE00> = <TLDE>;	// Some geometries use AE00
 diff -rupN xkb.ori/rules/base xkb/rules/base
 --- xkb.ori/rules/base	2020-02-29 12:32:57.000000000 +0100
-+++ xkb/rules/base	2022-05-08 09:28:55.525042672 +0200
++++ xkb/rules/base	2022-05-08 09:42:04.021677392 +0200
 @@ -1241,6 +1241,7 @@
    shift:lshift_both_shiftlock        =       +shift(lshift_both_shiftlock)
    shift:rshift_both_shiftlock        =       +shift(rshift_both_shiftlock)
    solaris:sun_compat				 =		 +sun_vndr/solaris(sun_compat)
-+  chromeb:cboverlay                  =       +inet(cboverlay)
++  chromeb:cbnavkeys                  =       +inet(cbnavkeys)
    lv3:caps_switch                    =       +level3(caps_switch)
    lv3:bksl_switch                    =       +level3(bksl_switch)
    lv3:lsgt_switch                    =       +level3(lsgt_switch)
@@ -53,17 +53,17 @@ diff -rupN xkb.ori/rules/base.extras.xml xkb/rules/base.extras.xml
              <shortDescription>ru</shortDescription>
 diff -rupN xkb.ori/rules/base.lst xkb/rules/base.lst
 --- xkb.ori/rules/base.lst	2020-02-29 12:32:57.000000000 +0100
-+++ xkb/rules/base.lst	2022-05-08 09:28:55.525042672 +0200
++++ xkb/rules/base.lst	2022-05-08 09:41:48.145851720 +0200
 @@ -970,5 +970,6 @@
    esperanto:colemak    To the corresponding key in a Colemak layout
    solaris              Maintain key compatibility with old Solaris keycodes
    solaris:sun_compat   Sun Key compatibility
-+  chromeb:cboverlay    Chromebook Function Keys Overlay
++  chromeb:cbnavkeys    Chromebook Alt Gr Nav Keys
    terminate            Key sequence to kill the X server
    terminate:ctrl_alt_bksp Ctrl+Alt+Backspace
 diff -rupN xkb.ori/rules/base.xml xkb/rules/base.xml
 --- xkb.ori/rules/base.xml	2020-02-29 12:32:57.000000000 +0100
-+++ xkb/rules/base.xml	2022-05-08 09:28:55.529042612 +0200
++++ xkb/rules/base.xml	2022-05-08 09:41:56.053764741 +0200
 @@ -7598,6 +7598,18 @@
      </group>
      <group allowMultipleSelection="true">
@@ -73,8 +73,8 @@ diff -rupN xkb.ori/rules/base.xml xkb/rules/base.xml
 +      </configItem>
 +      <option>
 +        <configItem>
-+          <name>chromeb:cboverlay</name>
-+          <description>Chromebook Function Key Overlay</description>
++          <name>chromeb:cbnavkeys</name>
++          <description>Chromebook Alt Gr Nav Keys</description>
 +        </configItem>
 +      </option>
 +    </group>
@@ -85,18 +85,18 @@ diff -rupN xkb.ori/rules/base.xml xkb/rules/base.xml
        </configItem>
 diff -rupN xkb.ori/rules/evdev xkb/rules/evdev
 --- xkb.ori/rules/evdev	2020-02-29 12:32:57.000000000 +0100
-+++ xkb/rules/evdev	2022-05-08 09:28:55.529042612 +0200
++++ xkb/rules/evdev	2022-05-08 09:42:19.413509417 +0200
 @@ -1127,6 +1127,7 @@
    shift:lshift_both_shiftlock        =       +shift(lshift_both_shiftlock)
    shift:rshift_both_shiftlock        =       +shift(rshift_both_shiftlock)
    solaris:sun_compat				 =		 +sun_vndr/solaris(sun_compat)
-+  chromeb:cboverlay                  =       +inet(cboverlay)
++  chromeb:cbnavkeys                  =       +inet(cbnavkeys)
    lv3:caps_switch                    =       +level3(caps_switch)
    lv3:bksl_switch                    =       +level3(bksl_switch)
    lv3:lsgt_switch                    =       +level3(lsgt_switch)
 diff -rupN xkb.ori/rules/evdev.extras.xml xkb/rules/evdev.extras.xml
 --- xkb.ori/rules/evdev.extras.xml	2020-02-29 12:32:57.000000000 +0100
-+++ xkb/rules/evdev.extras.xml	2022-05-08 09:28:55.529042612 +0200
++++ xkb/rules/evdev.extras.xml	2022-05-08 09:42:23.221468004 +0200
 @@ -172,6 +172,12 @@
          </variant>
          <variant>
@@ -112,17 +112,17 @@ diff -rupN xkb.ori/rules/evdev.extras.xml xkb/rules/evdev.extras.xml
              <shortDescription>ru</shortDescription>
 diff -rupN xkb.ori/rules/evdev.lst xkb/rules/evdev.lst
 --- xkb.ori/rules/evdev.lst	2020-02-29 12:32:57.000000000 +0100
-+++ xkb/rules/evdev.lst	2022-05-08 09:28:55.529042612 +0200
++++ xkb/rules/evdev.lst	2022-05-08 09:42:38.517302182 +0200
 @@ -970,5 +970,6 @@
    esperanto:colemak    To the corresponding key in a Colemak layout
    solaris              Maintain key compatibility with old Solaris keycodes
    solaris:sun_compat   Sun Key compatibility
-+  chromeb:cboverlay    Chromebook Function Keys Overlay
++  chromeb:cbnavkeys    Chromebook Alt Gr Nav Keys
    terminate            Key sequence to kill the X server
    terminate:ctrl_alt_bksp Ctrl+Alt+Backspace
 diff -rupN xkb.ori/rules/evdev.xml xkb/rules/evdev.xml
 --- xkb.ori/rules/evdev.xml	2020-02-29 12:32:57.000000000 +0100
-+++ xkb/rules/evdev.xml	2022-05-08 09:28:55.529042612 +0200
++++ xkb/rules/evdev.xml	2022-05-08 09:42:51.013167289 +0200
 @@ -7598,6 +7598,18 @@
      </group>
      <group allowMultipleSelection="true">
@@ -132,8 +132,8 @@ diff -rupN xkb.ori/rules/evdev.xml xkb/rules/evdev.xml
 +      </configItem>
 +      <option>
 +        <configItem>
-+          <name>chromeb:cboverlay</name>
-+          <description>Chromebook Function Key Overlay</description>
++          <name>chromeb:cbnavkeys</name>
++          <description>Chromebook Alt Gr Nav Keys</description>
 +        </configItem>
 +      </option>
 +    </group>
@@ -144,28 +144,28 @@ diff -rupN xkb.ori/rules/evdev.xml xkb/rules/evdev.xml
        </configItem>
 diff -rupN xkb.ori/rules/xfree86 xkb/rules/xfree86
 --- xkb.ori/rules/xfree86	2020-02-29 12:32:57.000000000 +0100
-+++ xkb/rules/xfree86	2022-05-08 09:28:55.525042672 +0200
++++ xkb/rules/xfree86	2022-05-08 09:42:04.021677392 +0200
 @@ -1241,6 +1241,7 @@
    shift:lshift_both_shiftlock        =       +shift(lshift_both_shiftlock)
    shift:rshift_both_shiftlock        =       +shift(rshift_both_shiftlock)
    solaris:sun_compat				 =		 +sun_vndr/solaris(sun_compat)
-+  chromeb:cboverlay                  =       +inet(cboverlay)
++  chromeb:cbnavkeys                  =       +inet(cbnavkeys)
    lv3:caps_switch                    =       +level3(caps_switch)
    lv3:bksl_switch                    =       +level3(bksl_switch)
    lv3:lsgt_switch                    =       +level3(lsgt_switch)
 diff -rupN xkb.ori/rules/xfree86.lst xkb/rules/xfree86.lst
 --- xkb.ori/rules/xfree86.lst	2020-02-29 12:32:57.000000000 +0100
-+++ xkb/rules/xfree86.lst	2022-05-08 09:28:55.525042672 +0200
++++ xkb/rules/xfree86.lst	2022-05-08 09:41:48.145851720 +0200
 @@ -970,5 +970,6 @@
    esperanto:colemak    To the corresponding key in a Colemak layout
    solaris              Maintain key compatibility with old Solaris keycodes
    solaris:sun_compat   Sun Key compatibility
-+  chromeb:cboverlay    Chromebook Function Keys Overlay
++  chromeb:cbnavkeys    Chromebook Alt Gr Nav Keys
    terminate            Key sequence to kill the X server
    terminate:ctrl_alt_bksp Ctrl+Alt+Backspace
 diff -rupN xkb.ori/rules/xfree86.xml xkb/rules/xfree86.xml
 --- xkb.ori/rules/xfree86.xml	2020-02-29 12:32:57.000000000 +0100
-+++ xkb/rules/xfree86.xml	2022-05-08 09:28:55.529042612 +0200
++++ xkb/rules/xfree86.xml	2022-05-08 09:41:56.053764741 +0200
 @@ -7598,6 +7598,18 @@
      </group>
      <group allowMultipleSelection="true">
@@ -175,8 +175,8 @@ diff -rupN xkb.ori/rules/xfree86.xml xkb/rules/xfree86.xml
 +      </configItem>
 +      <option>
 +        <configItem>
-+          <name>chromeb:cboverlay</name>
-+          <description>Chromebook Function Key Overlay</description>
++          <name>chromeb:cbnavkeys</name>
++          <description>Chromebook Alt Gr Nav Keys</description>
 +        </configItem>
 +      </option>
 +    </group>
@@ -187,28 +187,28 @@ diff -rupN xkb.ori/rules/xfree86.xml xkb/rules/xfree86.xml
        </configItem>
 diff -rupN xkb.ori/rules/xorg xkb/rules/xorg
 --- xkb.ori/rules/xorg	2020-02-29 12:32:57.000000000 +0100
-+++ xkb/rules/xorg	2022-05-08 09:28:55.525042672 +0200
++++ xkb/rules/xorg	2022-05-08 09:42:04.021677392 +0200
 @@ -1241,6 +1241,7 @@
    shift:lshift_both_shiftlock        =       +shift(lshift_both_shiftlock)
    shift:rshift_both_shiftlock        =       +shift(rshift_both_shiftlock)
    solaris:sun_compat				 =		 +sun_vndr/solaris(sun_compat)
-+  chromeb:cboverlay                  =       +inet(cboverlay)
++  chromeb:cbnavkeys                  =       +inet(cbnavkeys)
    lv3:caps_switch                    =       +level3(caps_switch)
    lv3:bksl_switch                    =       +level3(bksl_switch)
    lv3:lsgt_switch                    =       +level3(lsgt_switch)
 diff -rupN xkb.ori/rules/xorg.lst xkb/rules/xorg.lst
 --- xkb.ori/rules/xorg.lst	2020-02-29 12:32:57.000000000 +0100
-+++ xkb/rules/xorg.lst	2022-05-08 09:28:55.525042672 +0200
++++ xkb/rules/xorg.lst	2022-05-08 09:41:48.145851720 +0200
 @@ -970,5 +970,6 @@
    esperanto:colemak    To the corresponding key in a Colemak layout
    solaris              Maintain key compatibility with old Solaris keycodes
    solaris:sun_compat   Sun Key compatibility
-+  chromeb:cboverlay    Chromebook Function Keys Overlay
++  chromeb:cbnavkeys    Chromebook Alt Gr Nav Keys
    terminate            Key sequence to kill the X server
    terminate:ctrl_alt_bksp Ctrl+Alt+Backspace
 diff -rupN xkb.ori/rules/xorg.xml xkb/rules/xorg.xml
 --- xkb.ori/rules/xorg.xml	2020-02-29 12:32:57.000000000 +0100
-+++ xkb/rules/xorg.xml	2022-05-08 09:28:55.529042612 +0200
++++ xkb/rules/xorg.xml	2022-05-08 09:41:56.053764741 +0200
 @@ -7598,6 +7598,18 @@
      </group>
      <group allowMultipleSelection="true">
@@ -218,8 +218,8 @@ diff -rupN xkb.ori/rules/xorg.xml xkb/rules/xorg.xml
 +      </configItem>
 +      <option>
 +        <configItem>
-+          <name>chromeb:cboverlay</name>
-+          <description>Chromebook Function Key Overlay</description>
++          <name>chromeb:cbnavkeys</name>
++          <description>Chromebook Alt Gr Nav Keys</description>
 +        </configItem>
 +      </option>
 +    </group>
@@ -285,7 +285,7 @@ diff -rupN xkb.ori/symbols/de xkb/symbols/de
 +};
 diff -rupN xkb.ori/symbols/inet xkb/symbols/inet
 --- xkb.ori/symbols/inet	2020-02-29 12:32:57.000000000 +0100
-+++ xkb/symbols/inet	2022-05-08 09:30:40.639720368 +0200
++++ xkb/symbols/inet	2022-05-08 09:41:38.625956838 +0200
 @@ -1897,3 +1897,18 @@ xkb_symbols "teck229" {
      include "inet(teck227)"
  };
@@ -293,7 +293,7 @@ diff -rupN xkb.ori/symbols/inet xkb/symbols/inet
 +// Chromebooks do not have keys like Insert, Delete, Home or Page Up/Down
 +// so we have to use alternate key functions (Alt Gr) with other keys
 +partial
-+xkb_symbols "cboverlay" {
++xkb_symbols "cbnavkeys" {
 +    // Wayland doesn't support real xkb overlays, so this is no longer 
 +    // an overlay but a Level3_shift-function
 +    key <BKSP> { [BackSpace, BackSpace, Delete, Insert ] };
