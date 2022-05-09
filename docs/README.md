@@ -5,18 +5,21 @@
 
 <br>
 
+>🎉 Announcement:  
+> Crostini support has just been added and [headphone jack/mic support is on the horizon](https://github.com/cb-linux/breath/discussions/190)
+
 ## Supported Devices
 
-**All x64 (non-tablet) Chromebooks released after 2018 are supported.**
-
-> ### Is your Chromebook not on the list?
-> That's completely fine! As long as it's newer than 2017, chances are that most drivers will already be supported except audio. **If it is newer than 2019, chances are that audio is already supported**. If you would like audio working, open up a Github Issue with your Chromebook model and post the output of the commands `lsmod` and `find /usr/share/alsa`.
+**All 64-bit Intel/AMD (x64) Chromebooks are supported**
 
 <details>
-<summary>Expand List of tested devices with audio</summary>
+<summary>Expand List of devices confirmed to support audio</summary>
 <br>
 
-**Supported Boards**: `["nami", "octopus", "volteer", "coral", "reef", "hatch", "puff"]`
+> ### Is your Chromebook not on the list?
+> That's completely fine! As long as it's newer than 2017, most drivers will already be supported except audio. **If it is newer than 2019, chances are that audio is already supported**. If you would like audio working, open up a Github Issue with your Chromebook model and post the output of the commands `lsmod` and `find /usr/share/alsa`.
+
+**Supported Baseboardboards**: `["nami", "octopus", "volteer", "coral", "reef", "hatch", "puff"]`
 
 * IdeaPad Flex 5i Chromebook (13", 5)
 * IdeaPad Flex 5i Chromebook
@@ -87,24 +90,33 @@
 ## Running Breath
 
 Due to licensing restraints, you cannot just download an ISO of Breath and flash it. Instead, you *build* the bootable USB or the ISO.
-> Currently, this project can only work on a **full install** of Debian or Ubuntu (**not Crouton or Crostini**). Running this on Arch or Fedora is unsupported.
 
-**Prerequisite:** Git is installed and you have a mainstream, fast 12GB or bigger USB plugged in
+**Prerequisite:** Git is installed and you have a mainstream, fast 12GB or bigger USB/SDCard plugged in
 
-1. `git clone --recurse-submodules https://github.com/cb-linux/breath && cd breath`
-2. `FEATURES=ISO bash setup.sh cli ubuntu`
-(should take ~30 minutes on a 4-core laptop processor)
+**If you are running Crostini:** Follow the instructions [here](https://bugs.chromium.org/p/chromium/issues/detail?id=1303315#c3) first.
 
+1. ```
+    git clone --recurse-submodules https://github.com/cb-linux/breath && cd breath
+    ```
+2. ```
+   FEATURES=ISO,KEYMAP bash setup.sh cli ubuntu
+   ```
+    This command should take around 30 minutes.
+
+    If you **don't want a minimal environment without a desktop** or **are running Crostini**, don't run the command and read below.
+
+> * You must add `CROSTINI` to `FEATURES` (so `FEATURES=ISO,KEYMAP,CROSTINI`)  if you're running this script from Crostini.
 > * **Using the CLI argument installs a minimal CLI (no desktop!) environment on the USB.** If you would like to install a desktop, you can use `gnome`, `kde`, `minimal`, `deepin`, `budgie`, `xfce`, `lxqt`, `mate` or `openbox` instead of `cli`.
 > * You can replace `ubuntu` with `arch` (you can only use `cli`) or `debian` (all desktops are supported)
-> * Ubuntu supports custom versions. If you want to install Ubuntu 21.10 instead of the default Ubuntu 21.04, just run: `bash setup.sh cli ubuntu impish-21.10`, where `impish` is the codename and `21.10` is the version.
+> * Ubuntu supports custom versions. If you want to install Ubuntu 21.10 instead of the default Ubuntu 22.04, just run: `bash setup.sh cli ubuntu impish-21.10`, where `impish` is the codename and `21.10` is the version.
 > * You can remove the `FEATURES=ISO` to use the classic way which directly writes to a USB.
-> * You can add `KEYMAP` to `FEATURES` to map the keys to Chromebook actions; e.g., `FEATURES=ISO,KEYMAP`.
-> * You can add `LOCAL_KERNEL` to instruct it to use a local kernel generated from `build.sh`; e.g., `FEATURES=ISO,LOCAL_KERNEL`.
 
-3. Done! Flash the IMG file to a USB using something like Etcher.
-4. [**RECOMMENDED**] Resize the partition of your USB by running `bash expand.sh`. This will expand your USB image to use the entire available space.
-5. Now just boot into ChromeOS, enter the shell (<kbd>CTRL</kbd> <kbd>ALT</kbd> <kbd>T</kbd>, `shell`), and run:  
+1. Done! Flash the IMG file to a USB using something like Etcher.
+    - If you're running this within Crostini, copy it to a folder you can access from ChromeOS's Files App and then change the `.img` file's extension to `.bin`.
+    - You can then [flash](https://www.virtuallypotato.com/burn-an-iso-to-usb-with-the-chromebook-recovery-utility/) it by using the Chrome Recovery Tool.
+    - More information [here](https://github.com/cb-linux/breath/issues/186#issuecomment-1120342250)
+2. **[RECOMMENDED if you are not on Crostini]** Resize the partition of your USB by running `bash expand.sh`. This will expand your USB image to use the entire available space.
+3. Now just boot into ChromeOS, enter the shell (<kbd>CTRL</kbd> <kbd>ALT</kbd> <kbd>T</kbd>, `shell`), and run:  
 `sudo crossystem dev_boot_usb=1; sudo crossystem dev_boot_signed_only=0; sync`
 to enable USB and Custom Kernel Booting.
 
@@ -119,7 +131,7 @@ Once booted into Breath run the command depending on your device's board:
 1. Connect to Wifi on your Chromebook! You can use a GUI for this or `nmcli`/`nmtui`
 
 2. - `NAMI`:
-     1. `VERSION=ALT bash updatekernel.sh` on the PC you built Breath with
+     1. `VERSION=ALT bash updatekernel.sh` on the PC you built Breath with (cannot be run from Crostini)
      2. `setup-audio` on your Chromebook that has booted Breath
    - `BLOOG` or `BLOOGLET`: `setup-audio` and then `sof-setup-audio`
    - All Apollo Lake Devices (`CORAL` and `REEF`): `apl-sof-setup-audio`
@@ -130,7 +142,7 @@ If audo doesn't work, that's completely fine! Open up a Github Issue with your C
 
 > ### Skylake (SKL) / Kabylake (KBL) disclaimer
 >
-> If you have a Skylake or Kabylake device, do not attempt to change the UCM files (`/usr/share/alsa/ucm2/`) in an attempt to use PulseAudio. If you have no idea what any of these are, you can safely ignore this.
+> If you have a Skylake or Kabylake device, do not change the UCM files (`/usr/share/alsa/ucm2/`) in an attempt to use PulseAudio. If you have no idea what any of these are, you can safely ignore this.
 >
 > PulseAudio, without UCM modifications, errors out. If you modify the UCM to remove the `Front Mic`, `Rear Mic`, and `Mic` (all of these are related to PCM3 on `da7219max`), PulseAudio and general audio will work, but your speakers **will be fried** or their membranes **will burst**.
 
