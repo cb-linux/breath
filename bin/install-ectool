@@ -1,0 +1,17 @@
+#!/bin/bash
+
+# Rough script to install ectool to control fan speed
+
+set -xe
+
+echo "Downloading dependencies..."
+git clone https://chromium.googlesource.com/chromiumos/platform/ec --depth 1
+sudo apt update; sudo apt install git libftdi-dev libusb-dev libncurses5-dev pkgconf -y
+
+echo "Compiling ectool..."
+cd ec
+echo "What board do you have? (You can find this out by finding your 'Board Name' in https://mrchromebox.tech/#devices)"
+echo
+read BOARD
+make BOARD=$BOARD CROSS_COMPILE= HOST_CROSS_COMPILE= build/$BOARD/util/ectool || echo "Compiling error or invalid board supplied."
+

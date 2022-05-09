@@ -11,10 +11,9 @@ Although the [Ubuntu postinstall](https://github.com/cb-linux/breath/blob/main/u
 * Copy a working `/etc/resolv.conf` from the host
 * Add a complete `/etc/apt/sources.list`
 * Install NetworkManager for wifi support
-* Make LightDM look pretty
-* Load the `iwlmvm` module at startup
+* Load the `iwlmvm` module at startup (or create a `udev` rule)
 * Install a desktop with a huge `switch` statement
-* Create the home user and give a password to the `root` and home user
+* Create the home user and give a password to the root and home user
 * Patch sleep
 
 A new distro should have a bare minimum of:
@@ -33,4 +32,4 @@ The basic steps of adding a new Linux distro to Breath entail:
 * Add an entry to the `switch` statement in `bootstrap.sh` and `extract.sh`
     * [Located here](https://github.com/cb-linux/breath/search?q=%22READ%3A+Distro+dependent+step%22)
 * Add a file containing the above postinstall steps to `utils/distros`
-    * Name it into a one-word name of your distro
+    * Name it a one-word name of your distro

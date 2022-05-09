@@ -1,8 +1,8 @@
 # Depthcharge
 
-> I am not an expert on Depthcharge. Depthcharge is a very complicated piece of software, of which I only know the surface of it. Please excuse innacurate information.
+> I am not an expert on Depthcharge. Depthcharge is a very complicated piece of software, of which I only know the surface of. Please excuse any innacurate information.
 
-Depthcharge is the U-boot based bootloader for Chromebooks.
+Depthcharge is a U-boot based bootloader for Chromebooks.
 
 If you want to boot off Depthcharge, you'll want to enable unsigned kernel booting and USB booting from `crossystem`.
 
@@ -22,3 +22,9 @@ Depthcharge is not a BIOS, nor is it ever meant to be accessed by the end user. 
 
 * No `initramfs` support
     * Makes the Linux boot flow much simpler
+
+## Interesting features
+
+Depthcharge supports Multiboot and ZBI (initramfs support for Fuschia on the Pixelbook Pro). This means that, theoretically, you could boot any Multiboot-spec image, like GRUB2.
+
+However, this requires a recompile of the firmware and you ultimately need to disable Write Protect to flash your new firmware. At that point, a better idea would be using MrChromebox's Tianocore.

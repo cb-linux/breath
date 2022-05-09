@@ -107,6 +107,11 @@ Due to licensing restraints, you cannot just download an ISO of Breath and flash
 > * You can replace `ubuntu` with `arch` (you can only use `cli`) or `debian` (all desktops are supported)
 > * Ubuntu supports custom versions. If you want to install Ubuntu 21.10 instead of the default Ubuntu 22.04, just run: `bash setup.sh cli ubuntu impish-21.10`, where `impish` is the codename and `21.10` is the version.
 > * You can remove the `FEATURES=ISO` to use the classic way which directly writes to a USB.
+<<<<<<< HEAD
+=======
+> * You can add `KEYMAP` to `FEATURES` to map the keys to Chromebook actions; e.g., `FEATURES=ISO,KEYMAP`.
+> * You can add `LOCAL_KERNEL` to instruct it to use a local kernel generated from `build.sh`; e.g., `FEATURES=ISO,LOCAL_KERNEL`.
+>>>>>>> 0f44ccfbbd3337d35530a8fb447ec8b6c546d219
 
 1. Done! Flash the IMG file to a USB using something like Etcher.
     - If you're running this within Crostini, copy it to a folder you can access from ChromeOS's Files App and then change the `.img` file's extension to `.bin`.
