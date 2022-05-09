@@ -5,6 +5,9 @@
 
 <br>
 
+>🎉 Announcement:  
+> Crostini support has just been added and [headphone jack/mic support is on the horizon](https://github.com/cb-linux/breath/discussions/190)
+
 ## Supported Devices
 
 **All 64-bit Intel/AMD (x64) Chromebooks are supported**
@@ -110,7 +113,9 @@ Due to licensing restraints, you cannot just download an ISO of Breath and flash
 
 1. Done! Flash the IMG file to a USB using something like Etcher.
     - If you're running this within Crostini, copy it to a folder you can access from ChromeOS's Files App and then change the `.img` file's extension to `.bin`.
-2. [**RECOMMENDED if you are not on Crostini**] Resize the partition of your USB by running `bash expand.sh`. This will expand your USB image to use the entire available space.
+    - You can then [flash](https://www.virtuallypotato.com/burn-an-iso-to-usb-with-the-chromebook-recovery-utility/) it by using the Chrome Recovery Tool.
+    - More information [here](https://github.com/cb-linux/breath/issues/186#issuecomment-1120342250)
+2. **[RECOMMENDED if you are not on Crostini]** Resize the partition of your USB by running `bash expand.sh`. This will expand your USB image to use the entire available space.
 3. Now just boot into ChromeOS, enter the shell (<kbd>CTRL</kbd> <kbd>ALT</kbd> <kbd>T</kbd>, `shell`), and run:  
 `sudo crossystem dev_boot_usb=1; sudo crossystem dev_boot_signed_only=0; sync`
 to enable USB and Custom Kernel Booting.
@@ -137,7 +142,7 @@ If audo doesn't work, that's completely fine! Open up a Github Issue with your C
 
 > ### Skylake (SKL) / Kabylake (KBL) disclaimer
 >
-> If you have a Skylake or Kabylake device, do not attempt to change the UCM files (`/usr/share/alsa/ucm2/`) in an attempt to use PulseAudio. If you have no idea what any of these are, you can safely ignore this.
+> If you have a Skylake or Kabylake device, do not change the UCM files (`/usr/share/alsa/ucm2/`) in an attempt to use PulseAudio. If you have no idea what any of these are, you can safely ignore this.
 >
 > PulseAudio, without UCM modifications, errors out. If you modify the UCM to remove the `Front Mic`, `Rear Mic`, and `Mic` (all of these are related to PCM3 on `da7219max`), PulseAudio and general audio will work, but your speakers **will be fried** or their membranes **will burst**.
 
