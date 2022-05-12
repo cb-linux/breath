@@ -44,15 +44,7 @@ fi
         export DISTRO_RELEASE=$(echo "$DISTRO_VERSION" | cut -d- -f2)  # e.g. 21.04
         printq "Using ${DISTRO_CODENAME}-${DISTRO_RELEASE}"
       else
-        tail -n 1 /usr/share/distro-info/ubuntu.csv > /dev/null
-        if [[ $? -eq 0 ]]; then
-          LATEST=$(tail -n 1 /usr/share/distro-info/ubuntu.csv)
-          export DISTRO_RELEASE=$(echo $LATEST | cut -d, -f1 | cut -d' ' -f1)
-          export DISTRO_CODENAME=$(echo $LATEST | cut -d, -f3)
-        else
-          # The user is not on Ubuntu, so we can't parse the host Ubuntu version
-          export DISTRO_CODENAME="jammy" DISTRO_RELEASE="22.04"
-        fi
+        export DISTRO_CODENAME="jammy" DISTRO_RELEASE="22.04"
         printerr "No Ubuntu version specified, using ${DISTRO_CODENAME}-${DISTRO_RELEASE}"
       fi
 
