@@ -137,7 +137,7 @@ Once booted into Breath run the command depending on your device's board:
    - Everything else: `sof-setup-audio`
      - Doesn't work? Try `SOUNDCARD=rtk sof-setup-audio`
 
-If audo doesn't work, that's completely fine! Open up a Github Issue with your Chromebook model and I'll get audio working.
+If audo still doesn't work, that's completely fine! Open up a Github Issue with your Chromebook model and I'll get audio working.
 
 > ### Skylake (SKL) / Kabylake (KBL) disclaimer
 >
