@@ -6,7 +6,8 @@ set -xe
 
 echo "Downloading dependencies..."
 git clone https://chromium.googlesource.com/chromiumos/platform/ec --depth 1
-sudo apt update; sudo apt install git libftdi-dev libusb-dev libncurses5-dev pkgconf -y
+sed -i -e 's/<libusb.h>/<libusb-1.0/libusb.h>/g' /tmp/file.txt
+sudo apt update; sudo apt install git libftdi-dev libusb-dev libusb-1.0-0-dev libncurses5-dev pkgconf -y
 
 echo "Compiling ectool..."
 cd ec
@@ -15,3 +16,6 @@ echo
 read BOARD
 make BOARD=$BOARD CROSS_COMPILE= HOST_CROSS_COMPILE= build/$BOARD/util/ectool || echo "Compiling error or invalid board supplied."
 
+sudo make install
+echo "Done! Try this to set your fans to 100 percent:"
+echo "ectool fanduty 100"

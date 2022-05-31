@@ -101,7 +101,7 @@ Due to licensing restraints, you cannot just download an ISO of Breath and flash
 2. ```
    FEATURES=ISO,KEYMAP bash setup.sh cli ubuntu
    ```
-    This command should take around 30 minutes.
+    This command should take around 30cx minutes.
 
     If you **don't want a minimal environment without a desktop** or **are running Crostini**, don't run the command and read below.
 
@@ -139,11 +139,26 @@ Once booted into Breath run the command depending on your device's board:
 
 If audo still doesn't work, that's completely fine! Open up a Github Issue with your Chromebook model and I'll get audio working.
 
-> ### Skylake (SKL) / Kabylake (KBL) disclaimer
+> #### Skylake (SKL) / Kabylake (KBL) disclaimer
 >
 > If you have a Skylake or Kabylake device, do not change the UCM files (`/usr/share/alsa/ucm2/`) in an attempt to use PulseAudio. If you have no idea what any of these are, you can safely ignore this.
 >
 > PulseAudio, without UCM modifications, errors out. If you modify the UCM to remove the `Front Mic`, `Rear Mic`, and `Mic` (all of these are related to PCM3 on `da7219max`), PulseAudio and general audio will work, but your speakers **will be fried** or their membranes **will burst**.
+
+### Goodies
+
+**ZRAM:**  
+https://github.com/cb-linux/breath/issues/204#issuecomment-1133802766
+
+**Fan Control/ectool:**  
+https://github.com/cb-linux/breath/issues/168#issuecomment-1142534066
+
+**Audio Jack and Mic Testing:**  
+https://github.com/cb-linux/breath/discussions/190
+
+## OpenCollective Page
+
+If you find this useful, consider donating. Since I'm only a student, acquiring the resources to expand this project is only possible [with your support 💚](https://opencollective.com/breath)
 
 ## Doesn't work? That's expected!
 
