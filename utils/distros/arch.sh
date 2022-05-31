@@ -54,6 +54,6 @@ EOT
     vfat
 EOT
 
-    # Install nmcli for wifi
-    sudo arch-chroot $MNT bash -c "yes | pacman -S --noconfirm networkmanager"
+    # Install nmcli for wifi and xkeyboard-config so copying the keyboard layout doesn't error out
+    sudo arch-chroot $MNT bash -c "yes | pacman -S --noconfirm networkmanager xkeyboard-config"
 }

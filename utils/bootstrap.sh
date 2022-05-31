@@ -15,7 +15,7 @@ function bootstrapFiles {
 
   # If the ChromeOS firmware utility doesn't exist, install it and other packages
   printq "Installing Dependencies"
-  installDependencies vboot-kernel-utils arch-install-scripts git wget cgpt $FW_PACKAGE
+  installDependencies sudo vboot-kernel-utils arch-install-scripts git parted wget cgpt $FW_PACKAGE
 
 if [[ $FEATURES == *"LOCAL_KERNEL"* ]]; then
   cp $ORIGINAL_DIR/kernel/bzImage .
@@ -26,9 +26,9 @@ else
   printq "Downloading kernel files from cb-lines/breath"
   # Download the kernel bzImage and the kernel modules (wget)
   {
-  wget https://github.com/cb-linux/breath/releases/latest/download/bzImage -O bzImage -q --show-progress
-  wget https://github.com/cb-linux/breath/releases/latest/download/modules.tar.xz -O modules.tar.xz -q --show-progress
-  wget https://raw.githubusercontent.com/cb-linux/kernel/main/kernel.flags -O kernel.flags -q --show-progress
+  wget https://github.com/cb-linux/breath/releases/latest/download/bzImage -N -q --show-progress
+  wget https://github.com/cb-linux/breath/releases/latest/download/modules.tar.xz -N -q --show-progress
+  wget https://raw.githubusercontent.com/cb-linux/kernel/main/kernel.flags -N -q --show-progress
   } || true # Wget has the wrong exit status with no clobber
 fi
 
@@ -44,17 +44,14 @@ fi
         export DISTRO_RELEASE=$(echo "$DISTRO_VERSION" | cut -d- -f2)  # e.g. 21.04
         printq "Using ${DISTRO_CODENAME}-${DISTRO_RELEASE}"
       else
-        # This assumes the build system is also Ubuntu
-        LATEST=$(tail -n 1 /usr/share/distro-info/ubuntu.csv)
-        export DISTRO_RELEASE=$(echo $LATEST | cut -d, -f1 | cut -d' ' -f1)
-        export DISTRO_CODENAME=$(echo $LATEST | cut -d, -f3)
+        export DISTRO_CODENAME="jammy" DISTRO_RELEASE="22.04"
         printerr "No Ubuntu version specified, using ${DISTRO_CODENAME}-${DISTRO_RELEASE}"
       fi
 
       # Download the Ubuntu rootfs if it doesn't exist
       DISTRO_ROOTFS="ubuntu-rootfs.tar.xz"
       wget http://cloud-images.ubuntu.com/releases/${DISTRO_RELEASE}/release/ubuntu-${DISTRO_RELEASE}-server-cloudimg-amd64-root.tar.xz -O $DISTRO_ROOTFS -q --show-progress || {
-        echo "You have supplied an invalid Ubuntu version. It may not be released yet."; exit;
+        echo "You have supplied, or are on, an invalid or unreleased Ubuntu version. Try giving the Ubuntu version as an argument, as mentioned in the docs."; exit;
       }
       ;;
 

@@ -109,13 +109,17 @@ fi
 
 sudo systemctl enable alsa-reload
 
+sudo rm -rfv /lib/firmware/intel/sof* # Symlinks can conflict
 cd # to home directory
-git clone https://github.com/thesofproject/sof-bin —depth 1
+git clone --depth 1 "https://github.com/thesofproject/sof-bin"
 cd sof-bin/v2.1.x
 sudo rsync -a sof*v2.1.1   /lib/firmware/intel/
 sudo ln -s sof-v2.1.1      /lib/firmware/intel/sof
 sudo ln -s sof-tplg-v2.1.1 /lib/firmware/intel/sof-tplg
 sudo rsync tools-v2.1.1/*  /usr/local/bin
 
+# SOF doesn't need SST/HDA drivers, especially on Chromebooks where they conflict
+echo 'blacklist snd_soc_skl snd_hda_intel' | sudo tee /etc/modprobe.d/alsa-disable-sst.conf
+
 sync
-echo 'Done! Reboot to enable audio'
+echo 'SOF enabled successfully! Reboot to enable audio'
