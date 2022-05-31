@@ -1,13 +1,5 @@
 #!/bin/bash
 
-# Before we do anything, check if the user is on Crostini,
-# since /mnt will already be filled
-if [[ $FEATURES == *"CROSTINI"* ]]; then
-
-   sudo mkdir /mnt/breath
-
-fi
-
 # Import
 source utils/functions.sh # Functions
 source utils/bootstrap.sh # Bootstrap Function
@@ -87,6 +79,10 @@ if [[ $FEATURES == *"ISO"* ]]; then
    sleep 10
    fallocate -l 12G breath.img
    export USB=$(sudo losetup -f --show breath.img)
+	 if [[ -z "$USB" ]]; then
+      echo "ERROR: no loop device"
+      exit 1
+	 fi
    export USB1="${USB}p1"
    export USB2="${USB}p2"
 
@@ -177,6 +173,8 @@ sudo umount $MNT
 set +u
 printq "Done!"
 if [[ $FEATURES == *"ISO"* ]]; then
+   
+   losetup -d $USB
 
    echo "IMG built at ~/linux-build/breath.img"
    echo "You can flash this raw image using Etcher, Rufus, DD, or other ISO flash tools."
