@@ -16,7 +16,7 @@ jobs:
       - run: echo "💡 The ${{ github.repository }} repository has been cloned."
       - name: Running build.sh
         run: cd kernel; bash build.sh chromeos-5.10 && mkdir artifacts && mv bzImage* artifacts && mv modules* artifacts;
-      - name: Step 3 - Use the Upload Artifact GitHub Action
+      - name: Upload Artifacts
         uses: actions/upload-artifact@v2
         with:
           name: assets-for-download
