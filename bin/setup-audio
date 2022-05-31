@@ -35,11 +35,16 @@ sudo apt purge pulseaudio*
 # Copy the firmware and create the correct UCM Files
 sudo mount -t ext2 -o ro /dev/mmcblk0p3 /mnt || sudo mount -t ext2 -o ro /dev/mmcblk1p3 /mnt
 sudo cp -rv /mnt/lib/firmware/* /lib/firmware
-sudo cp -rv /mnt/usr/share/alsa/ucm/${SND_DEVICE} /usr/share/alsa/ucm2/${SND_CARD}
+sudo rm -rf /usr/share/alsa/ucm2/${SND_CARD}
+sudo cp -rv /mnt/usr/share/alsa/ucm*/${SND_DEVICE} /usr/share/alsa/ucm2/${SND_CARD}
 sudo umount /mnt
 sudo mv /usr/share/alsa/ucm2/${SND_CARD}/${SND_DEVICE}.conf /usr/share/alsa/ucm2/${SND_CARD}/${SND_CARD}.conf
 sudo sed -i '1s/^/Syntax 2\n/' /usr/share/alsa/ucm2/${SND_CARD}/${SND_CARD}.conf
 sudo sed -i '/Pin/{/Mux/ d}' /usr/share/alsa/ucm2/${SND_CARD}/HiFi.conf
+# Check if user has the newer UCM directory layout
+ls /usr/share/alsa/ucm2/conf.d && {
+    sudo mv /usr/share/alsa/ucm2/${SND_CARD} /usr/share/alsa/ucm2/conf.d
+}
 sudo apt install alsa-base alsa-utils apulse
 
 # Enable Dmix (multiple app audio output) and software master volume control
