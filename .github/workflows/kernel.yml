@@ -15,9 +15,11 @@ jobs:
           submodules: true
       - run: echo "💡 The ${{ github.repository }} repository has been cloned."
       - name: Running build.sh
-        run: cd kernel; bash build.sh chromeos-5.10 && mkdir artifacts && mv bzImage* artifacts && mv modules* artifacts;
+        run: cd kernel; bash build.sh chromeos-5.10;
       - name: Upload Artifacts
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: assets-for-download
-          path: artifacts
+          path: |
+            bzImage
+            modules*
