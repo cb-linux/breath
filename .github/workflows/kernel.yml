@@ -1,25 +1,38 @@
-name: 🐧 Build Linux Kernel
+name: 📦 Kernel Delivery System
 on:
   push:
     paths:
       - "kernel/*"
       - "**.conf"
-      - "**.yml"
+      - ".github/workflows/*.yml"
+
+git diff HEAD^..HEAD
+
 jobs:
-  BuildKernel:
+  main:
     runs-on: ubuntu-latest
+    if: "!contains(github.event.head_commit.message, 'skip-ci')"
     steps:
       - name: Check out repository code
         uses: actions/checkout@v3
         with:
           submodules: true
-      - run: echo "💡 The ${{ github.repository }} repository has been cloned."
+          fetch-depth: 2
       - name: Running build.sh
         run: cd kernel; bash build.sh chromeos-5.10;
-      - name: Upload Artifacts
-        uses: actions/upload-artifact@v3
+      # - name: Upload Artifacts
+      #   uses: actions/upload-artifact@v3
+      #   with:
+      #     name: assets-for-download
+      #     path: |
+      #       kernel/bzImage
+      #       kernel/modules*
+      - name: Release kernel and bzImage
+        uses: softprops/action-gh-release@v1
         with:
-          name: assets-for-download
-          path: |
+          name: 📦 Kernel Rebuild - ${{ github.event.head_commit.message }}
+          body: |
+            🚚 Kernel Delivery System - Triggered by ${{ github.sha }} at ${{ github.event.repository.updated_at }} 
+          files: |
             kernel/bzImage
             kernel/modules*
