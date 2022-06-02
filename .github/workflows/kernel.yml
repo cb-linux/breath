@@ -6,8 +6,6 @@ on:
       - "**.conf"
       - ".github/workflows/*.yml"
 
-git diff HEAD^..HEAD
-
 jobs:
   main:
     runs-on: ubuntu-latest
@@ -18,6 +16,8 @@ jobs:
         with:
           submodules: true
           fetch-depth: 2
+      - name: Generate Diff/Changelog
+        run: echo "DIFF=$(git diff HEAD^..HEAD)" >> $GITHUB_ENV
       - name: Running build.sh
         run: cd kernel; bash build.sh chromeos-5.10;
       # - name: Upload Artifacts
@@ -32,6 +32,11 @@ jobs:
         with:
           name: 📦 Kernel Rebuild - ${{ github.event.head_commit.message }}
           body: |
+            🛈 General Changes since the last release
+            ```
+            ${{ env.DIFF }}
+            ```
+
             🚚 Kernel Delivery System - Triggered by ${{ github.sha }} at ${{ github.event.repository.updated_at }} 
           files: |
             kernel/bzImage
