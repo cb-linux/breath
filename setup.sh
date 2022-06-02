@@ -174,7 +174,7 @@ set +u
 printq "Done!"
 if [[ $FEATURES == *"ISO"* ]]; then
    
-   losetup -d $USB
+   sudo losetup -d $USB
 
    echo "IMG built at ~/linux-build/breath.img"
    echo "You can flash this raw image using Etcher, Rufus, DD, or other ISO flash tools."
