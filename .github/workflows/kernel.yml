@@ -17,7 +17,10 @@ jobs:
           submodules: true
           fetch-depth: 2
       - name: Generate Diff/Changelog
-        run: echo "DIFF=$(git diff HEAD^..HEAD)" >> $GITHUB_ENV
+        run: |
+          echo 'DIFF<<EOF' >> $GITHUB_ENV
+          git diff HEAD^..HEAD >> $GITHUB_ENV
+          echo 'EOF' >> $GITHUB_ENV
       - name: Running build.sh
         run: cd kernel; bash build.sh chromeos-5.10;
       # - name: Upload Artifacts
@@ -37,7 +40,7 @@ jobs:
             ${{ env.DIFF }}
             ```
 
-            🚚 Kernel Delivery System - Triggered by ${{ github.sha }} at ${{ github.event.repository.updated_at }} 
+            🚚 Kernel Delivery System - Triggered by ${{ github.sha }} at ${{ github.event.repository.updated_at }}
           files: |
             kernel/bzImage
             kernel/modules*
