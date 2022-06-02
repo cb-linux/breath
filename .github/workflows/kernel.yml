@@ -21,6 +21,10 @@ jobs:
           echo 'DIFF<<EOF' >> $GITHUB_ENV
           git diff HEAD^..HEAD >> $GITHUB_ENV
           echo 'EOF' >> $GITHUB_ENV
+      - name: Generate release tag
+        id: tag
+        run: |
+          echo "::set-output name=release_tag::KernelDeliverySystem$(date +"%Y.%m.%d_%H-%M")"
       - name: Running build.sh
         run: cd kernel; bash build.sh chromeos-5.10;
       # - name: Upload Artifacts
@@ -33,6 +37,7 @@ jobs:
       - name: Release kernel and bzImage
         uses: softprops/action-gh-release@v1
         with:
+          tag_name: ${{ steps.tag.outputs.release_tag }}
           name: 📦 Kernel Rebuild - ${{ github.event.head_commit.message }}
           body: |
             🛈 General Changes since the last release
