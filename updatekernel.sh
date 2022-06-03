@@ -8,7 +8,7 @@ export MNT=/mnt
 [[ -n "$1" ]] && { export DIR=$1; }
 
 # Ask user which USB Device they would like to use
-printq "Which USB Drive or SD Card would you like to use (e.g. /dev/sda)? All data on the drive will be wiped!"
+printq "Which USB Drive or SD Card would you like to use (e.g. /dev/sda)?"
 lsblk -o name,model,tran | grep --color=never "usb"
 read USB
 printq "Ok, using $USB to update the kernel and its modules"
