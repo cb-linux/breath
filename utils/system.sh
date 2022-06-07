@@ -44,23 +44,12 @@ function checkDependency() {
     
     # NOTE: Distro dependent step
     # NOTE: Debian handles this faster via apt.
+    # NOTE: Fedora handles this faster via dnf.
 
     case $DIST in
         
     Arch)
         if ! command -v pacman -Qi $1 &> /dev/null
-        then
-            printq "Installing $1..."
-            return 1 # Package not present on system
-        else
-            printq "$1 already installed, skipping..."
-            return 0 # Package present on system
-        fi
-        ;;
-
-    # UNTESTED!
-    Fedora)
-        if ! command -v dnf list installed $1 &> /dev/null
         then
             printq "Installing $1..."
             return 1 # Package not present on system
@@ -142,22 +131,17 @@ function installDependencies () {
 
                 # vboot-utils
                 vboot-kernel-utils)
-                    if checkDependency vboot-utils; then var=""; else var=vboot-utils; fi
+                    var=vboot-utils;
                     ;;
 
                 # growpart
                 cloud-guest-utils)
-                    if checkDependency cloud-utils-growpart; then var=""; else var=cloud-utils-growpart; fi
+                    var=cloud-utils-growpart;
                     ;;
 
                 # cgpt
                 cgpt)
                     unset var; # Included in vboot-utils
-                    ;;
-
-                # Skip any packages already installed that weren't accounted for
-                *)
-                    if checkDependency $var; then var=""; else var=$var; fi
                     ;;
         
             esac
