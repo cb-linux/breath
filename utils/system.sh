@@ -38,6 +38,31 @@ function whichOperatingSystem {
 
 }
 
+# Check to see if a dependency is already installed
+# and skip installation if that is the case.
+function checkDependency() {
+    
+    # NOTE: Distro dependent step
+    # NOTE: Debian handles this faster via apt.
+    # NOTE: Fedora handles this faster via dnf.
+
+    case $DIST in
+        
+    Arch)
+        if ! command -v pacman -Qi $1 &> /dev/null
+        then
+            printq "Installing $1..."
+            return 1 # Package not present on system
+        else
+            printq "$1 already installed, skipping..."
+            return 0 # Package present on system
+        fi
+        ;;
+
+    esac
+    
+}
+
 # Install dependencies based on distro
 function installDependencies () {
 
@@ -64,22 +89,27 @@ function installDependencies () {
             # Install dependencies if yay is found
             for var in "$@"
             do
-                # Replace package names relevant to distro
+                # Replace package names relevant to distro and any packages already installed
                 case $var in
 
                     # vboot-utils
                     vboot-kernel-utils)
-                        var=vboot-utils;
+                        if checkDependency vboot-utils; then var=""; else var=vboot-utils; fi
                         ;;
 
                     # growpart
                     cloud-guest-utils)
-                        var=growpartfs;
+                        if checkDependency growpartfs; then var=""; else var=growpartfs; fi
                         ;;
 
                     # cgpt
                     cgpt)
                         unset var; # Included in vboot-utils
+                        ;;
+
+                    # Skip any packages already installed that weren't accounted for
+                    *)
+                        if checkDependency $var; then var=""; else var=$var; fi
                         ;;
 
                 esac
