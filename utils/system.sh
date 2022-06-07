@@ -43,20 +43,9 @@ function whichOperatingSystem {
 function checkDependency() {
     
     # NOTE: Distro dependent step
+    # NOTE: Debian handles this faster via apt.
 
     case $DIST in
-
-    # UNTESTED!
-    Debian)
-        if ! command -v dpkg -s $1 &> /dev/null
-        then
-            printq "Installing $1..."
-            return 1 # Package not present on system
-        else
-            printq "$1 already installed, skipping..."
-            return 0 # Package present on system
-        fi
-        ;;
         
     Arch)
         if ! command -v pacman -Qi $1 &> /dev/null
@@ -102,11 +91,7 @@ function installDependencies () {
 
     Debian)
         # Install dependencies on a Debian host system
-        for var in "$@"
-        do
-            if checkDependency $var; then var=""; else var=$var; fi
-            sudo apt install -y $var
-        done
+        sudo apt install -y "$@"
         ;;
 
     Arch)
