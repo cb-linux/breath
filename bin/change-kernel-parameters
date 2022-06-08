@@ -1,0 +1,63 @@
+#!/usr/bin/env python3
+
+import argparse
+import os.path
+import subprocess as sp
+
+def parseArgs():
+    # Create the parser and add arguments
+    parser = argparse.ArgumentParser()
+
+    # Positional argument for the cmdline
+    parser.add_argument(
+        dest='cmdline',
+        type=str, nargs=1,
+        help="The new kernel command line (also known as its parameters)"
+    )
+
+    # Boolean flag that doesn't accept data
+    parser.add_argument(
+        '-a', '--append',
+        action="store_true", default=False,
+        help="Append a flag rather than replacing the whole command line"
+    )
+
+    # Parse the arguments
+    args = parser.parse_args()
+
+def installPackages():
+    if not os.path.exists('/usr/bin/futility'):
+        if os.path.exists('/usr/bin/apt'):
+            os.system('sudo apt install -y vboot-kernel-utils')
+        else:
+            print("Please install vboot-kernel-utils or vboot-utils for the futility binary.")
+            sys.exit(1)
+
+def generateNewKernel():
+
+    # Get the root device
+    rootProcess = sp.Popen("mount | grep ' / ' | cut -d' ' -f 1", shell=True, stdout=sp.PIPE)
+    rootDevice = rootProcess.communicate()[0]
+    kernelPartition = rootDevice[:-1] + '1'
+
+    # Get the current kernel's command line
+    cmdlineProcess = sp.Popen("cat /proc/cmdline", shell=True, stdout=sp.PIPE)
+    cmdline = cmdlineProcess.communicate()[0]
+
+    # Write the new kernel commandline to a file
+    with open('cmdline', 'w') as f:
+        if args.a:
+            f.write(f"{cmdline} {args.cmdline}")
+        else:
+            f.write(args.cmdline)
+
+    sp.run(f'dd if={kernelPartition} of=kernelpart', shell=True, check=True)
+    sp.run(f'futility vbutil_kernel --repack newKernelPart --version 1 --keyblock /usr/share/vboot/devkeys/kernel.keyblock --signprivate /usr/share/vboot/devkeys/kernel_data_key.vbprivk --oldblob kernelpart --config cmdline', shell=True, check=True)
+
+def flashKernel():
+    sp.run(f'sudo dd if=newKernelPart of={kernelPartition}', check=True, shell=True)
+
+parseArgs()
+installPackages()
+generateNewKernel()
+flashKernel()
