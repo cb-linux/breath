@@ -30,12 +30,13 @@ sudo apt purge pulseaudio*
     systemctl --user mask pipewire.service
     systemctl --user mask pulseaudio.socket
     systemctl --user mask pulseaudio.service
-} || true
+} || echo "Please install a desktop and rerun this script if audio doesn't work."
 
 # Copy the firmware and create the correct UCM Files
+sudo umount /mnt || true
 sudo mount -t ext2 -o ro /dev/mmcblk0p3 /mnt || sudo mount -t ext2 -o ro /dev/mmcblk1p3 /mnt
 sudo cp -rv /mnt/lib/firmware/* /lib/firmware
-sudo rm -rf /usr/share/alsa/ucm2/${SND_CARD}
+sudo rm -rf /usr/share/alsa/ucm2/${SND_CARD} || true
 sudo cp -rv /mnt/usr/share/alsa/ucm*/${SND_DEVICE} /usr/share/alsa/ucm2/${SND_CARD}
 sudo umount /mnt
 sudo mv /usr/share/alsa/ucm2/${SND_CARD}/${SND_DEVICE}.conf /usr/share/alsa/ucm2/${SND_CARD}/${SND_CARD}.conf
