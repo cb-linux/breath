@@ -25,8 +25,10 @@ jobs:
         id: tag
         run: |
           echo "::set-output name=release_tag::KernelDeliverySystem$(date +"%Y.%m.%d_%H-%M")"
-      - name: Running build.sh
+      - name: Building the standard (Release 101) Kernel
         run: cd kernel; bash build.sh chromeos-5.10;
+      - name: Building the legacy SKL/KBL Kernel
+        run: cd kernel; bash build.sh alt-chromeos-5.10;
       # - name: Upload Artifacts
       #   uses: actions/upload-artifact@v3
       #   with:
