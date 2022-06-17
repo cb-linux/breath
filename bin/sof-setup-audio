@@ -119,7 +119,7 @@ sudo ln -s sof-tplg-v2.1.1 /lib/firmware/intel/sof-tplg
 sudo rsync tools-v2.1.1/*  /usr/local/bin
 
 # SOF doesn't need SST/HDA drivers, especially on Chromebooks where they conflict
-echo 'blacklist snd_soc_skl snd_hda_intel' | sudo tee /etc/modprobe.d/alsa-disable-sst.conf
+echo 'blacklist snd_hda_intel' | sudo tee /etc/modprobe.d/alsa-disable-sst.conf
 
 sync
 echo 'SOF enabled successfully! Reboot to enable audio'
