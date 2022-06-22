@@ -49,9 +49,8 @@ toilet -f term   -F border "Made by MilkyDeveloper"
 echo " $FEATURES"
 
 if [[ $FEATURES == *"KEYMAP"* ]]; then
-  # Ask to make the Search key a Caps_Lock key
-  printq "Do you want to make the Search key a Caps_Lock key ?"
-  printq "NOTE: Explicitly yes or no"
+  # Ask to make the Search key a Caps Lock key
+  printq "Would you like to make the Search Key a Caps Lock key?"
   read -r BREATH_CAPSLOCK
   export BREATH_CAPSLOCK
 fi
@@ -172,7 +171,7 @@ if [[ $FEATURES == *"KEYMAP"* ]]; then
 
   # Make the Search key a Caps_Lock key, if wanted by the user
   # Backup the default event definitions and copy in the new one
-  if [[ $BREATH_CAPSLOCK == "yes" ]]; then
+  if [[ $BREATH_CAPSLOCK =~ ^[Yy]$ ]]; then
     sudo cp -n ${MNT}/usr/share/X11/xkb/keycodes/evdev ${MNT}/usr/share/X11/xkb/keycodes/evdev.org
     sudo cp xkb/evdev.chromebook ${MNT}/usr/share/X11/xkb/keycodes/evdev
   fi
