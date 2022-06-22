@@ -49,5 +49,5 @@ jobs:
 
             🚚 Kernel Delivery System - Triggered by ${{ github.sha }} at ${{ github.event.repository.updated_at }}
           files: |
-            kernel/bzImage
+            kernel/bzImage*
             kernel/modules*
