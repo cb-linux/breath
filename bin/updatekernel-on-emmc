@@ -54,7 +54,7 @@ else
   export USB_KERNEL="${USB}p1"
 fi
 
-cd ~/linux-build || { mkdir ~/linux-build; cd ~/linux-build; }
+cd ~/linux-build &>/dev/null || { mkdir ~/linux-build; cd ~/linux-build; }
 
 # Download kernel commandline
 bash <(curl -s https://raw.githubusercontent.com/cb-linux/breath/main/kernel.root.flags.sh) > kernel.flags
