@@ -48,6 +48,14 @@ toilet -f mono12 -F crop   "Breath"
 toilet -f term   -F border "Made by MilkyDeveloper"
 echo " $FEATURES"
 
+if [[ $FEATURES == *"KEYMAP"* ]]; then
+  # Ask to make the Search key a Caps_Lock key
+  printq "Do you want to make the Search key a Caps_Lock key ?"
+  printq "NOTE: Explicitly yes or no"
+  read -r BREATH_CAPSLOCK
+  export BREATH_CAPSLOCK
+fi
+
 # Ask for username
 printq "What would you like the username to be?"
 printq "NOTE: No UPPERCASE letters, spaces, backslashes, or special characters"
@@ -162,10 +170,12 @@ if [[ $FEATURES == *"KEYMAP"* ]]; then
   sudo cp -n ${MNT}/usr/share/X11/xkb/symbols/pc ${MNT}/usr/share/X11/xkb/symbols/pc.org
   sudo cp xkb/xkb.chromebook ${MNT}/usr/share/X11/xkb/symbols/pc
 
-  # Make the Search key a Caps_Lock key
+  # Make the Search key a Caps_Lock key, if wanted by the user
   # Backup the default event definitions and copy in the new one
-  sudo cp -n ${MNT}/usr/share/X11/xkb/keycodes/evdev ${MNT}/usr/share/X11/xkb/keycodes/evdev.org
-  sudo cp xkb/evdev.chromebook ${MNT}/usr/share/X11/xkb/keycodes/evdev
+  if [[ $BREATH_CAPSLOCK == "yes" ]]; then
+    sudo cp -n ${MNT}/usr/share/X11/xkb/keycodes/evdev ${MNT}/usr/share/X11/xkb/keycodes/evdev.org
+    sudo cp xkb/evdev.chromebook ${MNT}/usr/share/X11/xkb/keycodes/evdev
+  fi
 fi
 
 sudo umount $MNT
