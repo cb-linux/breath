@@ -86,4 +86,4 @@ sudo dd if=bzImage.signed of=$USB_KERNEL
 sudo rm -rf ~/linux-build/modules/lib/modules/*
 extractModules
 
-echo "Done!"
+echo "Kernel updated!"
