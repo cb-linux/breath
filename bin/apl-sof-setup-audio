@@ -77,7 +77,7 @@ fi
 
 printq "Using $USB to update the kernel and its modules"
 
-cd ~/linux-build || { mkdir ~/linux-build; cd ~/linux-build; }
+sudo rm -rf ~/linux-build; mkdir ~/linux-build; cd ~/linux-build;
 
 # Download kernel commandline
 bash <(curl -s https://raw.githubusercontent.com/cb-linux/breath/main/kernel.root.flags.sh) > kernel.flags

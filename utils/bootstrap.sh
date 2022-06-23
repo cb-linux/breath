@@ -10,8 +10,7 @@ function bootstrapFiles {
   }
 
   # Make a directory and CD into it
-  mkdir -p ~/linux-build
-  cd ~/linux-build
+  sudo rm -rf ~/linux-build; mkdir ~/linux-build; cd ~/linux-build;
 
   # If the ChromeOS firmware utility doesn't exist, install it and other packages
   printq "Installing Dependencies"

@@ -16,7 +16,7 @@ printq "Ok, using $USB to update the kernel and its modules"
 # Mount the USB
 sudo mount ${USB}2 /mnt
 
-cd ~/linux-build || { mkdir ~/linux-build; cd ~/linux-build; }
+sudo rm -rf ~/linux-build; mkdir ~/linux-build; cd ~/linux-build;
 
 # Download kernel commandline
 wget https://raw.githubusercontent.com/cb-linux/kernel/main/kernel.flags -O kernel.flags -q --show-progress
