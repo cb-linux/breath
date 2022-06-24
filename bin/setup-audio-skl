@@ -8,9 +8,7 @@ echo "Installing Audio..."
 # Configuration
 # You can adapt these to support other KBL/SKL devices
 export SND_CARD=sklnau8825max;
-export SND_BOARD=lars; 
 export SND_MODULE=snd-skl_nau88l25_max98357a;
-export SND_DEVICE=${SND_CARD}
 
 # Remove PulseAudio
 sudo apt purge pulseaudio
@@ -25,15 +23,14 @@ sudo apt purge pulseaudio*
     systemctl --user mask pulseaudio.service
 } || echo "Please install a desktop and rerun this script if audio doesn't work."
 
+
 # Copy the firmware and create the correct UCM Files
-sudo umount /mnt || true
-# sudo mount -t ext2 -o ro /dev/mmcblk0p3 /mnt || sudo mount -t ext2 -o ro /dev/mmcblk1p3 /mnt
-sudo mount -o ro /home/andrelauret/recovery.img /mnt
+sudo umount /mnt &>/dev/null | true
+sudo mount -t ext2 -o ro /dev/mmcblk0p3 /mnt || sudo mount -t ext2 -o ro /dev/mmcblk1p3 /mnt
 sudo cp -rv /mnt/lib/firmware/* /lib/firmware
 sudo rm -rf /usr/share/alsa/ucm2/${SND_CARD} || true
 sudo cp -rv /mnt/usr/share/alsa/ucm*/${SND_CARD} /usr/share/alsa/ucm2/${SND_CARD}
-sudo umount /mnt
-# sudo mv /usr/share/alsa/ucm2/${SND_CARD}/${SND_DEVICE}.conf /usr/share/alsa/ucm2/${SND_CARD}/${SND_CARD}.conf
+sudo umount /mnt &>/dev/null
 sudo sed -i '1s/^/Syntax 2\n/' /usr/share/alsa/ucm2/${SND_CARD}/${SND_CARD}.conf
 sudo sed -i '/Pin/{/Mux/ d}' /usr/share/alsa/ucm2/${SND_CARD}/HiFi.conf
 # Check if user has the newer UCM directory layout
