@@ -57,7 +57,7 @@ function extractModules {
 
 	sudo mkdir -p ${MNT}/lib/modules
 	mkdir -p modules || sudo rm -rf modules; sudo mkdir -p modules
-	sudo tar xvpf modules.tar.xz -C modules
+	sudo tar xvpf modules.tar.xz -C modules || echo "This seems to be a malformed modules.tar.xz archive. Try removing ~/linux-build and rerunning this script."
 	sudo rm -rf ${MNT}/lib/modules/*
 	sudo cp -rv modules/lib/modules/* ${MNT}/lib/modules
 	syncStorage
