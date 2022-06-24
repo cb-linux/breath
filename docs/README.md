@@ -130,7 +130,9 @@ Once booted into Breath run the command depending on your device's board:
 
 1. Connect to Wifi on your Chromebook! You can use a GUI for this or `nmcli`/`nmtui`
 
-2. - Skylake, Kabylake, or Coffeelake (7th/8th Gen Intel CPU):
+2. - Skylake (6th Gen Intel CPU) : 
+     1. `setup-audio-skl` on your Chromebook that has booted Breath
+   - Kabylake, or Coffeelake (7th/8th Gen Intel CPU):
      1. `VERSION=ALT bash updatekernel.sh` on the PC you built Breath with (cannot be run from Crostini)
      2. `setup-audio` on your Chromebook that has booted Breath
    - All Apollo Lake Devices (`CORAL` and `REEF`): `apl-sof-setup-audio`
