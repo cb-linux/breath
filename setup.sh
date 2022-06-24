@@ -157,6 +157,9 @@ EOF
 
 sudo cp hostname ${MNT}/etc/
 
+# Set the hostname in hosts
+sudo sed -i "1a\\127.0.1.1 ${BREATH_HOST}" ${MNT}/etc/hosts
+
 # Install all utility files in the bin directory
 cd $ORIGINAL_DIR
 sudo chmod 755 bin/*
