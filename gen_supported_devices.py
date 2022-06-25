@@ -9,12 +9,12 @@ page = requests.get("https://www.chromium.org/chromium-os/developer-information-
 soup = BeautifulSoup(page.content, 'html.parser')
 table = soup.find_all("table")[-1]
 
-SupportedBoards = ["nami", "octopus", "volteer", "coral", "reef", "hatch", "puff"]
+SupportedBoards = ["nami", "octopus", "volteer", "coral", "reef", "hatch", "puff", "lars", "cave"]
 
 for child in table.children:
     try:
-        #print(child.contents)
-        if child.contents[11].text.strip().lower() in SupportedBoards:
+        # Checks in board name and baseboard 
+        if (child.contents[9].text.strip().lower() in SupportedBoards) or (child.contents[11].text.strip().lower() in SupportedBoards):
             # Newlines count as elements, so we use 5 instead of 3
             nameElement = child.contents[5]
             name = nameElement.a.text.strip()
