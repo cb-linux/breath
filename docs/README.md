@@ -155,6 +155,9 @@ https://github.com/cb-linux/breath/issues/204#issuecomment-1133802766
 **Fan Control/ectool:**  
 https://github.com/cb-linux/breath/issues/168#issuecomment-1142534066
 
+## Pipewire support in progress
+`setup-pipewire` on your Chromebook that has booted Breath
+
 **Audio Jack and Mic Testing:**  
 https://github.com/cb-linux/breath/discussions/190
 
