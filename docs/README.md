@@ -19,12 +19,14 @@
 > ### Is your Chromebook not on the list?
 > That's completely fine! As long as it's newer than 2017, most drivers will already be supported except audio. **If it is newer than 2019, chances are that audio is already supported**. If you would like audio working, open up a Github Issue with your Chromebook model and post the output of the commands `lsmod` and `find /usr/share/alsa`.
 
-**Supported Baseboardboards**: `["nami", "octopus", "volteer", "coral", "reef", "hatch", "puff"]`
+**Supported Baseboardboards**: `["nami", "octopus", "volteer", "coral", "reef", "hatch", "puff", "lars", "cave"]`
 
 * IdeaPad Flex 5i Chromebook (13", 5)
 * IdeaPad Flex 5i Chromebook
 * HP Chromebook x360 14b / HP Chromebook x360 14a
 * Acer Chromebook 712
+* Chromebook 14 for work (CP5-471)
+* ASUS Chromebook Flip C302
 * Lenovo Thinkpad 11e Chromebook / Lenovo Thinkpad Yoga 11e Chromebook
 * HP Chromebook x360 11 G1 EE
 * Acer Chromebook  Spin 11 R751T
@@ -48,6 +50,7 @@
 * ASUS Chromebook C403
 * Acer Chromebook 311
 * Acer Chromebook Spin 511
+* Lenovo 500e Chromebook 2nd Gen
 * Lenovo 100e Chromebook 2nd Gen (Intel)
 * Lenovo 300e Chromebook 2nd Gen (Intel)
 * Acer Chromebook Spin 512(R851TN)
@@ -72,6 +75,7 @@
 * HP Chromebook 14 G6
 * HP Chromebook 14a
 * Acer Chromebook 314 (C933L/LT)
+* Ideapad 3 Chromebook
 * HP Chromebox G3
 * ASUS Chromebox 4
 * Acer Chromebox CXI4
@@ -85,6 +89,7 @@
 * ASUS Chromebook CX1101
 * ASUS Chromebook C424
 * Acer Chromebook 515
+
 </details>
 
 ## Running Breath
