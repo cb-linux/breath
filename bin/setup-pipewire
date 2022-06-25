@@ -1,0 +1,15 @@
+#!/bin/bash
+#
+
+echo "Configuring Pipewire..."
+
+# Install pipewire libraries and alsa client
+sudo apt install libspa-0.2-bluetooth libspa-0.2-jack libspa-0.2-modules
+sudo apt install pipewire-audio-client-libraries
+sudo apt install wireplumber pipewire-media-session-
+
+# Configure wireplumber service and alsa 
+systemctl --user --now enable wireplumber.service
+sudo cp /usr/share/doc/pipewire/examples/alsa.conf.d/99-pipewire-default.conf /etc/alsa/conf.d/
+
+echo 'Done! Reboot to enable pipewire support'

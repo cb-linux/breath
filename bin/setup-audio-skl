@@ -14,11 +14,8 @@ export SND_MODULE=snd-skl_nau88l25_max98357a;
 sudo apt purge pulseaudio -y
 sudo apt purge pulseaudio* -y
 
-# On newer GNOME installs, Pipewire is a dependency of GNOME.
-# We can't remove it, but we can mask (completely disable) the systemd service
+# Just in case, Pulseaudio will be masked to completely disable the systemd service.
 {
-    systemctl --user mask pipewire.socket
-    systemctl --user mask pipewire.service
     systemctl --user mask pulseaudio.socket
     systemctl --user mask pulseaudio.service
 } || echo "Please install a desktop and rerun this script if audio doesn't work."
