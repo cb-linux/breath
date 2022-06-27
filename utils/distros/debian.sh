@@ -18,7 +18,7 @@ function postinstall {
 EOT
 
     # we have to add the non-free repository for non-free firmware
-    sed -i -e 's/ main/ main contrib non-free/g' ${MNT}/etc/apt/sources.list
+    sudo sed -i -e 's/ main/ main contrib non-free/g' ${MNT}/etc/apt/sources.list
 
     # Download the desktop that the user has selected
     case $DESKTOP in
