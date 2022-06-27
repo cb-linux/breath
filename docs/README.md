@@ -131,7 +131,7 @@ Once booted into Breath run the command depending on your device's board:
 1. Connect to Wifi on your Chromebook! You can use a GUI for this or `nmcli`/`nmtui`
 
 2. - All Devices : 
-     1. `breath-audio {BoardName}` on your Chromebook that has booted Breath (eg: `breath-audio nami`)
+     1. `breath-audio nami` on your Chromebook that has booted Breath (as nami is your boardname)
    - All Apollo Lake Devices (`CORAL` and `REEF`): `apl-sof-setup-audio`
    - Everything else: `sof-setup-audio`
      - Doesn't work? Try `SOUNDCARD=rtk sof-setup-audio`
@@ -151,9 +151,6 @@ https://github.com/cb-linux/breath/issues/204#issuecomment-1133802766
 
 **Fan Control/ectool:**  
 https://github.com/cb-linux/breath/issues/168#issuecomment-1142534066
-
-## Pipewire support in progress
-`setup-pipewire` on your Chromebook that has booted Breath
 
 **Audio Jack and Mic Testing:**  
 https://github.com/cb-linux/breath/discussions/190
