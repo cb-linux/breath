@@ -62,7 +62,7 @@ case $1 in
   *)
     echo "Your board is not recognized, please open an issue."
     echo "You can also try with sof or sof-rtk, maybe it will work."
-    
+    exit
     ;;
 esac
 
