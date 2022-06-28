@@ -89,6 +89,7 @@ if [[ "$SND_CONFIG" -eq 0 ]] || [[ "$SND_CONFIG" -eq 1 ]]; then
   sudo cp -rv /mnt/usr/share/alsa/ucm*/${SND_DEVICE} /usr/share/alsa/ucm2/${SND_CARD}
   sudo umount /mnt
   if [[ "$SND_CONFIG" -eq 1 ]]; then
+    sudo rm -f /usr/share/alsa/ucm2/${SND_CARD}/${SND_CARD}.conf
     sudo mv /usr/share/alsa/ucm2/${SND_CARD}/${SND_DEVICE}.conf /usr/share/alsa/ucm2/${SND_CARD}/${SND_CARD}.conf
   fi
   sudo sed -i '1s/^/Syntax 2\n/' /usr/share/alsa/ucm2/${SND_CARD}/${SND_CARD}.conf
