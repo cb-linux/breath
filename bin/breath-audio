@@ -3,6 +3,10 @@
 
 set -e
 
+function printq {
+  echo "$(tput setaf 114; tput bold)$1$(tput sgr0)"
+}
+
 # Adapt script to given board
 case $1 in
 
@@ -64,7 +68,7 @@ case $1 in
     ;;
 esac
 
-echo "Installing Audio on $1"
+printq "Installing Audio on $1"
 
 # Remove PulseAudio
 sudo apt purge pulseaudio -y
@@ -178,7 +182,7 @@ if [[ "$SND_CONFIG" -eq  0 ]]; then
     VERSION=ALT updatekernel-on-emmc
 fi
 
-echo "Configuring Pipewire..."
+printq "Configuring Pipewire..."
 
 # Install pipewire libraries and alsa client
 sudo apt install libspa-0.2-bluetooth libspa-0.2-jack libspa-0.2-modules
@@ -190,4 +194,4 @@ systemctl --user --now enable wireplumber.service
 sudo cp /usr/share/doc/pipewire/examples/alsa.conf.d/99-pipewire-default.conf /etc/alsa/conf.d/
 
 sync
-echo 'Done! Reboot to enable audio'
+printq 'Done! Reboot to enable audio'
