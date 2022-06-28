@@ -51,6 +51,12 @@ case $1 in
     export SND_DEVICE=bxtda7219max.coral;
     ;;
 
+  delbin)
+    export SND_CONFIG=2;
+    export SND_BOARD=delbin;
+    export SND_MODULE="snd_soc_max98373 snd_soc_rt5682";
+    ;;
+
   sof)
     export SND_CONFIG=2;
     export SND_MODULES="snd_soc_max98357a snd_soc_da7219";
@@ -77,27 +83,27 @@ sudo apt purge pulseaudio* -y
 if [[ "$SND_CONFIG" -eq 0 ]] || [[ "$SND_CONFIG" -eq 1 ]]; then
 
 
-    # Copy the firmware and create the correct UCM Files
-    sudo umount /mnt || true
-    sudo mount -t ext2 -o ro /dev/mmcblk0p3 /mnt || sudo mount -t ext2 -o ro /dev/mmcblk1p3 /mnt || sudo mount -t ext2 -o ro /dev/nvme0n1p3 /mnt
-    sudo cp -rv /mnt/lib/firmware/* /lib/firmware
-    sudo rm -rf /usr/share/alsa/ucm2/${SND_CARD} || true
-    sudo cp -rv /mnt/usr/share/alsa/ucm*/${SND_DEVICE} /usr/share/alsa/ucm2/${SND_CARD}
-    sudo umount /mnt
-    if [[ "$SND_CONFIG" -eq 1 ]]; then
-        sudo mv /usr/share/alsa/ucm2/${SND_CARD}/${SND_DEVICE}.conf /usr/share/alsa/ucm2/${SND_CARD}/${SND_CARD}.conf
-    fi
-    sudo sed -i '1s/^/Syntax 2\n/' /usr/share/alsa/ucm2/${SND_CARD}/${SND_CARD}.conf
-    sudo sed -i '/Pin/{/Mux/ d}' /usr/share/alsa/ucm2/${SND_CARD}/HiFi.conf
-    # Check if user has the newer UCM directory layout
-    ls /usr/share/alsa/ucm2/conf.d && {
-        sudo mv /usr/share/alsa/ucm2/${SND_CARD} /usr/share/alsa/ucm2/conf.d
-    }
+  # Copy the firmware and create the correct UCM Files
+  sudo umount /mnt || true
+  sudo mount -t ext2 -o ro /dev/mmcblk0p3 /mnt || sudo mount -t ext2 -o ro /dev/mmcblk1p3 /mnt || sudo mount -t ext2 -o ro /dev/nvme0n1p3 /mnt
+  sudo cp -rv /mnt/lib/firmware/* /lib/firmware
+  sudo rm -rf /usr/share/alsa/ucm2/${SND_CARD} || true
+  sudo cp -rv /mnt/usr/share/alsa/ucm*/${SND_DEVICE} /usr/share/alsa/ucm2/${SND_CARD}
+  sudo umount /mnt
+  if [[ "$SND_CONFIG" -eq 1 ]]; then
+    sudo mv /usr/share/alsa/ucm2/${SND_CARD}/${SND_DEVICE}.conf /usr/share/alsa/ucm2/${SND_CARD}/${SND_CARD}.conf
+  fi
+  sudo sed -i '1s/^/Syntax 2\n/' /usr/share/alsa/ucm2/${SND_CARD}/${SND_CARD}.conf
+  sudo sed -i '/Pin/{/Mux/ d}' /usr/share/alsa/ucm2/${SND_CARD}/HiFi.conf
+  # Check if user has the newer UCM directory layout
+  ls /usr/share/alsa/ucm2/conf.d && {
+    sudo mv /usr/share/alsa/ucm2/${SND_CARD} /usr/share/alsa/ucm2/conf.d
+  }
 
-    sudo apt install -y alsa-base alsa-utils apulse
+  sudo apt install -y alsa-base alsa-utils apulse
 
-    # Add a systemd service to start sound
-    sudo tee /etc/systemd/system/alsa-reload.service <<EOF
+  # Add a systemd service to start sound
+  sudo tee /etc/systemd/system/alsa-reload.service <<EOF
 [Unit]
 Description="Reload ALSA and set the correct UCM"
 
@@ -111,9 +117,9 @@ WantedBy=multi-user.target
 EOF
 fi 
 if [[ "$SND_CONFIG" -eq 2 ]]; then
-    sudo apt install -y apulse alsa-* rsync
-    sudo apt install -y firmware-sof-signed || sudo apt-get -o Dpkg::Options::="--force-overwrite" install firmware-sof-signed
-    sudo tee /etc/systemd/system/alsa-reload.service <<EOF
+  sudo apt install -y apulse alsa-* rsync
+  sudo apt install -y firmware-sof-signed || sudo apt-get -o Dpkg::Options::="--force-overwrite" install firmware-sof-signed
+  sudo tee /etc/systemd/system/alsa-reload.service <<EOF
 [Unit]
 Description="Reload ALSA and set the correct UCM"
 
@@ -153,33 +159,33 @@ sudo systemctl enable alsa-reload
 # Replace PulseAudio libraries with Apulse, which makes PulseAudio apps work with ALSA
 for lib in libpulse-mainloop-glib.so libpulse-simple.so libpulse.so; do
 
-    set +e
-    sudo rm -f /usr/lib/${lib} /usr/lib/${lib}.0 /usr/lib/x86_64-linux-gnu/${lib} /usr/lib/x86_64-linux-gnu/${lib}.0
-    set -e
+  set +e
+  sudo rm -f /usr/lib/${lib} /usr/lib/${lib}.0 /usr/lib/x86_64-linux-gnu/${lib} /usr/lib/x86_64-linux-gnu/${lib}.0
+  set -e
         
-    sudo ln -s /usr/lib/x86_64-linux-gnu/apulse/${lib}   "/usr/lib/${lib}"
-    sudo ln -s /usr/lib/x86_64-linux-gnu/apulse/${lib}.0 "/usr/lib/${lib}.0"
-    sudo ln -s /usr/lib/x86_64-linux-gnu/apulse/${lib}   "/usr/lib/x86_64-linux-gnu/${lib}"
-    sudo ln -s /usr/lib/x86_64-linux-gnu/apulse/${lib}.0 "/usr/lib/x86_64-linux-gnu/${lib}.0"
+  sudo ln -s /usr/lib/x86_64-linux-gnu/apulse/${lib}   "/usr/lib/${lib}"
+  sudo ln -s /usr/lib/x86_64-linux-gnu/apulse/${lib}.0 "/usr/lib/${lib}.0"
+  sudo ln -s /usr/lib/x86_64-linux-gnu/apulse/${lib}   "/usr/lib/x86_64-linux-gnu/${lib}"
+  sudo ln -s /usr/lib/x86_64-linux-gnu/apulse/${lib}.0 "/usr/lib/x86_64-linux-gnu/${lib}.0"
         
 done
 
 if [[ "$SND_CONFIG" -eq  2 ]]; then
-    sudo rm -rfv /lib/firmware/intel/sof* # Symlinks can conflict
-    cd # to home directory
-    git clone --depth 1 "https://github.com/thesofproject/sof-bin"
-    cd sof-bin/v2.1.x
-    sudo rsync -a sof*v2.1.1   /lib/firmware/intel/
-    sudo ln -s sof-v2.1.1      /lib/firmware/intel/sof
-    sudo ln -s sof-tplg-v2.1.1 /lib/firmware/intel/sof-tplg
-    sudo rsync tools-v2.1.1/*  /usr/local/bin
+  sudo rm -rfv /lib/firmware/intel/sof* # Symlinks can conflict
+  cd # to home directory
+  git clone --depth 1 "https://github.com/thesofproject/sof-bin"
+  cd sof-bin/v2.1.x
+  sudo rsync -a sof*v2.1.1   /lib/firmware/intel/
+  sudo ln -s sof-v2.1.1      /lib/firmware/intel/sof
+  sudo ln -s sof-tplg-v2.1.1 /lib/firmware/intel/sof-tplg
+  sudo rsync tools-v2.1.1/*  /usr/local/bin
 
-    # SOF doesn't need SST/HDA drivers, especially on Chromebooks where they conflict
-    echo 'blacklist snd_hda_intel' | sudo tee /etc/modprobe.d/alsa-disable-sst.conf
+  # SOF doesn't need SST/HDA drivers, especially on Chromebooks where they conflict
+  echo 'blacklist snd_hda_intel' | sudo tee /etc/modprobe.d/alsa-disable-sst.conf
 fi
 
 if [[ "$SND_CONFIG" -eq  0 ]]; then
-    VERSION=ALT updatekernel-on-emmc
+  VERSION=ALT updatekernel-on-emmc
 fi
 
 printq "Configuring Pipewire..."
@@ -193,9 +199,11 @@ sudo apt install wireplumber pipewire-media-session-
 systemctl --user --now enable wireplumber.service
 sudo cp /usr/share/doc/pipewire/examples/alsa.conf.d/99-pipewire-default.conf /etc/alsa/conf.d/
 
-# Make wireplumber use Alsa-ucm
-sudo sed -i -e 's/\[\"api.alsa.use-acp\"\] =.*/\[\"api.alsa.use-acp\"\] = false,/g' /usr/share/wireplumber/main.lua.d/50-alsa-config.lua
-sudo sed -i -e 's/--\[\"api.alsa.use-ucm\"\] = .*/\[\"api.alsa.use-ucm\"\] = true,/g' /usr/share/wireplumber/main.lua.d/50-alsa-config.lua
+if [[ "$SND_CONFIG" -eq 0 ]] || [[ "$SND_CONFIG" -eq 1 ]]; then
+  # Make wireplumber use Alsa-ucm
+  sudo sed -i -e 's/\[\"api.alsa.use-acp\"\] =.*/\[\"api.alsa.use-acp\"\] = false,/g' /usr/share/wireplumber/main.lua.d/50-alsa-config.lua
+  sudo sed -i -e 's/--\[\"api.alsa.use-ucm\"\] = .*/\[\"api.alsa.use-ucm\"\] = true,/g' /usr/share/wireplumber/main.lua.d/50-alsa-config.lua
+fi
 
 sync
 printq 'Done! Reboot to enable audio'
