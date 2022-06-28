@@ -54,7 +54,7 @@ case $1 in
   delbin)
     export SND_CONFIG=2;
     export SND_BOARD=delbin;
-    export SND_MODULE="snd_soc_max98373 snd_soc_rt5682";
+    export SND_MODULES="snd_soc_max98373 snd_soc_rt5682";
     ;;
 
   sof)
@@ -195,7 +195,7 @@ sudo apt install wireplumber pipewire-media-session-
 
 # Configure wireplumber service and alsa 
 systemctl --user --now enable wireplumber.service
-sudo cp /usr/share/doc/pipewire/examples/alsa.conf.d/99-pipewire-default.conf 
+sudo cp /usr/share/doc/pipewire/examples/alsa.conf.d/99-pipewire-default.conf /etc/alsa/conf.d/
 
 if [[ "$SND_CONFIG" -eq 0 ]] || [[ "$SND_CONFIG" -eq 1 ]]; then
   # Make wireplumber use Alsa-ucm
