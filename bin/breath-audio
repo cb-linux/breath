@@ -193,5 +193,9 @@ sudo apt install wireplumber pipewire-media-session-
 systemctl --user --now enable wireplumber.service
 sudo cp /usr/share/doc/pipewire/examples/alsa.conf.d/99-pipewire-default.conf /etc/alsa/conf.d/
 
+# Make wireplumber use Alsa-ucm
+sudo sed -i -e 's/\[\"api.alsa.use-acp\"\] =.*/\[\"api.alsa.use-acp\"\] = false,/g' /usr/share/wireplumber/main.lua.d/50-alsa-config.lua
+sudo sed -i -e 's/--\[\"api.alsa.use-ucm\"\] = .*/\[\"api.alsa.use-ucm\"\] = true,/g' /usr/share/wireplumber/main.lua.d/50-alsa-config.lua
+
 sync
 printq 'Done! Reboot to enable audio'
