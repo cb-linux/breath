@@ -81,8 +81,6 @@ sudo apt purge pulseaudio -y
 sudo apt purge pulseaudio* -y
 
 if [[ "$SND_CONFIG" -eq 0 ]] || [[ "$SND_CONFIG" -eq 1 ]]; then
-
-
   # Copy the firmware and create the correct UCM Files
   sudo umount /mnt || true
   sudo mount -t ext2 -o ro /dev/mmcblk0p3 /mnt || sudo mount -t ext2 -o ro /dev/mmcblk1p3 /mnt || sudo mount -t ext2 -o ro /dev/nvme0n1p3 /mnt
@@ -197,7 +195,7 @@ sudo apt install wireplumber pipewire-media-session-
 
 # Configure wireplumber service and alsa 
 systemctl --user --now enable wireplumber.service
-sudo cp /usr/share/doc/pipewire/examples/alsa.conf.d/99-pipewire-default.conf /etc/alsa/conf.d/
+sudo cp /usr/share/doc/pipewire/examples/alsa.conf.d/99-pipewire-default.conf 
 
 if [[ "$SND_CONFIG" -eq 0 ]] || [[ "$SND_CONFIG" -eq 1 ]]; then
   # Make wireplumber use Alsa-ucm
