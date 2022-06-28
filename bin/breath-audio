@@ -3,8 +3,6 @@
 
 set -e
 
-echo "Installing Audio..."
-
 # Adapt script to given board
 case $1 in
 
@@ -66,6 +64,8 @@ case $1 in
     ;;
 esac
 
+echo "Installing Audio on $1"
+
 # Remove PulseAudio
 sudo apt purge pulseaudio -y
 sudo apt purge pulseaudio* -y
@@ -90,7 +90,7 @@ if [[ "$SND_CONFIG" -eq 0 ]] || [[ "$SND_CONFIG" -eq 1 ]]; then
         sudo mv /usr/share/alsa/ucm2/${SND_CARD} /usr/share/alsa/ucm2/conf.d
     }
 
-    sudo apt install alsa-base alsa-utils apulse
+    sudo apt install -y alsa-base alsa-utils apulse
 
     # Add a systemd service to start sound
     sudo tee /etc/systemd/system/alsa-reload.service <<EOF
