@@ -23,6 +23,7 @@ def parseArgs():
     )
 
     # Parse the arguments
+    global args
     args = parser.parse_args()
 
 def installPackages():
@@ -38,7 +39,8 @@ def generateNewKernel():
     # Get the root device
     rootProcess = sp.Popen("mount | grep ' / ' | cut -d' ' -f 1", shell=True, stdout=sp.PIPE)
     rootDevice = rootProcess.communicate()[0]
-    kernelPartition = rootDevice[:-1] + '1'
+    global kernelPartition
+    kernelPartition = rootDevice[:-2].decode() + '1'
 
     # Get the current kernel's command line
     cmdlineProcess = sp.Popen("cat /proc/cmdline", shell=True, stdout=sp.PIPE)
@@ -46,10 +48,10 @@ def generateNewKernel():
 
     # Write the new kernel commandline to a file
     with open('cmdline', 'w') as f:
-        if args.a:
-            f.write(f"{cmdline} {args.cmdline}")
+        if args.append:
+            f.write(f"{cmdline} {args.cmdline[0]}")
         else:
-            f.write(args.cmdline)
+            f.write(args.cmdline[0])
 
     sp.run(f'dd if={kernelPartition} of=kernelpart', shell=True, check=True)
     sp.run(f'futility vbutil_kernel --repack newKernelPart --version 1 --keyblock /usr/share/vboot/devkeys/kernel.keyblock --signprivate /usr/share/vboot/devkeys/kernel_data_key.vbprivk --oldblob kernelpart --config cmdline', shell=True, check=True)
