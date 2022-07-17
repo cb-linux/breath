@@ -67,11 +67,23 @@ fi
   fedora)
       # Download the Fedora rootfs if it doesn't exist
       # Extracting a Fedora rootfs from koji is quite complicated
-      # I've hardcoded it, but otherwise you need to parse a json file
-      # TOOD: Implement versioning support in Fedora
+      # Since they don't provide a latest symlink we need to figure it out based on current date
+      # Generate yesterday date to fetch the good enough update image from koji
+      YESTERDAY=`TZ=aaa24 date +%Y%m%d`
+
       DISTRO_ROOTFS="fedora-rootfs.tar.xz"
+
+      # Check and set Fedora version to be used
+      if [[ -n $DISTRO_VERSION ]]; then
+        export DISTRO_RELEASE=$(echo "$DISTRO_VERSION")
+        printq "Using Fedora ${DISTRO_RELEASE}"
+      else
+        export DISTRO_RELEASE="36"
+        printerr "No Fedora version specified, using Fedora ${DISTRO_RELEASE}"
+      fi
+
       [[ ! -f $DISTRO_ROOTFS ]] && {
-      wget "https://kojipkgs.fedoraproject.org//packages/Fedora-Container-Base/35/20211127.0/images/Fedora-Container-Base-35-20211127.0.x86_64.tar.xz" -O $DISTRO_ROOTFS -q --show-progress
+      wget https://kojipkgs.fedoraproject.org/packages/Fedora-Container-Base/${DISTRO_RELEASE}/${YESTERDAY}.0/images/Fedora-Container-Base-${DISTRO_RELEASE}-${YESTERDAY}.0.x86_64.tar.xz -O $DISTRO_ROOTFS -q --show-progress
       }
       ;;
 
