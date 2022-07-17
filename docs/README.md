@@ -107,8 +107,9 @@ Due to licensing restraints, you cannot just download an ISO of Breath and flash
 
 > * You must add `CROSTINI` to `FEATURES` (so `FEATURES=ISO,KEYMAP,CROSTINI`)  if you're running this script from Crostini.
 > * **Using the CLI argument installs a minimal CLI (no desktop!) environment on the USB.** If you would like to install a desktop, you can use `gnome`, `kde`, `minimal`, `deepin`, `budgie`, `xfce`, `lxqt`, `mate` or `openbox` instead of `cli`.
-> * You can replace `ubuntu` with `arch` (you can only use `cli`) or `debian` (all desktops are supported)
+> * You can replace `ubuntu` with `arch`, `fedora` (you can only use `cli`) or `debian` (all desktops are supported)
 > * Ubuntu supports custom versions. If you want to install Ubuntu 21.10 instead of the default Ubuntu 22.04, just run: `bash setup.sh cli ubuntu impish-21.10`, where `impish` is the codename and `21.10` is the version.
+> * Fedora also supports custom versions. Just add the desired version number at the end of `setup.sh` command: `bash setup.sh cli fedora 36`.
 > * You can remove the `FEATURES=ISO` to use the classic way which directly writes to a USB.
 
 1. Done! Flash the IMG file to a USB using something like Etcher.
