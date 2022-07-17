@@ -27,7 +27,7 @@ function extractRootfs {
 			mkdir fedora
 			sudo tar xvpf $DISTRO_ROOTFS -C fedora
 			# This will look for layer.tar file inside whatever hashed directory name was on the tar package and copy it.
-			find fedora -name layer.tar -exec echo cp {} rootfs.tar \;
+			find fedora -name layer.tar -exec cp {} rootfs.tar \;
 			DISTRO_ROOTFS_ABSOLUTE=$(readlink -f rootfs.tar)
 			cd $MNT
 			sudo tar --wildcards -xvpf "$DISTRO_ROOTFS_ABSOLUTE" "./*"
