@@ -5,8 +5,9 @@
 
 <br>
 
->🎉 Announcement:  
-> Crostini support has just been added and [headphone jack/mic support is on the horizon](https://github.com/cb-linux/breath/discussions/190)
+>🎉 OMGUbuntu article: https://www.omgubuntu.co.uk/2022/07/i-used-breath-on-my-acer-chromebook-cp713
+<br><br>
+I couldn't have done this without the help of the community and all of my users 💖
 
 ## Supported Devices
 
