@@ -1,0 +1,4 @@
+/etc/acpi/events/headphone
+/etc/acpi/events/microphone
+/etc/acpi/headphone.sh
+/etc/modprobe.d/snd-hda-intel.conf

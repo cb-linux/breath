@@ -1,0 +1,15 @@
+#!/bin/bash
+
+# Ask to make the Search key a Caps Lock key
+echo -e "$(tput setaf 114; tput bold)Would you like to make the Search Key a Caps Lock key?$(tput sgr0)"
+read -r BREATH_CAPSLOCK
+export 
+
+
+sudo cp -v /usr/share/breath-base/xkb/pc /usr/share/X11/xkb/symbols/pc
+
+if [[ $BREATH_CAPSLOCK =~ ^[Yy]$ ]]; then
+  sudo cp -v /usr/share/breath-base/xkb/evdev /usr/share/X11/xkb/keycodes/evdev
+fi
+
+exit 0

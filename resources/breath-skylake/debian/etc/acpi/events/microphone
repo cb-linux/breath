@@ -1,0 +1,2 @@
+event=jack/microphone
+action=/etc/acpi/headphone.sh "%e"

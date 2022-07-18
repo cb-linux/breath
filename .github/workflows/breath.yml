@@ -1,7 +1,8 @@
-name: 📦 Kernel Delivery System
+name: 📦 Breath Delivery System
 on:
   push:
     paths:
+      - "resources/*"
       - "kernel/*"
       - "**.conf"
       - ".github/workflows/*.yml"
@@ -24,30 +25,30 @@ jobs:
       - name: Generate release tag
         id: tag
         run: |
-          echo "::set-output name=release_tag::KernelDeliverySystem$(date +"%Y.%m.%d_%H-%M")"
+          echo "::set-output name=release_tag::BreathDeliverySystem$(date +"%Y.%m.%d_%H-%M")"
+      - name: Create output folder
+        run: mkdir -v output
+      - name: Building breath-base
+        run: dpkg-deb -Z gzip -b resources/breath-base/debian output/breath-base.deb
+      - name: Building breath-skylake
+        run: dpkg-deb -Z gzip -b resources/breath-skylake/debian output/breath-skylake.deb
       - name: Building the standard (Release 101) Kernel
         run: cd kernel; bash build.sh chromeos-5.10;
       - name: Building the legacy SKL/KBL Kernel
         run: cd kernel; bash build.sh alt-chromeos-5.10;
-      # - name: Upload Artifacts
-      #   uses: actions/upload-artifact@v3
-      #   with:
-      #     name: assets-for-download
-      #     path: |
-      #       kernel/bzImage
-      #       kernel/modules*
       - name: Release kernel and bzImage
         uses: softprops/action-gh-release@v1
         with:
           tag_name: ${{ steps.tag.outputs.release_tag }}
-          name: 📦 Kernel Rebuild - ${{ github.event.head_commit.message }}
+          name: 📦 Breath Rebuild - ${{ github.event.head_commit.message }}
           body: |
             🛈 General Changes since the last release
             ```
             ${{ env.DIFF }}
             ```
 
-            🚚 Kernel Delivery System - Triggered by ${{ github.sha }} at ${{ github.event.repository.updated_at }}
+            🚚 Breath Delivery System - Triggered by ${{ github.sha }} at ${{ github.event.repository.updated_at }}
           files: |
             kernel/bzImage*
             kernel/modules*
+            output/*

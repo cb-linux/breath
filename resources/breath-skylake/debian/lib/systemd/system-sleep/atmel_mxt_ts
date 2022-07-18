@@ -1,0 +1,19 @@
+#!/bin/bash
+
+MODULE=atmel_mxt_ts
+LOADED="/sys/module/${MODULE}"
+SUSPENDED="/run/${MODULE}.suspended"
+
+case $1/$2 in
+    pre/*)
+        [[ -e "${LOADED}" ]] || exit 0
+        modprobe -r "${MODULE}"
+        touch "${SUSPENDED}"
+        ;;
+    post/*)
+        [[ -e "${SUSPENDED}" ]] || exit 0
+        modprobe "${MODULE}"
+        rm "${SUSPENDED}"
+        ;;
+esac
+exit 0

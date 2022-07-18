@@ -1,0 +1,11 @@
+Package: breath-skylake
+Version: 0.1-1607221104
+Architecture: all
+Maintainer: RunCros <lauret.andretheo@gmail.com>
+Installed-Size: 98
+Replaces: pipewire-bin, libpulse0, pulseaudio, linux-firmware, wireless-regdb, firmware-misc-nonfree, firmware-iwlwifi
+Depends: breath-base, pulseaudio, pipewire
+Conflicts: wireplumber, apulse, breath-apollolake, breath-baytrail, breath-braswell, breath-broadwell, breath-haswell, breath-kabylake, breath-samus, breath-sandyivy
+Section: admin
+Priority: required
+Description: This package contains Skylake-specific files for Breath

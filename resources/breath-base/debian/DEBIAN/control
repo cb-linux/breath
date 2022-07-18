@@ -1,0 +1,8 @@
+Package: breath-base
+Version: 0.1-1707220015
+Architecture: all
+Maintainer: RunCros <lauret.andretheo@gmail.com>
+Installed-Size: 98
+Section: admin
+Priority: required
+Description: This package contains files for Breath

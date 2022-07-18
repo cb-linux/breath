@@ -1,0 +1,35 @@
+#!/bin/bash
+
+# Check if user has the newer UCM directory layout
+ls /usr/share/alsa/ucm2/conf.d && {
+  ls /usr/share/alsa/ucm2/conf.d/sklnau8825max && {
+    sudo rm -rv /usr/share/alsa/ucm2/conf.d/sklnau8825max
+  }
+  sudo mv -v /usr/share/alsa/ucm2/sklnau8825max /usr/share/alsa/ucm2/conf.d
+}
+
+# rebuild initramfs due to /etc/modprobe.d/* changes in re: sdhci
+update-initramfs -u -k all
+
+service acpid restart
+
+# If sound card is found by kernel, reset system ALSA config.
+# This will only work if an appropriate kernel version is in place.
+CARD0_ID_FILE="/proc/asound/card0/id"
+
+if [ -r "$CARD0_ID_FILE" ]; then
+  HOME=/tmp alsaucm -c $(cat $CARD0_ID_FILE) reset
+fi
+
+# Reset all user sound settings and clear pulseaudio tdb cache, to
+# allow in-place upgrading, and "sudo apt install --reinstall" to fix
+# system audio.
+set +e
+rm -f /var/lib/alsa/asound.state
+rm -rf /home/*/.config/pulse
+killall pulseaudio || true
+
+# Update grub
+sudo update-grub
+
+exit 0
