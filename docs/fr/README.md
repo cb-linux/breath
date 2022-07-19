@@ -5,8 +5,10 @@
 
 <br>
 
->🎉 Annonce :
-> La prise en charge de Crostini vient d'être ajoutée et [la prise en charge de la prise casque/micro est à l'horizon](https://github.com/cb-linux/breath/discussions/190)
+> 🎉 Merci à OMGUbuntu ! Pour cette article: https://www.omgubuntu.co.uk/2022/07/i-used-breath-on-my-acer-chromebook-cp713
+
+<br><br>
+Nous n'aurions pas pu le faire sans l'aide de la communauté et de tous nos utilisateurs 💖.
 
 ## Périphériques compatibles
 
@@ -19,14 +21,20 @@
 > ### Votre Chromebook ne figure pas dans la liste ?
 > C'est tout à fait bien ! Tant qu'il est plus récent que 2017, la plupart des pilotes seront déjà pris en charge, sauf l'audio. ** S'il est plus récent que 2019, il est probable que l'audio soit déjà pris en charge **. Si vous souhaitez que l'audio fonctionne, ouvrez une issue Github avec votre modèle de Chromebook et publiez la sortie des commandes `lsmod` et `find /usr/share/alsa`.
 
-**Cartes-mère prises en charge**: `["nami", "octopus", "volteer", "coral", "reef", "hatch", "puff"]`
+**Cartes-mère prises en charge**: `["asuka", "caroline", "cave", "chell", "glados", "kunimitsu", "lars", "sentry" "nami", "octopus", "volteer", "coral", "reef", "hatch", "puff"]`
 
 * IdeaPad Flex 5i Chromebook (13", 5)
 * IdeaPad Flex 5i Chromebook
 * HP Chromebook x360 14b / HP Chromebook x360 14a
 * Acer Chromebook 712
+* HP Chromebook 13 G1
+* Thinkpad 13 Chromebook
+* Chromebook 14 for work (CP5-471)
+* ASUS Chromebook Flip C302
+* Dell Chromebook 13 3380
 * Lenovo Thinkpad 11e Chromebook / Lenovo Thinkpad Yoga 11e Chromebook
 * HP Chromebook x360 11 G1 EE
+* Samsung Chromebook Pro
 * Acer Chromebook  Spin 11 R751T
 * Chromebook 15 CB515-1HT/1H
 * Acer Chromebook 11 (C732, C732T, C732L & C732LT )
@@ -41,13 +49,11 @@
 * ASUS Chromebook C423
 * ASUS Chromebook C523
 * Acer Chromebook 514
-* Acer Chromebook 13 / Spin 13
-* Dell Inspiron 14 2-in-1 Model 7486
-* Yoga Chromebook C630
 * PCmerge Chromebook AL116
 * ASUS Chromebook C403
 * Acer Chromebook 311
 * Acer Chromebook Spin 511
+* Lenovo 500e Chromebook 2nd Gen
 * Lenovo 100e Chromebook 2nd Gen (Intel)
 * Lenovo 300e Chromebook 2nd Gen (Intel)
 * Acer Chromebook Spin 512(R851TN)
@@ -58,7 +64,6 @@
 * HP Chromebook x360 11 G2 EE
 * Lenovo Chromebook C340-11
 * Lenovo Chromebook S340-14
-* Lenovo Chromebook C340-15
 * Acer Chromebook Spin 311 (CP311-2H)
 * Acer Chromebook 314 (CB314-1H/1HT)
 * Acer Chromebook 315 (CB315-3H/3HT)
@@ -72,6 +77,7 @@
 * HP Chromebook 14 G6
 * HP Chromebook 14a
 * Acer Chromebook 314 (C933L/LT)
+* Ideapad 3 Chromebook
 * HP Chromebox G3
 * ASUS Chromebox 4
 * Acer Chromebox CXI4
