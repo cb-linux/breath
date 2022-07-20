@@ -3,7 +3,6 @@ on:
   push:
     paths:
       - "kernel/*"
-      - "**.conf"
       - ".github/workflows/*.yml"
 
 jobs:
@@ -29,13 +28,6 @@ jobs:
         run: cd kernel; bash build.sh chromeos-5.10;
       - name: Building the legacy SKL/KBL Kernel
         run: cd kernel; bash build.sh alt-chromeos-5.10;
-      # - name: Upload Artifacts
-      #   uses: actions/upload-artifact@v3
-      #   with:
-      #     name: assets-for-download
-      #     path: |
-      #       kernel/bzImage
-      #       kernel/modules*
       - name: Release kernel and bzImage
         uses: softprops/action-gh-release@v1
         with:
