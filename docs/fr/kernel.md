@@ -33,7 +33,7 @@ cd kernel
 
 2. Téléchargez le fichier `.config` du noyau et mettez-le à jour en exécutant :
 ```bash
-wget https://raw.githubusercontent.com/cb-linux/breath/main/kernel.conf -O .config
+wget https://raw.githubusercontent.com/cb-linux/kernel/main/kernel.conf -O .config
 make olddefconfig
 ```
 
