@@ -19,12 +19,12 @@ export MNT="/mnt"
 export ORIGINAL_DIR=$(pwd)
 
 # Crostini already has folders in /mnt
-if [[ $FEATURES == *"CROSTINI"* ]]; then
+#if [[ $FEATURES == *"CROSTINI"* ]]; then
 
    sudo mkdir /mnt/breath
    export MNT="/mnt/breath"
 
-fi
+#fi
 
 # Import a seperate postinstall function depending on the distro
 # shellcheck source=utils/ubuntu_postinstall.sh
