@@ -15,16 +15,10 @@ source utils/system.sh    # Host OS Abstraction
 export DESKTOP=$1
 export DISTRO=$2
 export DISTRO_VERSION=$3
-export MNT="/mnt"
 export ORIGINAL_DIR=$(pwd)
 
-# Crostini already has folders in /mnt
-#if [[ $FEATURES == *"CROSTINI"* ]]; then
-
-   sudo mkdir /mnt/breath
-   export MNT="/mnt/breath"
-
-#fi
+sudo mkdir /mnt/breath
+export MNT="/mnt/breath"
 
 # Import a seperate postinstall function depending on the distro
 # shellcheck source=utils/ubuntu_postinstall.sh
