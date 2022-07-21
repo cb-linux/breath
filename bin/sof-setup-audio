@@ -135,7 +135,17 @@ sudo rsync tools-v2.1.1/*  /usr/local/bin
 cd ..; rm -rf sof-bin; cd # Cleanup
 
 # SOF doesn't need SST/HDA drivers, especially on Chromebooks where they conflict
-printf 'blacklist snd_hda_intel\nblacklist snd_soc_skl' | sudo tee /etc/modprobe.d/alsa-disable-sst.conf
+# The rest of this fixes dependency ordering and prevents the infamous
+# "codec #2 probe error, ret: -2" SOF error
+sudo tee /etc/modprobe.d/alsa-breath.conf <<EOF
+blacklist snd_hda_intel
+blacklist snd_soc_skl
+softdep snd_sof_pci_intel_icl pre: snd_hda_codec_hdmi
+softdep snd_sof_pci_intel_cnl pre: snd_hda_codec_hdmi
+softdep snd_sof_pci_intel_apl pre: snd_hda_codec_hdmi
+softdep snd_sof_pci_intel_tgl pre: snd_hda_codec_hdmi
+softdep snd_sof_pci_intel_tng pre: snd_hda_codec_hdmi
+EOF
 
 sync
 echo 'SOF enabled successfully! Reboot to enable audio'
