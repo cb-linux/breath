@@ -51,3 +51,5 @@ jobs:
           files: |
             kernel/bzImage*
             kernel/modules*
+            kernel/System.map-breath*
+            kernel/config-breath*
