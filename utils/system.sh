@@ -75,12 +75,7 @@ function installDependencies () {
     # NOTE: "$*" is used to call all function arguments
 
     # Linux
-    if [[ $OS == Linux]]; then
-
-        # Identify the distro if it is undefined
-        if [[ -z $DIST ]]; then
-            whichOperatingSystem
-        fi
+    if [[ $OS == Linux ]]; then
 
         echo "Installing $*"
 
@@ -173,3 +168,24 @@ function installDependencies () {
     fi
 
 }
+
+# OS  Abstraction that creates and exports $MNT(breath mountpoint)
+function createMountPoint () {
+    # Linux
+    if [[ $OS == Linux ]]; then
+        sudo mkdir /mnt/breath
+        export MNT="/mnt/breath"
+
+    elif [[ $OS == Darwin ]]; then
+        # sudo mkdir /Volumes/breath
+        export MNT="/mnt/breath"
+    
+    fi
+
+}
+
+
+# Identify the operating system when this script is sourced
+if [[ -z $OS ]]; then
+    whichOperatingSystem
+fi

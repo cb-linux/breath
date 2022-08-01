@@ -17,8 +17,8 @@ export DISTRO=$2
 export DISTRO_VERSION=$3
 export ORIGINAL_DIR=$(pwd)
 
-sudo mkdir /mnt/breath
-export MNT="/mnt/breath"
+createMountPoint
+exit
 
 # Import a seperate postinstall function depending on the distro
 # shellcheck source=utils/ubuntu_postinstall.sh
