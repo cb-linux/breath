@@ -5,8 +5,45 @@
 DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 source ${DIR}/functions.sh
 
-# Determine host system 
+# Determines and prepares host system for installation
 function whichOperatingSystem {
+
+    # Install os specific package manager if needed
+    #NOTE: Scope limited to parent function
+    function installPackageManager() (
+
+        # Linux
+        if [[ $OS == Linux ]]; then
+
+            # Arch requires yay
+            if [[ $DIST == Arch ]]; then
+
+                # Ensure yay is installed
+                if ! command -v yay &>/dev/null; then
+                    :
+                    # Install yay
+                    #TODO: figure out root workaround
+                    pacman -S --needed git base-devel && git clone https://aur.archlinux.org/yay.git && cd yay && makepkg -si
+                
+                fi
+            
+            fi
+
+        # Darwin requires brew
+        elif [[ $OS == Darwin ]]; then
+
+            # Ensure brew is installed
+            if ! command -v brew &>/dev/null; then
+                #TODO: figure out root workaround
+                printq "Installing brew..."
+                /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+                brew install coreutils findutils
+
+            fi
+
+        fi
+
+    )
 
     OS=$(uname -s)
 
@@ -33,12 +70,15 @@ function whichOperatingSystem {
 
     # Darwin(MacOS)
     elif [[ $OS == Darwin ]]; then
-        : # Allows to pass the unsupported system trap below
+        : # Pass the os specific trap below
 
     else
         printerr "$OS is not supported, exiting!"
         exit
     fi
+
+    # Prepare $OS for the script
+    installPackageManager
 
 }
 
@@ -89,41 +129,35 @@ function installDependencies () {
 
         Arch)
             # Install dependencies on a Arch host system
-            if [[ -f /usr/bin/yay ]]; then
-                # Install dependencies if yay is found
-                for var in "$@"
-                do
-                    # Replace package names relevant to distro and any packages already installed
-                    case $var in
+            for var in "$@"
+            do
+                # Replace package names relevant to distro and any packages already installed
+                case $var in
 
-                        # vboot-utils
-                        vboot-kernel-utils)
-                            if checkDependency vboot-utils; then var=""; else var=vboot-utils; fi
-                            ;;
+                    # vboot-utils
+                    vboot-kernel-utils)
+                        if checkDependency vboot-utils; then var=""; else var=vboot-utils; fi
+                        ;;
 
-                        # growpart
-                        cloud-guest-utils)
-                            if checkDependency growpartfs; then var=""; else var=growpartfs; fi
-                            ;;
+                    # growpart
+                    cloud-guest-utils)
+                        if checkDependency growpartfs; then var=""; else var=growpartfs; fi
+                        ;;
 
-                        # cgpt
-                        cgpt)
-                            unset var; # Included in vboot-utils
-                            ;;
+                    # cgpt
+                    cgpt)
+                        unset var; # Included in vboot-utils
+                        ;;
 
-                        # Skip any packages already installed that weren't accounted for
-                        *)
-                            if checkDependency $var; then var=""; else var=$var; fi
-                            ;;
+                    # Skip any packages already installed that weren't accounted for
+                    *)
+                        if checkDependency $var; then var=""; else var=$var; fi
+                        ;;
 
-                    esac
-                    yay -S --noconfirm $var
-                done
-            else
-                # Yay not istalled, exit
-                printerr "Please install yay(https://aur.archlinux.org/yay.git) to continue installation, exiting!"
-                exit
-            fi
+                esac
+                yay -S --noconfirm $var
+
+            done
             ;;
 
         Fedora)
@@ -162,8 +196,10 @@ function installDependencies () {
     
     # Darwin
     elif [[ $OS == Darwin ]]; then
-        echo $OS 
-        exit
+        for var in "$@"
+        do
+            brew install $var
+        done
     
     fi
 
@@ -183,7 +219,6 @@ function createMountPoint () {
     fi
 
 }
-
 
 # Identify the operating system when this script is sourced
 if [[ -z $OS ]]; then
