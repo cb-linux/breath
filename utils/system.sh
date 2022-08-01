@@ -21,15 +21,19 @@ function whichOperatingSystem {
         elif [[ -f /etc/arch-release ]]; then
             DIST="Arch"
 
-	# Fedora
+	    # Fedora
         elif [[ -f /etc/fedora-release ]]; then
-	    DIST="Fedora"
+	        DIST="Fedora"
 
         # Other
         else
             printerr "This distribution is not supported, exiting!"
             exit
         fi
+
+    # Darwin(MacOS)
+    elif [[ $OS == Darwin ]]; then
+        : # Allows to pass the unsupported system trap below
 
     else
         printerr "$OS is not supported, exiting!"
@@ -60,6 +64,8 @@ function checkDependency() {
         ;;
 
     esac
+
+    #TODO: Darwin checkdeps for brew
     
 }
 
@@ -68,92 +74,102 @@ function installDependencies () {
 
     # NOTE: "$*" is used to call all function arguments
 
-    # Identify the distro if it is undefined
-    if [[ -z $DIST ]]; then
-        whichOperatingSystem
-    fi
+    # Linux
+    if [[ $OS == Linux]]; then
 
-    echo "Installing $*"
+        # Identify the distro if it is undefined
+        if [[ -z $DIST ]]; then
+            whichOperatingSystem
+        fi
 
-    # Download dependencies based on distribution
-    case $DIST in
+        echo "Installing $*"
 
-    Debian)
-        # Install dependencies on a Debian host system
-        sudo apt install -y "$@"
-        ;;
+        # Download dependencies based on distribution
+        case $DIST in
 
-    Arch)
-        # Install dependencies on a Arch host system
-        if [[ -f /usr/bin/yay ]]; then
-            # Install dependencies if yay is found
+        Debian)
+            # Install dependencies on a Debian host system
+            sudo apt install -y "$@"
+            ;;
+
+        Arch)
+            # Install dependencies on a Arch host system
+            if [[ -f /usr/bin/yay ]]; then
+                # Install dependencies if yay is found
+                for var in "$@"
+                do
+                    # Replace package names relevant to distro and any packages already installed
+                    case $var in
+
+                        # vboot-utils
+                        vboot-kernel-utils)
+                            if checkDependency vboot-utils; then var=""; else var=vboot-utils; fi
+                            ;;
+
+                        # growpart
+                        cloud-guest-utils)
+                            if checkDependency growpartfs; then var=""; else var=growpartfs; fi
+                            ;;
+
+                        # cgpt
+                        cgpt)
+                            unset var; # Included in vboot-utils
+                            ;;
+
+                        # Skip any packages already installed that weren't accounted for
+                        *)
+                            if checkDependency $var; then var=""; else var=$var; fi
+                            ;;
+
+                    esac
+                    yay -S --noconfirm $var
+                done
+            else
+                # Yay not istalled, exit
+                printerr "Please install yay(https://aur.archlinux.org/yay.git) to continue installation, exiting!"
+                exit
+            fi
+            ;;
+
+        Fedora)
+            # Install dependencies on a Fedora host system
             for var in "$@"
             do
-                # Replace package names relevant to distro and any packages already installed
+                # Replace package names relevant to distro
                 case $var in
 
                     # vboot-utils
                     vboot-kernel-utils)
-                        if checkDependency vboot-utils; then var=""; else var=vboot-utils; fi
+                        var=vboot-utils;
                         ;;
 
                     # growpart
                     cloud-guest-utils)
-                        if checkDependency growpartfs; then var=""; else var=growpartfs; fi
+                        var=cloud-utils-growpart;
                         ;;
 
                     # cgpt
                     cgpt)
                         unset var; # Included in vboot-utils
                         ;;
-
-                    # Skip any packages already installed that weren't accounted for
-                    *)
-                        if checkDependency $var; then var=""; else var=$var; fi
-                        ;;
-
+            
                 esac
-                yay -S --noconfirm $var
+                # dnf doesn't like $FW_PACKAGE, do nothing on null $var
+                if [[ -z "$var" ]]; then
+                    :
+                else
+                    sudo dnf install $var --assumeyes
+                fi
             done
-        else
-            # Yay not istalled, exit
-            printerr "Please install yay(https://aur.archlinux.org/yay.git) to continue installation, exiting!"
-            exit
-        fi
-        ;;
+            ;;
 
-    Fedora)
-        # Install dependencies on a Fedora host system
-        for var in "$@"
-        do
-            # Replace package names relevant to distro
-            case $var in
-
-                # vboot-utils
-                vboot-kernel-utils)
-                    var=vboot-utils;
-                    ;;
-
-                # growpart
-                cloud-guest-utils)
-                    var=cloud-utils-growpart;
-                    ;;
-
-                # cgpt
-                cgpt)
-                    unset var; # Included in vboot-utils
-                    ;;
-        
-            esac
-            # dnf doesn't like $FW_PACKAGE, do nothing on null $var
-            if [[ -z "$var" ]]; then
-                :
-            else
-                sudo dnf install $var --assumeyes
-            fi
-        done
-        ;;
-
-    esac
+        esac
+    
+    # Darwin
+    elif [[ $OS == Darwin ]]; then
+        echo $OS 
+        exit
+    
+    fi
 
 }
