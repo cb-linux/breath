@@ -17,7 +17,11 @@ export DISTRO=$2
 export DISTRO_VERSION=$3
 export ORIGINAL_DIR=$(pwd)
 
-sudo mkdir /mnt/breath
+sudo mkdir -p /mnt/breath
+ls /mnt/breath && {
+  sudo umount /mnt/breath || true
+  sudo rm -rf /mnt/breath/*
+}
 export MNT="/mnt/breath"
 
 # Import a seperate postinstall function depending on the distro
@@ -40,7 +44,6 @@ done
 # Show title message - I told you it was important
 toilet -f mono12 -F crop   "Breath"
 toilet -f term   -F border "Made by MilkyDeveloper"
-echo " $FEATURES"
 
 if [[ $FEATURES == *"KEYMAP"* ]]; then
   # Ask to make the Search key a Caps Lock key

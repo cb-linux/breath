@@ -33,8 +33,12 @@ jobs:
           echo "::set-output name=release_tag::KernelDeliverySystem$(date +"%Y.%m.%d_%H-%M")"
       - name: Building the standard (Release 101) Kernel
         run: cd kernel; bash build.sh chromeos-5.10;
+
       - name: Building the legacy SKL/KBL Kernel
-        run: cd kernel; bash build.sh alt-chromeos-5.10;
+        # We're not building the below for now because of Google's kernel clusterfuck
+        # Looks like the 5.10.70 commit was deleted and now 5.10.54 is used, which doesn't work.
+        run: wget https://github.com/cb-linux/breath/releases/download/KernelDeliverySystem2022.06.24_14-10/{bzImage.alt,modules.alt.tar.xz};
+
       # - name: Upload Artifacts
       #   uses: actions/upload-artifact@v3
       #   with:
@@ -48,6 +52,8 @@ jobs:
           tag_name: ${{ steps.tag.outputs.release_tag }}
           name: 📦 Kernel Rebuild - ${{ github.event.head_commit.message }}
           body: |
+            ⚠ For SKL and KBL users - an old release of the 5.10.70 kernel is being distributed until I can find a backup of the source.
+
             🛈 General Changes since the last release
             ```
             ${{ env.DIFF }}

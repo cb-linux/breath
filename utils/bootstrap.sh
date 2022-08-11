@@ -18,12 +18,12 @@ function bootstrapFiles {
   installDependencies sudo vboot-kernel-utils arch-install-scripts git parted wget cgpt $FW_PACKAGE
 
 if [[ $FEATURES == *"LOCAL_KERNEL"* ]]; then
+  printq "Copying kernel files"
   cp $ORIGINAL_DIR/kernel/bzImage .
   cp $ORIGINAL_DIR/kernel/modules.tar.xz .
   cp $ORIGINAL_DIR/kernel/kernel.flags .
-  printq "Copied kernel files from breath/kernel"
 else
-  printq "Downloading kernel files from cb-lines/breath"
+  printq "Downloading kernel files"
   # Download the kernel bzImage and the kernel modules (wget)
   {
   wget https://github.com/cb-linux/breath/releases/latest/download/bzImage -N -q --show-progress
