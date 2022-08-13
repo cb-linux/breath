@@ -57,22 +57,15 @@ function extractModules {
 
 }
 
-# Parse the arguments of the kernel command line to get the root device
-set -- $(cat /proc/cmdline)
-for x in "$@"; do
-    case "$x" in
-        root=*)
-        export USB_ROOTFS="${x#root=}"
-        ;;
-    esac
-done
+# Parse mounted devices to get the root device
+export USB_ROOTFS=$(mount | sed -n 's|^\(.*\) on / .*|\1|p')
+export USB=$(lsblk -pno pkname $USB_ROOTFS)
+printq "Using $USB to update the kernel and its modules"
 
-# We can get the overall block device of the USB from the root partition
-USB=$(lsblk -pno pkname $USB_ROOTFS)
-if [[ $USB == *"sd"* ]]; then
-  USB_KERNEL=${USB}1
+if [[ $USB == *"/dev/sd"* ]]; then
+  export USB_KERNEL="${USB}1"
 else
-  USB_KERNEL=${USB}p1
+  export USB_KERNEL="${USB}p1"
 fi
 
 printq "Using $USB to update the kernel and its modules"
@@ -80,8 +73,9 @@ printq "Using $USB to update the kernel and its modules"
 cd ~/linux-build || { mkdir ~/linux-build; cd ~/linux-build; }
 
 # Download kernel commandline
-bash <(curl -s https://raw.githubusercontent.com/cb-linux/breath/main/kernel.root.flags.sh) > kernel.flags
-echo -n ' snd-intel-dspcfg.dsp_driver=3 snd_sof_pci.fw_path="intel/sof"'   >> kernel.flags
+export USB_ROOTFS=$(sudo blkid -o value -s PARTUUID $USB_ROOTFS)
+bash <(curl -s https://raw.githubusercontent.com/cb-linux/breath/main/kernel.flags.sh) > kernel.flags
+echo -n ' snd-intel-dspcfg.dsp_driver=3 snd_sof_pci.fw_path="intel/sof"' >> kernel.flags
 
 # Download kernel and modules
 if [[ -n "$DIR" ]]; then

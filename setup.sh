@@ -116,6 +116,11 @@ partitionUSB
 # (1) Write the kernel to a 64mb Partition
 # (2) Write a Linux distro rootfs to a partition filling the rest of the storage
 
+# We used to do this in bootstrapFiles,
+# but we now need the UUID, only available after partitioning,
+# to allow booting on all platform's SD Card slot
+postBootstrapFiles
+
 # Flash the signed kernel to the kernel partition
 sudo dd if=bzImage.signed of=${USB1}
 

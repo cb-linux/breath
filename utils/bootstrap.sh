@@ -9,7 +9,7 @@ function bootstrapFiles {
     "There are files in ${MNT}! Please clear this directory of any valuable information!"; exit
   }
 
-  # Make a directory and CD into it
+  # Make the build directory and CD into it
   mkdir -p ~/linux-build
   cd ~/linux-build
 
@@ -17,20 +17,18 @@ function bootstrapFiles {
   printq "Installing Dependencies"
   installDependencies sudo vboot-kernel-utils arch-install-scripts git parted wget cgpt $FW_PACKAGE
 
-if [[ $FEATURES == *"LOCAL_KERNEL"* ]]; then
-  printq "Copying kernel files"
-  cp $ORIGINAL_DIR/kernel/bzImage .
-  cp $ORIGINAL_DIR/kernel/modules.tar.xz .
-  cp $ORIGINAL_DIR/kernel/kernel.flags .
-else
-  printq "Downloading kernel files"
-  # Download the kernel bzImage and the kernel modules (wget)
-  {
-  wget https://github.com/cb-linux/breath/releases/latest/download/bzImage -N -q --show-progress
-  wget https://github.com/cb-linux/breath/releases/latest/download/modules.tar.xz -N -q --show-progress
-  wget https://raw.githubusercontent.com/cb-linux/kernel/main/kernel.flags -N -q --show-progress
-  } || true # Wget has the wrong exit status with no clobber
-fi
+  if [[ $FEATURES == *"LOCAL_KERNEL"* ]]; then
+    printq "Copying kernel files"
+    cp $ORIGINAL_DIR/kernel/bzImage .
+    cp $ORIGINAL_DIR/kernel/modules.tar.xz .
+  else
+    printq "Downloading kernel files"
+    # Download the kernel bzImage and the kernel modules (wget)
+    {
+    wget https://github.com/cb-linux/breath/releases/latest/download/bzImage -N -q --show-progress
+    wget https://github.com/cb-linux/breath/releases/latest/download/modules.tar.xz -N -q --show-progress
+    } || true # Wget has the wrong exit status with no clobber
+  fi
 
   # READ: Distro dependent step
   # Download the root file system based on the distribution
@@ -104,6 +102,15 @@ fi
       exit
       ;;
   esac
+
+}
+
+function postBootstrapFiles {
+
+  # Set up the kernel.flags depending on the UUID
+  # shellcheck disable=SC2034
+  export USB_ROOTFS=$(sudo blkid -o value -s PARTUUID $USB2)
+  bash ${ORIGINAL_DIR}/kernel.flags.sh > kernel.flags
 
   # Sign the kernel
   # After this, the kernel can no longer be booted on non-depthcharge devices

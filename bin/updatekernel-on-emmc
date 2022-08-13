@@ -56,8 +56,10 @@ fi
 
 cd ~/linux-build &>/dev/null || { mkdir ~/linux-build; cd ~/linux-build; }
 
-# Download kernel commandline
-bash <(curl -s https://raw.githubusercontent.com/cb-linux/breath/main/kernel.root.flags.sh) > kernel.flags
+# Set up the kernel.flags depending on the UUID
+# shellcheck disable=SC2034
+export USB_ROOTFS=$(sudo blkid -o value -s PARTUUID $USB_ROOTFS)
+bash <(curl -s https://raw.githubusercontent.com/cb-linux/breath/main/kernel.flags.sh) > kernel.flags
 
 # Download kernel and modules
 if [ -n "$VERSION" ]; then

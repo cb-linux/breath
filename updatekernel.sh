@@ -18,14 +18,15 @@ sudo mount ${USB}2 /mnt
 
 cd ~/linux-build || { mkdir ~/linux-build; cd ~/linux-build; }
 
-# Download kernel commandline
-wget https://raw.githubusercontent.com/cb-linux/kernel/main/kernel.flags -O kernel.flags -q --show-progress
+# Set up the kernel.flags depending on the UUID
+export USB_ROOTFS=$(sudo blkid -o value -s PARTUUID ${USB}2)
+bash <(curl -s https://raw.githubusercontent.com/cb-linux/breath/main/kernel.flags.sh) > kernel.flags
 
 # Download kernel and modules
 if [[ -n "$DIR" ]]; then
     echo "Files supplied"
-    cp ${DIR}/bzImage .
-    cp ${DIR}/modules.tar.xz .
+    cp ${DIR}/bzImage.alt bzImage
+    cp ${DIR}/modules.alt.tar.xz modules.tar.xz
 elif [[ $VERSION == "ALT" ]]; then
     wget https://github.com/cb-linux/breath/releases/latest/download/bzImage.alt -N -q --show-progress
 		ln -s bzImage.alt bzImage
