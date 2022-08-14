@@ -6,7 +6,7 @@ function postinstall {
     sudo cp --remove-destination /etc/resolv.conf ${MNT}/etc/resolv.conf
 
     # We're installing the below packages for a cli environment and all desktops
-    BASECMD="apt install -y network-manager tasksel software-properties-common adduser sudo firmware-linux-free firmware-linux-nonfree firmware-iwlwifi iw"
+    BASECMD="apt install -y network-manager tasksel software-properties-common adduser sudo firmware-linux-free firmware-linux-nonfree firmware-iwlwifi iw curl wget git rsync"
 
     # We need to load the iwlmvm module at startup for WiFi
     sudo tee -a ${MNT}/etc/modules-load.d/modules.conf > /dev/null <<EOT
