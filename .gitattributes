@@ -1,1 +1,3 @@
 * text eol=auto
+*.png binary
+*.gif binary
