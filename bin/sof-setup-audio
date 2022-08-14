@@ -7,12 +7,9 @@ echo "Installing Audio..."
 
 # With SOF, configuration becomes much easier
 # Everything is pretty much universal, like HD-Audio
-case $SOUNDCARD in
-    "rtk") SND_MODULES="snd_soc_max98357a snd_soc_rt5682"
-    ;;
-    *) SND_MODULES="snd_soc_max98357a snd_soc_da7219"
-    ;;
-esac
+# The kernel ignores modules extraneous modules,
+# so there shouldn't be any problems loading all of them
+SND_MODULES="snd_soc_max98357a snd_soc_da7219 snd_soc_rt5682 snd_soc_rt1015 snd_soc_rt1011" 
 
 if [[ -v ONLY_ALSA ]]; then
 
@@ -53,7 +50,7 @@ EOF
 fi
 
 # Add a systemd service to start sound
-# ${SND_MODULE} is expanded to the variable above
+# ${SND_MODULES} is expanded to the variable above
 sudo tee /etc/systemd/system/alsa-reload.service <<EOF
 [Unit]
 Description="Reload ALSA and set the correct UCM"
