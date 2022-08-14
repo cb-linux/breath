@@ -5,7 +5,8 @@ set -e
 
 [[ -n "$1" ]] && { export DIR=$1; }
 
-sudo add-apt-repository restricted
+sudo apt update -y
+sudo add-apt-repository restricted || true # Appears to work fine without this line on Debian
 sudo apt install vboot-kernel-utils cgpt gzip -y
 sudo apt install -y firmware-sof-signed || sudo apt-get -o Dpkg::Options::="--force-overwrite" install firmware-sof-signed
 
@@ -70,7 +71,10 @@ fi
 
 printq "Using $USB to update the kernel and its modules"
 
-cd ~/linux-build || { mkdir ~/linux-build; cd ~/linux-build; }
+if [[ ! -d ~/linux-build ]]; then
+  mkdir ~/linux-build
+fi
+cd ~/linux-build
 
 # Download kernel commandline
 export USB_ROOTFS=$(sudo blkid -o value -s PARTUUID $USB_ROOTFS)
