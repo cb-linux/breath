@@ -37,7 +37,7 @@ jobs:
       - name: Building the legacy SKL/KBL Kernel
         # We're not building the below for now because of Google's kernel clusterfuck
         # Looks like the 5.10.70 commit was deleted and now 5.10.54 is used, which doesn't work.
-        run: wget https://github.com/cb-linux/breath/releases/download/KernelDeliverySystem2022.06.24_14-10/{bzImage.alt,modules.alt.tar.xz};
+        run: cd kernel; wget https://github.com/cb-linux/breath/releases/download/KernelDeliverySystem2022.06.24_14-10/{bzImage.alt,modules.alt.tar.xz};
 
       # - name: Upload Artifacts
       #   uses: actions/upload-artifact@v3
