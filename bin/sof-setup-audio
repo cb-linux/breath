@@ -14,8 +14,6 @@ SND_MODULES="snd_soc_max98357a snd_soc_da7219 snd_soc_rt5682 snd_soc_rt1015 snd_
 if [[ -v ONLY_ALSA ]]; then
 
     # Remove PulseAudio
-    sudo apt purge -y pulseaudio
-    sudo apt purge -y pulseaudio*
     sudo apt install -y apulse alsa-* rsync
     sudo apt install -y firmware-sof-signed || sudo apt-get -o Dpkg::Options::="--force-overwrite" install firmware-sof-signed
 
@@ -47,7 +45,7 @@ pcm.softvol {
 }
 EOF
 
-fi
+    fi
 
 # Add a systemd service to start sound
 # ${SND_MODULES} is expanded to the variable above

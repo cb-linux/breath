@@ -28,13 +28,13 @@ if [[ -n "$DIR" ]]; then
     cp ${DIR}/bzImage.alt bzImage
     cp ${DIR}/modules.alt.tar.xz modules.tar.xz
 elif [[ $VERSION == "ALT" ]]; then
-    wget https://github.com/cb-linux/breath/releases/latest/download/bzImage.alt -N -q --show-progress
-		ln -s bzImage.alt bzImage
-    wget https://github.com/cb-linux/breath/releases/latest/download/modules.alt.tar.xz -N -q --show-progress
-		ln -s modules.alt.tar.xz modules.tar.xz
+    wget https://github.com/cb-linux/breath/releases/latest/download/bzImage.alt -q --show-progress
+    ln -s bzImage.alt bzImage
+    wget https://github.com/cb-linux/breath/releases/latest/download/modules.alt.tar.xz -q --show-progress
+    ln -s modules.alt.tar.xz modules.tar.xz
 else
-    wget https://github.com/cb-linux/breath/releases/latest/download/bzImage -N -q --show-progress
-    wget https://github.com/cb-linux/breath/releases/latest/download/modules.tar.xz -N -q --show-progress
+    wget https://github.com/cb-linux/breath/releases/latest/download/bzImage -q --show-progress
+    wget https://github.com/cb-linux/breath/releases/latest/download/modules.tar.xz -q --show-progress
 fi
 
 # Sign the kernel

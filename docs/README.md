@@ -11,86 +11,24 @@ We couldn't have done this without the help of the community and all of our user
 
 ## Supported Devices
 
-**All 64-bit Intel/AMD (x64) Chromebooks are supported**
+**All 64-bit Intel/AMD (x64) Chromebooks are supported with a bare-minimum of booting.**
 
-<details>
-<summary>Expand List of devices confirmed to support audio</summary>
-<br>
+For an exhaustive list of Chromebooks and their CPU Generations, [look here](https://wiki.mrchromebox.tech/Supported_Devices).
 
-> ### Is your Chromebook not on the list?
-> That's completely fine! As long as it's newer than 2017, most drivers will already be supported except audio. **If it is newer than 2019, chances are that audio is already supported**. If you would like audio working, open up a Github Issue with your Chromebook model and post the output of the commands `lsmod` and `find /usr/share/alsa`.
+### Intel
 
-**Supported Baseboardboards**: `["asuka", "caroline", "cave", "chell", "glados", "kunimitsu", "lars", "sentry" "nami", "octopus", "volteer", "coral", "reef", "hatch", "puff"]`
+* Amberlake, Whiskeylake (-UE CPUs), and Skylake
+  * All peripherals supported, audio may need extra modules
+* Apollolake, Geminilake, Cometlake, Jasperlake, Tigerlake
+  * All peripherals supported
 
-* IdeaPad Flex 5i Chromebook (13", 5)
-* IdeaPad Flex 5i Chromebook
-* HP Chromebook x360 14b / HP Chromebook x360 14a
-* Acer Chromebook 712
-* HP Chromebook 13 G1
-* Thinkpad 13 Chromebook
-* Chromebook 14 for work (CP5-471)
-* ASUS Chromebook Flip C302
-* Dell Chromebook 13 3380
-* Lenovo Thinkpad 11e Chromebook / Lenovo Thinkpad Yoga 11e Chromebook
-* HP Chromebook x360 11 G1 EE
-* Samsung Chromebook Pro
-* Acer Chromebook  Spin 11 R751T
-* Chromebook 15 CB515-1HT/1H
-* Acer Chromebook 11 (C732, C732T, C732L & C732LT )
-* Lenovo 500e Chromebook
-* Lenovo 100e Chromebook
-* AcerChromebook 11 (CB311-8H & CB311-8HT)
-* Acer Chromebook Spin 11 (CP311-1H & CP311-1HN)
-* CTL Chromebook J41
-* CTL Chromebook NL7T-360
-* CTL Chromebook NL7
-* ASUS Chromebook C223
-* ASUS Chromebook C423
-* ASUS Chromebook C523
-* Acer Chromebook 514
-* PCmerge Chromebook AL116
-* ASUS Chromebook C403
-* Acer Chromebook 311
-* Acer Chromebook Spin 511
-* Lenovo 500e Chromebook 2nd Gen
-* Lenovo 100e Chromebook 2nd Gen (Intel)
-* Lenovo 300e Chromebook 2nd Gen (Intel)
-* Acer Chromebook Spin 512(R851TN)
-* Acer Chromebook 512(C851/C851T)
-* ASUS-Chromebook-Flip-C214
-* ASUS Chromebook Flip C204
-* HP Chromebook 11 G7 EE
-* HP Chromebook x360 11 G2 EE
-* Lenovo Chromebook C340-11
-* Lenovo Chromebook S340-14
-* Acer Chromebook Spin 311 (CP311-2H)
-* Acer Chromebook 314 (CB314-1H/1HT)
-* Acer Chromebook 315 (CB315-3H/3HT)
-* Acer Chromebook 311 (CB311-9HT/9H) )
-* Samsung Chromebook 4
-* Samsung Chromebook+
-* Samsung Galaxy Chromebook
-* ASUS Chromebook Flip C436FA
-* HP Chromebook 11 G8 EE
-* HP Chromebook x360 11 G3 EE
-* HP Chromebook 14 G6
-* HP Chromebook 14a
-* Acer Chromebook 314 (C933L/LT)
-* Ideapad 3 Chromebook
-* HP Chromebox G3
-* ASUS Chromebox 4
-* Acer Chromebox CXI4
-* ASUS Fanless Chromebox
-* Samsung Galaxy Chromebook 2
-* The Acer Chromebook 514 (CB514-1H)
-* Acer Chromebook Spin 713 (CP713-3W)
-* ASUS Chromebook Flip CX5 (CX5500)
-* HP Pro c640 G2 Chromebook
-* ASUS Chromebook CX9 (CX9400)
-* ASUS Chromebook CX1101
-* ASUS Chromebook C424
-* Acer Chromebook 515
-</details>
+### AMD
+
+* Stoneyridge
+  * All peripherals supported except audio
+  * These Chromebooks are unable to handle Windows on custom UEFI firmware
+* Picasso/Dali
+  * All peripherals supported except audio, of which I can get running with a tester
 
 ## Running Breath
 
@@ -106,7 +44,7 @@ Due to licensing restraints, you cannot just download an ISO of Breath and flash
 2. ```
    FEATURES=ISO,KEYMAP bash setup.sh cli ubuntu
    ```
-    This command should take around 30cx minutes.
+    This command should take around 30 minutes.
 
     If you **don't want a minimal environment without a desktop** or **are running Crostini**, don't run the command and read below.
 
@@ -151,7 +89,11 @@ If audo still doesn't work, that's completely fine! Open up a Github Issue with 
 >
 > PulseAudio, without UCM modifications, errors out. If you modify the UCM to remove the `Front Mic`, `Rear Mic`, and `Mic` (all of these are related to PCM3 on `da7219max`), PulseAudio and general audio will work, but your speakers **will be fried** or their membranes **will burst**.
 
-### Goodies
+## OpenCollective Page
+
+If you find this useful, consider donating. Since I'm only a student, acquiring the resources to expand this project is only possible [with your support 💚](https://opencollective.com/breath)
+
+## Goodies
 
 **ZRAM:**  
 https://github.com/cb-linux/breath/issues/204#issuecomment-1133802766
@@ -161,10 +103,6 @@ https://github.com/cb-linux/breath/issues/168#issuecomment-1142534066
 
 **Audio Jack and Mic Testing:**  
 https://github.com/cb-linux/breath/discussions/190
-
-## OpenCollective Page
-
-If you find this useful, consider donating. Since I'm only a student, acquiring the resources to expand this project is only possible [with your support 💚](https://opencollective.com/breath)
 
 ## Doesn't work? That's expected!
 
