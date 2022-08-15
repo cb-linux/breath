@@ -28,6 +28,7 @@ if [[ -n "$DIR" ]]; then
     cp ${DIR}/bzImage.alt bzImage
     cp ${DIR}/modules.alt.tar.xz modules.tar.xz
 elif [[ $VERSION == "ALT" ]]; then
+    sudo rm -rf bzImage* modules*
     wget https://github.com/cb-linux/breath/releases/latest/download/bzImage.alt -q --show-progress
     ln -s bzImage.alt bzImage
     wget https://github.com/cb-linux/breath/releases/latest/download/modules.alt.tar.xz -q --show-progress
