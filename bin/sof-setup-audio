@@ -149,5 +149,21 @@ softdep snd_sof_pci_intel_tgl pre: snd_hda_codec_hdmi
 softdep snd_sof_pci_intel_tng pre: snd_hda_codec_hdmi
 EOF
 
+sudo tee /etc/asound.conf <<EOF
+pcm.!default {
+  type pulse
+  fallback "sysdefault"
+  hint {
+    show on
+    description "Default ALSA Output (currently PulseAudio Sound Server)"
+  }
+}
+
+ctl.!default {
+  type pulse
+  fallback "sysdefault"
+}
+EOF
+
 sync
 echo 'SOF enabled successfully! Reboot to enable audio'
