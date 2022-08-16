@@ -76,6 +76,10 @@ function postinstall {
     # Hibernating shouldn't work, but fake it anyways
     runChrootCommand "echo 'HibernateState=freeze' >> /etc/systemd/sleep.conf"
 
+    # Run SELinux in permissive mode to fix login issues; SELinux as a whole is
+	# pretty broken on Breath.
+	runChrootCommand "sed -i 's/SELINUX=enforcing/SELINUX=permissive/g' /etc/sysconfig/selinux"
+
     # Create a new user that isn't root (if they don't exist)
     if runChrootCommand "id $BREATH_USER"; then
       true
