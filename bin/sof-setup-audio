@@ -81,6 +81,20 @@ sudo tee /etc/pulse/default.pa <<EOF
     # Accept clients
     load-module module-native-protocol-unix
 
+    # Automatically switch to USB/BT devices
+    .ifexists module-switch-on-connect.so
+    load-module module-switch-on-connect
+    .endif
+
+    # Automatically load driver modules for Bluetooth hardware
+    .ifexists module-bluetooth-policy.so
+    load-module module-bluetooth-policy
+    .endif
+
+    .ifexists module-bluetooth-discover.so
+    load-module module-bluetooth-discover
+    .endif
+
 .nofail
 EOF
 
