@@ -110,18 +110,6 @@ elif ! command -v pulseaudio &> /dev/null; then
 
     sudo apt install -y pulseaudio pulseaudio-module-bluetooth pulseaudio-utils
 
-    {
-
-        systemctl --user mask pipewire.socket
-        systemctl --user mask pipewire.service
-        systemctl --user unmask pulseaudio.socket
-        systemctl --user unmask pulseaudio.service
-
-        systemctl --user enable pulseaudio.socket
-        systemctl --user enable pulseaudio.service
-
-    } || true
-
 fi
 
 sudo systemctl enable alsa-reload
@@ -136,6 +124,15 @@ sudo ln -s sof-tplg-v2.1.1 /lib/firmware/intel/sof-tplg
 sudo rsync tools-v2.1.1/*  /usr/local/bin
 cd ..; rm -rf sof-bin; cd # Cleanup
 
+# Mask Pipewire
+systemctl --user mask pipewire.{socket,service}
+
+# Unmask PulseAudio
+systemctl --user unmask pulseaudio.{socket,service}
+
+# Enable PulseAudio
+systemctl --user enable pulseaudio.{socket,service}
+
 # SOF doesn't need SST/HDA drivers, especially on Chromebooks where they conflict
 # The rest of this fixes dependency ordering and prevents the infamous
 # "codec #2 probe error, ret: -2" SOF error
@@ -149,6 +146,7 @@ softdep snd_sof_pci_intel_tgl pre: snd_hda_codec_hdmi
 softdep snd_sof_pci_intel_tng pre: snd_hda_codec_hdmi
 EOF
 
+# Should be the default, but verify that the correct asound.conf is in place
 sudo tee /etc/asound.conf <<EOF
 pcm.!default {
   type pulse
@@ -164,6 +162,10 @@ ctl.!default {
   fallback "sysdefault"
 }
 EOF
+
+# Add a five second delay to PulseAudio to let audio devices initialize
+# This is a messy solution
+sudo sed -i '/ExecStart/a ExecStartPre=/usr/bin/sleep 5' /usr/lib/systemd/user/pulseaudio.service
 
 sync
 echo 'SOF enabled successfully! Reboot to enable audio'

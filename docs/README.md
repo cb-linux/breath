@@ -77,11 +77,10 @@ Once booted into Breath run the command depending on your device's board:
 2. - Skylake, Kabylake, or Coffeelake (7th/8th Gen Intel CPU):
      1. `VERSION=ALT bash updatekernel.sh` on the PC you built Breath with (cannot be run from Crostini)
      2. `setup-audio` on your Chromebook that has booted Breath
-   - All Apollo Lake Devices (`CORAL` and `REEF`): `apl-sof-setup-audio`
-   - Everything else: `sof-setup-audio`
-     - Doesn't work? Try `SOUNDCARD=rtk sof-setup-audio`
+   - All Apollo Lake Devices (`CORAL` and `REEF`): `apl-sof-setup-audio` on your Chromebook that has booted Breath
+   - Everything else: `sof-setup-audio` on your Chromebook that has booted Breath
 
-If audo still doesn't work, that's completely fine! Open up a Github Issue with your Chromebook model and I'll get audio working.
+If audio still doesn't work, [open up an issue](https://github.com/cb-linux/breath/issues) and provide the file/link created by `sudo alsa-info`.
 
 > #### Skylake (SKL) / Kabylake (KBL) disclaimer
 >
@@ -100,13 +99,6 @@ https://github.com/cb-linux/breath/issues/204#issuecomment-1133802766
 
 **Fan Control/ectool:**  
 https://github.com/cb-linux/breath/issues/168#issuecomment-1142534066
-
-**Audio Jack and Mic Testing:**  
-https://github.com/cb-linux/breath/discussions/190
-
-## Doesn't work? That's expected!
-
-Breath uses the exact ChromeOS Linux kernel. In other words, if the thing not working in Breath works in ChromeOS, it's a toggle away on my side. Just provide details like your **exact** Chromebook model name and your board name (shown on the bottom of the dev mode screen) and make a Github Issue. When you help me add support to your device, chances are a few more devices will become supported too!
 
 #### --Project Overview--
 
