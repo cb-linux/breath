@@ -1,5 +1,10 @@
-<br>
+# ⚠️ Project Archived
 
+Due to the burden of active maintenance on everything from the boot process to desktop environments, I'm discontinuing this project to work on more engaging projects. The [Discord](https://discord.gg/djGdQczudU) will always be open for discussions over Breath and for the enthusiasts that do (or would like to) understand the codebase.
+
+<details>
+<summary>View the archived content</summary>
+<br>
 <img src="https://github.com/cb-linux/breath/blob/main/docs/assets/banner.png?raw=true" alt="Breath Banner"></img>
 
 # 🙼 ＢＲＥＡＴＨ
@@ -30,3 +35,5 @@ This project uses the ChromeOS Kernel and firmware. Touchscreen and all other pe
 Audio works [perfectly](bin/setup-audio) through ALSA, but not PulseAudio or Pipewire. All apps that use PulseAudio libraries (like Firefox) work as of [this commit](https://github.com/cb-linux/breath/commit/884bd03b8eef554bdbafd7b4d62f36690f472237). You can follow further audio progress [here](https://github.com/cb-linux/breath/projects/1).
 
 **[Looking for Maintainers!]**
+
+</details>
