@@ -1,13 +1,7 @@
-# ⚠️ Project Archived
+# LOOKING FOR DEVELOPERS TO HELP
+Looking for developers willing to help with this project, please open an issue if youd like to help
 
-Due to the burden of active maintenance on everything from the boot process to desktop environments, I'm discontinuing this project to work on more engaging projects. The [Discord](https://discord.gg/djGdQczudU) will always be open for discussions over Breath and for the enthusiasts that do (or would like to) understand the codebase.
-
-<details>
-<summary>View the archived content</summary>
-<br>
-<img src="https://github.com/cb-linux/breath/blob/main/docs/assets/banner.png?raw=true" alt="Breath Banner"></img>
-
-# 🙼 ＢＲＥＡＴＨ
+# 🙼 EUPNEA
 
 <p align="center">A way to natively boot and run <kbd><img width="25" height="30" src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/35/Tux.svg/1200px-Tux.svg.png"></img></kbd> Linux on modern Chromebooks without replacing firmware</p>
 
@@ -22,9 +16,9 @@ Due to the burden of active maintenance on everything from the boot process to d
 * Has everything working except touchscreen and audio
 
 **Breath:**
-* Requires no change in firmware and has all peripherals working on my HP Chromebook 14 x360.
+* Requires no change in firmware and has all peripherals working
 
-## Running Breath
+## Running Eupnea
 
 <h3 align="center"><a href="https://cb-linux.github.io/breath/docs.html#/">📄 Please visit the docs here 📄</a></h3>
 
@@ -33,7 +27,5 @@ Due to the burden of active maintenance on everything from the boot process to d
 This project uses the ChromeOS Kernel and firmware. Touchscreen and all other peripherals *just work*. Breath has been carefully designed to not have any legal issues, so you can't flash the ISO or have the audio firmware bundled.
 
 Audio works [perfectly](bin/setup-audio) through ALSA, but not PulseAudio or Pipewire. All apps that use PulseAudio libraries (like Firefox) work as of [this commit](https://github.com/cb-linux/breath/commit/884bd03b8eef554bdbafd7b4d62f36690f472237). You can follow further audio progress [here](https://github.com/cb-linux/breath/projects/1).
-
-**[Looking for Maintainers!]**
 
 </details>
