@@ -17,16 +17,19 @@ jobs:
           root-reserve-mb: 512
           swap-size-mb: 1024
           remove-dotnet: 'true'
+          
       - name: Check out repository code
         uses: actions/checkout@v3
         with:
           submodules: true
           fetch-depth: 2
+          
       - name: Generate Diff/Changelog
         run: |
           echo 'DIFF<<EOF' >> $GITHUB_ENV
           git diff HEAD^..HEAD >> $GITHUB_ENV
           echo 'EOF' >> $GITHUB_ENV
+          
       - name: Generate release tag
         id: tag
         run: |
@@ -46,11 +49,13 @@ jobs:
       #     path: |
       #       kernel/bzImage
       #       kernel/modules*
+      
       - name: Release kernel and bzImage
         uses: softprops/action-gh-release@v1
         with:
           tag_name: ${{ steps.tag.outputs.release_tag }}
           name: 📦 Kernel Rebuild - ${{ github.event.head_commit.message }}
+          prerelease: true
           body: |
             ⚠ For SKL and KBL users - an old release of the 5.10.70 kernel is being distributed until I can find a backup of the source.
 
