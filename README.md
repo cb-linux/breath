@@ -15,7 +15,7 @@ Looking for developers willing to help with this project, please open an issue i
 * Requires a change in firmware (UEFI or Legacy Boot)
 * Has everything working except touchscreen and audio
 
-**Breath:**
+**Eupnea:**
 * Requires no change in firmware and has all peripherals working
 
 ## Running Eupnea
