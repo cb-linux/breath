@@ -54,7 +54,7 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           tag_name: ${{ steps.tag.outputs.release_tag }}
-          name: 📦 Kernel Rebuild - ${{ github.event.head_commit.message }}
+          name: 📦 Kernel build - ${{ github.event.head_commit.message }}
           prerelease: true
           body: |
             ⚠ For SKL and KBL users - an old release of the 5.10.70 kernel is being distributed until I can find a backup of the source.
