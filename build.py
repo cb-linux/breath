@@ -62,6 +62,11 @@ def prepare_host(de_name) -> None:
 
 # download kernel files from GitHub
 def download_kernel(dev_build: bool) -> None:
+    if args.local_path:
+        print("\033[96m" + "Using local kernel files" + "\033[0m")
+        bash("cp " + args.local_path + "bzImage /tmp/eupnea-build/bzImage")
+        bash("cp " + args.local_path + "modules.tar.xz /tmp/eupnea-build/modules.tar.xz")
+        return
     print("\033[96m" + "Downloading kernel binaries from the eupnea github" + "\033[0m")
     if dev_build:
         url = "https://github.com/eupnea-linux/eupnea/releases/download/dev-build/"
@@ -71,11 +76,11 @@ def download_kernel(dev_build: bool) -> None:
         if args.alt:
             print("Downloading alt kernel")
             urllib.request.urlretrieve(url + "bzImage.alt", filename="/tmp/eupnea-build/bzImage")
-            urllib.request.urlretrieve(url + "modules.alt.tar.xz", "/tmp/eupnea-build/alt-kernel.tar.gz")
+            urllib.request.urlretrieve(url + "modules.alt.tar.xz", filename="/tmp/eupnea-build/modules.tar.xz")
         elif args.exp:
             print("Downloading experimental 5.15 kernel")
             urllib.request.urlretrieve(url + "bzImage.exp", filename="/tmp/eupnea-build/bzImage")
-            urllib.request.urlretrieve(url + "modules.exp.tar.xz", "/tmp/eupnea-build/exp-kernel.tar.gz")
+            urllib.request.urlretrieve(url + "modules.exp.tar.xz", filename="/tmp/eupnea-build/modules.tar.xz")
         else:
             urllib.request.urlretrieve(url + "bzImage", filename="/tmp/eupnea-build/bzImage")
             urllib.request.urlretrieve(url + "modules.tar.xz", filename="/tmp/eupnea-build/modules.tar.xz")
