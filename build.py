@@ -66,7 +66,7 @@ def download_kernel(dev_build: bool) -> None:
     if dev_build:
         url = "https://github.com/eupnea-linux/eupnea/releases/download/dev-build/"
     else:
-        url = "https://github.com/eupnea-linux/eupnea/releases/download/latest/"
+        url = "https://github.com/eupnea-linux/eupnea/releases/latest/download/"
     try:
         if args.alt:
             print("Downloading alt kernel")
@@ -192,7 +192,7 @@ def extract_rootfs(distro: str) -> None:
 
 
 # Configure distro agnostic options
-def post_extract(username: str, password: str, hostname: str, rebind_search: bool) -> None:
+def post_extract(username: str, password: str, hostname: str, rebind_search: bool, distro, de_name) -> None:
     print("\n\033[96m" + "Configuring Eupnea" + "\033[0m")
     print("Copying resolv.conf")
     bash("cp --remove-destination /etc/resolv.conf /mnt/eupnea/etc/resolv.conf")
@@ -204,11 +204,12 @@ def post_extract(username: str, password: str, hostname: str, rebind_search: boo
     rmdir("/mnt/eupnea/lib/modules", ignore_errors=True)
     Path("/mnt/eupnea/lib/modules").mkdir(parents=True, exist_ok=True)
     bash("tar xpf /tmp/eupnea-build/modules.tar.xz -C /mnt/eupnea/")  # the tar contains /lib/modules already
-    print("Configuring user")
-    if not chroot("id " + username).find("no such user") == -1:
-        chroot('adduser --disabled-password --gecos "" ' + username)
-        chroot('echo "' + username + ':' + password + '" | chpasswd')
-        chroot("usermod -aG sudo " + username)
+    if not distro == "ubuntu" and not de_name == "gnome":
+        print("Configuring user")
+        if not chroot("id " + username).find("no such user") == -1:
+            chroot('adduser --disabled-password --gecos "" ' + username)
+            chroot('echo "' + username + ':' + password + '" | chpasswd')
+            chroot("usermod -aG sudo " + username)
     print("Setting hostname")
     with open("/mnt/eupnea/etc/hostname", "w") as hostname_file:
         hostname_file.write(hostname)
@@ -218,11 +219,11 @@ def post_extract(username: str, password: str, hostname: str, rebind_search: boo
     chroot("chmod 755 /mnt/eupnea/usr/local/bin/*")
     print("Backing up default keymap and setting Chromebook layout")
     chroot("cp /mnt/eupnea/usr/share/X11/xkb/symbols/pc /mnt/eupnea/usr/share/X11/xkb/symbols/pc.default")
-    chroot("cp -f xkb/xkb.chromebook /mnt/eupnea/usr/share/X11/xkb/symbols/pc")
+    chroot("cp -f configs/xkb/xkb.chromebook /mnt/eupnea/usr/share/X11/xkb/symbols/pc")
     if rebind_search:
         print("Rebinding search key to Caps Lock")
         chroot("cp /mnt/eupnea/usr/share/X11/xkb/keycodes/evdev /mnt/eupnea/usr/share/X11/xkb/keycodes/evdev.default")
-        chroot("cp xkb/xkb.chromebook /mnt/eupnea/usr/share/X11/xkb/symbols/pc")
+        chroot("cp configs/xkb/xkb.chromebook /mnt/eupnea/usr/share/X11/xkb/symbols/pc")
     print("Configuring sleep")
     # disable deep sleep and hibernation
     # TODO: Fix sleep?
@@ -264,7 +265,7 @@ if __name__ == "__main__":
         prepare_usb()
     download_rootfs(user_input[0], user_input[1], user_input[2])
     extract_rootfs(user_input[0])
-    post_extract(user_input[5], user_input[6], user_input[7], user_input[8])
+    post_extract(user_input[5], user_input[6], user_input[7], user_input[8], user_input[0], user_input[3])
     match user_input[0]:
         case "ubuntu":
             import distro.ubuntu as distro

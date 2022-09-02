@@ -15,6 +15,8 @@ def user_input() -> Tuple[str, str, str, str, bool, str, str, str, bool, bool]:
     rebind_search = False
     create_iso = True
     distro_link = ""
+    username = ""
+    password = ""
     while True:
         distro_name = input(
             "\033[94m" + "Available options: Ubuntu(default, recommended), Debian, Arch, Fedora(cli only)\n" +
