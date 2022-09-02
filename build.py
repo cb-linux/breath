@@ -214,7 +214,7 @@ def post_extract(username: str, password: str, hostname: str, rebind_search: boo
         hostname_file.write(hostname)
     print("Copying eupnea utils")
     # TODO: add py utils when rewrite is finished
-    bash("cp bin/* /mnt/eupnea/usr/local/bin/")
+    bash("cp eupnea-scripts/scripts/* /mnt/eupnea/usr/local/bin/")
     chroot("chmod 755 /mnt/eupnea/usr/local/bin/*")
     print("Backing up default keymap and setting Chromebook layout")
     chroot("cp /mnt/eupnea/usr/share/X11/xkb/symbols/pc /mnt/eupnea/usr/share/X11/xkb/symbols/pc.default")
