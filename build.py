@@ -62,11 +62,6 @@ def prepare_host(de_name) -> None:
 
 # download kernel files from GitHub
 def download_kernel(dev_build: bool) -> None:
-    if args.local_path:
-        print("\033[96m" + "Using local kernel files" + "\033[0m")
-        bash("cp " + args.local_path + "bzImage /tmp/eupnea-build/bzImage")
-        bash("cp " + args.local_path + "modules.tar.xz /tmp/eupnea-build/modules.tar.xz")
-        return
     print("\033[96m" + "Downloading kernel binaries from the eupnea github" + "\033[0m")
     if dev_build:
         url = "https://github.com/eupnea-linux/eupnea/releases/download/dev-build/"
@@ -258,12 +253,14 @@ if __name__ == "__main__":
     prepare_host(user_input[0])
     if args.local_path is None:
         download_kernel(args.dev_build)
-        kernel_path = "/tmp/eupnea-build/"
     else:
         if not args.local_path.endswith("/"):
             kernel_path = args.local_path + "/"
         else:
             kernel_path = args.local_path
+        print("\033[96m" + "Using local kernel files" + "\033[0m")
+        bash("cp " + kernel_path + "bzImage /tmp/eupnea-build/bzImage")
+        bash("cp " + kernel_path + "modules.tar.xz /tmp/eupnea-build/modules.tar.xz")
     if user_input[9]:
         img_mnt = prepare_img()
     else:
