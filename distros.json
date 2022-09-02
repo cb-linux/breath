@@ -1,0 +1,22 @@
+{
+  "ubuntu": {
+    "22.04": "jammy",
+    "21.10": "impish",
+    "21.04": "hirsute",
+    "20.10": "groovy",
+    "20.04": "focal",
+    "19.10": "eoan"
+  },
+  "debian": {
+  },
+  "fedora": {
+    "28": "https://kojipkgs.fedoraproject.org/packages/Fedora-Container-Base/28/20180302.n.0/images/Fedora-Container-Base-28-20180302.n.0.x86_64.tar.xz",
+    "29": "https://kojipkgs.fedoraproject.org/packages/Fedora-Container-Base/29/20180827.n.0/images/Fedora-Container-Base-29-20180827.n.0.x86_64.tar.xz",
+    "30": "https://kojipkgs.fedoraproject.org/packages/Fedora-Container-Base/30/20190304.n.0/images/Fedora-Container-Base-30-20190304.n.0.x86_64.tar.xz",
+    "31": "https://kojipkgs.fedoraproject.org/packages/Fedora-Container-Base/31/20190826.n.0/images/Fedora-Container-Base-31-20190826.n.0.x86_64.tar.xz",
+    "34": "https://kojipkgs.fedoraproject.org/packages/Fedora-Container-Base/34/20220607.0/images/Fedora-Container-Base-34-20220607.0.x86_64.tar.xz",
+    "35": "https://kojipkgs.fedoraproject.org/packages/Fedora-Container-Base/35/20220828.0/images/Fedora-Container-Base-35-20220828.0.x86_64.tar.xz",
+    "36": "https://kojipkgs.fedoraproject.org/packages/Fedora-Container-Base/36/20220719.0/images/Fedora-Container-Base-36-20220719.0.x86_64.tar.xz",
+    "37": "https://kojipkgs.fedoraproject.org/packages/Fedora-Container-Base/37/20220828.n.0/images/Fedora-Container-Base-37-20220828.n.0.x86_64.tar.xz"
+  }
+}
