@@ -1,0 +1,4 @@
+[submodule "scripts"]
+	path = scripts
+	url = https://github.com/eupnea-linux/eupnea-scripts.git
+	branch = main
