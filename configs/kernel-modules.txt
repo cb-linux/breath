@@ -1,0 +1,6 @@
+# Eupnea modules
+iwlmvm
+uvcvideo
+nls_iso8859-1
+nls_cp437
+vfat
