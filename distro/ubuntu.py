@@ -3,7 +3,7 @@ from os import system as bash
 import subprocess as sp
 
 
-def config(de_name: str) -> None:
+def config(de_name: str, distro_version: str) -> None:
     print("\033[96m" + "Configuring Ubuntu" + "\033[0m")
     print("Installing packages")
     chroot("apt install -y linux-firmware network-manager tasksel software-properties-common")
@@ -31,10 +31,13 @@ def config(de_name: str) -> None:
             chroot("apt install -y lubuntu-desktop")
         case "deepin":
             print("Installing deepin")
-            chroot("add-apt-repository ppa:ubuntudde-dev/stable; apt update; apt install -y ubuntudde-dde")
+            chroot("add-apt-repository ppa:ubuntudde-dev/stable")
+            chroot("apt update")
+            chroot("apt install -y ubuntudde-dde")
         case "budgie":
             print("Installing budgie")
-            chroot("apt install -y ubuntu-budgie-desktop; sudo dpkg-reconfigure lightdm")
+            chroot("apt install -y ubuntu-budgie-desktop")
+            chroot("sudo dpkg-reconfigure lightdm")
         case "minimal":
             print("Installing minimal")
             chroot("apt install -y xfce4 xfce4-terminal --no-install-recommends")
@@ -51,8 +54,7 @@ def config(de_name: str) -> None:
         except FileNotFoundError:
             pass
         chroot("apt remove -y gnome-shell; apt autoremove -y")
-    # TODO: Figure out if this is necessary
-    # remove needrestart for some reason?
+    # TODO: Figure out if removing needrestart is necessary
     chroot("apt remove -y needrestart")
     print("Fixing securetty if needed")
     # "2>/dev/null" is for hiding error message, as not to scare the user

@@ -204,18 +204,15 @@ def post_extract(username: str, password: str, hostname: str, rebind_search: boo
     rmdir("/mnt/eupnea/lib/modules", ignore_errors=True)
     Path("/mnt/eupnea/lib/modules").mkdir(parents=True, exist_ok=True)
     bash("tar xpf /tmp/eupnea-build/modules.tar.xz -C /mnt/eupnea/")  # the tar contains /lib/modules already
-    if not distro == "ubuntu" and not de_name == "gnome":  # Ubuntu + gnome has first time setup
+    if not (distro == "ubuntu" and de_name == "gnome"):  # Ubuntu + gnome has first time setup
+        print("Configuring user")
         chroot('useradd --create-home --comment "" ' + username)
         chroot('echo "' + username + ':' + password + '" | chpasswd')
         match distro:
             case "ubuntu" | "debian":
                 chroot("usermod -aG sudo " + username)
-            case "arch":
+            case "arch" | "fedora":
                 chroot("usermod -aG wheel " + username)
-        print("Configuring user")
-        chroot('useradd --create-home --comment "" ' + username)
-        chroot('echo "' + username + ':' + password + '" | chpasswd')
-        chroot("usermod -aG sudo " + username)
     print("Setting hostname")
     with open("/mnt/eupnea/etc/hostname", "w") as hostname_file:
         hostname_file.write(hostname)
@@ -285,7 +282,7 @@ if __name__ == "__main__":
             import distro.fedora as distro
         case _:
             print("\033[91m" + "Something went **really** wrong somewhere!(Distro name not found)" + "\033[0m")
-    distro.config(user_input[3])
+    distro.config(user_input[3], user_input[1])
     print("\033[96m" + "Finishing setup" + "\033[0m")
     print("Unmounting rootfs")
     bash("umount /mnt/eupnea")

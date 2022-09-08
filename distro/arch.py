@@ -2,7 +2,7 @@ from os import system as bash
 import subprocess as sp
 
 
-def config(de_name: str) -> None:
+def config(de_name: str, distro_version: str) -> None:
     print("\033[96m" + "Configuring Arch" + "\033[0m")
     print("Uncomment arch mirror")
     with open("/mnt/eupnea/etc/pacman.d/mirrorlist", "r") as read:
@@ -16,7 +16,7 @@ def config(de_name: str) -> None:
     bash("mount --bind /mnt/eupnea /mnt/eupnea")
     with open("/mnt/eupnea/etc/pacman.conf", "r") as conf:
         temp_pacman = conf.readlines()
-    # comment out CheckSpace
+    # temporarily comment out CheckSpace, otherwise
     temp_pacman[34] = "#" + temp_pacman[34]
     with open("/mnt/eupnea/etc/pacman.conf", "w") as conf:
         conf.writelines(temp_pacman)
