@@ -8,8 +8,11 @@ import argparse
 import urllib.request
 import subprocess as sp
 from os import system as bash
-import user_input
+from threading import Thread
 import urllib.error
+from time import sleep
+
+import user_input
 
 
 # parse arguments from the cli. Only for testing/advanced use. 95% of the arguments are handled by the user_input script
@@ -62,7 +65,7 @@ def prepare_host(de_name) -> None:
 
 # download kernel files from GitHub
 def download_kernel(dev_build: bool) -> None:
-    print("\033[96m" + "Downloading kernel binaries from the eupnea github" + "\033[0m")
+    print("\033[96m" + "Downloading kernel binaries from github" + "\033[0m")
     if dev_build:
         url = "https://github.com/eupnea-linux/kernel/releases/download/dev-build/"
     else:
@@ -130,7 +133,7 @@ def prepare_img() -> str:
 
 # download the distro rootfs
 def download_rootfs(distro_name: str, distro_version: str, distro_link: str) -> None:
-    print("\033[96m" + "Downlaoding rootfs. Do not panick if script seems stuck" + "\033[0m")
+    print("\033[96m" + "Downloading rootfs." + "\033[0m")
     # TODO: Add progress bar or something
     try:
         match distro_name:
@@ -206,7 +209,7 @@ def post_extract(username: str, password: str, hostname: str, rebind_search: boo
     bash("tar xpf /tmp/eupnea-build/modules.tar.xz -C /mnt/eupnea/")  # the tar contains /lib/modules already
     if not (distro == "ubuntu" and de_name == "gnome"):  # Ubuntu + gnome has first time setup
         print("Configuring user")
-        chroot('useradd --create-home --comment "" ' + username)
+        chroot('useradd --create-home ' + username)
         chroot('echo "' + username + ':' + password + '" | chpasswd')
         match distro:
             case "ubuntu" | "debian":
@@ -252,10 +255,19 @@ if __name__ == "__main__":
     args = process_args()
     if args.dev_build:
         print("\033[93m" + "Using dev kernel" + "\033[0m")
+
     user_input = user_input.user_input()
     prepare_host(user_input[0])
     if args.local_path is None:
-        download_kernel(args.dev_build)
+        # Print download progress in terminal
+        t = Thread(target=download_kernel, args=(args.dev_build,))
+        t.start()
+        sleep(1)
+        while t.is_alive():
+            sys.stdout.flush()
+            print(".", end="")
+            sleep(1)
+        print("")
     else:
         if not args.local_path.endswith("/"):
             kernel_path = args.local_path + "/"
@@ -268,7 +280,15 @@ if __name__ == "__main__":
         img_mnt = prepare_img()
     else:
         prepare_usb()
-    download_rootfs(user_input[0], user_input[1], user_input[2])
+    # Print download progress in terminal
+    t = Thread(target=download_rootfs, args=(user_input[0], user_input[1], user_input[2],))
+    t.start()
+    sleep(1)
+    while t.is_alive():
+        sys.stdout.flush()
+        print(".", end="")
+        sleep(1)
+    print("")
     extract_rootfs(user_input[0])
     post_extract(user_input[5], user_input[6], user_input[7], user_input[8], user_input[0], user_input[3])
     match user_input[0]:
@@ -281,7 +301,7 @@ if __name__ == "__main__":
         case "fedora":
             import distro.fedora as distro
         case _:
-            print("\033[91m" + "Something went **really** wrong somewhere!(Distro name not found)" + "\033[0m")
+            print("\033[91m" + "Something went **really** wrong somewhere! (Distro name not found)" + "\033[0m")
     distro.config(user_input[3], user_input[1])
     print("\033[96m" + "Finishing setup" + "\033[0m")
     print("Unmounting rootfs")
