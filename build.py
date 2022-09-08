@@ -64,9 +64,9 @@ def prepare_host(de_name) -> None:
 def download_kernel(dev_build: bool) -> None:
     print("\033[96m" + "Downloading kernel binaries from the eupnea github" + "\033[0m")
     if dev_build:
-        url = "https://github.com/eupnea-linux/eupnea/releases/download/dev-build/"
+        url = "https://github.com/eupnea-linux/kernel/releases/download/dev-build/"
     else:
-        url = "https://github.com/eupnea-linux/eupnea/releases/latest/download/"
+        url = "https://github.com/eupnea-linux/kernel/releases/latest/download/"
     try:
         if args.alt:
             print("Downloading alt kernel")
