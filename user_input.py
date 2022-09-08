@@ -28,14 +28,14 @@ def user_input() -> Tuple[str, str, str, str, bool, str, str, str, bool, bool]:
                 print("\033[92m" + "Use latest Ubuntu version?" + "\033[0m")
                 temp_input = input("\033[94mPress enter for yes, or type in the version number(for example: '21.10'):\n"
                                    + "\033[0m")
+                with open("distros.json", "r") as file:
+                    distros = json.load(file)
                 if temp_input == "":
                     distro_version = "22.04"
-                    distro_link = "jammy"
+                    distro_link = distros["ubuntu"][distro_version]
                     print("Using latest Ubuntu version: " + distro_version)
                     break
                 else:
-                    with open("distros.json", "r") as file:
-                        distros = json.load(file)
                     if temp_input in distros["ubuntu"]:
                         distro_version = temp_input
                         distro_link = distros["ubuntu"][distro_version]
@@ -57,15 +57,17 @@ def user_input() -> Tuple[str, str, str, str, bool, str, str, str, bool, bool]:
                 temp_input = input("\033[92m" + "Use latest Fedora version?" + "\033[94m" + "\nPress enter for yes, " +
                                    "or type in the version number(for example: '35'). " +
                                    "Versions 32 and 33 are not available:\n" + "\033[0m")
+                with open("distros.json", "r") as file:
+                    distros = json.load(file)
                 if temp_input == "":
                     distro_version = "36"
+                    distro_link = distros["fedora"][distro_version]
                     print("Using Fedora version: " + distro_version)
                     break
                 else:
-                    with open("distros.json", "r") as file:
-                        distros = json.load(file)
                     if temp_input in distros["fedora"]:
                         distro_version = temp_input
+                        distro_link = distros["fedora"][distro_version]
                         print("Using Fedora version: " + distro_version)
                         break
                     else:

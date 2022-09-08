@@ -34,7 +34,6 @@ def process_args():
 def prepare_host(de_name) -> None:
     print("\033[96m" + "Preparing host system" + "\033[0m")
     print("Creating /tmp/eupnea-build")
-    bash("umount -f /tmp/eupnea-build/arch")
     rmdir("/tmp/eupnea-build", ignore_errors=True)
     Path("/tmp/eupnea-build/rootfs").mkdir(parents=True)
     print("Creating mnt point")
@@ -178,20 +177,23 @@ def extract_rootfs(distro: str) -> None:
             # temp chdir into mounted image, then go back to original dir
             temp_path = os.getcwd()
             os.chdir("/mnt/eupnea")
-            bash("tar xvpfz /tmp/eupnea-build/rootfs/arch-rootfs.tar.gz root.x86_64/ --strip-components=1" +
-                 " --numeric-owner")
+            bash("tar xpfz /tmp/eupnea-build/rootfs/arch-rootfs.tar.gz root.x86_64/ --strip-components=1" +
+                 " --numeric-owner --checkpoint=.10000")
             os.chdir(temp_path)
         case "fedora":
-            print("Extracting fedora rootfs to temporary location")
+            print("Extracting fedora rootfs")
+            # extract to temp location, find rootfs and extract it to mounted image
             Path("/tmp/eupnea-build/fedora-temp").mkdir()
-            bash("tar xfp /tmp/eupnea-build/rootfs/fedora-rootfs.tar.xz -C /tmp/eupnea-build/rootfs/fedora-temp")
-            with os.scandir("/tmp/eupnea-build/rootfs/fedora-temp") as scan:
+            bash(
+                "tar xfp /tmp/eupnea-build/rootfs/fedora-rootfs.tar.xz -C /tmp/eupnea-build/fedora-temp " +
+                "--checkpoint=.10000")
+            with os.scandir("/tmp/eupnea-build/fedora-temp") as scan:
                 for entry in scan:
                     if entry.is_dir():
                         temp_rootfs_path = entry.path
                         break
-            print("Copying fedora rootfs to /mnt/eupnea")
-            bash("tar xvpf " + temp_rootfs_path + "/layer.tar -C /mnt/eupnea")
+            print("\nCopying fedora rootfs to /mnt/eupnea")
+            bash("tar xpf " + temp_rootfs_path + "/layer.tar -C /mnt/eupnea --checkpoint=.10000")
 
 
 # Configure distro agnostic options
