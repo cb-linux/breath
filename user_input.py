@@ -146,7 +146,7 @@ def user_input() -> Tuple[str, str, str, str, bool, str, str, str, bool, bool]:
             case _:
                 print("\033[93m" + "Check your spelling and try again" + "\033[0m")
     # Ubuntu + gnome now has a first time setup, so skip this part for ubuntu with gnome
-    if not distro_name == "ubuntu" and not de_name == "gnome":
+    if not (distro_name == "ubuntu" and de_name == "gnome"):
         print("\033[92m" + "Enter username to be used in Eupnea" + "\033[0m")
         while True:
             username = input("\033[94m" + "Username(default: 'localuser'): " + "\033[0m")
