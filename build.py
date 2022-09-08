@@ -204,7 +204,14 @@ def post_extract(username: str, password: str, hostname: str, rebind_search: boo
     rmdir("/mnt/eupnea/lib/modules", ignore_errors=True)
     Path("/mnt/eupnea/lib/modules").mkdir(parents=True, exist_ok=True)
     bash("tar xpf /tmp/eupnea-build/modules.tar.xz -C /mnt/eupnea/")  # the tar contains /lib/modules already
-    if not distro == "ubuntu" and not de_name == "gnome":
+    if not distro == "ubuntu" and not de_name == "gnome":  # Ubuntu + gnome has first time setup
+        chroot('useradd --create-home --comment "" ' + username)
+        chroot('echo "' + username + ':' + password + '" | chpasswd')
+        match distro:
+            case "ubuntu" | "debian":
+                chroot("usermod -aG sudo " + username)
+            case "arch":
+                chroot("usermod -aG wheel " + username)
         print("Configuring user")
         chroot('useradd --create-home --comment "" ' + username)
         chroot('echo "' + username + ':' + password + '" | chpasswd')
