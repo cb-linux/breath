@@ -207,9 +207,11 @@ def post_extract(username: str, password: str, hostname: str, rebind_search: boo
     if not distro == "ubuntu" and not de_name == "gnome":
         print("Configuring user")
         if not chroot("id " + username).find("no such user") == -1:
-            chroot('adduser --disabled-password --gecos "" ' + username)
+            chroot('useradd -c "" ' + username)
             chroot('echo "' + username + ':' + password + '" | chpasswd')
             chroot("usermod -aG sudo " + username)
+        else:
+            print("User already exists, skipping")
     print("Setting hostname")
     with open("/mnt/eupnea/etc/hostname", "w") as hostname_file:
         hostname_file.write(hostname)
