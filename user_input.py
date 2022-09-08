@@ -18,20 +18,20 @@ def user_input() -> Tuple[str, str, str, str, bool, str, str, str, bool, bool]:
     username = ""
     password = ""
     while True:
-        distro_name = input(
+        temp_distro_name = input(
             "\033[94m" + "Available options: Ubuntu(default, recommended), Debian, Arch, Fedora(cli only)\n" +
             "\033[0m")
-        match distro_name:
+        match temp_distro_name:
             case "Ubuntu" | "ubuntu" | "":
-                print("Ubuntu selected")
+                # print("Ubuntu selected")
                 distro_name = "ubuntu"
-                print("\033[92mUse latest version?\033[0m")
+                print("\033[92m" + "Use latest Ubuntu version?" + "\033[0m")
                 temp_input = input("\033[94mPress enter for yes, or type in the version number(for example: '21.10'):\n"
                                    + "\033[0m")
                 if temp_input == "":
                     distro_version = "22.04"
                     distro_link = "jammy"
-                    print("Using latest version: " + distro_version)
+                    print("Using latest Ubuntu version: " + distro_version)
                     break
                 else:
                     with open("distros.json", "r") as file:
@@ -39,51 +39,53 @@ def user_input() -> Tuple[str, str, str, str, bool, str, str, str, bool, bool]:
                     if temp_input in distros["ubuntu"]:
                         distro_version = temp_input
                         distro_link = distros["ubuntu"][distro_version]
-                        print("Using version: " + distro_version + " codename: " + distros["ubuntu"][temp_input])
+                        print("Using Ubuntu version: " + distro_version + " codename: " + distros["ubuntu"][temp_input])
                         break
                     else:
                         print("\033[93m" + "Version not available, please choose another" + "\033[0m")
                         continue
             case "Debian" | "debian":
                 print("Debian selected")
+                distro_name = "debian"
                 break
             case "Arch" | "arch" | "arch btw":
                 print("Arch selected")
+                distro_name = "arch"
                 break
             case "Fedora" | "fedora":
-                print("Fedora selected")
-                if input("\033[93mWarning: No desktop environment available for Fedora" + "\033[94m" +
-                         "\nType 'yes' to continue or Press Enter to choose another distro(" + "\033[0m\n") == "yes":
-                    print("Fedora confirmed")
-                    temp_input = input("\033[92mUse latest version?" + "\033[94m" + "\nPress enter for yes, " +
-                                       "or type in the version number(for example: '35'). " +
-                                       "Versions 32 and 33 are not available:\n" + "\033[0m")
-                    if temp_input == "":
-                        distro_version = "36"
-                        print("Using version: " + distro_version)
+                distro_name = "fedora"
+                temp_input = input("\033[92m" + "Use latest Fedora version?" + "\033[94m" + "\nPress enter for yes, " +
+                                   "or type in the version number(for example: '35'). " +
+                                   "Versions 32 and 33 are not available:\n" + "\033[0m")
+                if temp_input == "":
+                    distro_version = "36"
+                    print("Using Fedora version: " + distro_version)
+                    break
+                else:
+                    with open("distros.json", "r") as file:
+                        distros = json.load(file)
+                    if temp_input in distros["fedora"]:
+                        distro_version = temp_input
+                        print("Using Fedora version: " + distro_version)
                         break
                     else:
-                        with open("distros.json", "r") as file:
-                            distros = json.load(file)
-                        if temp_input in distros["fedora"]:
-                            distro_version = temp_input
-                            print("Using version: " + distro_version)
-                            break
-                        else:
-                            print("\033[93m" + "Version not available, please choose another" + "\033[0m")
-                            continue
-                else:
-                    print("\033[93mFedora not confirmed, please select another distro" + "\033[0m")
-                    continue
+                        print("\033[93m" + "Fedora version not available, please choose another" + "\033[0m")
+                        continue
             case _:
                 print("\033[93mCheck your spelling and try again" + "\033[0m")
                 continue
-    # TODO: add per distro selections
     print("\033[92m" + "Which desktop environment would you like to use?" + "\033[0m")
+    match distro_name:
+        case "ubuntu" | "debian":
+            available_de = "Gnome(default, recommended), KDE(recommended), MATE, Xfce(recommended for weak devices), " \
+                           "LXQt(recommended for weak devices), deepin, budgie, minimal, cli"
+        case "arch":
+            available_de = "No DE available yet, type 'cli' to continue"
+        case "fedora":
+            available_de = "Gnome(default, recommended), KDE(recommended), MATE, Xfce(recommended for weak devices), " \
+                           "LXQt(recommended for weak devices), deepin, minimal, cli"
     while True:
-        de_name = input("\033[94mAvailable options: Gnome(default, recommended), KDE(recommended), MATE," +
-                        " Xfce(recommended for weak devices), LXQt(recommended for weak devices), deepin, budgie, " +
-                        "minimal, cli" + "\033[0m" + "\n")
+        de_name = input("\033[94m" + "Available options: " + available_de + "\033[0m" + "\n")
         match de_name:
             case "Gnome" | "gnome" | "":
                 print("Gnome selected")
@@ -124,19 +126,22 @@ def user_input() -> Tuple[str, str, str, str, bool, str, str, str, bool, bool]:
                 de_name = "deepin"
                 break
             case "budgie":
-                print("Budgie selected")
-                de_name = "budgie"
-                break
+                if distro_name == "fedora":
+                    print("\033[93m" + "Budgie is not available for Fedora, please choose another DE" + "\033[0m")
+                else:
+                    print("Budgie selected")
+                    de_name = "budgie"
+                    break
             case "minimal":
                 print("Minimal selected")
                 de_name = "minimal"
                 break
             case "cli" | "none":
-                print("CLI selected")
                 if input("\033[93mWarning: No desktop environment will be installed" + "\033[94m\nType 'yes' to " +
                          "continue or Press Enter to choose a desktop environment" + "\033[0m\n") == "yes":
                     print("No desktop will be installed")
                     de_name = "cli"
+                    print("CLI selected")
                     break
             case _:
                 print("\033[93m" + "Check your spelling and try again" + "\033[0m")
