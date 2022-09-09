@@ -22,12 +22,13 @@ def config(de_name: str, distro_version: str) -> None:
         conf.writelines(temp_pacman)
 
     print("Prepare pacman")
-    chroot("pacman-key --init; pacman-key --populate archlinux")
+    chroot("pacman-key --init")
+    chroot("pacman-key --populate archlinux")
     chroot("pacman -Syy --noconfirm")
     chroot("pacman -Syu --noconfirm")
 
     print("Installing packages")
-    chroot("pacman -S --noconfirm base base-devel nano networkmanager xkeyboard-config linux-firmware")
+    chroot("pacman -S --noconfirm base base-devel nano networkmanager xkeyboard-config linux-firmware sudo")
     print("\033[96m" + "Downloading and installing de, might take a while" + "\033[0m")
     '''
     match de_name:
