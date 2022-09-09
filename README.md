@@ -20,7 +20,7 @@ Looking for developers willing to help with this project, please open an issue i
 
 ## Running Eupnea
 
-<h3 align="center"><a href="https://cb-linux.github.io/breath/docs.html#/">📄 Please visit the docs here 📄</a></h3>
+<h3 align="center"><a href="https://eupnea-linux.github.io/docs.html#/">📄 Please visit the docs here 📄</a></h3>
 
 ## How does everything work?
 
