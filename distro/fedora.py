@@ -14,8 +14,8 @@ def config(de_name: str, distro_version: str) -> None:
            + ".noarch.rpm -y")
     print("Disabling plymouth")  # may fail sometimes without error
     chroot("plymouth-set-default-theme details -R &> /dev/null")
-    # TODO: Find out if disabling zram is necessary
-    # chroot("dnf remove zram-generator-defaults -y")
+    # TODO: Perhaps zram works with mainline?
+    chroot("dnf remove zram-generator-defaults -y")  # remove zram as it fails for some reason
     print("\033[96m" + "Downloading and installing DE, might take a while" + "\033[0m")
     match de_name:
         case "gnome":
