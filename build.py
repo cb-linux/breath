@@ -208,7 +208,7 @@ def post_extract(username: str, password: str, hostname: str, rebind_search: boo
     print("Extracting kernel modules")
     rmdir("/mnt/eupnea/lib/modules", ignore_errors=True)
     Path("/mnt/eupnea/lib/modules").mkdir(parents=True, exist_ok=True)
-    bash("tar xpf /tmp/eupnea-build/modules.tar.xz -C /mnt/eupnea/")  # the tar contains /lib/modules already
+    bash("tar xpf /tmp/eupnea-build/modules.tar.xz -C /mnt/eupnea/ --checkpoint=.10000")  # tar contains /lib/modules
     if not (distro == "ubuntu" and de_name == "gnome"):  # Ubuntu + gnome has first time setup
         print("Configuring user")
         chroot('useradd --create-home ' + username)
@@ -257,6 +257,8 @@ if __name__ == "__main__":
     args = process_args()
     if args.dev_build:
         print("\033[93m" + "Using dev kernel" + "\033[0m")
+    if args.local_path:
+        print("\033[93m" + "Using local path" + "\033[0m")
 
     user_input = user_input.user_input()
     prepare_host(user_input[0])
