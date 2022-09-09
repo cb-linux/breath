@@ -2,8 +2,7 @@
 <img src="https://github.com/eupnea-linux/eupnea-linux.github.io/blob/main/assets/banner.png?raw=true" alt="Breath Banner"></img>
 <p align="center">A way to natively boot and run Linux on modern Chromebooks without replacing firmware</p>
 
-## Running Eupnea
-<h2><a href="https://eupnea-linux.github.io/docs.html#/">‼️➡️ INSTALL INSTRUCTIONS ⬅️‼️</a></h2>
+<h2 align="center"><a href="https://eupnea-linux.github.io/docs.html#/">‼️➡️ INSTALL INSTRUCTIONS ⬅️‼️</a></h2>
 
 ## Supported Devices
 [Supported devices](https://eupnea-linux.github.io/docs.html#/devices)
