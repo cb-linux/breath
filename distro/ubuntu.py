@@ -37,7 +37,7 @@ def config(de_name: str, distro_version: str) -> None:
         case "budgie":
             print("Installing budgie")
             chroot("apt install -y ubuntu-budgie-desktop")
-            chroot("sudo dpkg-reconfigure lightdm")
+            chroot("dpkg-reconfigure lightdm")
         case "minimal":
             print("Installing minimal")
             chroot("apt install -y xfce4 xfce4-terminal --no-install-recommends")
@@ -45,6 +45,7 @@ def config(de_name: str, distro_version: str) -> None:
             print("Installing nothing")
         case _:
             print("\033[91m" + "Invalid desktop environment!!! Remove all files and retry." + "\033[0m")
+            exit()
     # Ignore libfprint-2-2 fprintd libpam-fprintd errors
     # GDM3 auto installs gnome-minimal. Gotta remove it if user didnt choose gnome
     if not de_name == "gnome":
@@ -53,7 +54,8 @@ def config(de_name: str, distro_version: str) -> None:
             os.remove("/mnt/eupnea/usr/share/xsessions/ubuntu.desktop")
         except FileNotFoundError:
             pass
-        chroot("apt remove -y gnome-shell; apt autoremove -y")
+        chroot("apt remove -y gnome-shell")
+        chroot("apt autoremove -y")
     # TODO: Figure out if removing needrestart is necessary
     chroot("apt remove -y needrestart")
     print("Fixing securetty if needed")

@@ -41,10 +41,12 @@ def config(de_name: str, distro_version: str) -> None:
             chroot("dnf group install 'Deepin Desktop' -y")
         case "budgie":
             print("\033[91m" + "Budgie is not available for Fedora" + "\033[91m")
+            exit()
         case "cli":
             print("Installing nothing")
         case _:
             print("\033[91m" + "Invalid desktop environment!!! Remove all files and retry." + "\033[0m")
+            exit()
     print("Set SELinux to permissive")
     chroot("sed -i 's/SELINUX=enforcing/SELINUX=permissive/g' /etc/sysconfig/selinux")
     print("Fix permissions")  # maybe not needed?

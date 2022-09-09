@@ -238,7 +238,7 @@ def post_extract(username: str, password: str, hostname: str, rebind_search: boo
     Path("/mnt/eupnea/etc/systemd/").mkdir(exist_ok=True)
     with open("/mnt/eupnea/etc/systemd/sleep.conf", "a") as file:
         file.write("SuspendState=freeze\nHibernateState=freeze")
-    # open kernel-modules.txt and then append its contents to the rootfs file
+    # open kernel-modules.txt and then append its contents to the Eupnea file
     with open("configs/kernel-modules.txt", "r") as repo_file:
         with open("/mnt/eupnea/etc/modules", "a") as file:
             file.write(repo_file.read())

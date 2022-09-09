@@ -78,9 +78,12 @@ def user_input() -> Tuple[str, str, str, str, bool, str, str, str, bool, bool]:
                 continue
     print("\033[92m" + "Which desktop environment would you like to use?" + "\033[0m")
     match distro_name:
-        case "ubuntu" | "debian":
+        case "ubuntu":
             available_de = "Gnome(default, recommended), KDE(recommended), MATE, Xfce(recommended for weak devices), " \
                            "LXQt(recommended for weak devices), deepin, budgie, minimal, cli"
+        case "debian":
+            available_de = "Gnome(default, recommended), KDE(recommended), MATE, Xfce(recommended for weak devices), " \
+                           "LXQt(recommended for weak devices), budgie, minimal, cli"
         case "arch":
             available_de = "No DE available yet, type 'cli' to continue"
         case "fedora":
@@ -124,9 +127,12 @@ def user_input() -> Tuple[str, str, str, str, bool, str, str, str, bool, bool]:
                 de_name = "lxqt"
                 break
             case "deepin":
-                print("Deepin selected")
-                de_name = "deepin"
-                break
+                if distro_name == "debian":
+                    print("\033[93m" + "Deepin is not available for Debian, please choose another DE" + "\033[0m")
+                else:
+                    print("Deepin selected")
+                    de_name = "deepin"
+                    break
             case "budgie":
                 if distro_name == "fedora":
                     print("\033[93m" + "Budgie is not available for Fedora, please choose another DE" + "\033[0m")
