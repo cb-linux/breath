@@ -1,5 +1,6 @@
 # 🙼 [EUPNEA](https://eupnea-linux.github.io/)
-<p>A way to natively boot and run <kbd><img width="25" height="30" src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/35/Tux.svg/1200px-Tux.svg.png"></img></kbd> Linux on modern Chromebooks without replacing firmware</p>
+<img src="https://github.com/eupnea-linux/eupnea-linux.github.io/blob/main/assets/banner.png?raw=true" alt="Breath Banner"></img>
+<p align="center">A way to natively boot and run Linux on modern Chromebooks without replacing firmware</p>
 
 ## Running Eupnea
 <h2><a href="https://eupnea-linux.github.io/docs.html#/">‼️➡️ INSTALL INSTRUCTIONS ⬅️‼️</a></h2>
