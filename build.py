@@ -97,8 +97,8 @@ def prepare_img() -> str:
     print("Allocating space for image, might take a while")
     # 12G for now, maybe decrease later
     # try fallocate, if it fails use dd
-    if sp.run("fallocate -l 12G eupnea.img", shell=True, capture_output=True).stderr.decode(
-            "utf-8").strip() == "/bin/sh: 1: fallocate: not found":
+    if not sp.run("fallocate -l 12G eupnea.img", shell=True, capture_output=True).stderr.decode(
+            "utf-8").strip() == "":
         bash("dd if=/dev/zero of=eupnea.img status=progress bs=12884 count=1000070")
     print("Mounting empty image")
     img_mnt = sp.run(["losetup", "-f", "--show", "eupnea.img"], capture_output=True).stdout.decode("utf-8").strip()
