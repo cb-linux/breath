@@ -223,10 +223,6 @@ def post_extract(username: str, password: str, hostname: str, rebind_search: boo
     print("\n\033[96m" + "Configuring Eupnea" + "\033[0m")
     print("Copying resolv.conf")
     bash("cp --remove-destination /etc/resolv.conf /mnt/eupnea/etc/resolv.conf")
-    # TODO: perhaps its not a good idea to cp firmware from host
-    print("Copying firmare from host")
-    Path("/mnt/eupnea/lib/firmware").mkdir(parents=True, exist_ok=True)
-    bash("cp -r /lib/firmware/* /mnt/eupnea/lib/firmware/")
     print("Extracting kernel modules")
     rmdir("/mnt/eupnea/lib/modules", ignore_errors=True)
     Path("/mnt/eupnea/lib/modules").mkdir(parents=True, exist_ok=True)
