@@ -36,7 +36,7 @@ def config(de_name: str, distro_version: str) -> None:
             chroot("apt install -y task-lxqt-desktop")
         case "deepin":
             print("\033[91m" + "Deepin is not available for Debian" + "\033[91m")
-            exit()
+            exit(1)
         case "budgie":
             print("Installing budgie")
             chroot("apt install budgie-desktop budgie-indicator-applet")
@@ -48,7 +48,7 @@ def config(de_name: str, distro_version: str) -> None:
             print("Installing nothing")
         case _:
             print("\033[91m" + "Invalid desktop environment!!! Remove all files and retry." + "\033[0m")
-            exit()
+            exit(1)
     # Ignore libfprint-2-2 fprintd libpam-fprintd errors
     if not de_name == "cli":
         print("Setting system to boot to gui")
@@ -70,7 +70,7 @@ def config(de_name: str, distro_version: str) -> None:
 
 
 def chroot(command: str) -> str:
-    return sp.run('chroot /mnt/eupnea /bin/sh -c "' + command + '"', shell=True, capture_output=True).stdout.decode(
+    return sp.run(f'chroot /mnt/eupnea /bin/sh -c "{command}"', shell=True, capture_output=True).stdout.decode(
         "utf-8").strip()
 
 

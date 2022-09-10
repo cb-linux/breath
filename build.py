@@ -27,6 +27,8 @@ def process_args():
                         help="Use alt kernel. Only for older devices.")
     parser.add_argument("--exp", action="store_true", dest="exp", default=False,
                         help="Use experimental 5.15 kernel.")
+    parser.add_argument("--mainline", action="store_true", dest="mainline", default=False,
+                        help="Use mainline linux kernel instead of modified chromeos kernel.")
     return parser.parse_args()
 
 
@@ -41,49 +43,70 @@ def prepare_host(de_name) -> None:
     rmdir("/mnt/eupnea", ignore_errors=True)
     Path("/mnt/eupnea").mkdir(parents=True, exist_ok=True)
     print("Installing necessary packages")
-    # apt only for now
     # install cgpt and futility
-    if sp.run("apt install cgpt vboot-kernel-utils", shell=True, capture_output=True).stdout.decode(
-            "utf-8").strip() == "/bin/sh: 1: apt: not found":
+    if os.path.exists("/usr/bin/apt"):
+        bash("apt install cgpt vboot-kernel-utils -y")
+    elif os.path.exists("/usr/bin/pacman"):
+        bash("pacman -S cgpt vboot-utils --noconfirm")
+    elif os.path.exists("/usr/bin/dnf"):
+        bash("dnf install cgpt vboot-utils --assumeyes")
+    else:
         print("\033[91m" + "cgpt and futility not found, please install them using your disotros package manager"
               + "\033[0m")
-        exit()
+        exit(1)
     if de_name == "debian":
-        if sp.run("apt install debootstrap", shell=True, capture_output=True).stdout.decode(
-                "utf-8").strip() == "/bin/sh: 1: apt: not found":
-            print("\033[91m" + "Debootstrap not found, please install it using your disotros package manager"
-                  + "\033[0m")
-            exit()
+        if os.path.exists("/usr/bin/apt"):
+            bash("apt install debootstrap -y")
+        elif os.path.exists("/usr/bin/pacman"):
+            bash("pacman -S debootstrap --noconfirm")
+        elif os.path.exists("/usr/bin/dnf"):
+            bash("dnf install debootstrap --assumeyes")
+        else:
+            print("\033[91m" + "Debootstrap not found, please install it using your disotros package manager or select"
+                  + " another distro instead of debian" + "\033[0m")
+            exit(1)
     elif de_name == "arch":
-        if sp.run("apt install arch-install-scripts", shell=True, capture_output=True).stdout.decode(
-                "utf-8").strip() == "/bin/sh: 1: apt: not found":
-            print("\033[91m" + "Debootstrap not found, please install it using your disotros package manager"
-                  + "\033[0m")
-            exit()
+        if os.path.exists("/usr/bin/apt"):
+            bash("apt install arch-install-scripts -y")
+        elif os.path.exists("/usr/bin/pacman"):
+            bash("pacman -S arch-install-scripts --noconfirm")
+        elif os.path.exists("/usr/bin/dnf"):
+            bash("dnf install arch-install-scripts --assumeyes")
+        else:
+            print(
+                "\033[91m" + "Arch-install-scripts not found, please install it using your disotros package manager" +
+                " or select another distro instead of arch" + "\033[0m")
+            exit(1)
 
 
 # download kernel files from GitHub
-def download_kernel(dev_build: bool) -> None:
+def download_kernel() -> None:
     print("\033[96m" + "Downloading kernel binaries from github" + "\033[0m")
-    if dev_build:
+    if args.dev_build:
         url = "https://github.com/eupnea-linux/kernel/releases/download/dev-build/"
+    elif args.mainline:
+        url = "https://github.com/eupnea-linux/mainline-kernel/releases/latest/download/"
     else:
         url = "https://github.com/eupnea-linux/kernel/releases/latest/download/"
     try:
-        if args.alt:
-            print("Downloading alt kernel")
-            urllib.request.urlretrieve(url + "bzImage.alt", filename="/tmp/eupnea-build/bzImage")
-            urllib.request.urlretrieve(url + "modules.alt.tar.xz", filename="/tmp/eupnea-build/modules.tar.xz")
-        elif args.exp:
-            print("Downloading experimental 5.15 kernel")
-            urllib.request.urlretrieve(url + "bzImage.exp", filename="/tmp/eupnea-build/bzImage")
-            urllib.request.urlretrieve(url + "modules.exp.tar.xz", filename="/tmp/eupnea-build/modules.tar.xz")
+        if args.mainline:
+            urllib.request.urlretrieve(f"{url}bzImage", filename="/tmp/eupnea-build/bzImage")
+            urllib.request.urlretrieve(f"{url}modules.tar.xz", filename="/tmp/eupnea-build/modules.tar.xz")
         else:
-            urllib.request.urlretrieve(url + "bzImage", filename="/tmp/eupnea-build/bzImage")
-            urllib.request.urlretrieve(url + "modules.tar.xz", filename="/tmp/eupnea-build/modules.tar.xz")
+            if args.alt:
+                print("Downloading alt kernel")
+                urllib.request.urlretrieve(f"{url}bzImage.alt", filename="/tmp/eupnea-build/bzImage")
+                urllib.request.urlretrieve(f"{url}modules.alt.tar.xz", filename="/tmp/eupnea-build/modules.tar.xz")
+            elif args.exp:
+                print("Downloading experimental 5.15 kernel")
+                urllib.request.urlretrieve(f"{url}bzImage.exp", filename="/tmp/eupnea-build/bzImage")
+                urllib.request.urlretrieve(f"{url}modules.exp.tar.xz", filename="/tmp/eupnea-build/modules.tar.xz")
+            else:
+                urllib.request.urlretrieve(f"{url}bzImage", filename="/tmp/eupnea-build/bzImage")
+                urllib.request.urlretrieve(f"{url}modules.tar.xz", filename="/tmp/eupnea-build/modules.tar.xz")
     except urllib.error.URLError:
         print("\033[91m" + "Failed to reach github. Check your internet connection and try again" + "\033[0m")
-        exit()
+        exit(1)
 
 
 # Prepare USB, usb is not yet fully implemented
@@ -105,10 +128,10 @@ def prepare_img() -> str:
     print("Image mounted at" + img_mnt)
     # format usb as per deptcharge requirements
     print("Partitioning mounted image and adding flags")
-    bash("parted -s " + img_mnt + " mklabel gpt")
-    bash("parted -s -a optimal " + img_mnt + " unit mib mkpart Kernel 1 65")
-    bash("parted -s -a optimal " + img_mnt + " unit mib mkpart Root 65 100%")
-    bash("cgpt add -i 1 -t kernel -S 1 -T 5 -P 15 " + img_mnt)
+    bash(f"parted -s {img_mnt} mklabel gpt")
+    bash(f"parted -s -a optimal {img_mnt} unit mib mkpart Kernel 1 65")
+    bash(f"parted -s -a optimal {img_mnt} unit mib mkpart Root 65 100%")
+    bash(f"cgpt add -i 1 -t kernel -S 1 -T 5 -P 15 {img_mnt}")
     # get uuid of rootfs partition
     usb_rootfs = sp.run(["blkid", "-o", "value", "-s", "PARTUUID", img_mnt + "p2"], capture_output=True).stdout.decode(
         "utf-8").strip()
@@ -122,25 +145,24 @@ def prepare_img() -> str:
          + " --signprivate /usr/share/vboot/devkeys/kernel_data_key.vbprivk --bootloader kernel.flags" +
          " --config kernel.flags --vmlinuz /tmp/eupnea-build/bzImage --pack /tmp/eupnea-build/bzImage.signed")
     print("Flashing kernel")
-    bash("dd if=/tmp/eupnea-build/bzImage.signed of=" + img_mnt + "p1")
+    bash(f"dd if=/tmp/eupnea-build/bzImage.signed of={img_mnt}p1")
     print("Formating rootfs")
-    bash("yes | mkfs.ext4 " + img_mnt + "p2")
+    bash(f"yes | mkfs.ext4 {img_mnt}p2")
     print("Mounting rootfs to /mnt/eupnea")
-    bash("mount " + img_mnt + "p2 /mnt/eupnea")
+    bash(f"mount {img_mnt}p2 /mnt/eupnea")
     return img_mnt
 
 
 # download the distro rootfs
 def download_rootfs(distro_name: str, distro_version: str, distro_link: str) -> None:
     print("\033[96m" + "Downloading rootfs." + "\033[0m")
-    # TODO: Add progress bar or something
     try:
         match distro_name:
             case "ubuntu":
-                print("Downloading ubuntu rootfs " + distro_version)
+                print(f"Downloading ubuntu rootfs {distro_version}")
                 urllib.request.urlretrieve(
-                    "https://cloud-images.ubuntu.com/releases/" + distro_version + "/release/ubuntu-"
-                    + distro_version + "-server-cloudimg-amd64-root.tar.xz",
+                    f"https://cloud-images.ubuntu.com/releases/{distro_version}/release/ubuntu-{distro_version}"
+                    f"-server-cloudimg-amd64-root.tar.xz",
                     filename="/tmp/eupnea-build/rootfs/ubuntu-rootfs.tar.xz")
             case "debian":
                 print("Downloading debian with debootstrap")
@@ -152,13 +174,13 @@ def download_rootfs(distro_name: str, distro_version: str, distro_link: str) -> 
                     "https://mirror.rackspace.com/archlinux/iso/latest/archlinux-bootstrap-x86_64.tar.gz",
                     filename="/tmp/eupnea-build/rootfs/arch-rootfs.tar.gz")
             case "fedora":
-                print("Downloading fedora rootfs version: " + distro_version)
+                print(f"Downloading fedora rootfs version: {distro_version}")
                 urllib.request.urlretrieve(distro_link, filename="/tmp/eupnea-build/rootfs/fedora-rootfs.tar.xz")
     except urllib.error.URLError:
         print(
             "\033[91m" + "Failed to download rootfs. Check your internet connection and try again. If the error" +
             " persists, create an issue with the distro and version in the name" + "\033[0m")
-        exit()
+        exit(1)
 
 
 # extract the rootfs to the img
@@ -193,7 +215,7 @@ def extract_rootfs(distro: str) -> None:
                         temp_rootfs_path = entry.path
                         break
             print("\nCopying fedora rootfs to /mnt/eupnea")
-            bash("tar xpf " + temp_rootfs_path + "/layer.tar -C /mnt/eupnea --checkpoint=.10000")
+            bash(f"tar xpf {temp_rootfs_path}/layer.tar -C /mnt/eupnea --checkpoint=.10000")
 
 
 # Configure distro agnostic options
@@ -211,13 +233,15 @@ def post_extract(username: str, password: str, hostname: str, rebind_search: boo
     bash("tar xpf /tmp/eupnea-build/modules.tar.xz -C /mnt/eupnea/ --checkpoint=.10000")  # tar contains /lib/modules
     if not (distro == "ubuntu" and de_name == "gnome"):  # Ubuntu + gnome has first time setup
         print("Configuring user")
-        chroot('useradd --create-home ' + username)
-        chroot('echo "' + username + ':' + password + '" | chpasswd')
+        chroot(f"useradd --create-home {username}")
+        chroot(f'echo "{username}:{password}" | chpasswd')
         match distro:
             case "ubuntu" | "debian":
-                chroot("usermod -aG sudo " + username)
+                chroot(f"usermod -aG sudo {username}")
             case "arch" | "fedora":
-                chroot("usermod -aG wheel " + username)
+                chroot(f"usermod -aG wheel {username}")
+    print("Extracting kernel headers")
+    # TODO: extract kernel headers
     print("Setting hostname")
     with open("/mnt/eupnea/etc/hostname", "w") as hostname_file:
         hostname_file.write(hostname)
@@ -245,7 +269,7 @@ def post_extract(username: str, password: str, hostname: str, rebind_search: boo
 
 
 def chroot(command: str) -> str:
-    return sp.run('chroot /mnt/eupnea /bin/sh -c "' + command + '"', shell=True, capture_output=True).stdout.decode(
+    return sp.run(f'chroot /mnt/eupnea /bin/sh -c "{command}"', shell=True, capture_output=True).stdout.decode(
         "utf-8").strip()
 
 
@@ -256,7 +280,13 @@ if __name__ == "__main__":
         os.execlpe('sudo', *args)
     args = process_args()
     if args.dev_build:
-        print("\033[93m" + "Using dev kernel" + "\033[0m")
+        print("\033[93m" + "Using dev release" + "\033[0m")
+    if args.alt:
+        print("\033[93m" + "Using alt kernel" + "\033[0m")
+    if args.exp:
+        print("\033[93m" + "Using experimental kernel" + "\033[0m")
+    if args.mainline:
+        print("\033[93m" + "Using mainline kernel" + "\033[0m")
     if args.local_path:
         print("\033[93m" + "Using local path" + "\033[0m")
 
@@ -264,7 +294,7 @@ if __name__ == "__main__":
     prepare_host(user_input[0])
     if args.local_path is None:
         # Print download progress in terminal
-        t = Thread(target=download_kernel, args=(args.dev_build,))
+        t = Thread(target=download_kernel)
         t.start()
         sleep(1)
         while t.is_alive():
@@ -274,12 +304,12 @@ if __name__ == "__main__":
         print("")
     else:
         if not args.local_path.endswith("/"):
-            kernel_path = args.local_path + "/"
+            kernel_path = f"{args.local_path}/"
         else:
             kernel_path = args.local_path
         print("\033[96m" + "Using local kernel files" + "\033[0m")
-        bash("cp " + kernel_path + "bzImage /tmp/eupnea-build/bzImage")
-        bash("cp " + kernel_path + "modules.tar.xz /tmp/eupnea-build/modules.tar.xz")
+        bash(f"cp {kernel_path}bzImage /tmp/eupnea-build/bzImage")
+        bash(f"cp {kernel_path}modules.tar.xz /tmp/eupnea-build/modules.tar.xz")
     if user_input[9]:
         img_mnt = prepare_img()
     else:
@@ -306,13 +336,14 @@ if __name__ == "__main__":
             import distro.fedora as distro
         case _:
             print("\033[91m" + "Something went **really** wrong somewhere! (Distro name not found)" + "\033[0m")
+            exit(1)
     distro.config(user_input[3], user_input[1])
     print("\033[96m" + "Finishing setup" + "\033[0m")
     print("Unmounting rootfs")
     bash("umount /mnt/eupnea")
     if user_input[9]:
         print("Unmounting img")
-        bash("losetup -d " + img_mnt)
-        print("\033[95m" + "The ready Eupnea image is located at " + str(os.getcwd()) + "/eupnea.img" + "\033[0m")
+        bash(f"losetup -d {img_mnt}")
+        print("\033[95m" + f"The ready Eupnea image is located at {str(os.getcwd())}/eupnea.img" + "\033[0m")
     else:
         print("\033[95m" + "The USB is ready to boot Eupnea. " + "\033[0m")

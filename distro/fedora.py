@@ -10,8 +10,8 @@ def config(de_name: str, distro_version: str) -> None:
     chroot("dnf install linux-firmware -y")
     chroot("dnf group install 'Minimal Install' -y; dnf install NetworkManager-tui ncurses -y")
     print("Add nonfree repos")
-    chroot("dnf install https://download1.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-" + distro_version
-           + ".noarch.rpm -y")
+    chroot(f"dnf install https://download1.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-{distro_version}"
+           f".noarch.rpm -y")
     print("Disabling plymouth")  # may fail sometimes without error
     chroot("plymouth-set-default-theme details -R &> /dev/null")
     # TODO: Perhaps zram works with mainline?
@@ -41,12 +41,12 @@ def config(de_name: str, distro_version: str) -> None:
             chroot("dnf group install 'Deepin Desktop' -y")
         case "budgie":
             print("\033[91m" + "Budgie is not available for Fedora" + "\033[91m")
-            exit()
+            exit(1)
         case "cli":
             print("Installing nothing")
         case _:
             print("\033[91m" + "Invalid desktop environment!!! Remove all files and retry." + "\033[0m")
-            exit()
+            exit(1)
     print("Set SELinux to permissive")
     chroot("sed -i 's/SELINUX=enforcing/SELINUX=permissive/g' /etc/sysconfig/selinux")
     print("Fix permissions")  # maybe not needed?
@@ -54,7 +54,7 @@ def config(de_name: str, distro_version: str) -> None:
 
 
 def chroot(command: str) -> str:
-    return sp.run('chroot /mnt/eupnea /bin/sh -c "' + command + '"', shell=True, capture_output=True).stdout.decode(
+    return sp.run(f'chroot /mnt/eupnea /bin/sh -c "{command}"', shell=True, capture_output=True).stdout.decode(
         "utf-8").strip()
 
 

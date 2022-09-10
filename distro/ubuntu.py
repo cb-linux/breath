@@ -45,7 +45,7 @@ def config(de_name: str, distro_version: str) -> None:
             print("Installing nothing")
         case _:
             print("\033[91m" + "Invalid desktop environment!!! Remove all files and retry." + "\033[0m")
-            exit()
+            exit(1)
     # Ignore libfprint-2-2 fprintd libpam-fprintd errors
     # GDM3 auto installs gnome-minimal. Gotta remove it if user didnt choose gnome
     if not de_name == "gnome":
