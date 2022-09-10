@@ -28,7 +28,7 @@ def config(de_name: str, distro_version: str) -> None:
     chroot("pacman -Syu --noconfirm")
 
     print("Installing packages")
-    chroot("pacman -S --noconfirm base base-devel nano networkmanager xkeyboard-config linux-firmware sudo")
+    print(chroot("pacman -S --noconfirm base base-devel nano networkmanager xkeyboard-config linux-firmware sudo"))
     print("\033[96m" + "Downloading and installing de, might take a while" + "\033[0m")
     '''
     match de_name:

@@ -5,11 +5,11 @@ from shutil import rmtree as rmdir
 from pathlib import Path
 import sys
 import argparse
-import urllib.request
+from urllib.request import urlretrieve
 import subprocess as sp
 from os import system as bash
 from threading import Thread
-import urllib.error
+from urllib.error import URLError
 from time import sleep
 
 import user_input
@@ -90,21 +90,21 @@ def download_kernel() -> None:
         url = "https://github.com/eupnea-linux/kernel/releases/latest/download/"
     try:
         if args.mainline:
-            urllib.request.urlretrieve(f"{url}bzImage", filename="/tmp/eupnea-build/bzImage")
-            urllib.request.urlretrieve(f"{url}modules.tar.xz", filename="/tmp/eupnea-build/modules.tar.xz")
+            urlretrieve(f"{url}bzImage", filename="/tmp/eupnea-build/bzImage")
+            urlretrieve(f"{url}modules.tar.xz", filename="/tmp/eupnea-build/modules.tar.xz")
         else:
             if args.alt:
                 print("Downloading alt kernel")
-                urllib.request.urlretrieve(f"{url}bzImage.alt", filename="/tmp/eupnea-build/bzImage")
-                urllib.request.urlretrieve(f"{url}modules.alt.tar.xz", filename="/tmp/eupnea-build/modules.tar.xz")
+                urlretrieve(f"{url}bzImage.alt", filename="/tmp/eupnea-build/bzImage")
+                urlretrieve(f"{url}modules.alt.tar.xz", filename="/tmp/eupnea-build/modules.tar.xz")
             elif args.exp:
                 print("Downloading experimental 5.15 kernel")
-                urllib.request.urlretrieve(f"{url}bzImage.exp", filename="/tmp/eupnea-build/bzImage")
-                urllib.request.urlretrieve(f"{url}modules.exp.tar.xz", filename="/tmp/eupnea-build/modules.tar.xz")
+                urlretrieve(f"{url}bzImage.exp", filename="/tmp/eupnea-build/bzImage")
+                urlretrieve(f"{url}modules.exp.tar.xz", filename="/tmp/eupnea-build/modules.tar.xz")
             else:
-                urllib.request.urlretrieve(f"{url}bzImage", filename="/tmp/eupnea-build/bzImage")
-                urllib.request.urlretrieve(f"{url}modules.tar.xz", filename="/tmp/eupnea-build/modules.tar.xz")
-    except urllib.error.URLError:
+                urlretrieve(f"{url}bzImage", filename="/tmp/eupnea-build/bzImage")
+                urlretrieve(f"{url}modules.tar.xz", filename="/tmp/eupnea-build/modules.tar.xz")
+    except URLError:
         print("\033[91m" + "Failed to reach github. Check your internet connection and try again" + "\033[0m")
         exit(1)
 
@@ -133,11 +133,11 @@ def prepare_img() -> str:
     bash(f"parted -s -a optimal {img_mnt} unit mib mkpart Root 65 100%")
     bash(f"cgpt add -i 1 -t kernel -S 1 -T 5 -P 15 {img_mnt}")
     # get uuid of rootfs partition
-    usb_rootfs = sp.run(["blkid", "-o", "value", "-s", "PARTUUID", img_mnt + "p2"], capture_output=True).stdout.decode(
+    rootfs_partuuid = sp.run(["blkid", "-o", "value", "-s", "PARTUUID", img_mnt + "p2"], capture_output=True).stdout.decode(
         "utf-8").strip()
     # read and modify kernel flags
     with open("configs/kernel.flags", "r") as file:
-        temp = file.read().replace("${USB_ROOTFS}", usb_rootfs).strip()
+        temp = file.read().replace("${USB_ROOTFS}", rootfs_partuuid).strip()
     with open("kernel.flags", "w") as file:
         file.write(temp)
     print("Signing kernel")
@@ -160,7 +160,7 @@ def download_rootfs(distro_name: str, distro_version: str, distro_link: str) -> 
         match distro_name:
             case "ubuntu":
                 print(f"Downloading ubuntu rootfs {distro_version}")
-                urllib.request.urlretrieve(
+                urlretrieve(
                     f"https://cloud-images.ubuntu.com/releases/{distro_version}/release/ubuntu-{distro_version}"
                     f"-server-cloudimg-amd64-root.tar.xz",
                     filename="/tmp/eupnea-build/rootfs/ubuntu-rootfs.tar.xz")
@@ -170,13 +170,12 @@ def download_rootfs(distro_name: str, distro_version: str, distro_link: str) -> 
                 pass
             case "arch":
                 print("Downloading latest arch rootfs")
-                urllib.request.urlretrieve(
-                    "https://mirror.rackspace.com/archlinux/iso/latest/archlinux-bootstrap-x86_64.tar.gz",
-                    filename="/tmp/eupnea-build/rootfs/arch-rootfs.tar.gz")
+                urlretrieve("https://mirror.rackspace.com/archlinux/iso/latest/archlinux-bootstrap-x86_64.tar.gz",
+                            filename="/tmp/eupnea-build/rootfs/arch-rootfs.tar.gz")
             case "fedora":
                 print(f"Downloading fedora rootfs version: {distro_version}")
-                urllib.request.urlretrieve(distro_link, filename="/tmp/eupnea-build/rootfs/fedora-rootfs.tar.xz")
-    except urllib.error.URLError:
+                urlretrieve(distro_link, filename="/tmp/eupnea-build/rootfs/fedora-rootfs.tar.xz")
+    except URLError:
         print(
             "\033[91m" + "Failed to download rootfs. Check your internet connection and try again. If the error" +
             " persists, create an issue with the distro and version in the name" + "\033[0m")
@@ -226,7 +225,10 @@ def post_extract(username: str, password: str, hostname: str, rebind_search: boo
     print("Extracting kernel modules")
     rmdir("/mnt/eupnea/lib/modules", ignore_errors=True)
     Path("/mnt/eupnea/lib/modules").mkdir(parents=True, exist_ok=True)
-    bash("tar xpf /tmp/eupnea-build/modules.tar.xz -C /mnt/eupnea/ --checkpoint=.10000")  # tar contains /lib/modules
+    # modules tar contains /lib/modules, so its extracted to / and --skip-old-files is used to prevent overwriting
+    # other files in /lib
+    bash("tar xpf /tmp/eupnea-build/modules.tar.xz --skip-old-files -C /mnt/eupnea/ --checkpoint=.10000")
+    print("")  # break line after tar
     if not (distro == "ubuntu" and de_name == "gnome"):  # Ubuntu + gnome has first time setup
         print("Configuring user")
         chroot(f"useradd --create-home {username}")
