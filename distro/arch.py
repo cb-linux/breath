@@ -41,52 +41,52 @@ def config(de_name: str, distro_version: str) -> None:
         conf.writelines(temp_sudoers)
 
     print("\033[96m" + "Downloading and installing de, might take a while" + "\033[0m")
-    '''
     match de_name:
         case "gnome":
             print("Installing gnome")
-            chroot("apt install -y ubuntu-desktop")
+            chroot("pacman -S --noconfirm gnome gnome-extra")
+            chroot("systemctl enable gdm.service")
         case "kde":
             print("Installing kde")
-            chroot("apt install -y kde-standard")
+            chroot("pacman -S --noconfirm plasma-meta plasma-wayland-session kde-applications")
+            chroot("systemctl enable sddm.service")
         case "mate":
             print("Installing mate")
-            chroot("apt install -y ubuntu-mate-desktop")
+            # no wayland support in mate
+            chroot("pacman -S --noconfirm mate mate-extra xorg xorg-server lightdm lightdm-gtk-greeter")
+            chroot("systemctl enable lightdm.service")
         case "xfce":
             print("Installing xfce")
-            chroot("apt install -y xubuntu-desktop")
+            # no wayland support in xfce
+            chroot("pacman -S --noconfirm xfce4 xfce4-goodies xorg xorg-server lightdm lightdm-gtk-greeter")
+            chroot("systemctl enable lightdm.service")
         case "lxqt":
             print("Installing lxqt")
-            chroot("apt install -y lubuntu-desktop")
+            chroot("pacman -S --noconfirm lxqt breeze-icons xorg xorg-server sddm")
+            chroot("systemctl enable sddm.service")
         case "deepin":
             print("Installing deepin")
-            chroot("add-apt-repository ppa:ubuntudde-dev/stable; apt update; apt install -y ubuntudde-dde")
+            chroot("pacman -S --noconfirm deepin deepin-kwin deepin-extra xorg xorg-server lightdm")
+            # enable deepin specific login
+            with open("/mnt/eupnea/etc/lightdm/lightdm.conf", "a") as conf:
+                conf.write("greeter-session=lightdm-deepin-greeter")
+            chroot("systemctl enable lightdm.service")
         case "budgie":
             print("Installing budgie")
-            chroot("apt install -y ubuntu-budgie-desktop; sudo dpkg-reconfigure lightdm")
+            chroot("pacman -S --noconfirm budgie-desktop budgie-desktop-view budgie-screensaver budgie-control-center "
+                   "xorg xorg-server lightdm lightdm-gtk-greeter")
+            chroot("systemctl enable lightdm.service")
         case "minimal":
-            print("Installing minimal")
-            chroot("apt install -y xfce4 xfce4-terminal --no-install-recommends")
+            print("Installing xfce")
+            # no wayland support in xfce
+            chroot("pacman -S --noconfirm xfce4 xorg xorg-server lightdm lightdm-gtk-greeter")
+            chroot("systemctl enable lightdm.service")
         case "cli":
             print("Installing nothing")
         case _:
             print("\033[91m" + "Invalid desktop environment!!! Remove all files and retry." + "\033[0m")
-    # Ignore libfprint-2-2 fprintd libpam-fprintd errors
-    # GDM3 auto installs gnome-minimal. Gotta remove it if user didnt choose gnome
-    if not de_name == "gnome":
-        print("Fixing gdm3")
-        try:
-            os.remove("/mnt/eupnea/usr/share/xsessions/ubuntu.desktop")
-        except FileNotFoundError:
-            pass
-        chroot("apt remove -y gnome-shell; apt autoremove -y")
-    # TODO: Figure out if this is necessary
-    # remove needrestart for some reason?
-    chroot("apt remove -y needrestart")
-    print("Fixing securetty if needed")
-    # "2>/dev/null" is for hiding error message, as not to scare the user
-    bash("cp /mnt/eupnea/usr/share/doc/util-linux/examples/securetty /mnt/eupnea/etc/securetty 2>/dev/null")
-    '''
+    # enable network service
+    chroot("systemctl enable NetworkManager.service")
     print("Restoring pacman config")
     with open("/mnt/eupnea/etc/pacman.conf", "r") as conf:
         temp_pacman = conf.readlines()

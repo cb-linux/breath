@@ -19,7 +19,7 @@ def user_input() -> Tuple[str, str, str, str, bool, str, str, str, bool, bool]:
     password = ""
     while True:
         temp_distro_name = input(
-            "\033[94m" + "Available options: Ubuntu(default, recommended), Debian, Arch, Fedora(cli only)\n" +
+            "\033[94m" + "Available options: Ubuntu(default, recommended), Debian, Arch, Fedora\n" +
             "\033[0m")
         match temp_distro_name:
             case "Ubuntu" | "ubuntu" | "":

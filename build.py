@@ -247,7 +247,7 @@ def post_extract(username: str, password: str, hostname: str, rebind_search: boo
     with open("/mnt/eupnea/etc/hostname", "w") as hostname_file:
         hostname_file.write(hostname)
     print("Copying eupnea utils")
-    bash("cp eupnea-scripts/scripts/* /mnt/eupnea/usr/local/bin/")
+    bash("cp postinstall-scripts/scripts/* /mnt/eupnea/usr/local/bin/")
     chroot("chmod 755 /mnt/eupnea/usr/local/bin/*")
     print("Backing up default keymap and setting Chromebook layout")
     chroot("cp /mnt/eupnea/usr/share/X11/xkb/symbols/pc /mnt/eupnea/usr/share/X11/xkb/symbols/pc.default")
