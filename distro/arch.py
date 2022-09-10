@@ -16,8 +16,8 @@ def config(de_name: str, distro_version: str) -> None:
     bash("mount --bind /mnt/eupnea /mnt/eupnea")
     with open("/mnt/eupnea/etc/pacman.conf", "r") as conf:
         temp_pacman = conf.readlines()
-    # temporarily comment out CheckSpace, otherwise
-    temp_pacman[34] = "#" + temp_pacman[34]
+    # temporarily comment out CheckSpace, coz Pacman fails otherwise
+    temp_pacman[34] = f"#{temp_pacman[34]}"
     with open("/mnt/eupnea/etc/pacman.conf", "w") as conf:
         conf.writelines(temp_pacman)
 
@@ -29,6 +29,17 @@ def config(de_name: str, distro_version: str) -> None:
 
     print("Installing packages")
     print(chroot("pacman -S --noconfirm base base-devel nano networkmanager xkeyboard-config linux-firmware sudo"))
+
+    print("Configuring sudo")
+    with open("/mnt/eupnea/etc/pacman.conf", "r") as conf:
+        temp_sudoers = conf.readlines()
+    # uncomment wheel group
+    temp_sudoers[84] = temp_sudoers[84][2:]
+    temp_sudoers[87] = temp_sudoers[87][2:]
+    temp_sudoers[90] = temp_sudoers[90][2:]
+    with open("/mnt/eupnea/etc/pacman.conf", "w") as conf:
+        conf.writelines(temp_sudoers)
+
     print("\033[96m" + "Downloading and installing de, might take a while" + "\033[0m")
     '''
     match de_name:
@@ -87,7 +98,7 @@ def config(de_name: str, distro_version: str) -> None:
 
 # using arch-chroot for arch
 def chroot(command: str) -> str:
-    return sp.run('arch-chroot /tmp/eupnea-build/arch bash -c "' + command + '"', shell=True,
+    return sp.run('arch-chroot /mnt/eupnea bash -c "' + command + '"', shell=True,
                   capture_output=True).stdout.decode("utf-8").strip()
 
 

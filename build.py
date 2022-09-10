@@ -42,6 +42,8 @@ def prepare_host(de_name) -> None:
     bash("umount -lf /mnt/eupnea")  # just in case
     rmdir("/mnt/eupnea", ignore_errors=True)
     Path("/mnt/eupnea").mkdir(parents=True, exist_ok=True)
+    print("Remove old files if they exist")
+    bash("rm -rf ./eupnea.img ./kernel.flags")
     print("Installing necessary packages")
     # install cgpt and futility
     if os.path.exists("/usr/bin/apt"):
@@ -118,9 +120,10 @@ def prepare_usb() -> None:
 def prepare_img() -> str:
     print("\033[96m" + "Preparing img" + "\033[0m")
     print("Allocating space for image, might take a while")
-    # 12G for now, maybe decrease later
     # try fallocate, if it fails use dd
-    if not sp.run("fallocate -l 12G eupnea.img", shell=True, capture_output=True).stderr.decode(
+    # TODO: determine img size
+    img_size = 12
+    if not sp.run(f"fallocate -l {img_size}G eupnea.img", shell=True, capture_output=True).stderr.decode(
             "utf-8").strip() == "":
         bash("dd if=/dev/zero of=eupnea.img status=progress bs=12884 count=1000070")
     print("Mounting empty image")
@@ -133,8 +136,8 @@ def prepare_img() -> str:
     bash(f"parted -s -a optimal {img_mnt} unit mib mkpart Root 65 100%")
     bash(f"cgpt add -i 1 -t kernel -S 1 -T 5 -P 15 {img_mnt}")
     # get uuid of rootfs partition
-    rootfs_partuuid = sp.run(["blkid", "-o", "value", "-s", "PARTUUID", img_mnt + "p2"], capture_output=True).stdout.decode(
-        "utf-8").strip()
+    rootfs_partuuid = sp.run(["blkid", "-o", "value", "-s", "PARTUUID", img_mnt + "p2"],
+                             capture_output=True).stdout.decode("utf-8").strip()
     # read and modify kernel flags
     with open("configs/kernel.flags", "r") as file:
         temp = file.read().replace("${USB_ROOTFS}", rootfs_partuuid).strip()
@@ -244,7 +247,6 @@ def post_extract(username: str, password: str, hostname: str, rebind_search: boo
     with open("/mnt/eupnea/etc/hostname", "w") as hostname_file:
         hostname_file.write(hostname)
     print("Copying eupnea utils")
-    # TODO: add py utils when rewrite is finished
     bash("cp eupnea-scripts/scripts/* /mnt/eupnea/usr/local/bin/")
     chroot("chmod 755 /mnt/eupnea/usr/local/bin/*")
     print("Backing up default keymap and setting Chromebook layout")
