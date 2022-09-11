@@ -335,7 +335,7 @@ if __name__ == "__main__":
         case "fedora":
             import distro.fedora as distro
         case _:
-            print("\033[91m" + "Something went **really** wrong somewhere! (Distro name not found)" + "\033[0m")
+            print("\033[91m" + "Something went **really** wrong!!! (Distro name not found)" + "\033[0m")
             exit(1)
     distro.config(user_input[3], user_input[1])
     print("Adding postinstall hook")
