@@ -33,6 +33,16 @@ def process_args():
 # Clean /tmp from eupnea files
 def prepare_host() -> None:
     print("\033[96m" + "Preparing host system" + "\033[0m")
+    print("Creating mnt points")
+    bash("umount -lf /mnt/eupnea_rootfs")  # just in case
+    rmdir("/mnt/eupnea_rootfs", ignore_errors=True)
+    Path("/mnt/eupnea_rootfs").mkdir(parents=True, exist_ok=True)
+
+    print("Remounting USB/SD-card")
+    bash(f"umount {device}1")
+    bash(f"umount {device}2")
+    bash(f"mount {device}2 /mnt/eupnea_rootfs")
+
     print("Creating /tmp/eupnea-update")
     rmdir("/tmp/eupnea-update", ignore_errors=True)
     Path("/tmp/eupnea-update").mkdir()
@@ -84,29 +94,33 @@ def download_kernel() -> None:
 def flash_kernel() -> None:
     print("\n\033[96m" + "Flashing new kernel" + "\033[0m")
     print("Extracting kernel modules")
-    rmdir(f"{rootfs_mnt}/lib/modules", ignore_errors=True)
-    Path(f"{rootfs_mnt}/lib/modules").mkdir(parents=True, exist_ok=True)
+    rmdir("/mnt/eupnea_rootfs/lib/modules", ignore_errors=True)
+    Path("/mnt/eupnea_rootfs/lib/modules").mkdir(parents=True, exist_ok=True)
     # modules tar contains /lib/modules, so it's extracted to / and --skip-old-files is used to prevent overwriting
     # other files in /lib
-    bash(f"tar xpf /tmp/eupnea-update/modules.tar.xz --skip-old-files -C {rootfs_mnt}/ --checkpoint=.10000")
+    bash(f"tar xpf /tmp/eupnea-update/modules.tar.xz --skip-old-files -C /mnt/eupnea_rootfs/ --checkpoint=.10000")
     print("")  # break line after tar
     print("Extracting kernel headers")
     # TODO: extract kernel headers
     print("")
     # get uuid of rootfs partition
-    rootfs_partuuid = sp.run([f"blkid -o value -s PARTUUID {rootfs_mnt}"], shell=True,
+    rootfs_partuuid = sp.run([f"blkid -o value -s PARTUUID {device}2"], shell=True,
                              capture_output=True).stdout.decode("utf-8").strip()
     # read and modify kernel flags
-    with open("../configs/kernel.flags", "r") as file:
-        temp = file.read().replace("${USB_ROOTFS}", rootfs_partuuid).strip()
+    try:
+        with open("../configs/kernel.flags", "r") as file:
+            temp = file.read().replace("${USB_ROOTFS}", rootfs_partuuid).strip()
+    except FileNotFoundError:
+        with open("configs/kernel.flags", "r") as file:
+            temp = file.read().replace("${USB_ROOTFS}", rootfs_partuuid).strip()
     with open("kernel.flags", "w") as file:
         file.write(temp)
     print("Signing kernel")
     bash("futility vbutil_kernel --arch x86_64 --version 1 --keyblock /usr/share/vboot/devkeys/kernel.keyblock"
          + " --signprivate /usr/share/vboot/devkeys/kernel_data_key.vbprivk --bootloader kernel.flags" +
-         " --config kernel.flags --vmlinuz /tmp/eupnea-build/bzImage --pack /tmp/eupnea-build/bzImage.signed")
+         " --config kernel.flags --vmlinuz /tmp/eupnea-update/bzImage --pack /tmp/eupnea-update/bzImage.signed")
     print("Flashing kernel")
-    bash(f"dd if=/tmp/eupnea-build/bzImage.signed of={kernel_mnt}")
+    bash(f"dd if=/tmp/eupnea-update/bzImage.signed of={device}1")
 
 
 if __name__ == "__main__":
@@ -125,6 +139,10 @@ if __name__ == "__main__":
         print("\033[93m" + "Using mainline kernel" + "\033[0m")
     if args.local_path:
         print("\033[93m" + "Using local path" + "\033[0m")
+    # get rootfs partition from user
+    device = input("Please enter the device (e.g. /dev/sda) and press enter: \n").strip()
+    if device.endswith("/"):
+        device = device[:-1]
 
     prepare_host()
     if args.local_path is None:
@@ -145,11 +163,5 @@ if __name__ == "__main__":
         print("\033[96m" + "Using local kernel files" + "\033[0m")
         bash(f"cp {kernel_path}bzImage /tmp/eupnea-update/bzImage")
         bash(f"cp {kernel_path}modules.tar.xz /tmp/eupnea-update/modules.tar.xz")
-
-    # get rootfs partition from user
-    rootfs_mnt = input("Please enter the root partition (e.g. /dev/sda2) and press enter: \n").strip()
-    if rootfs_mnt.endswith("/"):
-        rootfs_mnt = rootfs_mnt[:-1]
-    kernel_mnt = rootfs_mnt[:-1] + "1"
     flash_kernel()
     print("\033[92m" + "Kernel update complete!" + "\033[0m")
