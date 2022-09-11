@@ -205,14 +205,12 @@ def user_input() -> Tuple[str, str, str, str, bool, str, str, str, bool, bool]:
 
     print(
         "\033[92m" + "Would you like to rebind the Search/Super/Win key to Caps Lock?(NOT RECOMMENDED)" + "\033[0m")
-    while True:
-        if input("\033[94m" + "Type yes to rebind. Press enter to keep old binding" "\033[0m" + "\n") == "yes":
-            print("Search key will be a CAPS LOCK key")
-            rebind_search = True
-        else:
-            print("Search key will be Super/Win key")
-            rebind_search = False
-        break
+    if input("\033[94m" + "Type yes to rebind. Press enter to keep old binding" "\033[0m" + "\n") == "yes":
+        print("Search key will be a CAPS LOCK key")
+        rebind_search = True
+    else:
+        print("Search key will be Super/Win key")
+        rebind_search = False
 
     print("\033[92m" + "Create image or write to the SD-card/USB-stick directly? (direct write is not yet supported)"
           + "\033[0m")
