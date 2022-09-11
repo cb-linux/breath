@@ -85,10 +85,11 @@ def user_input() -> Tuple[str, str, str, str, bool, str, str, str, bool, bool]:
             available_de = "Gnome(default, recommended), KDE(recommended), MATE, Xfce(recommended for weak devices), " \
                            "LXQt(recommended for weak devices), budgie, minimal, cli"
         case "arch":
-            available_de = "No DE available yet, type 'cli' to continue"
+            available_de = "Gnome(default, recommended), KDE(recommended), MATE, Xfce(recommended for weak devices), " \
+                           "LXQt(recommended for weak devices), deepin, budgie, minimal, cli"
         case "fedora":
             available_de = "Gnome(default, recommended), KDE(recommended), MATE, Xfce(recommended for weak devices), " \
-                           "LXQt(recommended for weak devices), deepin, minimal, cli"
+                           "LXQt(recommended for weak devices), deepin, cli"
     while True:
         de_name = input("\033[94m" + "Available options: " + available_de + "\033[0m" + "\n")
         match de_name:

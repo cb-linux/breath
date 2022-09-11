@@ -42,6 +42,9 @@ def config(de_name: str, distro_version: str) -> None:
         case "budgie":
             print("\033[91m" + "Budgie is not available for Fedora" + "\033[91m")
             exit(1)
+        case "minimal":
+            # TODO: Add minimal
+            print("\033[91m" + "Minimal is not available YET for Fedora" + "\033[91m")
         case "cli":
             print("Installing nothing")
         case _:
