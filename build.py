@@ -33,7 +33,7 @@ def process_args():
 
 
 # Clean /tmp from eupnea files
-def prepare_host(de_name) -> None:
+def prepare_host(de_name: str) -> None:
     print("\033[96m" + "Preparing host system" + "\033[0m")
     print("Creating /tmp/eupnea-build")
     rmdir("/tmp/eupnea-build", ignore_errors=True)
@@ -127,16 +127,16 @@ def prepare_img() -> str:
             "utf-8").strip() == "":
         bash("dd if=/dev/zero of=eupnea.img status=progress bs=12884 count=1000070")
     print("Mounting empty image")
-    img_mnt = sp.run(["losetup", "-f", "--show", "eupnea.img"], capture_output=True).stdout.decode("utf-8").strip()
+    img_mnt = sp.run(["losetup -f --show eupnea.img"], shell=True, capture_output=True).stdout.decode("utf-8").strip()
     print("Image mounted at" + img_mnt)
-    # format usb as per deptcharge requirements
+    # format usb as per depthcharge requirements
     print("Partitioning mounted image and adding flags")
     bash(f"parted -s {img_mnt} mklabel gpt")
     bash(f"parted -s -a optimal {img_mnt} unit mib mkpart Kernel 1 65")
     bash(f"parted -s -a optimal {img_mnt} unit mib mkpart Root 65 100%")
     bash(f"cgpt add -i 1 -t kernel -S 1 -T 5 -P 15 {img_mnt}")
     # get uuid of rootfs partition
-    rootfs_partuuid = sp.run(["blkid", "-o", "value", "-s", "PARTUUID", img_mnt + "p2"],
+    rootfs_partuuid = sp.run([f"blkid -o value -s PARTUUID {img_mnt}p2"], shell=True,
                              capture_output=True).stdout.decode("utf-8").strip()
     # read and modify kernel flags
     with open("configs/kernel.flags", "r") as file:
@@ -221,14 +221,14 @@ def extract_rootfs(distro: str) -> None:
 
 
 # Configure distro agnostic options
-def post_extract(username: str, password: str, hostname: str, rebind_search: bool, distro, de_name) -> None:
+def post_extract(username: str, password: str, hostname: str, rebind_search: bool, distro: str, de_name: str) -> None:
     print("\n\033[96m" + "Configuring Eupnea" + "\033[0m")
     print("Copying resolv.conf")
     bash("cp --remove-destination /etc/resolv.conf /mnt/eupnea/etc/resolv.conf")
     print("Extracting kernel modules")
     rmdir("/mnt/eupnea/lib/modules", ignore_errors=True)
     Path("/mnt/eupnea/lib/modules").mkdir(parents=True, exist_ok=True)
-    # modules tar contains /lib/modules, so its extracted to / and --skip-old-files is used to prevent overwriting
+    # modules tar contains /lib/modules, so it's extracted to / and --skip-old-files is used to prevent overwriting
     # other files in /lib
     bash("tar xpf /tmp/eupnea-build/modules.tar.xz --skip-old-files -C /mnt/eupnea/ --checkpoint=.10000")
     print("")  # break line after tar
