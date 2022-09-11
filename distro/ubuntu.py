@@ -6,7 +6,8 @@ import subprocess as sp
 def config(de_name: str, distro_version: str) -> None:
     print("\033[96m" + "Configuring Ubuntu" + "\033[0m")
     print("Installing packages")
-    chroot("apt install -y linux-firmware network-manager tasksel software-properties-common cloud-utils")
+    chroot("apt install -y linux-firmware network-manager software-properties-common cloud-utils")
+    # TODO: Find out why we need to reinstall dbus
     print("Reinstalling dbus")
     chroot("apt reinstall -y dbus")
     # de install fails without updating apt

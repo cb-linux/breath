@@ -108,7 +108,7 @@ def download_kernel() -> None:
                 urlretrieve(f"{url}modules.tar.xz", filename="/tmp/eupnea-build/modules.tar.xz")
     except URLError:
         print("\033[91m" + "Failed to reach github. Check your internet connection and try again" + "\033[0m")
-        exit(1)
+        bash(f"kill {main_thread_pid}")
 
 
 # Prepare USB, usb is not yet fully implemented
@@ -169,15 +169,20 @@ def download_rootfs(distro_name: str, distro_version: str, distro_link: str) -> 
                     filename="/tmp/eupnea-build/rootfs/ubuntu-rootfs.tar.xz")
             case "debian":
                 print("Downloading debian with debootstrap")
-                if sp.run("debootstrap stable /tmp/eupnea-build/rootfs https://deb.debian.org/debian/", shell=True,
-                          capture_output=True).stdout.decode("utf-8").__contains__("Couldn't download packages:"):
-                    print("Debootstrap failed, retrying once")
+                debian_result = sp.run("debootstrap stable /tmp/eupnea-build/rootfs https://deb.debian.org/debian/",
+                                       shell=True, capture_output=True).stdout.decode("utf-8")
+                print(debian_result)
+                if debian_result.__contains__("Couldn't download packages:"):
+                    print("\033[91m\nDebootstrap failed, retrying once\n\033[0m")
                     rmdir("/tmp/eupnea-build", ignore_errors=True)
                     Path("/tmp/eupnea-build/rootfs").mkdir(parents=True)
-                    if sp.run("debootstrap stable /tmp/eupnea-build/rootfs https://deb.debian.org/debian/", shell=True,
-                              capture_output=True).stdout.decode("utf-8").__contains__("Couldn't download packages:"):
-                        print("Debootstrap failed again, check your internet connection or try again later")
-                        exit(1)
+                    debian_result = sp.run("debootstrap stable /tmp/eupnea-build/rootfs https://deb.debian.org/debian/",
+                                           shell=True, capture_output=True).stdout.decode("utf-8")
+                    print(debian_result)
+                    if debian_result.__contains__("Couldn't download packages:"):
+                        print("\033[91m\nDebootstrap failed again, check your internet connection or try again later" +
+                              "\033[0m")
+                        bash(f"kill {main_thread_pid}")
             case "arch":
                 print("Downloading latest arch rootfs")
                 urlretrieve("https://mirror.rackspace.com/archlinux/iso/latest/archlinux-bootstrap-x86_64.tar.gz",
@@ -189,7 +194,7 @@ def download_rootfs(distro_name: str, distro_version: str, distro_link: str) -> 
         print(
             "\033[91m" + "Failed to download rootfs. Check your internet connection and try again. If the error" +
             " persists, create an issue with the distro and version in the name" + "\033[0m")
-        exit(1)
+        bash(f"kill {main_thread_pid}")
 
 
 # extract the rootfs to the img
@@ -286,6 +291,7 @@ if __name__ == "__main__":
         args = ['sudo', sys.executable] + sys.argv + [os.environ]
         os.execlpe('sudo', *args)
     args = process_args()
+    main_thread_pid = os.getpid()  # for threads to kill mainthread
     if args.dev_build:
         print("\033[93m" + "Using dev release" + "\033[0m")
     if args.alt:
@@ -301,7 +307,7 @@ if __name__ == "__main__":
     prepare_host(user_input[0])
     if args.local_path is None:
         # Print download progress in terminal
-        t = Thread(target=download_kernel)
+        t = Thread(target=download_kernel, daemon=True)
         t.start()
         sleep(1)
         while t.is_alive():
@@ -322,7 +328,7 @@ if __name__ == "__main__":
     else:
         prepare_usb()
     # Print download progress in terminal
-    t = Thread(target=download_rootfs, args=(user_input[0], user_input[1], user_input[2],))
+    t = Thread(target=download_rootfs, args=(user_input[0], user_input[1], user_input[2],), daemon=True)
     t.start()
     sleep(1)
     while t.is_alive():

@@ -20,8 +20,7 @@ def config(de_name: str, distro_version: str) -> None:
     match de_name:
         case "gnome":
             print("Installing gnome")
-            # TODO: Maybe convert this to apt
-            chroot("tasksel install desktop gnome-desktop")
+            chroot("apt install gnome/stable")
         case "kde":
             print("Installing kde")
             chroot("apt install -y task-kde-desktop")
