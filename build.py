@@ -122,7 +122,7 @@ def prepare_img() -> str:
     print("Allocating space for image, might take a while")
     # try fallocate, if it fails use dd
     # TODO: determine img size
-    img_size = 12
+    img_size = 10  # 10 for now
     if not sp.run(f"fallocate -l {img_size}G eupnea.img", shell=True, capture_output=True).stderr.decode(
             "utf-8").strip() == "":
         bash("dd if=/dev/zero of=eupnea.img status=progress bs=12884 count=1000070")
@@ -270,7 +270,7 @@ def post_extract(username: str, password: str, hostname: str, rebind_search: boo
         chroot("cp configs/xkb/xkb.chromebook /mnt/eupnea/usr/share/X11/xkb/symbols/pc")
     print("Configuring sleep")
     # disable deep sleep and hibernation
-    # TODO: Fix sleep?
+    # TODO: Fix sleep
     Path("/mnt/eupnea/etc/systemd/").mkdir(exist_ok=True)
     with open("/mnt/eupnea/etc/systemd/sleep.conf", "a") as file:
         file.write("SuspendState=freeze\nHibernateState=freeze")
