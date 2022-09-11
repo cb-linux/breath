@@ -204,7 +204,7 @@ def user_input() -> Tuple[str, str, str, str, bool, str, str, str, bool, bool]:
             break
 
     print(
-        "\033[92m" + "Would you like to rebind the Search/Super(Win key) key to Caps Lock?(NOT RECOMMENDED)" + "\033[0m")
+        "\033[92m" + "Would you like to rebind the Search/Super/Win key to Caps Lock?(NOT RECOMMENDED)" + "\033[0m")
     while True:
         if input("\033[94m" + "Type yes to rebind. Press enter to keep old binding" "\033[0m" + "\n") == "yes":
             print("Search key will be a CAPS LOCK key")
