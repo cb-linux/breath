@@ -28,7 +28,10 @@ def config(de_name: str, distro_version: str) -> None:
     chroot("pacman -Syu --noconfirm")
 
     print("Installing packages")
-    print(chroot("pacman -S --noconfirm base base-devel nano networkmanager xkeyboard-config linux-firmware sudo"))
+    print(chroot("pacman -S --noconfirm base base-devel nano networkmanager xkeyboard-config linux-firmware sudo "
+                 "cloud-utils"))
+    # linux-firmware is for wifi
+    # cloud-utils is for grow-part
 
     print("Configuring sudo")
     with open("/mnt/eupnea/etc/sudoers", "r") as conf:

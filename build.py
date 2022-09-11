@@ -338,6 +338,13 @@ if __name__ == "__main__":
             print("\033[91m" + "Something went **really** wrong somewhere! (Distro name not found)" + "\033[0m")
             exit(1)
     distro.config(user_input[3], user_input[1])
+    print("Adding postinstall hook")
+    # read current crontab
+    sp.run("crontab -l -u root > /tmp/eupnea-build/crontab.current", shell=True)
+    with open("/tmp/eupnea-build/crontab.current", "a") as file:
+        file.write("@reboot /usr/local/bin/eupnea-postinstall\n")
+    # write new crontab
+    bash("crontab -u root /tmp/eupnea-build/crontab.current")
     print("\033[96m" + "Finishing setup" + "\033[0m")
     print("Unmounting rootfs")
     bash("umount /mnt/eupnea")

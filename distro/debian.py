@@ -7,7 +7,7 @@ def config(de_name: str, distro_version: str) -> None:
     print("\033[96m" + "Configuring Ubuntu" + "\033[0m")
     print("Installing packages")
     chroot("apt update -y")
-    chroot("apt install -y network-manager tasksel software-properties-common sudo firmware-linux-free " +
+    chroot("apt install -y network-manager tasksel software-properties-common sudo firmware-linux-free cloud-utils" +
            "firmware-linux-nonfree firmware-iwlwifi iw curl wget git")
     print("Reinstalling dbus")
     # TODO: Find out why reinstalling dbus is necessary

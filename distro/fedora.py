@@ -8,7 +8,7 @@ def config(de_name: str, distro_version: str) -> None:
     print("Installing packages")
     chroot("dnf update -y")
     chroot("dnf install linux-firmware -y")
-    chroot("dnf group install 'Minimal Install' -y; dnf install NetworkManager-tui ncurses -y")
+    chroot("dnf group install 'Minimal Install' -y; dnf install NetworkManager-tui ncurses cloud-utils -y")
     print("Add nonfree repos")
     chroot(f"dnf install https://download1.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-{distro_version}"
            f".noarch.rpm -y")
