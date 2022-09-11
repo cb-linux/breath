@@ -127,7 +127,7 @@ def prepare_img() -> str:
             "utf-8").strip() == "":
         bash("dd if=/dev/zero of=eupnea.img status=progress bs=12884 count=1000070")
     print("Mounting empty image")
-    img_mnt = sp.run(["losetup -f --show eupnea.img"], shell=True, capture_output=True).stdout.decode("utf-8").strip()
+    img_mnt = sp.run("losetup -f --show eupnea.img", shell=True, capture_output=True).stdout.decode("utf-8").strip()
     print("Image mounted at" + img_mnt)
     # format usb as per depthcharge requirements
     print("Partitioning mounted image and adding flags")
@@ -169,8 +169,15 @@ def download_rootfs(distro_name: str, distro_version: str, distro_link: str) -> 
                     filename="/tmp/eupnea-build/rootfs/ubuntu-rootfs.tar.xz")
             case "debian":
                 print("Downloading debian with debootstrap")
-                bash("debootstrap stable /tmp/eupnea-build/rootfs https://deb.debian.org/debian/")
-                pass
+                if sp.run("debootstrap stable /tmp/eupnea-build/rootfs https://deb.debian.org/debian/", shell=True,
+                          capture_output=True).stdout.decode("utf-8").__contains__("Couldn't download packages:"):
+                    print("Debootstrap failed, retrying once")
+                    rmdir("/tmp/eupnea-build", ignore_errors=True)
+                    Path("/tmp/eupnea-build/rootfs").mkdir(parents=True)
+                    if sp.run("debootstrap stable /tmp/eupnea-build/rootfs https://deb.debian.org/debian/", shell=True,
+                              capture_output=True).stdout.decode("utf-8").__contains__("Couldn't download packages:"):
+                        print("Debootstrap failed again, check your internet connection or try again later")
+                        exit(1)
             case "arch":
                 print("Downloading latest arch rootfs")
                 urlretrieve("https://mirror.rackspace.com/archlinux/iso/latest/archlinux-bootstrap-x86_64.tar.gz",
