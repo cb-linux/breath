@@ -31,13 +31,13 @@ def config(de_name: str, distro_version: str) -> None:
     print(chroot("pacman -S --noconfirm base base-devel nano networkmanager xkeyboard-config linux-firmware sudo"))
 
     print("Configuring sudo")
-    with open("/mnt/eupnea/etc/pacman.conf", "r") as conf:
+    with open("/mnt/eupnea/etc/sudoers", "r") as conf:
         temp_sudoers = conf.readlines()
     # uncomment wheel group
     temp_sudoers[84] = temp_sudoers[84][2:]
     temp_sudoers[87] = temp_sudoers[87][2:]
     temp_sudoers[90] = temp_sudoers[90][2:]
-    with open("/mnt/eupnea/etc/pacman.conf", "w") as conf:
+    with open("/mnt/eupnea/etc/sudoers", "w") as conf:
         conf.writelines(temp_sudoers)
 
     print("\033[96m" + "Downloading and installing de, might take a while" + "\033[0m")
