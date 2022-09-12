@@ -150,7 +150,7 @@ def prepare_img() -> str:
     print("Flashing kernel")
     bash(f"dd if=/tmp/eupnea-build/bzImage.signed of={img_mnt}p1")
     print("Formating rootfs")
-    bash(f"yes | mkfs.ext4 {img_mnt}p2")
+    bash(f"yes 2>/dev/null | mkfs.ext4 {img_mnt}p2")
     print("Mounting rootfs to /mnt/eupnea")
     bash(f"mount {img_mnt}p2 /mnt/eupnea")
     return img_mnt
@@ -261,7 +261,7 @@ def post_extract(username: str, password: str, hostname: str, rebind_search: boo
     print("Copying eupnea utils")
     bash("cp postinstall-scripts/* /mnt/eupnea/usr/local/bin/")
     Path("/mnt/eupnea/usr/local/eupnea-configs").mkdir(exist_ok=True)
-    bash("cp configs /mnt/eupnea/usr/local/eupnea-configs")
+    bash("cp -r configs /mnt/eupnea/usr/local/eupnea-configs")
     print("Backing up default keymap and setting Chromebook layout")
     chroot("cp /mnt/eupnea/usr/share/X11/xkb/symbols/pc /mnt/eupnea/usr/share/X11/xkb/symbols/pc.default")
     chroot("cp -f configs/xkb/xkb.chromebook /mnt/eupnea/usr/share/X11/xkb/symbols/pc")
