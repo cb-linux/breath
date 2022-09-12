@@ -1,3 +1,0 @@
-[submodule "postinstall-scripts"]
-	path = postinstall-scripts
-	url = https://github.com/eupnea-linux/eupnea-scripts.git
