@@ -259,14 +259,15 @@ def post_extract(username: str, password: str, hostname: str, rebind_search: boo
     with open("/mnt/eupnea/etc/hostname", "w") as hostname_file:
         hostname_file.write(hostname)
     print("Copying eupnea utils")
-    bash("cp postinstall-scripts/scripts/* /mnt/eupnea/usr/local/bin/")
+    bash("cp postinstall-scripts/* /mnt/eupnea/usr/local/bin/")
+    Path("/mnt/eupnea/usr/local/eupnea-configs").mkdir(exist_ok=True)
+    bash("cp configs /mnt/eupnea/usr/local/eupnea-configs")
     print("Backing up default keymap and setting Chromebook layout")
     chroot("cp /mnt/eupnea/usr/share/X11/xkb/symbols/pc /mnt/eupnea/usr/share/X11/xkb/symbols/pc.default")
     chroot("cp -f configs/xkb/xkb.chromebook /mnt/eupnea/usr/share/X11/xkb/symbols/pc")
     if rebind_search:
         print("Rebinding search key to Caps Lock")
         chroot("cp /mnt/eupnea/usr/share/X11/xkb/keycodes/evdev /mnt/eupnea/usr/share/X11/xkb/keycodes/evdev.default")
-        chroot("cp configs/xkb/xkb.chromebook /mnt/eupnea/usr/share/X11/xkb/symbols/pc")
     print("Configuring sleep")
     # disable deep sleep and hibernation
     # TODO: Fix sleep
@@ -357,7 +358,7 @@ if __name__ == "__main__":
     # read current crontab
     sp.run("crontab -l -u root > /tmp/eupnea-build/crontab.current", shell=True)
     with open("/tmp/eupnea-build/crontab.current", "a") as file:
-        file.write("@reboot /usr/local/bin/eupnea-postinstall\n")
+        file.write("@reboot /usr/local/bin/postinstall\n")
     # write new crontab
     bash("crontab -u root /tmp/eupnea-build/crontab.current")
     print("\033[96m" + "Finishing setup" + "\033[0m")

@@ -17,16 +17,17 @@ from time import sleep
 def process_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('-p', '--local-path', dest="local_path",
-                        help="Local path for kernel files, to use instead of downloading from github." +
-                             "(Unsigned kernels only)")
+                        help="Local path for kernel files to use instead of downloading from github.")
     parser.add_argument("--dev", action="store_true", dest="dev_build", default=False,
-                        help="Use latest dev build. May be unstable.")
+                        help="Use kernels from latest dev build. May be unstable.")
     parser.add_argument("--alt", action="store_true", dest="alt", default=False,
-                        help="Use alt kernel. Only for older devices.")
+                        help="Use alt kernel. Recommended for older devices.")
     parser.add_argument("--exp", action="store_true", dest="exp", default=False,
-                        help="Use experimental 5.15 kernel.")
+                        help="Use experimental 5.15 chromeos kernel. It is newer, but Google does not use "
+                             "it in production yet.")
     parser.add_argument("--mainline", action="store_true", dest="mainline", default=False,
-                        help="Use mainline linux kernel instead of modified chromeos kernel.")
+                        help="Use mainline linux kernel instead of modified chromeos kernel. Might provide more "
+                             "functionality on newer devices.")
     return parser.parse_args()
 
 
@@ -148,9 +149,14 @@ if __name__ == "__main__":
         skip_question = True
     # get rootfs partition from user
     bash("lsblk")
-    device = input("\033[92m" + "Please enter the device (e.g. /dev/sda) and press enter: \n" + "\033[0m").strip()
-    if device.endswith("/"):
+    device = input(
+        "\033[92m" + "Please enter the device name (e.g. sda or mmcblk0) and press enter: \n" + "\033[0m").strip()
+    if device.endswith("/") or device.endswith("1") or device.endswith("2"):
         device = device[:-1]
+    if not device.startswith("/dev/"):
+        device = device + "p"
+    # add /dev/ to device name
+    device = f"/dev/{device}"
     if not skip_question:
         while True:
             print("\033[92m" + "Which kernel would you like to flash? Press enter for default\n" + "\033[0m")
