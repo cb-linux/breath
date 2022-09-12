@@ -301,10 +301,12 @@ def post_extract(username: str, password: str, hostname: str, rebind_search: boo
     cpdir("configs", "/mnt/eupnea/usr/local/eupnea-configs")
 
     print("Backing up default keymap and setting Chromebook layout")
+    Path("/mnt/eupnea/usr/share/X11/xkb/symbols/").mkdir(parents=True, exist_ok=True)
     cp("/mnt/eupnea/usr/share/X11/xkb/symbols/pc", "/mnt/eupnea/usr/share/X11/xkb/symbols/pc.default")
     cp("configs/xkb/xkb.chromebook", "/mnt/eupnea/usr/share/X11/xkb/symbols/pc")
     if rebind_search:  # rebind search key to caps lock
         print("Rebinding search key to Caps Lock")
+        Path("/mnt/eupnea/usr/share/X11/xkb/keycodes/").mkdir(parents=True, exist_ok=True)
         cp("/mnt/eupnea/usr/share/X11/xkb/keycodes/evdev", "/mnt/eupnea/usr/share/X11/xkb/keycodes/evdev.default")
 
     print("Configuring sleep")
