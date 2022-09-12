@@ -16,15 +16,16 @@ def config(de_name: str, distro_version: str) -> None:
     chroot("plymouth-set-default-theme details -R &> /dev/null")
     # TODO: Perhaps zram works with mainline?
     chroot("dnf remove zram-generator-defaults -y")  # remove zram as it fails for some reason
-    chroot("systemctl disable systemd-zram-setup@zram0.service") # disable zram service
+    chroot("systemctl disable systemd-zram-setup@zram0.service")  # disable zram service
     print("\033[96m" + "Downloading and installing DE, might take a while" + "\033[0m")
     match de_name:
         case "gnome":
             print("Installing gnome")
             # As gnome is not preinstalled on the cloud version, we need to install it "manually"
-            chroot("dnf inastall @base-x gnome-shell gnome-terminal nautilus firefox chrome-gnome-shell gnome-tweaks " +
+            chroot("dnf install @base-x gnome-shell gnome-terminal nautilus firefox chrome-gnome-shell gnome-tweaks " +
                    "@development-tools gnome-terminal-nautilus xdg-user-dirs xdg-user-dirs-gtk gnome-calculator " +
-                   "gnome-system-monitor gedit file-roller")
+                   "gnome-system-monitor gedit file-roller gdm")
+            chroot("systemctl enable gdm.service")
         case "kde":
             print("Installing kde")
             chroot("dnf group install 'KDE Plasma Workspaces' -y")

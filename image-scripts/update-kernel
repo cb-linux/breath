@@ -147,6 +147,7 @@ if __name__ == "__main__":
         print("\033[93m" + "Using local path" + "\033[0m")
         skip_question = True
     # get rootfs partition from user
+    bash("lsblk")
     device = input("\033[92m" + "Please enter the device (e.g. /dev/sda) and press enter: \n" + "\033[0m").strip()
     if device.endswith("/"):
         device = device[:-1]

@@ -260,7 +260,6 @@ def post_extract(username: str, password: str, hostname: str, rebind_search: boo
         hostname_file.write(hostname)
     print("Copying eupnea utils")
     bash("cp postinstall-scripts/scripts/* /mnt/eupnea/usr/local/bin/")
-    chroot("chmod 755 /mnt/eupnea/usr/local/bin/*")
     print("Backing up default keymap and setting Chromebook layout")
     chroot("cp /mnt/eupnea/usr/share/X11/xkb/symbols/pc /mnt/eupnea/usr/share/X11/xkb/symbols/pc.default")
     chroot("cp -f configs/xkb/xkb.chromebook /mnt/eupnea/usr/share/X11/xkb/symbols/pc")
@@ -278,6 +277,9 @@ def post_extract(username: str, password: str, hostname: str, rebind_search: boo
     with open("configs/kernel-modules.txt", "r") as repo_file:
         with open("/mnt/eupnea/etc/modules", "a") as file:
             file.write(repo_file.read())
+    # disable ssh service, as it fails to start
+    # TODO: Fix ssh
+    chroot("systemctl disable ssh.service")
 
 
 def chroot(command: str) -> str:
