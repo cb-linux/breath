@@ -48,8 +48,14 @@ def prepare_host(de_name: str) -> None:
     Path("/mnt/eupnea").mkdir(parents=True, exist_ok=True)
 
     print("Remove old files if they exist")
-    os.remove("eupnea.img")
-    os.remove("kernel.flags")
+    try:
+        os.remove("eupnea.img")
+    except FileNotFoundError:
+        pass
+    try:
+        os.remove("kernel.flags")
+    except FileNotFoundError:
+        pass
 
     print("Installing necessary packages")
     # install cgpt and futility
