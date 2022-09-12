@@ -30,7 +30,7 @@ def config(de_name: str, distro_version: str) -> None:
     print("Installing packages")
     print(chroot("pacman -S --noconfirm base base-devel nano networkmanager xkeyboard-config linux-firmware sudo "
                  "cloud-utils"))
-    # linux-firmware is for wifi
+    # linux-firmware is for Wi-Fi
     # cloud-utils is for grow-part
 
     print("Configuring sudo")

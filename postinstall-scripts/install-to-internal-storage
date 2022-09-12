@@ -1,0 +1,68 @@
+#!/bin/bash
+#
+
+set -e
+
+# Arch support
+if [[ -f "/etc/arch-version" ]] || [[ -f "/etc/arch-release" ]]; then
+    git clone https://aur.archlinux.org/flashrom-git.git
+    git clone https://aur.archlinux.org/trousers.git
+    git clone https://aur.archlinux.org/vboot-utils.git
+
+    cd ./flashrom-git  && makepkg -cis 
+    cd ../trousers     && makepkg -cis
+    cd ../vboot-utils  && makepkg -cis 
+   
+    sudo pacman -Syu rsync curl parted
+
+    cd ../
+    rm -rf ./flashrom-git ./trousers ./vboot-utils
+else
+    sudo apt install vboot-kernel-utils cgpt curl rsync -y
+fi
+
+echo "What drive would you like to install to? (e.g. /dev/mmcblk0)"
+read -r USB
+export USB
+
+# Format the USB with GPT
+sudo parted $USB mklabel gpt
+echo "Writing storage, will take a few minutes"
+sync
+
+# Create a 65 Mb kernel partition
+# Our kernels are only ~10 Mb though
+sudo parted -a optimal $USB unit mib mkpart Kernel 1 65
+
+# Add a root partition
+sudo parted -a optimal $USB unit mib mkpart Root 65 100%
+
+# Make depthcharge know that this is a real kernel partition
+sudo cgpt add -i 1 -t kernel -S 1 -T 5 -P 15 $USB
+
+# Format the root partition as ext4 and mount it to /mnt
+sudo mkfs.ext4 ${USB}p2
+
+echo "Writing storage, will take a few minutes"
+sync
+
+sudo mount ${USB}p2 /mnt
+
+# Copy all files from the USB to the internal storage drive
+sudo rsync -a --info=progress2  / /mnt --exclude proc --exclude sys --exclude dev --exclude mnt --exclude media --exclude run || true
+echo "Writing storage, will take a few minutes"
+sync
+
+bash <(curl -s https://raw.githubusercontent.com/cb-linux/kernel/main/kernel.emmc.flags.sh) > cmdline
+
+# Get the bzImage
+sudo dd if=/dev/sda1 of=bzImage
+
+# Repack the kernel
+futility vbutil_kernel --repack bzImage.signed --keyblock /usr/share/vboot/devkeys/kernel.keyblock --signprivate /usr/share/vboot/devkeys/kernel_data_key.vbprivk --oldblob bzImage --config cmdline
+
+# Flash the kernel to the partition
+sudo dd if=bzImage.signed of=${USB}p1
+
+sync
+echo "Done! Use CTRL+D to boot from the internal storage next time."
