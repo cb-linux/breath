@@ -298,7 +298,6 @@ def post_extract(username: str, password: str, hostname: str, rebind_search: boo
 
     print("Copying eupnea utils")
     bash("cp postinstall-scripts/* /mnt/eupnea/usr/local/bin/")
-    Path("/mnt/eupnea/usr/local/eupnea-configs").mkdir(exist_ok=True)
     cpdir("configs", "/mnt/eupnea/usr/local/eupnea-configs")
 
     print("Backing up default keymap and setting Chromebook layout")
