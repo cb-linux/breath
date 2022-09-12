@@ -265,7 +265,7 @@ def extract_rootfs(distro: str) -> None:
 
 
 # Configure distro agnostic options
-def post_extract(username: str, password: str, hostname: str, rebind_search: bool, distro: str, de_name: str) -> None:
+def post_extract(username: str, password: str, hostname: str, distro: str, de_name: str) -> None:
     print("\n\033[96m" + "Configuring Eupnea" + "\033[0m")
 
     print("Copying resolv.conf")
@@ -299,15 +299,6 @@ def post_extract(username: str, password: str, hostname: str, rebind_search: boo
     print("Copying eupnea utils")
     bash("cp postinstall-scripts/* /mnt/eupnea/usr/local/bin/")
     cpdir("configs", "/mnt/eupnea/usr/local/eupnea-configs")
-
-    print("Backing up default keymap and setting Chromebook layout")
-    Path("/mnt/eupnea/usr/share/X11/xkb/symbols/").mkdir(parents=True, exist_ok=True)
-    cp("/mnt/eupnea/usr/share/X11/xkb/symbols/pc", "/mnt/eupnea/usr/share/X11/xkb/symbols/pc.default")
-    cp("configs/xkb/xkb.chromebook", "/mnt/eupnea/usr/share/X11/xkb/symbols/pc")
-    if rebind_search:  # rebind search key to caps lock
-        print("Rebinding search key to Caps Lock")
-        Path("/mnt/eupnea/usr/share/X11/xkb/keycodes/").mkdir(parents=True, exist_ok=True)
-        cp("/mnt/eupnea/usr/share/X11/xkb/keycodes/evdev", "/mnt/eupnea/usr/share/X11/xkb/keycodes/evdev.default")
 
     print("Configuring sleep")
     # disable hibernation aka S4 sleep, READ: https://eupnea-linux.github.io/docs.html#/bootlock
@@ -390,7 +381,7 @@ if __name__ == "__main__":
     print("")  # break line
 
     extract_rootfs(user_input[0])
-    post_extract(user_input[5], user_input[6], user_input[7], user_input[8], user_input[0], user_input[3])
+    post_extract(user_input[5], user_input[6], user_input[7], user_input[0], user_input[3])
 
     match user_input[0]:
         case "ubuntu":
@@ -405,6 +396,14 @@ if __name__ == "__main__":
             print("\033[91m" + "Something went **really** wrong!!! (Distro name not found)" + "\033[0m")
             exit(1)
     distro.config(user_input[3], user_input[1])
+
+    # Add chromebook layout. Needs to be done after install Xorg/Wayland
+    print("Backing up default keymap and setting Chromebook layout")
+    cp("/mnt/eupnea/usr/share/X11/xkb/symbols/pc", "/mnt/eupnea/usr/share/X11/xkb/symbols/pc.default")
+    cp("configs/xkb/xkb.chromebook", "/mnt/eupnea/usr/share/X11/xkb/symbols/pc")
+    if user_input[8]:  # rebind search key to caps lock
+        print("Rebinding search key to Caps Lock")
+        cp("/mnt/eupnea/usr/share/X11/xkb/keycodes/evdev", "/mnt/eupnea/usr/share/X11/xkb/keycodes/evdev.default")
 
     # Hook postinstall script
     print("Adding postinstall service")
