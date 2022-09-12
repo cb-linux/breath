@@ -171,8 +171,9 @@ if __name__ == "__main__":
         device = device[:-1]
     if not device.startswith("/dev/"):
         device = device + "p"
-    # add /dev/ to device name
-    device = f"/dev/{device}"
+    # add /dev/ to device name, if needed
+    if not device.startswith("/dev/"):
+        device = f"/dev/{device}"
 
     if not skip_question:
         while True:
