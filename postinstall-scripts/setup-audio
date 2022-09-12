@@ -1,0 +1,104 @@
+#!/bin/bash
+#
+
+set -e
+
+echo "Installing Audio..."
+
+# Configuration
+# You can adapt these to support other KBL/SKL devices
+
+# Apollo Lake / coral:
+# SND_CARD=bxtda7219max
+# SND_BOARD=.coral
+# SND_MODULE=snd_soc_sst_bxt_da7219_max98357a
+
+[[ -n "$SND_CARD"   ]] || { export SND_CARD=kblda7219max; }
+[[ -n "$SND_BOARD"  ]] || { export SND_BOARD=.nami; }
+[[ -n "$SND_MODULE" ]] || { export SND_MODULE=snd_soc_kbl_da7219_max98357a; }
+
+export SND_DEVICE=${SND_CARD}${SND_BOARD}
+
+# Remove PulseAudio
+sudo apt purge pulseaudio
+sudo apt purge pulseaudio*
+
+# On newer GNOME installs, Pipewire is a dependency of GNOME.
+# We can't remove it, but we can mask (completely disable) the systemd service
+{
+    systemctl --user mask pipewire.socket
+    systemctl --user mask pipewire.service
+    systemctl --user mask pulseaudio.socket
+    systemctl --user mask pulseaudio.service
+} || echo "Please install a desktop and rerun this script if audio doesn't work."
+
+# Copy the firmware and create the correct UCM Files
+sudo umount /mnt || true
+sudo mount -t ext2 -o ro /dev/mmcblk0p3 /mnt || sudo mount -t ext2 -o ro /dev/mmcblk1p3 /mnt
+sudo cp -rv /mnt/lib/firmware/* /lib/firmware
+sudo rm -rf /usr/share/alsa/ucm2/${SND_CARD} || true
+sudo cp -rv /mnt/usr/share/alsa/ucm*/${SND_DEVICE} /usr/share/alsa/ucm2/${SND_CARD}
+sudo umount /mnt
+sudo mv /usr/share/alsa/ucm2/${SND_CARD}/${SND_DEVICE}.conf /usr/share/alsa/ucm2/${SND_CARD}/${SND_CARD}.conf
+sudo sed -i '1s/^/Syntax 2\n/' /usr/share/alsa/ucm2/${SND_CARD}/${SND_CARD}.conf
+sudo sed -i '/Pin/{/Mux/ d}' /usr/share/alsa/ucm2/${SND_CARD}/HiFi.conf
+# Check if user has the newer UCM directory layout
+ls /usr/share/alsa/ucm2/conf.d && {
+    sudo mv /usr/share/alsa/ucm2/${SND_CARD} /usr/share/alsa/ucm2/conf.d
+}
+sudo apt install alsa-base alsa-utils apulse
+
+# Enable Dmix (multiple app audio output) and software master volume control
+sudo tee /etc/asound.conf <<EOF
+pcm.!default {
+    type plug
+    slave.pcm "softvol"
+}
+
+pcm.softvol {
+    type softvol # Software volume control
+    slave {
+        pcm "dmix"
+    }
+    control {
+        name "Master"
+        card 0
+    }
+}
+EOF
+
+# Add a systemd service to start sound
+sudo tee /etc/systemd/system/alsa-reload.service <<EOF
+[Unit]
+Description="Reload ALSA and set the correct UCM"
+
+[Service]
+User=root
+WorkingDirectory=/
+ExecStart=/bin/bash -c 'modprobe ${SND_MODULE} && alsa reload && sleep 2 && alsaucm -c ${SND_CARD} set _verb HiFi set _enadev Speaker'
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+# Refresh systemd
+sudo systemctl daemon-reload
+
+# Replace PulseAudio libraries with Apulse, which makes PulseAudio apps work with ALSA
+for lib in libpulse-mainloop-glib.so libpulse-simple.so libpulse.so; do
+
+    set +e
+	sudo rm -f /usr/lib/${lib} /usr/lib/${lib}.0 /usr/lib/x86_64-linux-gnu/${lib} /usr/lib/x86_64-linux-gnu/${lib}.0
+    set -e
+	
+	sudo ln -s /usr/lib/x86_64-linux-gnu/apulse/${lib}   "/usr/lib/${lib}"
+	sudo ln -s /usr/lib/x86_64-linux-gnu/apulse/${lib}.0 "/usr/lib/${lib}.0"
+	sudo ln -s /usr/lib/x86_64-linux-gnu/apulse/${lib}   "/usr/lib/x86_64-linux-gnu/${lib}"
+	sudo ln -s /usr/lib/x86_64-linux-gnu/apulse/${lib}.0 "/usr/lib/x86_64-linux-gnu/${lib}.0"
+	
+done
+
+sudo systemctl enable alsa-reload
+
+sync
+echo 'Done! Reboot to enable audio'

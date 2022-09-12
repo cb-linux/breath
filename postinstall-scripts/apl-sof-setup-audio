@@ -1,0 +1,123 @@
+#!/bin/bash
+#
+
+set -e
+
+[[ -n "$1" ]] && { export DIR=$1; }
+
+sudo apt update -y
+sudo add-apt-repository restricted || true # Appears to work fine without this line on Debian
+sudo apt install vboot-kernel-utils cgpt gzip -y
+sudo apt install -y firmware-sof-signed || sudo apt-get -o Dpkg::Options::="--force-overwrite" install firmware-sof-signed
+
+echo "Downloading the Apollo Lake SOF Topology..."
+wget https://github.com/thesofproject/sof/files/8118500/sof-apl-da7219.tplg.gz -q -O sof.tplg.gz
+gunzip sof.tplg.gz
+sudo mv sof.tplg /lib/firmware/intel/sof-tplg/sof-apl-da7219.tplg
+
+# ------------------------------------------- #
+# Code below copied from updatekernel-on-emmc #
+# ------------------------------------------- #
+
+# Function for printing a bold, green question or info prompt
+function printq {
+  echo "$(tput setaf 114; tput bold)$1$(tput sgr0)"
+}
+
+# Sync Progress Function
+function syncStorage {
+
+  printq "Writing storage, may take more than 5 minutes.  It may seem slow; consider"
+  printq "this process like flashing an ISO to a USB Drive.  Below is an innacurate"
+  printq "indicator of MB left to write (may decrease hundreds of MB in seconds)."
+
+  # shellcheck disable=SC2016
+  sync & {
+    # If the unsynced data (in kB) is greater than 50MB, then show the sync progress
+    while [[ $(grep -e Dirty: /proc/meminfo | grep --color=never -o '[0-9]\+') -gt 5000 ]]; do
+      SYNC_MB=$(grep -e Dirty: /proc/meminfo | grep --color=never -o '[0-9]\+' | awk '{$1/=1024;printf "%.2fMB\n",$1}')
+      echo -en "\r${SYNC_MB}"
+      sleep 1
+    done
+  }
+
+  echo
+
+  #watch -n 1 'grep -e Dirty: /proc/meminfo | grep --color=never -o '\''[0-9]\+'\'' | awk '\''{$1/=1024;printf "%.2fMB\n",$1}'\'''
+  #grep -e Dirty: /proc/meminfo | grep --color=never -o '[0-9]\+' | awk '{$1/=1024;printf "%.2fMB\n",$1}'
+}
+
+function extractModules {
+
+	sudo mkdir -p /lib/modules
+	mkdir -p modules || sudo rm -rf modules; sudo mkdir -p modules
+	sudo tar xvpf modules.tar.xz -C modules
+	sudo rm -rf /lib/modules/*
+	sudo cp -rv modules/lib/modules/* /lib/modules
+	syncStorage
+
+}
+
+# Parse mounted devices to get the root device
+export USB_ROOTFS=$(mount | sed -n 's|^\(.*\) on / .*|\1|p')
+export USB=$(lsblk -pno pkname $USB_ROOTFS)
+printq "Using $USB to update the kernel and its modules"
+
+if [[ $USB == *"/dev/sd"* ]]; then
+  export USB_KERNEL="${USB}1"
+else
+  export USB_KERNEL="${USB}p1"
+fi
+
+printq "Using $USB to update the kernel and its modules"
+
+if [[ ! -d ~/linux-build ]]; then
+  mkdir ~/linux-build
+fi
+cd ~/linux-build
+
+# Download kernel commandline
+export USB_ROOTFS=$(sudo blkid -o value -s PARTUUID $USB_ROOTFS)
+bash <(curl -s https://raw.githubusercontent.com/cb-linux/breath/main/kernel.flags.sh) > kernel.flags
+echo -n ' snd-intel-dspcfg.dsp_driver=3 snd_sof_pci.fw_path="intel/sof"' >> kernel.flags
+
+# Download kernel and modules
+if [[ -n "$DIR" ]]; then
+    echo "Files supplied"
+    cp ${DIR}/bzImage .
+    cp ${DIR}/modules.tar.xz .
+elif [[ $VERSION == "ALT" ]]; then
+    wget https://github.com/cb-linux/breath/releases/latest/download/bzImage.alt -O bzImage -q --show-progress
+    wget https://github.com/cb-linux/breath/releases/latest/download/modules.alt.tar.xz -O modules.tar.xz -q --show-progress
+else
+    wget https://github.com/cb-linux/breath/releases/latest/download/bzImage -O bzImage -q --show-progress
+    wget https://github.com/cb-linux/breath/releases/latest/download/modules.tar.xz -O modules.tar.xz -q --show-progress
+fi
+
+# Sign the kernel
+# After this, the kernel can no longer be booted on non-depthcharge devices
+futility vbutil_kernel \
+    --arch x86_64 --version 1 \
+    --keyblock /usr/share/vboot/devkeys/kernel.keyblock \
+    --signprivate /usr/share/vboot/devkeys/kernel_data_key.vbprivk \
+    --bootloader kernel.flags \
+    --config kernel.flags \
+    --vmlinuz bzImage \
+    --pack bzImage.signed
+
+# Flash kernel
+sudo dd if=bzImage.signed of=$USB_KERNEL
+
+# Extract modules
+sudo rm -rf ~/linux-build/modules/lib/modules/*
+extractModules
+
+# Write Storage
+echo "Writing storage..."
+syncStorage
+
+# Clean up
+sudo rm -rf ~/linux-build
+
+sof-setup-audio
+echo "SOF APL setup audio script done!"

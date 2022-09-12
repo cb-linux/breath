@@ -1,0 +1,31 @@
+#!/usr/bin/env python3
+
+import os
+import sys
+import subprocess as sp
+from os import system as bash
+
+if __name__ == "__main__":
+    # Elevate script to root
+    if os.geteuid() != 0:
+        args = ['sudo', sys.executable] + sys.argv + [os.environ]
+        os.execlpe('sudo', *args)
+    # read root partition mount
+    root_part = sp.run("mount | grep ' / ' | cut -d' ' -f 1", shell=True, capture_output=True).stdout.decode(
+        "utf-8").strip()
+    root_part = root_part[:len(root_part) - 1]  # get device "name"
+    bash(f"growpart {root_part} 2")
+    # get current config
+    sp.run("crontab -l -u root > /tmp/crontab.current", shell=True)
+    # remove hook from bashrc
+    with open("/tmp/crontab.current", "r") as file:
+        temp_crontab = file.readlines()
+        for line in temp_crontab:
+            if "@reboot /usr/local/bin/eupnea-postinstall" in line:
+                temp_crontab.remove(line)
+    with open("/tmp/crontab.new", "w") as file:
+        file.writelines(temp_crontab)
+    # write new crontab
+    bash("crontab -u root /tmp/crontab.new")
+    # TODO: remove next line
+    bash("touch /etc/I-RAN.txt")
