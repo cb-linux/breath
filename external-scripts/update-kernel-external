@@ -5,7 +5,7 @@ from shutil import rmtree as rmdir
 from pathlib import Path
 import sys
 import argparse
-from urllib.request import urlretrieve
+from urllib.request import urlretrieve, urlopen
 import subprocess as sp
 from os import system as bash
 from threading import Thread
@@ -34,6 +34,7 @@ def process_args():
 # Clean /tmp from eupnea files
 def prepare_host() -> None:
     print("\033[96m" + "Preparing host system" + "\033[0m")
+
     print("Creating mnt points")
     bash("umount -lf /mnt/eupnea_rootfs")  # just in case
     rmdir("/mnt/eupnea_rootfs", ignore_errors=True)
@@ -47,6 +48,7 @@ def prepare_host() -> None:
     print("Creating /tmp/eupnea-update")
     rmdir("/tmp/eupnea-update", ignore_errors=True)
     Path("/tmp/eupnea-update").mkdir()
+
     print("Installing necessary packages")
     # install cgpt and futility
     if os.path.exists("/usr/bin/apt"):
@@ -94,32 +96,43 @@ def download_kernel() -> None:
 # Configure distro agnostic options
 def flash_kernel() -> None:
     print("\n\033[96m" + "Flashing new kernel" + "\033[0m")
+
     print("Extracting kernel modules")
     rmdir("/mnt/eupnea_rootfs/lib/modules", ignore_errors=True)
     Path("/mnt/eupnea_rootfs/lib/modules").mkdir(parents=True, exist_ok=True)
+
     # modules tar contains /lib/modules, so it's extracted to / and --skip-old-files is used to prevent overwriting
     # other files in /lib
     bash(f"tar xpf /tmp/eupnea-update/modules.tar.xz --skip-old-files -C /mnt/eupnea_rootfs/ --checkpoint=.10000")
     print("")  # break line after tar
+
     print("Extracting kernel headers")
     # TODO: extract kernel headers
-    print("")
+    print("")  # break line
+
     # get uuid of rootfs partition
     rootfs_partuuid = sp.run([f"blkid -o value -s PARTUUID {device}2"], shell=True,
                              capture_output=True).stdout.decode("utf-8").strip()
-    # read and modify kernel flags
+
+    print("Downloading default command line from github")
     try:
-        with open("../configs/kernel.flags", "r") as file:
-            temp = file.read().replace("${USB_ROOTFS}", rootfs_partuuid).strip()
-    except FileNotFoundError:
-        with open("configs/kernel.flags", "r") as file:
-            temp = file.read().replace("${USB_ROOTFS}", rootfs_partuuid).strip()
+        temp_cmdline = urlopen(
+            "https://raw.githubusercontent.com/eupnea-linux/eupnea/main/configs/kernel.flags").read().decode(
+            "utf-8")
+    except URLError:
+        print("\033[91m" + "Failed to reach github. Fallback to hardcoded default cmdline" + "\033[0m")
+        temp_cmdline = "console=tty1 root=PARTUUID=${USB_ROOTFS} i915.modeset=1 rootwait rw fbcon=logo-pos:center" \
+                       ",logo-count:1 loglevel=0 splash"
+    # get partuuid of rootfs
+    new_cmdline = temp_cmdline.replace("${USB_ROOTFS}", rootfs_partuuid)
     with open("kernel.flags", "w") as file:
-        file.write(temp)
+        file.write(new_cmdline)
+
     print("Signing kernel")
     bash("futility vbutil_kernel --arch x86_64 --version 1 --keyblock /usr/share/vboot/devkeys/kernel.keyblock"
          + " --signprivate /usr/share/vboot/devkeys/kernel_data_key.vbprivk --bootloader kernel.flags" +
          " --config kernel.flags --vmlinuz /tmp/eupnea-update/bzImage --pack /tmp/eupnea-update/bzImage.signed")
+
     print("Flashing kernel")
     bash(f"dd if=/tmp/eupnea-update/bzImage.signed of={device}1")
 
@@ -130,8 +143,10 @@ if __name__ == "__main__":
         args = ['sudo', sys.executable] + sys.argv + [os.environ]
         os.execlpe('sudo', *args)
     args = process_args()
+
     skip_question = False
     skip_dev_question = False
+
     if args.dev_build:
         print("\033[93m" + "Using dev release" + "\033[0m")
         skip_dev_question = True
@@ -147,6 +162,7 @@ if __name__ == "__main__":
     if args.local_path:
         print("\033[93m" + "Using local path" + "\033[0m")
         skip_question = True
+
     # get rootfs partition from user
     bash("lsblk")
     device = input(
@@ -157,6 +173,7 @@ if __name__ == "__main__":
         device = device + "p"
     # add /dev/ to device name
     device = f"/dev/{device}"
+
     if not skip_question:
         while True:
             print("\033[92m" + "Which kernel would you like to flash? Press enter for default\n" + "\033[0m")
@@ -177,6 +194,7 @@ if __name__ == "__main__":
                     break
                 case _:
                     print("\033[91m" + "Invalid option, check your spelling" + "\033[0m")
+
     if not skip_dev_question:
         print("\033[92m" + "Would you like to the developer version of the kernel? Type yes or press Enter for no\n"
               + "\033[0m")
@@ -185,6 +203,7 @@ if __name__ == "__main__":
                          "newer devices, exp(experimental 5.15 kernel)" + "\033[0m" + "\n")
         if user_input == "yes":
             args.dev_build = True
+
     prepare_host()
     if args.local_path is None:
         # Print download progress in terminal
@@ -204,5 +223,6 @@ if __name__ == "__main__":
         print("\033[96m" + "Using local kernel files" + "\033[0m")
         bash(f"cp {kernel_path}bzImage /tmp/eupnea-update/bzImage")
         bash(f"cp {kernel_path}modules.tar.xz /tmp/eupnea-update/modules.tar.xz")
+
     flash_kernel()
     print("\033[92m" + "Kernel update complete!" + "\033[0m")
