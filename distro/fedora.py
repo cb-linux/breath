@@ -22,25 +22,26 @@ def config(de_name: str, distro_version: str) -> None:
         case "gnome":
             print("Installing gnome")
             # As gnome is not preinstalled on the cloud version, we need to install it "manually"
-            chroot("dnf install @base-x gnome-shell gnome-terminal nautilus firefox chrome-gnome-shell gnome-tweaks " +
-                   "@development-tools gnome-terminal-nautilus xdg-user-dirs xdg-user-dirs-gtk gnome-calculator " +
-                   "gnome-system-monitor gedit file-roller gdm")
+            chroot(
+                "dnf install -y @base-x gnome-shell gnome-terminal nautilus firefox chrome-gnome-shell gnome-tweaks " +
+                "@development-tools gnome-terminal-nautilus xdg-user-dirs xdg-user-dirs-gtk gnome-calculator " +
+                "gnome-system-monitor gedit file-roller gdm")
             chroot("systemctl enable gdm.service")
         case "kde":
             print("Installing kde")
-            chroot("dnf group install 'KDE Plasma Workspaces' -y")
+            chroot("dnf group install -y 'KDE Plasma Workspaces'")
         case "mate":
             print("Installing mate")
-            chroot("dnf group install 'MATE Desktop' -y")
+            chroot("dnf group install -y 'MATE Desktop'")
         case "xfce" | "minimal":
             print("Installing xfce")
-            chroot("dnf group install 'Xfce Desktop' -y")
+            chroot("dnf group install -y 'Xfce Desktop'")
         case "lxqt":
             print("Installing lxqt")
-            chroot("dnf group install 'LXQt Desktop' -y")
+            chroot("dnf group install -y 'LXQt Desktop'")
         case "deepin":
             print("Installing deepin")
-            chroot("dnf group install 'Deepin Desktop' -y")
+            chroot("dnf group install -y 'Deepin Desktop'")
         case "budgie":
             print("\033[91m" + "Budgie is not available for Fedora" + "\033[91m")
             exit(1)
@@ -58,9 +59,8 @@ def config(de_name: str, distro_version: str) -> None:
     # chroot("chmod -R 750 /root")
 
 
-def chroot(command: str) -> str:
-    return sp.run(f'chroot /mnt/eupnea /bin/sh -c "{command}"', shell=True, capture_output=True).stdout.decode(
-        "utf-8").strip()
+def chroot(command: str) -> None:
+    bash(f'chroot /mnt/eupnea /bin/sh -c "{command}"')
 
 
 if __name__ == "__main__":

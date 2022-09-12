@@ -64,9 +64,8 @@ def config(de_name: str, distro_version: str) -> None:
     bash("cp /mnt/eupnea/usr/share/doc/util-linux/examples/securetty /mnt/eupnea/etc/securetty 2>/dev/null")
 
 
-def chroot(command: str) -> str:
-    return sp.run('chroot /mnt/eupnea /bin/sh -c "' + command + '"', shell=True, capture_output=True).stdout.decode(
-        "utf-8").strip()
+def chroot(command: str) -> None:
+    bash('chroot /mnt/eupnea /bin/sh -c "' + command + '"')
 
 
 if __name__ == "__main__":

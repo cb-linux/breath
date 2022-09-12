@@ -28,8 +28,7 @@ def config(de_name: str, distro_version: str) -> None:
     chroot("pacman -Syu --noconfirm")
 
     print("Installing packages")
-    print(chroot("pacman -S --noconfirm base base-devel nano networkmanager xkeyboard-config linux-firmware sudo "
-                 "cloud-utils"))
+    chroot("pacman -S --noconfirm base base-devel nano networkmanager xkeyboard-config linux-firmware sudo cloud-utils")
     # linux-firmware is for Wi-Fi
     # cloud-utils is for grow-part
 
@@ -100,9 +99,8 @@ def config(de_name: str, distro_version: str) -> None:
 
 
 # using arch-chroot for arch
-def chroot(command: str) -> str:
-    return sp.run('arch-chroot /mnt/eupnea bash -c "' + command + '"', shell=True,
-                  capture_output=True).stdout.decode("utf-8").strip()
+def chroot(command: str) -> None:
+    bash('arch-chroot /mnt/eupnea bash -c "' + command + '"')
 
 
 if __name__ == "__main__":
