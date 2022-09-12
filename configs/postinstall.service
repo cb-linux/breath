@@ -1,0 +1,11 @@
+[Unit]
+Description=Postinstall service, should auto delete on first run
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/postinstall
+RemainAfterExit=false
+StandardOutput=journal
+
+[Install]
+WantedBy=multi-user.target

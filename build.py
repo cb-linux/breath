@@ -2,6 +2,8 @@
 
 import os
 from shutil import rmtree as rmdir
+from shutil import copy as cp
+from shutil import copytree as cpdir
 from pathlib import Path
 import sys
 import argparse
@@ -35,15 +37,20 @@ def process_args():
 # Clean /tmp from eupnea files
 def prepare_host(de_name: str) -> None:
     print("\033[96m" + "Preparing host system" + "\033[0m")
+
     print("Creating /tmp/eupnea-build")
     rmdir("/tmp/eupnea-build", ignore_errors=True)
     Path("/tmp/eupnea-build/rootfs").mkdir(parents=True)
+
     print("Creating mnt point")
     bash("umount -lf /mnt/eupnea")  # just in case
     rmdir("/mnt/eupnea", ignore_errors=True)
     Path("/mnt/eupnea").mkdir(parents=True, exist_ok=True)
+
     print("Remove old files if they exist")
-    bash("rm -rf ./eupnea.img ./kernel.flags")
+    os.remove("eupnea.img")
+    os.remove("kernel.flags")
+
     print("Installing necessary packages")
     # install cgpt and futility
     if os.path.exists("/usr/bin/apt"):
@@ -56,6 +63,8 @@ def prepare_host(de_name: str) -> None:
         print("\033[91m" + "cgpt and futility not found, please install them using your disotros package manager"
               + "\033[0m")
         exit(1)
+
+    # install debootstrap for debian
     if de_name == "debian":
         if os.path.exists("/usr/bin/apt"):
             bash("apt install debootstrap -y")
@@ -67,6 +76,8 @@ def prepare_host(de_name: str) -> None:
             print("\033[91m" + "Debootstrap not found, please install it using your disotros package manager or select"
                   + " another distro instead of debian" + "\033[0m")
             exit(1)
+
+    # install arch-chroot for arch
     elif de_name == "arch":
         if os.path.exists("/usr/bin/apt"):
             bash("apt install arch-install-scripts -y")
@@ -84,12 +95,15 @@ def prepare_host(de_name: str) -> None:
 # download kernel files from GitHub
 def download_kernel() -> None:
     print("\033[96m" + "Downloading kernel binaries from github" + "\033[0m")
+    # select correct link
     if args.dev_build:
         url = "https://github.com/eupnea-linux/kernel/releases/download/dev-build/"
     elif args.mainline:
         url = "https://github.com/eupnea-linux/mainline-kernel/releases/latest/download/"
     else:
         url = "https://github.com/eupnea-linux/kernel/releases/latest/download/"
+
+    # download kernel files
     try:
         if args.mainline:
             urlretrieve(f"{url}bzImage", filename="/tmp/eupnea-build/bzImage")
@@ -119,6 +133,7 @@ def prepare_usb() -> None:
 # Create, mount, partition the img and flash the eupnea kernel
 def prepare_img() -> str:
     print("\033[96m" + "Preparing img" + "\033[0m")
+
     print("Allocating space for image, might take a while")
     # try fallocate, if it fails use dd
     # TODO: determine img size
@@ -126,34 +141,43 @@ def prepare_img() -> str:
     if not sp.run(f"fallocate -l {img_size}G eupnea.img", shell=True, capture_output=True).stderr.decode(
             "utf-8").strip() == "":
         bash("dd if=/dev/zero of=eupnea.img status=progress bs=12884 count=1000070")
+
     print("Mounting empty image")
     img_mnt = sp.run("losetup -f --show eupnea.img", shell=True, capture_output=True).stdout.decode("utf-8").strip()
     print("Image mounted at" + img_mnt)
-    # format usb as per depthcharge requirements
+
+    # format usb as per depthcharge requirements,
+    # READ: https://wiki.gentoo.org/wiki/Creating_bootable_media_for_depthcharge_based_devices
     print("Partitioning mounted image and adding flags")
     bash(f"parted -s {img_mnt} mklabel gpt")
-    bash(f"parted -s -a optimal {img_mnt} unit mib mkpart Kernel 1 65")
-    bash(f"parted -s -a optimal {img_mnt} unit mib mkpart Root 65 100%")
-    bash(f"cgpt add -i 1 -t kernel -S 1 -T 5 -P 15 {img_mnt}")
+    bash(f"parted -s -a optimal {img_mnt} unit mib mkpart Kernel 1 65")  # kernel partition
+    bash(f"parted -s -a optimal {img_mnt} unit mib mkpart Root 65 100%")  # rootfs partition
+    bash(f"cgpt add -i 1 -t kernel -S 1 -T 5 -P 15 {img_mnt}")  # depthcharge flags
+
     # get uuid of rootfs partition
-    rootfs_partuuid = sp.run([f"blkid -o value -s PARTUUID {img_mnt}p2"], shell=True,
+    rootfs_partuuid = sp.run(f"blkid -o value -s PARTUUID {img_mnt}p2", shell=True,
                              capture_output=True).stdout.decode("utf-8").strip()
+
     # read and modify kernel flags
     with open("configs/kernel.flags", "r") as file:
         temp = file.read().replace("${USB_ROOTFS}", rootfs_partuuid).strip()
     with open("kernel.flags", "w") as file:
         file.write(temp)
+
     print("Signing kernel")
     bash("futility vbutil_kernel --arch x86_64 --version 1 --keyblock /usr/share/vboot/devkeys/kernel.keyblock"
          + " --signprivate /usr/share/vboot/devkeys/kernel_data_key.vbprivk --bootloader kernel.flags" +
          " --config kernel.flags --vmlinuz /tmp/eupnea-build/bzImage --pack /tmp/eupnea-build/bzImage.signed")
+
     print("Flashing kernel")
     bash(f"dd if=/tmp/eupnea-build/bzImage.signed of={img_mnt}p1")
+
     print("Formating rootfs")
-    bash(f"yes 2>/dev/null | mkfs.ext4 {img_mnt}p2")
+    bash(f"yes 2>/dev/null | mkfs.ext4 {img_mnt}p2")  # 2>/dev/null is to supress yes broken pipe warning
+
     print("Mounting rootfs to /mnt/eupnea")
     bash(f"mount {img_mnt}p2 /mnt/eupnea")
-    return img_mnt
+    return img_mnt  # return loop device so it can be at the end
 
 
 # download the distro rootfs
@@ -169,16 +193,18 @@ def download_rootfs(distro_name: str, distro_version: str, distro_link: str) -> 
                     filename="/tmp/eupnea-build/rootfs/ubuntu-rootfs.tar.xz")
             case "debian":
                 print("Downloading debian with debootstrap")
+                # Debian sometimes fails for no apparent reason, so we try 2 times
                 debian_result = sp.run("debootstrap stable /tmp/eupnea-build/rootfs https://deb.debian.org/debian/",
                                        shell=True, capture_output=True).stdout.decode("utf-8")
-                print(debian_result)
+                print("Result: " + str(debian_result))  # print results for debugging
                 if debian_result.__contains__("Couldn't download packages:"):
                     print("\033[91m\nDebootstrap failed, retrying once\n\033[0m")
-                    rmdir("/tmp/eupnea-build", ignore_errors=True)
+                    # delete the failed rootfs
+                    rmdir("/tmp/eupnea-build/rootfs", ignore_errors=True)
                     Path("/tmp/eupnea-build/rootfs").mkdir(parents=True)
                     debian_result = sp.run("debootstrap stable /tmp/eupnea-build/rootfs https://deb.debian.org/debian/",
                                            shell=True, capture_output=True).stdout.decode("utf-8")
-                    print(debian_result)
+                    print("Result: " + str(debian_result))  # print results for debugging
                     if debian_result.__contains__("Couldn't download packages:"):
                         print("\033[91m\nDebootstrap failed again, check your internet connection or try again later" +
                               "\033[0m")
@@ -194,7 +220,7 @@ def download_rootfs(distro_name: str, distro_version: str, distro_link: str) -> 
         print(
             "\033[91m" + "Failed to download rootfs. Check your internet connection and try again. If the error" +
             " persists, create an issue with the distro and version in the name" + "\033[0m")
-        bash(f"kill {main_thread_pid}")
+        bash(f"kill {main_thread_pid}")  # kill main thread, as this function running in a different thread
 
 
 # extract the rootfs to the img
@@ -235,8 +261,10 @@ def extract_rootfs(distro: str) -> None:
 # Configure distro agnostic options
 def post_extract(username: str, password: str, hostname: str, rebind_search: bool, distro: str, de_name: str) -> None:
     print("\n\033[96m" + "Configuring Eupnea" + "\033[0m")
+
     print("Copying resolv.conf")
-    bash("cp --remove-destination /etc/resolv.conf /mnt/eupnea/etc/resolv.conf")
+    cp("/etc/resolv.conf", "/mnt/eupnea/etc/resolv.conf")
+
     print("Extracting kernel modules")
     rmdir("/mnt/eupnea/lib/modules", ignore_errors=True)
     Path("/mnt/eupnea/lib/modules").mkdir(parents=True, exist_ok=True)
@@ -244,6 +272,7 @@ def post_extract(username: str, password: str, hostname: str, rebind_search: boo
     # other files in /lib
     bash("tar xpf /tmp/eupnea-build/modules.tar.xz --skip-old-files -C /mnt/eupnea/ --checkpoint=.10000")
     print("")  # break line after tar
+
     if not (distro == "ubuntu" and de_name == "gnome"):  # Ubuntu + gnome has first time setup
         print("Configuring user")
         chroot(f"useradd --create-home {username}")
@@ -253,36 +282,45 @@ def post_extract(username: str, password: str, hostname: str, rebind_search: boo
                 chroot(f"usermod -aG sudo {username}")
             case "arch" | "fedora":
                 chroot(f"usermod -aG wheel {username}")
+
     print("Extracting kernel headers")
     # TODO: extract kernel headers
+
     print("Setting hostname")
     with open("/mnt/eupnea/etc/hostname", "w") as hostname_file:
         hostname_file.write(hostname)
+
     print("Copying eupnea utils")
     bash("cp postinstall-scripts/* /mnt/eupnea/usr/local/bin/")
     Path("/mnt/eupnea/usr/local/eupnea-configs").mkdir(exist_ok=True)
-    bash("cp -r configs /mnt/eupnea/usr/local/eupnea-configs")
+    cpdir("configs", "/mnt/eupnea/usr/local/eupnea-configs")
+
     print("Backing up default keymap and setting Chromebook layout")
-    chroot("cp /mnt/eupnea/usr/share/X11/xkb/symbols/pc /mnt/eupnea/usr/share/X11/xkb/symbols/pc.default")
-    chroot("cp -f configs/xkb/xkb.chromebook /mnt/eupnea/usr/share/X11/xkb/symbols/pc")
-    if rebind_search:
+    cp("/mnt/eupnea/usr/share/X11/xkb/symbols/pc", "/mnt/eupnea/usr/share/X11/xkb/symbols/pc.default")
+    cp("configs/xkb/xkb.chromebook", "/mnt/eupnea/usr/share/X11/xkb/symbols/pc")
+    if rebind_search:  # rebind search key to caps lock
         print("Rebinding search key to Caps Lock")
-        chroot("cp /mnt/eupnea/usr/share/X11/xkb/keycodes/evdev /mnt/eupnea/usr/share/X11/xkb/keycodes/evdev.default")
+        cp("/mnt/eupnea/usr/share/X11/xkb/keycodes/evdev", "/mnt/eupnea/usr/share/X11/xkb/keycodes/evdev.default")
+
     print("Configuring sleep")
-    # disable deep sleep and hibernation
+    # disable hibernation aka S4 sleep, READ: https://eupnea-linux.github.io/docs.html#/bootlock
     # TODO: Fix sleep
-    Path("/mnt/eupnea/etc/systemd/").mkdir(exist_ok=True)
+    Path("/mnt/eupnea/etc/systemd/").mkdir(exist_ok=True)  # just in case systemd path doesn't exist
     with open("/mnt/eupnea/etc/systemd/sleep.conf", "a") as file:
         file.write("SuspendState=freeze\nHibernateState=freeze")
+
+    print("Adding kernel modules")
     # open kernel-modules.txt and then append its contents to the Eupnea file
     with open("configs/kernel-modules.txt", "r") as repo_file:
         with open("/mnt/eupnea/etc/modules", "a") as file:
             file.write(repo_file.read())
+
     # disable ssh service, as it fails to start
     # TODO: Fix ssh
     chroot("systemctl disable ssh.service")
 
 
+# chroot command
 def chroot(command: str) -> str:
     return sp.run(f'chroot /mnt/eupnea /bin/sh -c "{command}"', shell=True, capture_output=True).stdout.decode(
         "utf-8").strip()
@@ -295,6 +333,7 @@ if __name__ == "__main__":
         os.execlpe('sudo', *args)
     args = process_args()
     main_thread_pid = os.getpid()  # for threads to kill mainthread
+
     if args.dev_build:
         print("\033[93m" + "Using dev release" + "\033[0m")
     if args.alt:
@@ -306,41 +345,46 @@ if __name__ == "__main__":
     if args.local_path:
         print("\033[93m" + "Using local path" + "\033[0m")
 
-    user_input = user_input.user_input()
+    user_input = user_input.user_input()  # get user input
     prepare_host(user_input[0])
+
     if args.local_path is None:
         # Print download progress in terminal
         t = Thread(target=download_kernel, daemon=True)
         t.start()
-        sleep(1)
+        sleep(1)  # wait for thread to print info
         while t.is_alive():
             sys.stdout.flush()
             print(".", end="")
             sleep(1)
-        print("")
-    else:
+        print("")  # break line
+    else:  # if local path is specified, copy kernel from there
         if not args.local_path.endswith("/"):
             kernel_path = f"{args.local_path}/"
         else:
             kernel_path = args.local_path
         print("\033[96m" + "Using local kernel files" + "\033[0m")
-        bash(f"cp {kernel_path}bzImage /tmp/eupnea-build/bzImage")
-        bash(f"cp {kernel_path}modules.tar.xz /tmp/eupnea-build/modules.tar.xz")
+        cp(f"{kernel_path}bzImage", "/tmp/eupnea-build/bzImage")
+        cp(f"{kernel_path}modules.tar.xz", "/tmp/eupnea-build/modules.tar.xz")
+
     if user_input[9]:
         img_mnt = prepare_img()
     else:
-        prepare_usb()
+        prepare_usb()  # not yet implemented
+
     # Print download progress in terminal
     t = Thread(target=download_rootfs, args=(user_input[0], user_input[1], user_input[2],), daemon=True)
     t.start()
-    sleep(1)
+    sleep(1)  # wait for thread to print info
     while t.is_alive():
         sys.stdout.flush()
         print(".", end="")
         sleep(1)
-    print("")
+    print("")  # break line
+
     extract_rootfs(user_input[0])
     post_extract(user_input[5], user_input[6], user_input[7], user_input[8], user_input[0], user_input[3])
+
     match user_input[0]:
         case "ubuntu":
             import distro.ubuntu as distro
@@ -354,13 +398,13 @@ if __name__ == "__main__":
             print("\033[91m" + "Something went **really** wrong!!! (Distro name not found)" + "\033[0m")
             exit(1)
     distro.config(user_input[3], user_input[1])
-    print("Adding postinstall hook")
-    # read current crontab
-    sp.run("crontab -l -u root > /tmp/eupnea-build/crontab.current", shell=True)
-    with open("/tmp/eupnea-build/crontab.current", "a") as file:
-        file.write("@reboot /usr/local/bin/postinstall\n")
-    # write new crontab
-    bash("crontab -u root /tmp/eupnea-build/crontab.current")
+
+    # Hook postinstall script
+    print("Adding postinstall service")
+    cp("configs/postinstall.service", "/mnt/eupnea/etc/systemd/system/")
+    bash("systemctl enable postinstall.service")
+
+    # Unmount everything
     print("\033[96m" + "Finishing setup" + "\033[0m")
     print("Unmounting rootfs")
     bash("umount /mnt/eupnea")
