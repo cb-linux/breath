@@ -168,8 +168,6 @@ if __name__ == "__main__":
         "\033[92m" + "Please enter the device name (e.g. sda or mmcblk0) and press enter: \n" + "\033[0m").strip()
     if device.endswith("/") or device.endswith("1") or device.endswith("2"):
         device = device[:-1]
-    if not device.startswith("/dev/"):
-        device = device + "p"
     # add /dev/ to device name, if needed
     if not device.startswith("/dev/"):
         device = f"/dev/{device}"

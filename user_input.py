@@ -1,9 +1,10 @@
 from typing import Tuple
 import json
 from getpass import getpass
+from os import system as bash
 
 
-def user_input() -> Tuple[str, str, str, str, bool, str, str, str, bool, bool]:
+def user_input() -> Tuple[str, str, str, str, str, str, str, str, bool, bool]:
     print("\033[95m" + "Welcome to Eupnea" + "\033[0m")
     print("\033[95m" + "This script will help you create a bootable USB Stick/SD card for Eupnea" + "\033[0m")
     print("\033[95m" + "Please answer the following questions." "\033[0m")
@@ -11,12 +12,13 @@ def user_input() -> Tuple[str, str, str, str, bool, str, str, str, bool, bool]:
     print("\033[92m" + "Which Linux distro(flavor) would you like to use?" + "\033[0m")
     # setting optional vars to 0
     distro_version = 0
-    use_openbox = False
+    # use_openbox = False
     rebind_search = False
     create_iso = True
     distro_link = ""
     username = ""
     password = ""
+    device = ""
     while True:
         temp_distro_name = input(
             "\033[94m" + "Available options: Ubuntu(default, recommended), Debian, Arch, Fedora\n" +
@@ -219,12 +221,15 @@ def user_input() -> Tuple[str, str, str, str, bool, str, str, str, bool, bool]:
                  "Press Enter to create an img file" "\033[0m" + "\n") == "direct":
             print("USB selected")
             create_iso = False
+            bash("lsblk")
+            device = input(
+                "\033[92m" + "Please enter the device name (e.g. sda) and press enter: \n" + "\033[0m").strip()
         else:
             print("Image selected")
         break
     print("User input complete")
-    return distro_name, distro_version, distro_link, de_name, use_openbox, username, password, hostname, \
-           rebind_search, create_iso
+    return distro_name, distro_version, distro_link, de_name, device, username, password, hostname, rebind_search, \
+           create_iso
 
 
 if __name__ == "__main__":

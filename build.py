@@ -44,7 +44,7 @@ def prepare_host(de_name: str) -> None:
     Path("/tmp/eupnea-build/rootfs").mkdir(parents=True)
 
     print("Creating mnt point")
-    bash("umount -lf /mnt/eupnea")  # just in case
+    bash("umount -lf /mnt/eupnea 2>/dev/null")  # just in case
     rmdir("/mnt/eupnea", ignore_errors=True)
     Path("/mnt/eupnea").mkdir(parents=True, exist_ok=True)
 
@@ -132,8 +132,19 @@ def download_kernel() -> None:
 
 
 # Prepare USB, usb is not yet fully implemented
-def prepare_usb() -> None:
+def prepare_usb(device) -> str:
     print("\033[96m" + "Preparing USB" + "\033[0m")
+
+    # fix device name if needed
+    if device.endswith("/") or device.endswith("1") or device.endswith("2"):
+        mnt_point = device[:-1]
+    # add /dev/ to device name, if needed
+    if not device.startswith("/dev/"):
+        device = f"/dev/{device}"
+
+    # unmount all partitions
+    bash(f"umount -lf {device}* 2>/dev/null")
+    return partition(device, True)
 
 
 # Create, mount, partition the img and flash the eupnea kernel
@@ -149,20 +160,28 @@ def prepare_img() -> str:
         bash("dd if=/dev/zero of=eupnea.img status=progress bs=12884 count=1000070")
 
     print("Mounting empty image")
-    img_mnt = sp.run("losetup -f --show eupnea.img", shell=True, capture_output=True).stdout.decode("utf-8").strip()
-    print("Image mounted at" + img_mnt)
+    mnt_point = sp.run("losetup -f --show eupnea.img", shell=True, capture_output=True).stdout.decode("utf-8").strip()
+    print("Image mounted at" + mnt_point)
+    return partition(mnt_point, False)
 
-    # format usb as per depthcharge requirements,
+
+def partition(mnt_point: str, write_usb: bool) -> str:
+    # format as per depthcharge requirements,
     # READ: https://wiki.gentoo.org/wiki/Creating_bootable_media_for_depthcharge_based_devices
     print("Partitioning mounted image and adding flags")
-    bash(f"parted -s {img_mnt} mklabel gpt")
-    bash(f"parted -s -a optimal {img_mnt} unit mib mkpart Kernel 1 65")  # kernel partition
-    bash(f"parted -s -a optimal {img_mnt} unit mib mkpart Root 65 100%")  # rootfs partition
-    bash(f"cgpt add -i 1 -t kernel -S 1 -T 5 -P 15 {img_mnt}")  # depthcharge flags
+    bash(f"parted -s {mnt_point} mklabel gpt")
+    bash(f"parted -s -a optimal {mnt_point} unit mib mkpart Kernel 1 65")  # kernel partition
+    bash(f"parted -s -a optimal {mnt_point} unit mib mkpart Root 65 100%")  # rootfs partition
+    bash(f"cgpt add -i 1 -t kernel -S 1 -T 5 -P 15 {mnt_point}")  # depthcharge flags
 
     # get uuid of rootfs partition
-    rootfs_partuuid = sp.run(f"blkid -o value -s PARTUUID {img_mnt}p2", shell=True,
-                             capture_output=True).stdout.decode("utf-8").strip()
+    if write_usb:
+        # if writing to usb, then no p in partition name
+        rootfs_partuuid = sp.run(f"blkid -o value -s PARTUUID {mnt_point}2", shell=True,
+                                 capture_output=True).stdout.decode("utf-8").strip()
+    else:
+        rootfs_partuuid = sp.run(f"blkid -o value -s PARTUUID {mnt_point}p2", shell=True,
+                                 capture_output=True).stdout.decode("utf-8").strip()
 
     # read and modify kernel flags
     with open("configs/kernel.flags", "r") as file:
@@ -176,14 +195,26 @@ def prepare_img() -> str:
          " --config kernel.flags --vmlinuz /tmp/eupnea-build/bzImage --pack /tmp/eupnea-build/bzImage.signed")
 
     print("Flashing kernel")
-    bash(f"dd if=/tmp/eupnea-build/bzImage.signed of={img_mnt}p1")
+    if write_usb:
+        # if writing to usb, then no p in partition name
+        bash(f"dd if=/tmp/eupnea-build/bzImage.signed of={mnt_point}1")
+    else:
+        bash(f"dd if=/tmp/eupnea-build/bzImage.signed of={mnt_point}p1")
 
     print("Formating rootfs")
-    bash(f"yes 2>/dev/null | mkfs.ext4 {img_mnt}p2")  # 2>/dev/null is to supress yes broken pipe warning
+    if write_usb:
+        # if writing to usb, then no p in partition name
+        bash(f"yes 2>/dev/null | mkfs.ext4 {mnt_point}2")  # 2>/dev/null is to supress yes broken pipe warning
+    else:
+        bash(f"yes 2>/dev/null | mkfs.ext4 {mnt_point}p2")  # 2>/dev/null is to supress yes broken pipe warning
 
     print("Mounting rootfs to /mnt/eupnea")
-    bash(f"mount {img_mnt}p2 /mnt/eupnea")
-    return img_mnt  # return loop device so it can be at the end
+    if write_usb:
+        # if writing to usb, then no p in partition name
+        bash(f"mount {mnt_point}2 /mnt/eupnea")
+    else:
+        bash(f"mount {mnt_point}p2 /mnt/eupnea")
+    return mnt_point  # return loop device, so it can be unmounted at the end
 
 
 # download the distro rootfs
@@ -345,6 +376,8 @@ if __name__ == "__main__":
         print("\033[93m" + "Using mainline kernel" + "\033[0m")
     if args.local_path:
         print("\033[93m" + "Using local path" + "\033[0m")
+    if args.verbose:
+        print("\033[93m" + "Verbosity increased" + "\033[0m")
 
     user_input = user_input.user_input()  # get user input
     prepare_host(user_input[0])
@@ -371,7 +404,7 @@ if __name__ == "__main__":
     if user_input[9]:
         img_mnt = prepare_img()
     else:
-        prepare_usb()  # not yet implemented
+        img_mnt = prepare_usb(user_input[4])
 
     # Print download progress in terminal
     t = Thread(target=download_rootfs, args=(user_input[0], user_input[1], user_input[2],), daemon=True)
@@ -398,7 +431,7 @@ if __name__ == "__main__":
         case _:
             print("\033[91m" + "Something went **really** wrong!!! (Distro name not found)" + "\033[0m")
             exit(1)
-    distro.config(user_input[3], user_input[1])
+    distro.config(user_input[3], user_input[1], args.verbose)
 
     # Add chromebook layout. Needs to be done after install Xorg/Wayland
     print("Backing up default keymap and setting Chromebook layout")
@@ -408,15 +441,15 @@ if __name__ == "__main__":
         print("Rebinding search key to Caps Lock")
         cp("/mnt/eupnea/usr/share/X11/xkb/keycodes/evdev", "/mnt/eupnea/usr/share/X11/xkb/keycodes/evdev.default")
 
-    # Hook postinstall script
+    # Hook postinstall script, needs to be done after preping system
     print("Adding postinstall service")
-    cp("configs/postinstall.service", "/mnt/eupnea/etc/systemd/system/postinstall.service")
-    bash("systemctl enable postinstall.service")
+    bash("cp configs/postinstall.service /mnt/eupnea/etc/systemd/system/postinstall.service")
+    chroot("systemctl enable postinstall.service")
 
     # Unmount everything
     print("\033[96m" + "Finishing setup" + "\033[0m")
     print("Unmounting rootfs")
-    bash("umount /mnt/eupnea")
+    bash("umount -f /mnt/eupnea")
     if user_input[9]:
         print("Unmounting img")
         bash(f"losetup -d {img_mnt}")
