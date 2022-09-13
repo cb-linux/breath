@@ -42,7 +42,7 @@ def config(de_name: str, distro_version: str, verbose_var: bool) -> None:
             exit(1)
         case "budgie":
             print("Installing budgie")
-            chroot("apt install budgie-desktop budgie-indicator-applet")
+            chroot("apt install -y budgie-desktop budgie-indicator-applet")
             # chroot("dpkg-reconfigure lightdm")
         case "minimal":
             print("Installing minimal")
