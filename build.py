@@ -118,12 +118,12 @@ def download_kernel() -> None:
         else:
             if args.alt:
                 print("Downloading alt kernel")
-                urlretrieve(f"{url}bzImage.alt", filename="/tmp/eupnea-build/bzImage")
-                urlretrieve(f"{url}modules.alt.tar.xz", filename="/tmp/eupnea-build/modules.tar.xz")
+                urlretrieve(f"{url}bzImage-alt", filename="/tmp/eupnea-build/bzImage")
+                urlretrieve(f"{url}modules-alt.tar.xz", filename="/tmp/eupnea-build/modules.tar.xz")
             elif args.exp:
                 print("Downloading experimental 5.15 kernel")
-                urlretrieve(f"{url}bzImage.exp", filename="/tmp/eupnea-build/bzImage")
-                urlretrieve(f"{url}modules.exp.tar.xz", filename="/tmp/eupnea-build/modules.tar.xz")
+                urlretrieve(f"{url}bzImage-exp", filename="/tmp/eupnea-build/bzImage")
+                urlretrieve(f"{url}modules-exp.tar.xz", filename="/tmp/eupnea-build/modules.tar.xz")
             else:
                 urlretrieve(f"{url}bzImage", filename="/tmp/eupnea-build/bzImage")
                 urlretrieve(f"{url}modules.tar.xz", filename="/tmp/eupnea-build/modules.tar.xz")
