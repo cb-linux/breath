@@ -331,7 +331,8 @@ def post_extract(username: str, password: str, hostname: str, distro: str, de_na
 
     print("Copying eupnea utils")
     bash("cp postinstall-scripts/* /mnt/eupnea/usr/local/bin/")
-    cpdir("configs", "/mnt/eupnea/usr/local/eupnea-configs")
+    Path("/mnt/eupnea/usr/local/eupnea-configs").mkdir(parents=True)
+    bash("cp configs/* /mnt/eupnea/usr/local/eupnea-configs/")
 
     print("Configuring sleep")
     # disable hibernation aka S4 sleep, READ: https://eupnea-linux.github.io/docs.html#/bootlock

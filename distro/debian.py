@@ -24,7 +24,7 @@ def config(de_name: str, distro_version: str, verbose_var: bool) -> None:
     match de_name:
         case "gnome":
             print("Installing gnome")
-            chroot("apt install gnome/stable")
+            chroot("apt install -y gnome/stable gnome-initial-setup")
         case "kde":
             print("Installing kde")
             chroot("apt install -y task-kde-desktop")

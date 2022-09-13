@@ -50,7 +50,7 @@ def config(de_name: str, distro_version: str, verbose_var: bool) -> None:
     match de_name:
         case "gnome":
             print("Installing gnome")
-            chroot("pacman -S --noconfirm gnome gnome-extra")
+            chroot("pacman -S --noconfirm gnome gnome-extra gnome-initial-setup")
             chroot("systemctl enable gdm.service")
         case "kde":
             print("Installing kde")
