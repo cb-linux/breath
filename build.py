@@ -105,14 +105,13 @@ def download_kernel() -> None:
     # select correct link
     if args.dev_build:
         url = "https://github.com/eupnea-linux/kernel/releases/download/dev-build/"
-    elif args.mainline:
-        url = "https://github.com/eupnea-linux/mainline-kernel/releases/latest/download/"
     else:
         url = "https://github.com/eupnea-linux/kernel/releases/latest/download/"
 
     # download kernel files
     try:
         if args.mainline:
+            url = "https://github.com/eupnea-linux/mainline-kernel/releases/latest/download/"
             urlretrieve(f"{url}bzImage", filename="/tmp/eupnea-build/bzImage")
             urlretrieve(f"{url}modules.tar.xz", filename="/tmp/eupnea-build/modules.tar.xz")
         else:

@@ -68,23 +68,22 @@ def download_kernel() -> None:
     print("\033[96m" + "Downloading kernel binaries from github" + "\033[0m")
     if args.dev_build:
         url = "https://github.com/eupnea-linux/kernel/releases/download/dev-build/"
-    elif args.mainline:
-        url = "https://github.com/eupnea-linux/mainline-kernel/releases/latest/download/"
     else:
         url = "https://github.com/eupnea-linux/kernel/releases/latest/download/"
     try:
         if args.mainline:
+            url = "https://github.com/eupnea-linux/mainline-kernel/releases/latest/download/"
             urlretrieve(f"{url}bzImage", filename="/tmp/eupnea-update/bzImage")
             urlretrieve(f"{url}modules.tar.xz", filename="/tmp/eupnea-update/modules.tar.xz")
         else:
             if args.alt:
                 print("Downloading alt kernel")
-                urlretrieve(f"{url}bzImage.alt", filename="/tmp/eupnea-update/bzImage")
-                urlretrieve(f"{url}modules.alt.tar.xz", filename="/tmp/eupnea-update/modules.tar.xz")
+                urlretrieve(f"{url}bzImage-alt", filename="/tmp/eupnea-update/bzImage")
+                urlretrieve(f"{url}modules-alt.tar.xz", filename="/tmp/eupnea-update/modules.tar.xz")
             elif args.exp:
                 print("Downloading experimental 5.15 kernel")
-                urlretrieve(f"{url}bzImage.exp", filename="/tmp/eupnea-update/bzImage")
-                urlretrieve(f"{url}modules.exp.tar.xz", filename="/tmp/eupnea-update/modules.tar.xz")
+                urlretrieve(f"{url}bzImage-exp", filename="/tmp/eupnea-update/bzImage")
+                urlretrieve(f"{url}modules-exp.tar.xz", filename="/tmp/eupnea-update/modules.tar.xz")
             else:
                 urlretrieve(f"{url}bzImage", filename="/tmp/eupnea-update/bzImage")
                 urlretrieve(f"{url}modules.tar.xz", filename="/tmp/eupnea-update/modules.tar.xz")
