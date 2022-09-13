@@ -3,7 +3,11 @@ from os import system as bash
 import subprocess as sp
 
 
-def config(de_name: str, distro_version: str) -> None:
+def config(de_name: str, distro_version: str, verbose_var: bool) -> None:
+    # set verbose var
+    global verbose
+    verbose = verbose_var
+
     print("\033[96m" + "Configuring Fedora" + "\033[0m")
     print("Installing packages")
     chroot("dnf update -y")
@@ -56,11 +60,14 @@ def config(de_name: str, distro_version: str) -> None:
     print("Set SELinux to permissive")
     chroot("sed -i 's/SELINUX=enforcing/SELINUX=permissive/g' /etc/sysconfig/selinux")
     print("Fix permissions")  # maybe not needed?
-    # chroot("chmod -R 750 /root")
+    chroot("chmod -R 750 /root")
 
 
 def chroot(command: str) -> None:
-    bash(f'chroot /mnt/eupnea /bin/sh -c "{command}"')
+    if verbose:
+        bash(f'chroot /mnt/eupnea /bin/sh -c "{command}"')
+    else:
+        bash(f'chroot /mnt/eupnea /bin/sh -c "{command}" 2>/dev/null 1>/dev/null')  # supress all output
 
 
 if __name__ == "__main__":

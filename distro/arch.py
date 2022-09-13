@@ -2,7 +2,11 @@ from os import system as bash
 import subprocess as sp
 
 
-def config(de_name: str, distro_version: str) -> None:
+def config(de_name: str, distro_version: str, verbose_var: bool) -> None:
+    # set verbose var
+    global verbose
+    verbose = verbose_var
+
     print("\033[96m" + "Configuring Arch" + "\033[0m")
     print("Uncomment arch mirror")
     with open("/mnt/eupnea/etc/pacman.d/mirrorlist", "r") as read:
@@ -99,8 +103,11 @@ def config(de_name: str, distro_version: str) -> None:
 
 
 # using arch-chroot for arch
-def chroot(command: str) -> None:
-    bash('arch-chroot /mnt/eupnea bash -c "' + command + '"')
+def chroot(command: str):
+    if verbose:
+        bash(f'arch-chroot /mnt/eupnea bash -c "{command}"')
+    else:
+        bash(f'arch-chroot /mnt/eupnea bash -c "{command}" 2>/dev/null 1>/dev/null')  # supress all output
 
 
 if __name__ == "__main__":

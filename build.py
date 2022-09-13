@@ -31,6 +31,7 @@ def process_args():
                         help="Use experimental 5.15 kernel.")
     parser.add_argument("--mainline", action="store_true", dest="mainline", default=False,
                         help="Use mainline linux kernel instead of modified chromeos kernel.")
+    parser.add_argument("-v", "--verbose", action="store_true", dest="verbose", default=False, help="Print more output")
     return parser.parse_args()
 
 
@@ -224,7 +225,7 @@ def download_rootfs(distro_name: str, distro_version: str, distro_link: str) -> 
                 urlretrieve(distro_link, filename="/tmp/eupnea-build/rootfs/fedora-rootfs.tar.xz")
     except URLError:
         print(
-            "\033[91m" + "Failed to download rootfs. Check your internet connection and try again. If the error" +
+            "\033[91m" + "Couldnt download rootfs. Check your internet connection and try again. If the error" +
             " persists, create an issue with the distro and version in the name" + "\033[0m")
         bash(f"kill {main_thread_pid}")  # kill main thread, as this function running in a different thread
 
@@ -320,8 +321,11 @@ def post_extract(username: str, password: str, hostname: str, distro: str, de_na
 
 # chroot command
 def chroot(command: str) -> str:
-    return sp.run(f'chroot /mnt/eupnea /bin/sh -c "{command}"', shell=True, capture_output=True).stdout.decode(
+    output = sp.run(f'chroot /mnt/eupnea /bin/sh -c "{command}"', shell=True, capture_output=True).stdout.decode(
         "utf-8").strip()
+    if args.verbose:
+        print(output)
+    return output
 
 
 if __name__ == "__main__":
