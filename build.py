@@ -233,7 +233,8 @@ def download_rootfs(distro_name: str, distro_version: str, distro_link: str) -> 
                 # Debian sometimes fails for no apparent reason, so we try 2 times
                 debian_result = sp.run("debootstrap stable /tmp/eupnea-build/rootfs https://deb.debian.org/debian/",
                                        shell=True, capture_output=True).stdout.decode("utf-8")
-                print("Result: " + str(debian_result))  # print results for debugging
+                if args.verbose:
+                    print("Result: " + str(debian_result))  # print results for debugging
                 if debian_result.__contains__("Couldn't download packages:"):
                     print("\033[91m\nDebootstrap failed, retrying once\n\033[0m")
                     # delete the failed rootfs
@@ -241,7 +242,8 @@ def download_rootfs(distro_name: str, distro_version: str, distro_link: str) -> 
                     Path("/tmp/eupnea-build/rootfs").mkdir(parents=True)
                     debian_result = sp.run("debootstrap stable /tmp/eupnea-build/rootfs https://deb.debian.org/debian/",
                                            shell=True, capture_output=True).stdout.decode("utf-8")
-                    print("Result: " + str(debian_result))  # print results for debugging
+                    if args.verbose:
+                        print("Result: " + str(debian_result))  # print results for debugging
                     if debian_result.__contains__("Couldn't download packages:"):
                         print("\033[91m\nDebootstrap failed again, check your internet connection or try again later" +
                               "\033[0m")

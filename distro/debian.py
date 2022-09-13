@@ -12,7 +12,7 @@ def config(de_name: str, distro_version: str, verbose_var: bool) -> None:
     print("Installing packages")
     chroot("apt update -y")
     chroot("apt install -y network-manager tasksel software-properties-common sudo firmware-linux-free cloud-utils" +
-           "firmware-linux-nonfree firmware-iwlwifi iw curl wget git")
+           " firmware-linux-nonfree firmware-iwlwifi iw curl wget git")
     print("Reinstalling dbus")
     # TODO: Find out why reinstalling dbus is necessary
     chroot("apt reinstall -y dbus")
