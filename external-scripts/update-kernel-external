@@ -122,7 +122,7 @@ def flash_kernel() -> None:
     except URLError:
         print("\033[91m" + "Failed to reach github. Fallback to hardcoded default cmdline" + "\033[0m")
         temp_cmdline = "console=tty1 root=PARTUUID=${USB_ROOTFS} i915.modeset=1 rootwait rw fbcon=logo-pos:center" \
-                       ",logo-count:1 loglevel=0 splash"
+                       ",logo-count:1 loglevel=0 iommu=pt splash"
     # get partuuid of rootfs
     new_cmdline = temp_cmdline.replace("${USB_ROOTFS}", rootfs_partuuid)
     with open("kernel.flags", "w") as file:
