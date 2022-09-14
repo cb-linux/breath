@@ -48,7 +48,7 @@ def config(de_name: str, distro_version: str, verbose_var: bool) -> None:
         case "budgie":
             print("Installing budgie")
             # DEBIAN_FRONTEND=noninteractive skips locale setup in cli
-            chroot("DEBIAN_FRONTEND=noninteractive apt install -y budgie-desktop budgie-indicator-applet "
+            chroot("DEBIAN_FRONTEND=noninteractive apt install -y budgie-desktop budgie-indicator-applet budgie-core "
                    "lightdm lightdm-gtk-greeter")
             chroot("systemctl enable lightdm.service")
         case "minimal":
