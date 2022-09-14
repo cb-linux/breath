@@ -307,7 +307,7 @@ def post_extract(username: str, password: str, hostname: str, distro: str, de_na
     print("\n\033[96m" + "Configuring Eupnea" + "\033[0m")
 
     print("Copying resolv.conf")
-    cp("/etc/resolv.conf", "/mnt/eupnea/etc/resolv.conf")
+    bash("cp --remove-destination /etc/resolv.conf /mnt/eupnea/etc/resolv.conf")  # python wont follow symlinks, using bash instead
 
     print("Extracting kernel modules")
     rmdir("/mnt/eupnea/lib/modules", ignore_errors=True)
