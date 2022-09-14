@@ -114,6 +114,7 @@ def download_kernel() -> None:
             url = "https://github.com/eupnea-linux/mainline-kernel/releases/latest/download/"
             urlretrieve(f"{url}bzImage", filename="/tmp/eupnea-build/bzImage")
             urlretrieve(f"{url}modules.tar.xz", filename="/tmp/eupnea-build/modules.tar.xz")
+            urlretrieve(f"{url}headers.tar.xz", filename="/tmp/eupnea-build/headers.tar.xz")
         else:
             if args.alt:
                 print("Downloading alt kernel")
@@ -166,6 +167,10 @@ def prepare_img() -> str:
 
 
 def partition(mnt_point: str, write_usb: bool) -> str:
+    # remove partition table from usb
+    if write_usb:
+        bash("wipefs -af /dev/sdg")
+
     # format as per depthcharge requirements,
     # READ: https://wiki.gentoo.org/wiki/Creating_bootable_media_for_depthcharge_based_devices
     print("Partitioning mounted image and adding flags")
@@ -332,7 +337,7 @@ def post_extract(username: str, password: str, hostname: str, distro: str, de_na
     print("Copying eupnea utils")
     bash("cp postinstall-scripts/* /mnt/eupnea/usr/local/bin/")
     Path("/mnt/eupnea/usr/local/eupnea-configs").mkdir(parents=True)
-    bash("cp configs/* /mnt/eupnea/usr/local/eupnea-configs/")
+    bash("cp -r configs/* /mnt/eupnea/usr/local/eupnea-configs/")
 
     print("Configuring sleep")
     # disable hibernation aka S4 sleep, READ: https://eupnea-linux.github.io/docs.html#/bootlock
@@ -391,8 +396,7 @@ if __name__ == "__main__":
         t.start()
         sleep(1)  # wait for thread to print info
         while t.is_alive():
-            sys.stdout.flush()
-            print(".", end="")
+            print(".", end="", flush=True)
             sleep(1)
         print("")  # break line
     else:  # if local path is specified, copy kernel from there
@@ -414,8 +418,7 @@ if __name__ == "__main__":
     t.start()
     sleep(1)  # wait for thread to print info
     while t.is_alive():
-        sys.stdout.flush()
-        print(".", end="")
+        print(".", end="", flush=True)
         sleep(1)
     print("")  # break line
 

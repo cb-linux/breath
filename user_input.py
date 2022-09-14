@@ -223,7 +223,7 @@ def user_input() -> Tuple[str, str, str, str, str, str, str, str, bool, bool]:
             create_iso = False
             bash("lsblk -o NAME,LABEL,SIZE")
             device = input(
-                "\033[92m" + "Please enter the device name (e.g. sda) and press enter: \n" + "\033[0m").strip()
+                "\033[92m" + "Please enter the device name (example: sdc) and press enter: \n" + "\033[0m").strip()
         else:
             print("Image selected")
         break

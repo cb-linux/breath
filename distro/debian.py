@@ -1,6 +1,5 @@
 import os
 from os import system as bash
-import subprocess as sp
 
 
 def config(de_name: str, distro_version: str, verbose_var: bool) -> None:
@@ -9,16 +8,22 @@ def config(de_name: str, distro_version: str, verbose_var: bool) -> None:
     verbose = verbose_var
 
     print("\033[96m" + "Configuring Ubuntu" + "\033[0m")
-    print("Installing packages")
+
+    print("Installling add-apt-repository")
     chroot("apt update -y")
-    chroot("apt install -y network-manager tasksel software-properties-common sudo firmware-linux-free cloud-utils" +
-           " firmware-linux-nonfree firmware-iwlwifi iw curl wget git")
-    print("Reinstalling dbus")
-    # TODO: Find out why reinstalling dbus is necessary
-    chroot("apt reinstall -y dbus")
-    print("Add non free repo")
+    chroot("apt install -y software-properties-common")
+
+    print("Adding non free repos")
     chroot("apt-add-repository non-free")
     chroot("apt update -y")
+
+    print("Installing packages")
+    chroot("apt install -y network-manager sudo firmware-linux-free cloud-utils firmware-linux-nonfree firmware-iwlwifi"
+           " iw curl wget git")
+
+    # print("Reinstalling dbus")
+    # TODO: Find out why reinstalling dbus is necessary
+    # chroot("apt reinstall -y dbus")
     # de install fails without updating apt
     print("\033[96m" + "Downloading and installing de, might take a while" + "\033[0m")
     match de_name:
@@ -42,8 +47,10 @@ def config(de_name: str, distro_version: str, verbose_var: bool) -> None:
             exit(1)
         case "budgie":
             print("Installing budgie")
-            chroot("apt install -y budgie-desktop budgie-indicator-applet")
-            # chroot("dpkg-reconfigure lightdm")
+            # DEBIAN_FRONTEND=noninteractive skips locale setup in cli
+            chroot("DEBIAN_FRONTEND=noninteractive apt install -y budgie-desktop budgie-indicator-applet "
+                   "lightdm lightdm-gtk-greeter")
+            chroot("systemctl enable lightdm.service")
         case "minimal":
             print("Installing minimal")
             chroot("apt install -y xfce4 xfce4-terminal --no-install-recommends")
@@ -65,8 +72,6 @@ def config(de_name: str, distro_version: str, verbose_var: bool) -> None:
             pass
         chroot("apt remove -y gnome-shell")
         chroot("apt autoremove -y")
-    # TODO: Figure out why removing needrestart is necessary
-    chroot("apt remove -y needrestart")
     print("Fixing securetty if needed")
     # "2>/dev/null" is for hiding error message, as not to scare the user
     bash("cp /mnt/eupnea/usr/share/doc/util-linux/examples/securetty /mnt/eupnea/etc/securetty 2>/dev/null")
