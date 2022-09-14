@@ -79,7 +79,7 @@ def config(de_name: str, distro_version: str, verbose_var: bool) -> None:
         case "budgie":
             print("Installing budgie")
             chroot("pacman -S --noconfirm budgie-desktop budgie-desktop-view budgie-screensaver budgie-control-center "
-                   "xorg xorg-server lightdm lightdm-gtk-greeter")
+                   "lightdm lightdm-gtk-greeter")
             chroot("systemctl enable lightdm.service")
         case "minimal":
             print("Installing xfce")
