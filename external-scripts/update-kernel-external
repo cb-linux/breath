@@ -209,8 +209,7 @@ if __name__ == "__main__":
         t.start()
         sleep(1)
         while t.is_alive():
-            sys.stdout.flush()
-            print(".", end="")
+            print(".", end="", flush=True)
             sleep(1)
         print("")
     else:
