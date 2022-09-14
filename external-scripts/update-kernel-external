@@ -163,7 +163,7 @@ if __name__ == "__main__":
         skip_question = True
 
     # get rootfs partition from user
-    bash("lsblk")
+    bash("lsblk -o NAME,LABEL,SIZE")
     device = input(
         "\033[92m" + "Please enter the device name (e.g. sda or mmcblk0) and press enter: \n" + "\033[0m").strip()
     if device.endswith("/") or device.endswith("1") or device.endswith("2"):

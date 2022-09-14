@@ -221,7 +221,7 @@ def user_input() -> Tuple[str, str, str, str, str, str, str, str, bool, bool]:
                  "Press Enter to create an img file" "\033[0m" + "\n") == "direct":
             print("USB selected")
             create_iso = False
-            bash("lsblk")
+            bash("lsblk -o NAME,LABEL,SIZE")
             device = input(
                 "\033[92m" + "Please enter the device name (e.g. sda) and press enter: \n" + "\033[0m").strip()
         else:
