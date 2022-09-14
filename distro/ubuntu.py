@@ -1,6 +1,6 @@
 import os
 from os import system as bash
-import subprocess as sp
+from shutil import copy as cp
 
 
 def config(de_name: str, distro_version: str, verbose_var: bool) -> None:
@@ -9,11 +9,14 @@ def config(de_name: str, distro_version: str, verbose_var: bool) -> None:
     verbose = verbose_var
 
     print("\033[96m" + "Configuring Ubuntu" + "\033[0m")
+
     print("Installing packages")
     chroot("apt install -y linux-firmware network-manager software-properties-common cloud-utils")
+
     # TODO: Find out why we need to reinstall dbus
     print("Reinstalling dbus")
     chroot("apt reinstall -y dbus")
+
     # de install fails without updating apt
     print("Updating apt")
     chroot("apt update -y")
@@ -52,7 +55,8 @@ def config(de_name: str, distro_version: str, verbose_var: bool) -> None:
             print("\033[91m" + "Invalid desktop environment!!! Remove all files and retry." + "\033[0m")
             exit(1)
     # Ignore libfprint-2-2 fprintd libpam-fprintd errors
-    # GDM3 auto installs gnome-minimal. Gotta remove it if user didnt choose gnome
+
+    # GDM3 auto installs gnome-minimal. Remove the session link as its not needed
     if not de_name == "gnome":
         print("Fixing gdm3")
         try:
@@ -64,8 +68,10 @@ def config(de_name: str, distro_version: str, verbose_var: bool) -> None:
     # TODO: Figure out if removing needrestart is necessary
     chroot("apt remove -y needrestart")
     print("Fixing securetty if needed")
-    # "2>/dev/null" is for hiding error message, as not to scare the user
-    bash("cp /mnt/eupnea/usr/share/doc/util-linux/examples/securetty /mnt/eupnea/etc/securetty 2>/dev/null")
+    try:
+        cp("/mnt/eupnea/usr/share/doc/util-linux/examples/securetty", "/mnt/eupnea/etc/securetty", follow_symlinks=True)
+    except FileNotFoundError:
+        pass
 
 
 def chroot(command: str) -> None:

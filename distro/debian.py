@@ -1,5 +1,6 @@
 import os
 from os import system as bash
+from shutil import copy as cp
 
 
 def config(de_name: str, distro_version: str, verbose_var: bool) -> None:
@@ -74,7 +75,10 @@ def config(de_name: str, distro_version: str, verbose_var: bool) -> None:
         chroot("apt autoremove -y")
     print("Fixing securetty if needed")
     # "2>/dev/null" is for hiding error message, as not to scare the user
-    bash("cp /mnt/eupnea/usr/share/doc/util-linux/examples/securetty /mnt/eupnea/etc/securetty 2>/dev/null")
+    try:
+        cp("/mnt/eupnea/usr/share/doc/util-linux/examples/securetty", "/mnt/eupnea/etc/securetty", follow_symlinks=True)
+    except FileNotFoundError:
+        pass
 
 
 def chroot(command: str) -> None:

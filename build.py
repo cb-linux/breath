@@ -276,7 +276,7 @@ def extract_rootfs(distro: str) -> None:
             bash("tar xfp /tmp/eupnea-build/rootfs/ubuntu-rootfs.tar.xz -C " + "/mnt/eupnea --checkpoint=.10000")
         case "debian":
             print("Copying debian rootfs")
-            bash("cp -r -p /tmp/eupnea-build/rootfs/* /mnt/eupnea/")
+            cpdir("/tmp/eupnea-build/rootfs/", "/mnt/eupnea/")
         case "arch":
             print("Extracting arch rootfs")
             # TODO: Figure out how to extract arch rootfs without cd
@@ -298,7 +298,7 @@ def extract_rootfs(distro: str) -> None:
                     if entry.is_dir():
                         temp_rootfs_path = entry.path
                         break
-            print("\nCopying fedora rootfs to /mnt/eupnea")
+            print("\nExtractin fedora rootfs to /mnt/eupnea")
             bash(f"tar xpf {temp_rootfs_path}/layer.tar -C /mnt/eupnea --checkpoint=.10000")
 
 
@@ -307,7 +307,7 @@ def post_extract(username: str, password: str, hostname: str, distro: str, de_na
     print("\n\033[96m" + "Configuring Eupnea" + "\033[0m")
 
     print("Copying resolv.conf")
-    bash("cp --remove-destination /etc/resolv.conf /mnt/eupnea/etc/resolv.conf")
+    cp("/etc/resolv.conf", "/mnt/eupnea/etc/resolv.conf")
 
     print("Extracting kernel modules")
     rmdir("/mnt/eupnea/lib/modules", ignore_errors=True)
@@ -335,9 +335,9 @@ def post_extract(username: str, password: str, hostname: str, distro: str, de_na
         hostname_file.write(hostname)
 
     print("Copying eupnea utils")
-    bash("cp postinstall-scripts/* /mnt/eupnea/usr/local/bin/")
+    bash("cp postinstall-scripts/* /mnt/eupnea/usr/local/bin/")  # more efficient to use bash than python in this case
     Path("/mnt/eupnea/usr/local/eupnea-configs").mkdir(parents=True)
-    bash("cp -r configs/* /mnt/eupnea/usr/local/eupnea-configs/")
+    cpdir("configs", "/mnt/eupnea/usr/local/eupnea-configs")
 
     print("Configuring sleep")
     # disable hibernation aka S4 sleep, READ: https://eupnea-linux.github.io/docs.html#/bootlock
@@ -449,7 +449,7 @@ if __name__ == "__main__":
 
     # Hook postinstall script, needs to be done after preping system
     print("Adding postinstall service")
-    bash("cp configs/postinstall.service /mnt/eupnea/etc/systemd/system/postinstall.service")
+    cp("configs/postinstall.service", "/mnt/eupnea/etc/systemd/system/postinstall.service")
     chroot("systemctl enable postinstall.service")
 
     # Unmount everything

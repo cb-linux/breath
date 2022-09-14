@@ -1,6 +1,4 @@
-import os
 from os import system as bash
-import subprocess as sp
 
 
 def config(de_name: str, distro_version: str, verbose_var: bool) -> None:

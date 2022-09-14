@@ -2,6 +2,7 @@
 
 import os
 from shutil import rmtree as rmdir
+from shutil import copy as cp
 from pathlib import Path
 import sys
 import argparse
@@ -204,8 +205,8 @@ if __name__ == "__main__":
         else:
             kernel_path = args.local_path
         print("\033[96m" + "Using local kernel files" + "\033[0m")
-        bash(f"cp {kernel_path}bzImage /tmp/eupnea-update/bzImage")
-        bash(f"cp {kernel_path}modules.tar.xz /tmp/eupnea-update/modules.tar.xz")
+        cp(f"{kernel_path}bzImage", "/tmp/eupnea-update/bzImage")
+        cp(f"{kernel_path}modules.tar.xz", "/tmp/eupnea-update/modules.tar.xz")
 
     flash_kernel()
     print("\033[92m" + "Kernel update complete!" + "\033[0m")
