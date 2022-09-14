@@ -33,13 +33,13 @@ def process_args():
 
 # Clean /tmp from eupnea files
 def prepare_host() -> None:
-    print("\033[96m" + "Preparing host system" + "\033[0m")
+    print("\033[96m" + "Preparing host system" + "\033[0m", flush=True)
 
-    print("Creating /tmp/eupnea-update")
+    print("Creating /tmp/eupnea-update", flush=True)
     rmdir("/tmp/eupnea-update", ignore_errors=True)
     Path("/tmp/eupnea-update").mkdir()
 
-    print("Installing necessary packages")
+    print("Installing necessary packages", flush=True)
     # install cgpt and futility
     if os.path.exists("/usr/bin/apt"):
         bash("apt install cgpt vboot-kernel-utils -y")
@@ -49,13 +49,13 @@ def prepare_host() -> None:
         bash("dnf install cgpt vboot-utils --assumeyes")
     else:
         print("\033[91m" + "cgpt and futility not found, please install them using your disotros package manager"
-              + "\033[0m")
+              + "\033[0m", flush=True)
         exit(1)
 
 
 # download kernel files from GitHub
 def download_kernel() -> None:
-    print("\033[96m" + "Downloading kernel binaries from github" + "\033[0m")
+    print("\033[96m" + "Downloading kernel binaries from github" + "\033[0m", flush=True)
     if args.dev_build:
         url = "https://github.com/eupnea-linux/kernel/releases/download/dev-build/"
     else:
@@ -67,49 +67,49 @@ def download_kernel() -> None:
             urlretrieve(f"{url}modules.tar.xz", filename="/tmp/eupnea-update/modules.tar.xz")
         else:
             if args.alt:
-                print("Downloading alt kernel")
+                print("Downloading alt kernel", flush=True)
                 urlretrieve(f"{url}bzImage-alt", filename="/tmp/eupnea-update/bzImage")
                 urlretrieve(f"{url}modules-alt.tar.xz", filename="/tmp/eupnea-update/modules.tar.xz")
             elif args.exp:
-                print("Downloading experimental 5.15 kernel")
+                print("Downloading experimental 5.15 kernel", flush=True)
                 urlretrieve(f"{url}bzImage-exp", filename="/tmp/eupnea-update/bzImage")
                 urlretrieve(f"{url}modules-exp.tar.xz", filename="/tmp/eupnea-update/modules.tar.xz")
             else:
                 urlretrieve(f"{url}bzImage", filename="/tmp/eupnea-update/bzImage")
                 urlretrieve(f"{url}modules.tar.xz", filename="/tmp/eupnea-update/modules.tar.xz")
     except URLError:
-        print("\033[91m" + "Failed to reach github. Check your internet connection and try again" + "\033[0m")
+        print("\033[91m" + "Failed to reach github. Check your internet connection and try again\033[0m", flush=True)
         exit(1)
 
 
 # Configure distro agnostic options
 def flash_kernel() -> None:
-    print("\n\033[96m" + "Flashing new kernel" + "\033[0m")
+    print("\n\033[96m" + "Flashing new kernel" + "\033[0m", flush=True)
 
-    print("Extracting kernel modules")
+    print("Extracting kernel modules", flush=True)
     rmdir("/lib/modules", ignore_errors=True)
     Path("/lib/modules").mkdir(parents=True, exist_ok=True)
 
     # modules tar contains /lib/modules, so it's extracted to / and --skip-old-files is used to prevent overwriting
     # other files in /lib
     bash(f"tar xpf /tmp/eupnea-update/modules.tar.xz --skip-old-files -C / --checkpoint=.10000")
-    print("")  # break line after tar
+    print("", flush=True)  # break line after tar
 
-    print("Extracting kernel headers")
+    print("Extracting kernel headers", flush=True)
     # TODO: extract kernel headers
-    print("")  # break line
+    print("", flush=True)  # break line
 
     # get uuid of rootfs partition
     rootfs_partuuid = sp.run([f"blkid -o value -s PARTUUID {device}2"], shell=True,
                              capture_output=True).stdout.decode("utf-8").strip()
 
-    print("Downloading default command line from github")
+    print("Downloading default command line from github", flush=True)
     try:
         temp_cmdline = urlopen(
             "https://raw.githubusercontent.com/eupnea-linux/eupnea/main/configs/kernel.flags").read().decode(
             "utf-8")
     except URLError:
-        print("\033[91m" + "Failed to reach github. Fallback to hardcoded default cmdline" + "\033[0m")
+        print("\033[91m" + "Failed to reach github. Fallback to hardcoded default cmdline" + "\033[0m", flush=True)
         temp_cmdline = "console=tty1 root=PARTUUID=${USB_ROOTFS} i915.modeset=1 rootwait rw fbcon=logo-pos:center" \
                        ",logo-count:1 loglevel=0 splash"
     # get partuuid of rootfs
@@ -117,12 +117,12 @@ def flash_kernel() -> None:
     with open("kernel.flags", "w") as file:
         file.write(new_cmdline)
 
-    print("Signing kernel")
+    print("Signing kernel", flush=True)
     bash("futility vbutil_kernel --arch x86_64 --version 1 --keyblock /usr/share/vboot/devkeys/kernel.keyblock"
          + " --signprivate /usr/share/vboot/devkeys/kernel_data_key.vbprivk --bootloader kernel.flags" +
          " --config kernel.flags --vmlinuz /tmp/eupnea-update/bzImage --pack /tmp/eupnea-update/bzImage.signed")
 
-    print("Flashing kernel")
+    print("Flashing kernel", flush=True)
     bash(f"dd if=/tmp/eupnea-update/bzImage.signed of={device}1")
 
 
@@ -137,19 +137,19 @@ if __name__ == "__main__":
     skip_dev_question = False
 
     if args.dev_build:
-        print("\033[93m" + "Using dev release" + "\033[0m")
+        print("\033[93m" + "Using dev release" + "\033[0m", flush=True)
         skip_dev_question = True
     if args.alt:
-        print("\033[93m" + "Using alt kernel" + "\033[0m")
+        print("\033[93m" + "Using alt kernel" + "\033[0m", flush=True)
         skip_version_question = True
     if args.exp:
-        print("\033[93m" + "Using experimental kernel" + "\033[0m")
+        print("\033[93m" + "Using experimental kernel" + "\033[0m", flush=True)
         skip_version_question = True
     if args.mainline:
-        print("\033[93m" + "Using mainline kernel" + "\033[0m")
+        print("\033[93m" + "Using mainline kernel" + "\033[0m", flush=True)
         skip_version_question = True
     if args.local_path:
-        print("\033[93m" + "Using local path" + "\033[0m")
+        print("\033[93m" + "Using local path" + "\033[0m", flush=True)
         skip_version_question = True
 
     # read root partition mount
@@ -159,7 +159,7 @@ if __name__ == "__main__":
 
     if not skip_version_question:
         while True:
-            print("\033[92m" + "Which kernel would you like to flash? Press enter for default\n" + "\033[0m")
+            print("\033[92m" + "Which kernel would you like to flash? Press enter for default\n\033[0m", flush=True)
             user_input = input(
                 "\033[94m" + "Available options: stable(default), alt(for older devices), mainline(might work better on"
                              " newer devices, exp(experimental 5.15 kernel)" + "\033[0m" + "\n")
@@ -176,11 +176,11 @@ if __name__ == "__main__":
                     args.exp = True
                     break
                 case _:
-                    print("\033[91m" + "Invalid option, check your spelling" + "\033[0m")
+                    print("\033[91m" + "Invalid option, check your spelling" + "\033[0m", flush=True)
 
     if not skip_dev_question:
         print("\033[92m" + "Would you like to the developer version of the kernel? Type yes or press Enter for no\n"
-              + "\033[0m")
+              + "\033[0m", flush=True)
         user_input = input(
             "\033[94m" + "Available options: stable(default), alt(for older devices), mainline(might work better on "
                          "newer devices, exp(experimental 5.15 kernel)" + "\033[0m" + "\n")
@@ -194,18 +194,17 @@ if __name__ == "__main__":
         t.start()
         sleep(1)
         while t.is_alive():
-            sys.stdout.flush()
-            print(".", end="")
+            print(".", end="", flush=True)
             sleep(1)
-        print("")
+        print("", flush=True)
     else:
         if not args.local_path.endswith("/"):
             kernel_path = f"{args.local_path}/"
         else:
             kernel_path = args.local_path
-        print("\033[96m" + "Using local kernel files" + "\033[0m")
+        print("\033[96m" + "Using local kernel files" + "\033[0m", flush=True)
         bash(f"cp {kernel_path}bzImage /tmp/eupnea-update/bzImage")
         bash(f"cp {kernel_path}modules.tar.xz /tmp/eupnea-update/modules.tar.xz")
 
     flash_kernel()
-    print("\033[92m" + "Kernel update complete!" + "\033[0m")
+    print("\033[92m" + "Kernel update complete!" + "\033[0m", flush=True)
