@@ -336,7 +336,6 @@ def post_extract(username: str, password: str, hostname: str, distro: str, de_na
 
     print("Copying eupnea utils")
     bash("cp postinstall-scripts/* /mnt/eupnea/usr/local/bin/")  # more efficient to use bash than python in this case
-    Path("/mnt/eupnea/usr/local/eupnea-configs").mkdir(parents=True)
     cpdir("configs", "/mnt/eupnea/usr/local/eupnea-configs")
 
     print("Configuring sleep")
