@@ -67,12 +67,12 @@ def user_input() -> Tuple[str, str, str, str, str, str, str, str, bool, bool]:
                     print("Using Fedora version: " + distro_version)
                     break
                 else:
-                    if temp_input in distros["fedora"]:
+                    try:
                         distro_version = temp_input
                         distro_link = distros["fedora"][distro_version]
                         print("Using Fedora version: " + distro_version)
                         break
-                    else:
+                    except KeyError:
                         print("\033[93m" + "Fedora version not available, please choose another" + "\033[0m")
                         continue
             case _:

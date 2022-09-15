@@ -9,7 +9,7 @@
   },
   "debian": {
   },
-  "fedora": {
+  "fedora_wrong": {
     "28": "https://kojipkgs.fedoraproject.org/packages/Fedora-Container-Base/28/20180302.n.0/images/Fedora-Container-Base-28-20180302.n.0.x86_64.tar.xz",
     "29": "https://kojipkgs.fedoraproject.org/packages/Fedora-Container-Base/29/20180827.n.0/images/Fedora-Container-Base-29-20180827.n.0.x86_64.tar.xz",
     "30": "https://kojipkgs.fedoraproject.org/packages/Fedora-Container-Base/30/20190304.n.0/images/Fedora-Container-Base-30-20190304.n.0.x86_64.tar.xz",
@@ -18,5 +18,8 @@
     "35": "https://kojipkgs.fedoraproject.org/packages/Fedora-Container-Base/35/20220828.0/images/Fedora-Container-Base-35-20220828.0.x86_64.tar.xz",
     "36": "https://kojipkgs.fedoraproject.org/packages/Fedora-Container-Base/36/20220719.0/images/Fedora-Container-Base-36-20220719.0.x86_64.tar.xz",
     "37": "https://kojipkgs.fedoraproject.org/packages/Fedora-Container-Base/37/20220828.n.0/images/Fedora-Container-Base-37-20220828.n.0.x86_64.tar.xz"
+  },
+  "fedora": {
+    "37": "https://kojipkgs.fedoraproject.org/packages/Fedora-Cloud-Base/37/20220914.n.0/images/Fedora-Cloud-Base-37-20220914.n.0.x86_64.raw.xz"
   }
 }

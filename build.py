@@ -169,7 +169,7 @@ def prepare_img() -> str:
 def partition(mnt_point: str, write_usb: bool) -> str:
     # remove partition table from usb
     if write_usb:
-        bash("wipefs -af /dev/sdg")
+        bash(f"wipefs -af {mnt_point}")
 
     # format as per depthcharge requirements,
     # READ: https://wiki.gentoo.org/wiki/Creating_bootable_media_for_depthcharge_based_devices
@@ -232,7 +232,7 @@ def download_rootfs(distro_name: str, distro_version: str, distro_link: str) -> 
                 urlretrieve(
                     f"https://cloud-images.ubuntu.com/releases/{distro_version}/release/ubuntu-{distro_version}"
                     f"-server-cloudimg-amd64-root.tar.xz",
-                    filename="/tmp/eupnea-build/rootfs/ubuntu-rootfs.tar.xz")
+                    filename="/tmp/eupnea-build/ubuntu-rootfs.tar.xz")
             case "debian":
                 print("Downloading debian with debootstrap")
                 # Debian sometimes fails for no apparent reason, so we try 2 times
@@ -245,7 +245,7 @@ def download_rootfs(distro_name: str, distro_version: str, distro_link: str) -> 
                     # delete the failed rootfs
                     rmdir("/tmp/eupnea-build/rootfs", ignore_errors=True)
                     Path("/tmp/eupnea-build/rootfs").mkdir(parents=True)
-                    debian_result = sp.run("debootstrap stable /tmp/eupnea-build/rootfs https://deb.debian.org/debian/",
+                    debian_result = sp.run("debootstrap stable /tmp/eupnea-build/debian https://deb.debian.org/debian/",
                                            shell=True, capture_output=True).stdout.decode("utf-8")
                     if args.verbose:
                         print("Result: " + str(debian_result))  # print results for debugging
@@ -256,10 +256,10 @@ def download_rootfs(distro_name: str, distro_version: str, distro_link: str) -> 
             case "arch":
                 print("Downloading latest arch rootfs")
                 urlretrieve("https://mirror.rackspace.com/archlinux/iso/latest/archlinux-bootstrap-x86_64.tar.gz",
-                            filename="/tmp/eupnea-build/rootfs/arch-rootfs.tar.gz")
+                            filename="/tmp/eupnea-build/arch-rootfs.tar.gz")
             case "fedora":
                 print(f"Downloading fedora rootfs version: {distro_version}")
-                urlretrieve(distro_link, filename="/tmp/eupnea-build/rootfs/fedora-rootfs.tar.xz")
+                urlretrieve(distro_link, filename="/tmp/eupnea-build/fedora-rootfs.raw.xz")
     except URLError:
         print(
             "\033[91m" + "Couldnt download rootfs. Check your internet connection and try again. If the error" +
@@ -273,34 +273,34 @@ def extract_rootfs(distro: str) -> None:
     match distro:
         case "ubuntu":
             print("Extracting ubuntu rootfs")
-            bash("tar xfp /tmp/eupnea-build/rootfs/ubuntu-rootfs.tar.xz -C " + "/mnt/eupnea --checkpoint=.10000")
+            bash("tar xfp /tmp/eupnea-build/ubuntu-rootfs.tar.xz -C " + "/mnt/eupnea --checkpoint=.10000")
         case "debian":
             print("Copying debian rootfs")
-            # TODO: rewrite in "python" instead of bash
-            bash("cp -pr /tmp/eupnea-build/rootfs/* /mnt/eupnea/")
+            # TODO: rewrite copy in "python" instead of bash
+            bash("cp -pr /tmp/eupnea-build/debian/* /mnt/eupnea/")
         case "arch":
             print("Extracting arch rootfs")
             # TODO: Figure out how to extract arch rootfs without cd
             # temp chdir into mounted image, then go back to original dir
             temp_path = os.getcwd()
             os.chdir("/mnt/eupnea")
-            bash("tar xpfz /tmp/eupnea-build/rootfs/arch-rootfs.tar.gz root.x86_64/ --strip-components=1" +
+            bash("tar xpfz /tmp/eupnea-build/arch-rootfs.tar.gz root.x86_64/ --strip-components=1" +
                  " --numeric-owner --checkpoint=.10000")
             os.chdir(temp_path)
         case "fedora":
             print("Extracting fedora rootfs")
             # extract to temp location, find rootfs and extract it to mounted image
-            Path("/tmp/eupnea-build/fedora-temp").mkdir()
-            bash(
-                "tar xfp /tmp/eupnea-build/rootfs/fedora-rootfs.tar.xz -C /tmp/eupnea-build/fedora-temp " +
-                "--checkpoint=.10000")
-            with os.scandir("/tmp/eupnea-build/fedora-temp") as scan:
-                for entry in scan:
-                    if entry.is_dir():
-                        temp_rootfs_path = entry.path
-                        break
-            print("\nExtractin fedora rootfs to /mnt/eupnea")
-            bash(f"tar xpf {temp_rootfs_path}/layer.tar -C /mnt/eupnea --checkpoint=.10000")
+            Path("/tmp/eupnea-build/fedora-tmp-mnt").mkdir(exist_ok=True)
+            # using unxz instead of tar
+            bash("unxz -d /tmp/eupnea-build/fedora-rootfs.raw.xz -c > /tmp/eupnea-build/fedora-raw")
+
+            # mount fedora raw image
+            fedora_root_part = sp.run("losetup -f --show /tmp/eupnea-build/fedora-raw", shell=True,
+                                      capture_output=True).stdout.decode(
+                "utf-8").strip() + "p5"
+            bash(f"mount {fedora_root_part} /tmp/eupnea-build/fedora-tmp-mnt")
+            # copy actual root file to eupnea mount
+            bash("cp -pr /tmp/eupnea-build/fedora-tmp-mnt/root/* /mnt/eupnea/")
 
 
 # Configure distro agnostic options
@@ -308,8 +308,8 @@ def post_extract(username: str, password: str, hostname: str, distro: str, de_na
     print("\n\033[96m" + "Configuring Eupnea" + "\033[0m")
 
     print("Copying resolv.conf")
-    bash(
-        "cp --remove-destination /etc/resolv.conf /mnt/eupnea/etc/resolv.conf")  # python wont follow symlinks, using bash instead
+    # python wont follow symlinks, using bash instead
+    bash("cp --remove-destination /etc/resolv.conf /mnt/eupnea/etc/resolv.conf")
 
     print("Extracting kernel modules")
     rmdir("/mnt/eupnea/lib/modules", ignore_errors=True)
