@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
 
-import argparse
 import os.path
 from os import system as bash
-import subprocess as sp
+from subprocess import check_output as bash_return
 from urllib.request import urlopen
 from urllib.error import URLError
+import sys
+import argparse
 
 
 # parse arguments from the cli.
@@ -37,10 +38,14 @@ def install_packages() -> None:
 
 
 if __name__ == '__main__':
+    # Elevate script to root
+    if not os.geteuid() == 0:
+        sudo_args = ['sudo', sys.executable] + sys.argv + [os.environ]
+        os.execlpe('sudo', *sudo_args)
+
     args = process_args()
     print("Reading partition table")
-    partitions = sp.run("mount | grep ' / ' | cut -d' ' -f 1", shell=True, capture_output=True).stdout.decode(
-        "utf-8").strip()
+    partitions = bash_return("mount | grep ' / ' | cut -d' ' -f 1", shell=True, text=True).strip()
     partitions = partitions[:len(partitions) - 1]  # get device "name"
     if args.reset:
         print("Resetting to default command line")
@@ -54,15 +59,14 @@ if __name__ == '__main__':
             temp_cmdline = "console=tty1 root=PARTUUID=${USB_ROOTFS} i915.modeset=1 rootwait rw fbcon=logo-pos:center" \
                            ",logo-count:1 loglevel=0 splash"
         # get partuuid of rootfs
-        rootfs_partuuid = sp.run(["blkid", "-o", "value", "-s", "PARTUUID", f"{partitions}2"],
-                                 capture_output=True).stdout.decode("utf-8").strip()
+        rootfs_partuuid = bash_return(f"blkid -o value -s PARTUUID {partitions}2", shell=True, text=True).strip()
         new_cmdline = temp_cmdline.replace("${USB_ROOTFS}", rootfs_partuuid)
     else:
         new_cmdline = args.cmdline.strip()
     install_packages()
     kernel_partition = f"{partitions}1"
     # Get the current kernel's command line
-    current_cmdline = sp.run("cat /proc/cmdline", shell=True, capture_output=True).stdout.decode("utf-8").strip()
+    current_cmdline = bash_return("cat /proc/cmdline", shell=True, text=True).strip()
     # Write the new kernel commandline to a file
     with open('cmdline', 'w') as file:
         if args.append:

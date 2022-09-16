@@ -1,13 +1,11 @@
 #!/usr/bin/env python3
 
-import argparse
-from pathlib import Path
-from os import remove as rm
-from os import system as bash
 import os
-from shutil import copytree as cpdir
+from os import remove, system as bash
+from shutil import move, copy, rmtree as rmdir, copytree as cpdir
+from pathlib import Path
 import sys
-import shutil
+import argparse
 
 
 def process_args():
@@ -24,8 +22,8 @@ def process_args():
 def download_files() -> None:
     print("\033[94m" + "Downloading files from github" + "\033[0m")
     print("Removing old files")
-    shutil.rmtree("/tmp/eupnea-audio", ignore_errors=True)
-    shutil.rmtree("/tmp/sof-audio", ignore_errors=True)
+    rmdir("/tmp/eupnea-audio", ignore_errors=True)
+    rmdir("/tmp/sof-audio", ignore_errors=True)
     print("Downloading config files from github")
     os.system("git clone --depth 1 https://github.com/eupnea-linux/eupnea /tmp/eupnea-audio")
     print("Downloading sof audio from github")
@@ -37,19 +35,19 @@ def install_pa(path: str, sof_version: str) -> None:
     if sof_version is None:
         sof_version = "v2.2.x"
     try:
-        rm("/etc/systemd/system/alsa-reload.service")
+        remove("/etc/systemd/system/alsa-reload.service")
     except FileNotFoundError:
         pass
     try:
-        rm("/etc/pulse/default.pa")
+        remove("/etc/pulse/default.pa")
     except FileNotFoundError:
         pass
     try:
-        rm("/etc/modprobe.d/alsa-breath.conf")
+        remove("/etc/modprobe.d/alsa-breath.conf")
     except FileNotFoundError:
         pass
     try:
-        rm("/etc/asound.conf")
+        remove("/etc/asound.conf")
     except FileNotFoundError:
         pass
     if path == "":
@@ -65,27 +63,27 @@ def install_pa(path: str, sof_version: str) -> None:
             else:
                 os.remove(file)
         for file in os.listdir("/tmp/sof-audio/" + sof_version + "/tools-" + sof_version[:sof_version.rfind(".")]):
-            shutil.move(
+            move(
                 os.path.join("/tmp/sof-audio/" + sof_version + "/tools-" + sof_version[:sof_version.rfind(".")], file),
                 "/usr/local/bin/")
         # set path to temp if no path is given
         path = "/tmp/eupnea-audio/configs/audio/"
     print("Installing audio services")
-    shutil.copy(f"{path}alsa-reload.service", "/etc/systemd/system/")
+    copy(f"{path}alsa-reload.service", "/etc/systemd/system/")
     os.system("systemctl enable alsa-reload")
     print("Copying pa config")
-    shutil.copy(f"{path}default.pa", "/etc/pulse/")
+    copy(f"{path}default.pa", "/etc/pulse/")
     print("Blacklising old drivers")
-    shutil.copy(f"{path}alsa-breath.conf", "/etc/modprobe.d/")
+    copy(f"{path}alsa-breath.conf", "/etc/modprobe.d/")
     print("Copying asound.conf")
-    shutil.copy(f"{path}asound.conf", "/etc/")
+    copy(f"{path}asound.conf", "/etc/")
 
 
 if __name__ == "__main__":
     # Elevate script to root
-    if os.geteuid() != 0:
-        args = ['sudo', sys.executable] + sys.argv + [os.environ]
-        os.execlpe('sudo', *args)
+    if not os.geteuid() == 0:
+        sudo_args = ['sudo', sys.executable] + sys.argv + [os.environ]
+        os.execlpe('sudo', *sudo_args)
     args = process_args()
     if not args.local_files:
         download_files()
