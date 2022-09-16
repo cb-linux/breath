@@ -10,10 +10,25 @@ if __name__ == "__main__":
     if not os.geteuid() == 0:
         sudo_args = ['sudo', sys.executable] + sys.argv + [os.environ]
         os.execlpe('sudo', *sudo_args)
+
+    # Expand root partition to whole drive
     # read root partition mount
     root_part = bash_return("mount | grep ' / ' | cut -d' ' -f 1", shell=True, text=True).strip()
     root_part = root_part[:len(root_part) - 1]  # get device "name"
     bash(f"growpart {root_part} 2")
+
+    # Device specific things:
+    match bash_return("sudo dmidecode --string system-product-name", shell=True, text=True).strip().lower():
+        case "sona" | "laser":
+            # Apply fix for display driver
+            # TODO: Add multitouch support
+
+            # copy systemd file from config
+            bash("cp /usr/local/config/device-specific/sona_laser/touchscreen-fix.service "
+                 "/etc/systemd/system/touchscreen-fix.service")
+            # enable service
+            bash("systemctl enable touchscreen-fix.service")
+
     # delete systemd service
     bash("systemctl disable postinstall.service")
     os.remove("/etc/systemd/system/postinstall.service")

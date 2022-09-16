@@ -1,0 +1,19 @@
+# This is a modified version of the original script by xinato from a github issue on GalliumOS's github
+# SOURCE: https://github.com/GalliumOS/galliumos-distro/issues/606#issuecomment-1009236456
+
+# This one-shot unit is responsible for linking the i2c_hid_acpi driver to the SYTS7817 touchscreen device
+[Unit]
+Description=Fix SYTS7817 Touchscreen by linking it to i2c_hid_acpi driver
+ConditionPathIsReadWrite=/etc
+#ConditionPathExists=/sys//sys/bus/i2c/drivers/i2c_hid_acpi
+ConditionPathExists=/sys/bus/i2c/devices/i2c-SYTS7817:00
+After=basic.target
+
+
+[Service]
+Type=oneshot
+RemainAfterExit=no
+ExecStart=/bin/bash -c 'echo -n \"i2c-SYTS7817:00\" > /sys/bus/i2c/drivers/i2c_hid_acpi/bind'
+
+[Install]
+WantedBy=graphical.target
