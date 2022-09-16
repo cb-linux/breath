@@ -1,4 +1,4 @@
-from os import system as bash
+from functions import *
 
 
 def config(de_name: str, distro_version: str, verbose_var: bool) -> None:
@@ -57,8 +57,8 @@ def config(de_name: str, distro_version: str, verbose_var: bool) -> None:
             exit(1)
     print("Set SELinux to permissive")
     chroot("sed -i 's/SELINUX=enforcing/SELINUX=permissive/g' /etc/sysconfig/selinux")
-    print("Fix permissions")  # maybe not needed?
-    chroot("chmod -R 750 /root")
+    # print("Fix permissions")  # maybe not needed?
+    # chroot("chmod -R 750 /root")
 
 
 def chroot(command: str) -> None:

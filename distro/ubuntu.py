@@ -1,6 +1,4 @@
-import os
-from os import system as bash
-from shutil import copy as cp
+from functions import *
 
 
 def config(de_name: str, distro_version: str, verbose_var: bool) -> None:
@@ -56,11 +54,11 @@ def config(de_name: str, distro_version: str, verbose_var: bool) -> None:
             exit(1)
     # Ignore libfprint-2-2 fprintd libpam-fprintd errors
 
-    # GDM3 auto installs gnome-minimal. Remove the session link as its not needed
+    # GDM3 auto installs gnome-minimal. Remove the session link as it's not needed
     if not de_name == "gnome":
         print("Fixing gdm3")
         try:
-            os.remove("/mnt/eupnea/usr/share/xsessions/ubuntu.desktop")
+            rmfile("/mnt/eupnea/usr/share/xsessions/ubuntu.desktop")
         except FileNotFoundError:
             pass
         chroot("apt remove -y gnome-shell")
@@ -69,7 +67,7 @@ def config(de_name: str, distro_version: str, verbose_var: bool) -> None:
     chroot("apt remove -y needrestart")
     print("Fixing securetty if needed")
     try:
-        cp("/mnt/eupnea/usr/share/doc/util-linux/examples/securetty", "/mnt/eupnea/etc/securetty", follow_symlinks=True)
+        cpfile("/mnt/eupnea/usr/share/doc/util-linux/examples/securetty", "/mnt/eupnea/etc/securetty")
     except FileNotFoundError:
         pass
 

@@ -1,16 +1,11 @@
 #!/usr/bin/env python3
 
 import os
-from shutil import rmtree as rmdir
-from shutil import copy as cp
-from pathlib import Path
 import sys
 import argparse
-from urllib.request import urlretrieve, urlopen
-import subprocess as sp
-from os import system as bash
 from threading import Thread
 from urllib.error import URLError
+from urllib.request import urlretrieve, urlopen
 from time import sleep
 
 
@@ -38,8 +33,8 @@ def prepare_host() -> None:
 
     print("Creating mnt points")
     bash("umount -lf /mnt/eupnea_rootfs")  # just in case
-    rmdir("/mnt/eupnea_rootfs", ignore_errors=True)
-    Path("/mnt/eupnea_rootfs").mkdir(parents=True, exist_ok=True)
+    rmdir("/mnt/eupnea_rootfs")
+    mkdir("/mnt/eupnea_rootfs")
 
     print("Remounting USB/SD-card")
     bash(f"umount {device}1")
@@ -47,16 +42,16 @@ def prepare_host() -> None:
     bash(f"mount {device}2 /mnt/eupnea_rootfs")
 
     print("Creating /tmp/eupnea-update")
-    rmdir("/tmp/eupnea-update", ignore_errors=True)
-    Path("/tmp/eupnea-update").mkdir()
+    rmdir("/tmp/eupnea-update")
+    mkdir("/tmp/eupnea-update")
 
     print("Installing necessary packages")
     # install cgpt and futility
-    if os.path.exists("/usr/bin/apt"):
+    if path_exists("/usr/bin/apt"):
         bash("apt install cgpt vboot-kernel-utils -y")
-    elif os.path.exists("/usr/bin/pacman"):
+    elif path_exists("/usr/bin/pacman"):
         bash("pacman -S cgpt vboot-utils --noconfirm")
-    elif os.path.exists("/usr/bin/dnf"):
+    elif path_exists("/usr/bin/dnf"):
         bash("dnf install cgpt vboot-utils --assumeyes")
     else:
         print("\033[91m" + "cgpt and futility not found, please install them using your disotros package manager"
@@ -98,8 +93,7 @@ def flash_kernel() -> None:
     print("\n\033[96m" + "Flashing new kernel" + "\033[0m")
 
     print("Extracting kernel modules")
-    rmdir("/mnt/eupnea_rootfs/lib/modules", ignore_errors=True)
-    Path("/mnt/eupnea_rootfs/lib/modules").mkdir(parents=True, exist_ok=True)
+    rmdir("/mnt/eupnea_rootfs/lib/modules")
 
     # modules tar contains /lib/modules, so it's extracted to / and --skip-old-files is used to prevent overwriting
     # other files in /lib
@@ -111,8 +105,7 @@ def flash_kernel() -> None:
     print("")  # break line
 
     # get uuid of rootfs partition
-    rootfs_partuuid = sp.run([f"blkid -o value -s PARTUUID {device}2"], shell=True,
-                             capture_output=True).stdout.decode("utf-8").strip()
+    rootfs_partuuid = bash_return(f"blkid -o value -s PARTUUID {device}2")
 
     print("Downloading default command line from github")
     try:
@@ -142,6 +135,20 @@ if __name__ == "__main__":
     if os.geteuid() != 0:
         args = ['sudo', sys.executable] + sys.argv + [os.environ]
         os.execlpe('sudo', *args)
+    # Try importing functions.py
+    try:
+        from functions import *
+    except ModuleNotFoundError:
+        print("\033[96m" + "Downloading functions.py from github" + "\033[0m")
+        try:
+            urlretrieve("https://raw.githubusercontent.com/eupnea-linux/eupnea/main/functions.py",
+                        filename="functions.py")
+        except URLError:
+            print("\033[91m" + "Functions.py not found. Internet connection not available. Please clone the whole repo."
+                  + "\033[0m")
+            exit(1)
+        from functions import *
+
     args = process_args()
 
     skip_question = False
@@ -219,8 +226,8 @@ if __name__ == "__main__":
         else:
             kernel_path = args.local_path
         print("\033[96m" + "Using local kernel files" + "\033[0m")
-        cp(f"{kernel_path}bzImage", "/tmp/eupnea-update/bzImage")
-        cp(f"{kernel_path}modules.tar.xz", "/tmp/eupnea-update/modules.tar.xz")
+        cpfile(f"{kernel_path}bzImage", "/tmp/eupnea-update/bzImage")
+        cpfile(f"{kernel_path}modules.tar.xz", "/tmp/eupnea-update/modules.tar.xz")
 
     flash_kernel()
     print("\033[92m" + "Kernel update complete!" + "\033[0m")

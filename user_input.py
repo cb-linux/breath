@@ -1,7 +1,7 @@
 from typing import Tuple
 import json
 from getpass import getpass
-from os import system as bash
+from functions import bash
 
 
 def user_input() -> Tuple[str, str, str, str, str, str, str, str, bool, bool]:

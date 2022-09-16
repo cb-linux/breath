@@ -1,11 +1,8 @@
 #!/usr/bin/env python3
 
 import os
-from os import remove, system as bash
-from shutil import move, copy, rmtree as rmdir, copytree as cpdir
-from pathlib import Path
-import sys
 import argparse
+from functions import *
 
 
 def process_args():
@@ -22,61 +19,49 @@ def process_args():
 def download_files() -> None:
     print("\033[94m" + "Downloading files from github" + "\033[0m")
     print("Removing old files")
-    rmdir("/tmp/eupnea-audio", ignore_errors=True)
-    rmdir("/tmp/sof-audio", ignore_errors=True)
+    rmdir("/tmp/eupnea-audio")
+    rmdir("/tmp/sof-audio")
     print("Downloading config files from github")
-    os.system("git clone --depth 1 https://github.com/eupnea-linux/eupnea /tmp/eupnea-audio")
+    bash("git clone --depth 1 https://github.com/eupnea-linux/eupnea /tmp/eupnea-audio")
     print("Downloading sof audio from github")
-    os.system("git clone --depth 1 https://github.com/thesofproject/sof-bin /tmp/sof-audio")
+    bash("git clone --depth 1 https://github.com/thesofproject/sof-bin /tmp/sof-audio")
 
 
 def install_pa(path: str, sof_version: str) -> None:
     print("\033[95m" + "Removing old files" + "\033[0m")
     if sof_version is None:
         sof_version = "v2.2.x"
-    try:
-        remove("/etc/systemd/system/alsa-reload.service")
-    except FileNotFoundError:
-        pass
-    try:
-        remove("/etc/pulse/default.pa")
-    except FileNotFoundError:
-        pass
-    try:
-        remove("/etc/modprobe.d/alsa-breath.conf")
-    except FileNotFoundError:
-        pass
-    try:
-        remove("/etc/asound.conf")
-    except FileNotFoundError:
-        pass
+    rmfile("/etc/systemd/system/alsa-reload.service")
+    rmfile("/etc/pulse/default.pa")
+    rmfile("/etc/modprobe.d/alsa-breath.conf")
+    rmfile("/etc/asound.conf")
+
     if path == "":
         # remove all old sof folders + files
         bash("rm -rf /lib/firmware/intel/sof*")
         print("\033[95m" + "Installing sof-audio" + "\033[0m")
-        cpdir("/tmp/sof-audio/" + sof_version + "/sof", "/lib/firmware/intel/sof")
-        cpdir("/tmp/sof-audio/" + sof_version + "/sof-tplg", "/lib/firmware/intel/sof-tplg")
+        cpdir(f"/tmp/sof-audio/{sof_version}/sof", "/lib/firmware/intel/sof")
+        cpdir(f"/tmp/sof-audio/{sof_version}/sof-tplg", "/lib/firmware/intel/sof-tplg")
         # remove old sof scripts
         for file in Path("/usr/local/bin/").glob("sof*"):
             if not str(file).find("sof-setup-audio") == -1:
                 continue
             else:
-                os.remove(file)
-        for file in os.listdir("/tmp/sof-audio/" + sof_version + "/tools-" + sof_version[:sof_version.rfind(".")]):
-            move(
-                os.path.join("/tmp/sof-audio/" + sof_version + "/tools-" + sof_version[:sof_version.rfind(".")], file),
-                "/usr/local/bin/")
+                rmfile(file.absolute().as_posix())
+        for script in os.listdir("/tmp/sof-audio/" + sof_version + "/tools-" + sof_version[:sof_version.rfind(".")]):
+            cpfile(f'/tmp/sof-audio/{sof_version}/tools-{sof_version[:sof_version.rfind(".")]}/{script}',
+                   "/usr/local/bin/")
         # set path to temp if no path is given
         path = "/tmp/eupnea-audio/configs/audio/"
     print("Installing audio services")
-    copy(f"{path}alsa-reload.service", "/etc/systemd/system/")
-    os.system("systemctl enable alsa-reload")
+    cpfile(f"{path}alsa-reload.service", "/etc/systemd/system/alsa-reload.service")
+    bash("systemctl enable alsa-reload")
     print("Copying pa config")
-    copy(f"{path}default.pa", "/etc/pulse/")
+    cpfile(f"{path}default.pa", "/etc/pulse/default.pa")
     print("Blacklising old drivers")
-    copy(f"{path}alsa-breath.conf", "/etc/modprobe.d/")
+    cpfile(f"{path}alsa-breath.conf", "/etc/modprobe.d/alsa-breath.conf")
     print("Copying asound.conf")
-    copy(f"{path}asound.conf", "/etc/")
+    cpfile(f"{path}asound.conf", "/etc/asound.conf")
 
 
 if __name__ == "__main__":

@@ -1,11 +1,6 @@
 #!/usr/bin/env python3
 
 import os
-from os import system as bash
-from subprocess import check_output as bash_return
-from shutil import rmtree as rmdir, copytree as cpdir, copy
-from pathlib import Path
-import sys
 import argparse
 from urllib.request import urlretrieve
 from urllib.error import URLError
@@ -13,6 +8,7 @@ from threading import Thread
 from time import sleep
 
 import user_input
+from functions import *
 
 
 # parse arguments from the cli. Only for testing/advanced use. 95% of the arguments are handled by the user_input script
@@ -38,31 +34,25 @@ def prepare_host(de_name: str) -> None:
     print("\033[96m" + "Preparing host system" + "\033[0m")
 
     print("Creating /tmp/eupnea-build")
-    rmdir("/tmp/eupnea-build", ignore_errors=True)
-    Path("/tmp/eupnea-build/rootfs").mkdir(parents=True)
+    rmdir("/tmp/eupnea-build")
+    mkdir("/tmp/eupnea-build")
 
     print("Creating mnt point")
     bash("umount -lf /mnt/eupnea 2>/dev/null")  # just in case
-    rmdir("/mnt/eupnea", ignore_errors=True)
-    Path("/mnt/eupnea").mkdir(parents=True, exist_ok=True)
+    rmdir("/mnt/eupnea")
+    mkdir("/mnt/eupnea")
 
     print("Remove old files if they exist")
-    try:
-        os.remove("eupnea.img")
-    except FileNotFoundError:
-        pass
-    try:
-        os.remove("kernel.flags")
-    except FileNotFoundError:
-        pass
+    rmfile("eupnea.img")
+    rmfile("kernel.flags")
 
     print("Installing necessary packages")
     # install cgpt and futility
-    if os.path.exists("/usr/bin/apt"):
+    if path_exists("/usr/bin/apt"):
         bash("apt install cgpt vboot-kernel-utils -y")
-    elif os.path.exists("/usr/bin/pacman"):
+    elif path_exists("/usr/bin/pacman"):
         bash("pacman -S cgpt vboot-utils --noconfirm")
-    elif os.path.exists("/usr/bin/dnf"):
+    elif path_exists("/usr/bin/dnf"):
         bash("dnf install cgpt vboot-utils --assumeyes")
     else:
         print("\033[91m" + "cgpt and futility not found, please install them using your disotros package manager"
@@ -71,11 +61,11 @@ def prepare_host(de_name: str) -> None:
 
     # install debootstrap for debian
     if de_name == "debian":
-        if os.path.exists("/usr/bin/apt"):
+        if path_exists("/usr/bin/apt"):
             bash("apt install debootstrap -y")
-        elif os.path.exists("/usr/bin/pacman"):
+        elif path_exists("/usr/bin/pacman"):
             bash("pacman -S debootstrap --noconfirm")
-        elif os.path.exists("/usr/bin/dnf"):
+        elif path_exists("/usr/bin/dnf"):
             bash("dnf install debootstrap --assumeyes")
         else:
             print("\033[91m" + "Debootstrap not found, please install it using your disotros package manager or select"
@@ -84,11 +74,11 @@ def prepare_host(de_name: str) -> None:
 
     # install arch-chroot for arch
     elif de_name == "arch":
-        if os.path.exists("/usr/bin/apt"):
+        if path_exists("/usr/bin/apt"):
             bash("apt install arch-install-scripts -y")
-        elif os.path.exists("/usr/bin/pacman"):
+        elif path_exists("/usr/bin/pacman"):
             bash("pacman -S arch-install-scripts --noconfirm")
-        elif os.path.exists("/usr/bin/dnf"):
+        elif path_exists("/usr/bin/dnf"):
             bash("dnf install arch-install-scripts --assumeyes")
         else:
             print(
@@ -154,11 +144,14 @@ def prepare_img() -> str:
     # try fallocate, if it fails use dd
     # TODO: determine img size
     img_size = 10  # 10 for now
-    if not bash_return(f"fallocate -l {img_size}G eupnea.img", shell=True, text=True).strip() == "":
+    if not bash_return(f"fallocate -l {img_size}G eupnea.img") == "":
         bash("dd if=/dev/zero of=eupnea.img status=progress bs=12884 count=1000070")
 
     print("Mounting empty image")
-    mnt_point = bash_return("losetup -f --show eupnea.img", shell=True, text=True).strip()
+    mnt_point = bash_return("losetup -f --show eupnea.img")
+    if mnt_point == "":
+        print("\033[91m" + "Failed to mount image" + "\033[0m")
+        exit(1)
     print("Image mounted at" + mnt_point)
     return partition(mnt_point, False)
 
@@ -179,9 +172,12 @@ def partition(mnt_point: str, write_usb: bool) -> str:
     # get uuid of rootfs partition
     if write_usb:
         # if writing to usb, then no p in partition name
-        rootfs_partuuid = bash_return(f"blkid -o value -s PARTUUID {mnt_point}2", shell=True, text=True).strip()
+        rootfs_partuuid = bash_return(f"blkid -o value -s PARTUUID {mnt_point}2")
     else:
-        rootfs_partuuid = bash_return(f"blkid -o value -s PARTUUID {mnt_point}p2", shell=True, text=True).strip()
+        rootfs_partuuid = bash_return(f"blkid -o value -s PARTUUID {mnt_point}p2")
+    if rootfs_partuuid == "":
+        print("\033[91m" + "Failed to get rootfs partition uuid" + "\033[0m")
+        exit(1)
     # read and modify kernel flags
     with open("configs/kernel.flags", "r") as flags:
         temp = flags.read().replace("${USB_ROOTFS}", rootfs_partuuid).strip()
@@ -231,20 +227,17 @@ def download_rootfs(distro_name: str, distro_version: str, distro_link: str) -> 
                 print("Downloading debian with debootstrap")
                 # Debian sometimes fails for no apparent reason, so we try 2 times
                 debian_result = bash_return(
-                    "debootstrap stable /tmp/eupnea-build/rootfs https://deb.debian.org/debian/", shell=True,
-                    text=True).strip()
+                    "debootstrap stable /tmp/eupnea-build/debian https://deb.debian.org/debian/")
                 if args.verbose:
                     print("Result: " + str(debian_result))  # print results for debugging
                 if debian_result.__contains__("Couldn't download packages:"):
                     print("\033[91m\nDebootstrap failed, retrying once\n\033[0m")
                     # delete the failed rootfs
-                    rmdir("/tmp/eupnea-build/rootfs", ignore_errors=True)
-                    Path("/tmp/eupnea-build/rootfs").mkdir(parents=True)
+                    rmdir("/tmp/eupnea-build/debian")
                     debian_result = bash_return(
-                        "debootstrap stable /tmp/eupnea-build/debian https://deb.debian.org/debian/", shell=True,
-                        text=True).strip()
+                        "debootstrap stable /tmp/eupnea-build/debian https://deb.debian.org/debian/")
                     if args.verbose:
-                        print("Result: " + str(debian_result))  # print results for debugging
+                        print(f"Result: {debian_result}")  # print results for debugging
                     if debian_result.__contains__("Couldn't download packages:"):
                         print("\033[91m\nDebootstrap failed again, check your internet connection or try again later" +
                               "\033[0m")
@@ -269,33 +262,31 @@ def extract_rootfs(distro_name: str) -> None:
     match distro_name:
         case "ubuntu":
             print("Extracting ubuntu rootfs")
-            bash("tar xfp /tmp/eupnea-build/ubuntu-rootfs.tar.xz -C " + "/mnt/eupnea --checkpoint=.10000")
+            bash("tar xfp /tmp/eupnea-build/ubuntu-rootfs.tar.xz -C /mnt/eupnea --checkpoint=.10000")
         case "debian":
             print("Copying debian rootfs")
-            # TODO: rewrite copy in "python" instead of bash
-            bash("cp -pr /tmp/eupnea-build/debian/* /mnt/eupnea/")
+            cpdir("/tmp/eupnea-build/debian/", "/mnt/eupnea/")
         case "arch":
             print("Extracting arch rootfs")
-            # TODO: Figure out how to extract arch rootfs without cd
-            # temp chdir into mounted image, then go back to original dir
-            temp_path = os.getcwd()
-            os.chdir("/mnt/eupnea")
-            bash("tar xpfz /tmp/eupnea-build/arch-rootfs.tar.gz root.x86_64/ --strip-components=1" +
-                 " --numeric-owner --checkpoint=.10000")
-            os.chdir(temp_path)
+            mkdir("/tmp/eupnea-build/arch-rootfs")
+            bash("tar xfp /tmp/eupnea-build/ubuntu-rootfs.tar.xz -C /tmp/eupnea-build/arch-rootfs --checkpoint=.10000")
+            cpdir("/tmp/eupnea-build/arch-rootfs/", "/mnt/eupnea/")
+
         case "fedora":
             print("Extracting fedora rootfs")
             # extract to temp location, find rootfs and extract it to mounted image
-            Path("/tmp/eupnea-build/fedora-tmp-mnt").mkdir(exist_ok=True)
+            mkdir("/tmp/eupnea-build/fedora-tmp-mnt")
             # using unxz instead of tar
             bash("unxz -d /tmp/eupnea-build/fedora-rootfs.raw.xz -c > /tmp/eupnea-build/fedora-raw")
 
             # mount fedora raw image
-            fedora_root_part = bash_return("losetup -f --show /tmp/eupnea-build/fedora-raw", shell=True,
-                                           text=True).strip() + "p5"
+            fedora_root_part = bash_return("losetup -f --show /tmp/eupnea-build/fedora-raw") + "p5"
+            if fedora_root_part == "":
+                print("\033[91m" + "Couldnt mount fedora image with losetup" + "\033[0m")
+                bash(f"kill {main_thread_pid}")
             bash(f"mount {fedora_root_part} /tmp/eupnea-build/fedora-tmp-mnt")
             # copy actual root file to eupnea mount
-            bash("cp -pr /tmp/eupnea-build/fedora-tmp-mnt/root/* /mnt/eupnea/")
+            cpdir("/tmp/eupnea-build/fedora-tmp-mnt/root/", "/mnt/eupnea/")
 
 
 # Configure distro agnostic options
@@ -303,12 +294,13 @@ def post_extract(username: str, password: str, hostname: str, distro_name: str, 
     print("\n\033[96m" + "Configuring Eupnea" + "\033[0m")
 
     print("Copying resolv.conf")
-    # python won't follow symlinks, using bash instead
-    bash("cp --remove-destination /etc/resolv.conf /mnt/eupnea/etc/resolv.conf")
+    # delete broken symlink
+    rmfile("/mnt/eupnea/etc/resolv.conf")
+    cpfile("/etc/resolv.conf", "/mnt/eupnea/etc/resolv.conf")
 
     print("Extracting kernel modules")
-    rmdir("/mnt/eupnea/lib/modules", ignore_errors=True)
-    Path("/mnt/eupnea/lib/modules").mkdir(parents=True, exist_ok=True)
+    rmdir("/mnt/eupnea/lib/modules")
+
     # modules tar contains /lib/modules, so it's extracted to / and --skip-old-files is used to prevent overwriting
     # other files in /lib
     bash("tar xpf /tmp/eupnea-build/modules.tar.xz --skip-old-files -C /mnt/eupnea/ --checkpoint=.10000")
@@ -332,13 +324,14 @@ def post_extract(username: str, password: str, hostname: str, distro_name: str, 
         hostname_file.write(hostname)
 
     print("Copying eupnea utils")
-    bash("cp postinstall-scripts/* /mnt/eupnea/usr/local/bin/")  # more efficient to use bash than python in this case
+    cpdir("postinstall-scripts", "/mnt/eupnea/usr/local/bin/")
+    cpfile("functions.py", "/mnt/eupnea/usr/local/bin/functions.py")
     cpdir("configs", "/mnt/eupnea/usr/local/eupnea-configs")
 
     print("Configuring sleep")
     # disable hibernation aka S4 sleep, READ: https://eupnea-linux.github.io/docs.html#/bootlock
     # TODO: Fix sleep
-    Path("/mnt/eupnea/etc/systemd/").mkdir(exist_ok=True)  # just in case systemd path doesn't exist
+    mkdir("/mnt/eupnea/etc/systemd/")  # just in case systemd path doesn't exist
     with open("/mnt/eupnea/etc/systemd/sleep.conf", "a") as conf:
         conf.write("SuspendState=freeze\nHibernateState=freeze")
 
@@ -350,13 +343,15 @@ def post_extract(username: str, password: str, hostname: str, distro_name: str, 
         conf.write(modules)
 
     # disable ssh service, as it fails to start
-    # TODO: Fix ssh
+    # TODO: Fix services
     chroot("systemctl disable ssh.service")
+    # Disable remount fs service, as it fails to start
+    chroot("systemctl disable sys-fs-fuse-connections.mount")
 
 
 # chroot command
 def chroot(command: str) -> str:
-    output = bash_return(f'chroot /mnt/eupnea /bin/sh -c "{command}"', shell=True, text=True).strip()
+    output = bash_return(f'chroot /mnt/eupnea /bin/sh -c "{command}"')
     if args.verbose:
         print(output)
     return output
@@ -370,7 +365,7 @@ if __name__ == "__main__":
 
     # check python version
     if sys.version_info < (3, 10):  # python 3.10 or higher is required
-        if os.path.exists("/usr/bin/apt"):
+        if path_exists("/usr/bin/apt"):
             print("\033[92m" + "Python 3.10 or higher is required. Attempt to install?" + "\033[0m")
             if input("\033[94m" + "Recommended if running under Crostini(aka Linux on ChromeOS)" +
                      "\033[0m\n").lower() == "y" or "":
@@ -428,8 +423,8 @@ if __name__ == "__main__":
         else:
             kernel_path = args.local_path
         print("\033[96m" + "Using local kernel files" + "\033[0m")
-        copy(f"{kernel_path}bzImage", "/tmp/eupnea-build/bzImage")
-        copy(f"{kernel_path}modules.tar.xz", "/tmp/eupnea-build/modules.tar.xz")
+        cpfile(f"{kernel_path}bzImage", "/tmp/eupnea-build/bzImage")
+        cpfile(f"{kernel_path}modules.tar.xz", "/tmp/eupnea-build/modules.tar.xz")
 
     if user_input[9]:
         img_mnt = prepare_img()
@@ -464,15 +459,15 @@ if __name__ == "__main__":
 
     # Add chromebook layout. Needs to be done after install Xorg/Wayland
     print("Backing up default keymap and setting Chromebook layout")
-    copy("/mnt/eupnea/usr/share/X11/xkb/symbols/pc", "/mnt/eupnea/usr/share/X11/xkb/symbols/pc.default")
-    copy("configs/xkb/xkb.chromebook", "/mnt/eupnea/usr/share/X11/xkb/symbols/pc")
+    cpfile("/mnt/eupnea/usr/share/X11/xkb/symbols/pc", "/mnt/eupnea/usr/share/X11/xkb/symbols/pc.default")
+    cpfile("configs/xkb/xkb.chromebook", "/mnt/eupnea/usr/share/X11/xkb/symbols/pc")
     if user_input[8]:  # rebind search key to caps lock
         print("Rebinding search key to Caps Lock")
-        copy("/mnt/eupnea/usr/share/X11/xkb/keycodes/evdev", "/mnt/eupnea/usr/share/X11/xkb/keycodes/evdev.default")
+        cpfile("/mnt/eupnea/usr/share/X11/xkb/keycodes/evdev", "/mnt/eupnea/usr/share/X11/xkb/keycodes/evdev.default")
 
     # Hook postinstall script, needs to be done after preping system
     print("Adding postinstall service")
-    copy("configs/postinstall.service", "/mnt/eupnea/etc/systemd/system/postinstall.service")
+    cpfile("configs/postinstall.service", "/mnt/eupnea/etc/systemd/system/postinstall.service")
     chroot("systemctl enable postinstall.service")
 
     # Unmount everything
@@ -482,6 +477,6 @@ if __name__ == "__main__":
     if user_input[9]:
         print("Unmounting img")
         bash(f"losetup -d {img_mnt}")
-        print("\033[95m" + f"The ready Eupnea image is located at {str(os.getcwd())}/eupnea.img" + "\033[0m")
+        print("\033[95m" + f"The ready Eupnea image is located at {get_full_path('.')}/eupnea.img" + "\033[0m")
     else:
         print("\033[95m" + "The USB is ready to boot Eupnea. " + "\033[0m")

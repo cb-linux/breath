@@ -1,6 +1,4 @@
-import os
-from os import system as bash
-from shutil import copy as cp
+from functions import *
 
 
 def config(de_name: str, distro_version: str, verbose_var: bool) -> None:
@@ -20,12 +18,8 @@ def config(de_name: str, distro_version: str, verbose_var: bool) -> None:
 
     print("Installing packages")
     chroot("apt install -y network-manager sudo firmware-linux-free cloud-utils firmware-linux-nonfree firmware-iwlwifi"
-           " iw curl wget git")
+           " iw git")
 
-    # print("Reinstalling dbus")
-    # TODO: Find out why reinstalling dbus is necessary
-    # chroot("apt reinstall -y dbus")
-    # de install fails without updating apt
     print("\033[96m" + "Downloading and installing de, might take a while" + "\033[0m")
     match de_name:
         case "gnome":
@@ -68,15 +62,14 @@ def config(de_name: str, distro_version: str, verbose_var: bool) -> None:
     if not de_name == "gnome":
         print("Fixing gdm3")
         try:
-            os.remove("/mnt/eupnea/usr/share/xsessions/ubuntu.desktop")
+            rmfile("/mnt/eupnea/usr/share/xsessions/ubuntu.desktop")
         except FileNotFoundError:
             pass
         chroot("apt remove -y gnome-shell")
         chroot("apt autoremove -y")
     print("Fixing securetty if needed")
-    # "2>/dev/null" is for hiding error message, as not to scare the user
     try:
-        cp("/mnt/eupnea/usr/share/doc/util-linux/examples/securetty", "/mnt/eupnea/etc/securetty", follow_symlinks=True)
+        cpfile("/mnt/eupnea/usr/share/doc/util-linux/examples/securetty", "/mnt/eupnea/etc/securetty")
     except FileNotFoundError:
         pass
 

@@ -1,4 +1,4 @@
-from os import system as bash
+from functions import *
 
 
 def config(de_name: str, distro_version: str, verbose_var: bool) -> None:
@@ -7,6 +7,7 @@ def config(de_name: str, distro_version: str, verbose_var: bool) -> None:
     verbose = verbose_var
 
     print("\033[96m" + "Configuring Arch" + "\033[0m")
+
     print("Uncomment arch mirror")
     with open("/mnt/eupnea/etc/pacman.d/mirrorlist", "r") as read:
         mirrors = read.readlines()

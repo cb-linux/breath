@@ -1,12 +1,10 @@
 #!/usr/bin/env python3
 
-import os.path
-from os import system as bash
-from subprocess import check_output as bash_return
+import os
 from urllib.request import urlopen
 from urllib.error import URLError
-import sys
 import argparse
+from functions import *
 
 
 # parse arguments from the cli.
@@ -24,12 +22,12 @@ def process_args():
 
 
 def install_packages() -> None:
-    if not os.path.exists('/usr/bin/futility'):
-        if os.path.exists('/usr/bin/apt'):
-            os.system('sudo apt install -y vboot-kernel-utils')
-        elif os.path.exists("/usr/bin/pacman"):
+    if not path_exists('/usr/bin/futility'):
+        if path_exists('/usr/bin/apt'):
+            bash('sudo apt install -y vboot-kernel-utils')
+        elif path_exists("/usr/bin/pacman"):
             bash("pacman -S vboot-kernel-utils --noconfirm")
-        elif os.path.exists("/usr/bin/dnf"):
+        elif path_exists("/usr/bin/dnf"):
             bash("dnf install vboot-kernel-utils --assumeyes")
         else:
             print("Vboot-kernel-utils not found. Please install vboot-kernel-utils or vboot-utils using your distros" +
@@ -45,7 +43,7 @@ if __name__ == '__main__':
 
     args = process_args()
     print("Reading partition table")
-    partitions = bash_return("mount | grep ' / ' | cut -d' ' -f 1", shell=True, text=True).strip()
+    partitions = bash_return("mount | grep ' / ' | cut -d' ' -f 1")
     partitions = partitions[:len(partitions) - 1]  # get device "name"
     if args.reset:
         print("Resetting to default command line")
@@ -59,14 +57,14 @@ if __name__ == '__main__':
             temp_cmdline = "console=tty1 root=PARTUUID=${USB_ROOTFS} i915.modeset=1 rootwait rw fbcon=logo-pos:center" \
                            ",logo-count:1 loglevel=0 splash"
         # get partuuid of rootfs
-        rootfs_partuuid = bash_return(f"blkid -o value -s PARTUUID {partitions}2", shell=True, text=True).strip()
+        rootfs_partuuid = bash_return(f"blkid -o value -s PARTUUID {partitions}2")
         new_cmdline = temp_cmdline.replace("${USB_ROOTFS}", rootfs_partuuid)
     else:
         new_cmdline = args.cmdline.strip()
     install_packages()
     kernel_partition = f"{partitions}1"
     # Get the current kernel's command line
-    current_cmdline = bash_return("cat /proc/cmdline", shell=True, text=True).strip()
+    current_cmdline = bash_return("cat /proc/cmdline")
     # Write the new kernel commandline to a file
     with open('cmdline', 'w') as file:
         if args.append:

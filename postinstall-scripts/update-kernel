@@ -1,16 +1,12 @@
 #!/usr/bin/env python3
 
 import os
-from os import system as bash
-from subprocess import check_output as bash_return
-from shutil import copy, rmtree as rmdir
-from pathlib import Path
 from urllib.request import urlretrieve, urlopen
 from urllib.error import URLError
 from time import sleep
 from threading import Thread
-import sys
 import argparse
+from functions import *
 
 
 # parse arguments from the cli. Only for testing/advanced use. 95% of the arguments are handled by the user_input script
@@ -36,16 +32,16 @@ def prepare_host() -> None:
     print("\033[96m" + "Preparing host system" + "\033[0m")
 
     print("Creating /tmp/eupnea-update")
-    rmdir("/tmp/eupnea-update", ignore_errors=True)
-    Path("/tmp/eupnea-update").mkdir()
+    rmdir("/tmp/eupnea-update")
+    mkdir("/tmp/eupnea-update")
 
     print("Installing necessary packages")
     # install cgpt and futility
-    if os.path.exists("/usr/bin/apt"):
+    if path_exists("/usr/bin/apt"):
         bash("apt install cgpt vboot-kernel-utils -y")
-    elif os.path.exists("/usr/bin/pacman"):
+    elif path_exists("/usr/bin/pacman"):
         bash("pacman -S cgpt vboot-utils --noconfirm")
-    elif os.path.exists("/usr/bin/dnf"):
+    elif path_exists("/usr/bin/dnf"):
         bash("dnf install cgpt vboot-utils --assumeyes")
     else:
         print("\033[91m" + "cgpt and futility not found, please install them using your disotros package manager"
@@ -87,8 +83,7 @@ def flash_kernel() -> None:
     print("\n\033[96m" + "Flashing new kernel" + "\033[0m")
 
     print("Extracting kernel modules")
-    rmdir("/lib/modules", ignore_errors=True)
-    Path("/lib/modules").mkdir(parents=True, exist_ok=True)
+    rmdir("/lib/modules")
 
     # modules tar contains /lib/modules, so it's extracted to / and --skip-old-files is used to prevent overwriting
     # other files in /lib
@@ -100,7 +95,10 @@ def flash_kernel() -> None:
     print("")  # break line
 
     # get uuid of rootfs partition
-    rootfs_partuuid = bash_return(f"blkid -o value -s PARTUUID {device}2", shell=True, text=True).strip()
+    rootfs_partuuid = bash_return(f"blkid -o value -s PARTUUID {device}2")
+    if rootfs_partuuid == "":
+        print("\033[91m" + "Failed to get rootfs partition uuid" + "\033[0m")
+        exit(1)
 
     print("Downloading default command line from github")
     try:
@@ -152,7 +150,7 @@ if __name__ == "__main__":
         skip_version_question = True
 
     # read root partition mount
-    root_part = bash_return("mount | grep ' / ' | cut -d' ' -f 1", shell=True, text=True).strip()
+    root_part = bash_return("mount | grep ' / ' | cut -d' ' -f 1")
     device = root_part[:len(root_part) - 1]  # get device "name"
 
     if not skip_version_question:
@@ -192,8 +190,7 @@ if __name__ == "__main__":
         t.start()
         sleep(1)
         while t.is_alive():
-            sys.stdout.flush()
-            print(".", end="")
+            print(".", end="", flush=True)
             sleep(1)
         print("")
     else:
@@ -202,8 +199,8 @@ if __name__ == "__main__":
         else:
             kernel_path = args.local_path
         print("\033[96m" + "Using local kernel files" + "\033[0m")
-        copy(f"{kernel_path}bzImage", "/tmp/eupnea-update/bzImage")
-        copy(f"{kernel_path}modules.tar.xz", "/tmp/eupnea-update/modules.tar.xz")
+        cpfile(f"{kernel_path}bzImage", "/tmp/eupnea-update/bzImage")
+        cpfile(f"{kernel_path}modules.tar.xz", "/tmp/eupnea-update/modules.tar.xz")
 
     flash_kernel()
     print("\033[92m" + "Kernel update complete!" + "\033[0m")
