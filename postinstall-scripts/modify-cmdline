@@ -15,7 +15,7 @@ def process_args():
     parser.add_argument('-r', '--reset', action="store_true", dest="reset", default=False,
                         help="Reset to default command line")
     parser.add_argument(dest='cmdline', type=str, nargs=1,
-                        help="New, full kernel command line, example: \n"
+                        help="New, full kernel command line in quotes, example: \n"
                              + r'modify-cmdline "console=tty1 root=PARTUUID=7d83c214-289e-4e8b-93cc-685aea502'
                                r'f59 i915.modeset=1 rootwait rw fbcon=logo-pos:center,logo-count:1 loglevel=0 splash"')
     return parser.parse_args()
@@ -60,14 +60,14 @@ if __name__ == '__main__':
         rootfs_partuuid = bash_return(f"blkid -o value -s PARTUUID {partitions}2")
         new_cmdline = temp_cmdline.replace("${USB_ROOTFS}", rootfs_partuuid)
     else:
-        new_cmdline = args.cmdline.strip()
+        new_cmdline = args.cmdline[0].strip()
     install_packages()
     kernel_partition = f"{partitions}1"
-    # Get the current kernel's command line
-    current_cmdline = bash_return("cat /proc/cmdline")
     # Write the new kernel commandline to a file
     with open('cmdline', 'w') as file:
         if args.append:
+            # Get the current kernel's command line
+            current_cmdline = bash_return("cat /proc/cmdline")
             file.write(f"{current_cmdline} {new_cmdline}")  # space needed as both args have no spaces before and after
         else:
             file.write(new_cmdline)
