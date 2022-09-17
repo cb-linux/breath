@@ -34,7 +34,11 @@ def prepare_host(de_name: str) -> None:
     print("\033[96m" + "Preparing host system" + "\033[0m")
 
     print("Creating /tmp/eupnea-build")
-    rmdir("/tmp/eupnea-build")
+    try:
+        rmdir("/tmp/eupnea-build")
+    except RecursionError:
+        print("\033[93m" + "Failed to remove /tmp/eupnea-build, using heavier tools" + "\033[0m")
+        bash("rm -rf /tmp/eupnea-build/*")
     mkdir("/tmp/eupnea-build")
 
     print("Creating mnt point")
