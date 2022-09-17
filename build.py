@@ -318,7 +318,7 @@ def post_extract(username: str, password: str, hostname: str, distro_name: str, 
 
     print("Copying resolv.conf")
     # delete broken symlink
-    rmfile("/mnt/eupnea/etc/resolv.conf", true)
+    rmfile("/mnt/eupnea/etc/resolv.conf", True)
     cpfile("/etc/resolv.conf", "/mnt/eupnea/etc/resolv.conf")
 
     print("Extracting kernel modules")
