@@ -33,6 +33,9 @@ def process_args():
 def prepare_host(de_name: str) -> None:
     print("\033[96m" + "Preparing host system" + "\033[0m")
 
+    # umount fedora temp if exists
+    bash("umount -lf /tmp/eupnea-build/fedora-tmp-mnt 2>/dev/null")
+
     print("Creating /tmp/eupnea-build")
     try:
         rmdir("/tmp/eupnea-build")
