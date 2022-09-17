@@ -61,15 +61,19 @@ def get_full_path(path: str) -> str:
 def cpdir(root_src: str, root_dst: str) -> None:  # dst_dir must be a full path, including the new dir name
     def copy_files(src: Path, dst: Path) -> None:
         # create dst dir if it doesn't exist
+        print(f"Copying {src} to {dst}")
         mkdir(dst.absolute().as_posix(), create_parents=True)
         for src_file in src.iterdir():
             if src_file.is_file():
                 dst_file = dst.joinpath(src_file.stem + src_file.suffix)
                 dst_file.write_bytes(src_file.read_bytes())
-            else:
-                new_dst = dst.joinpath(src_file.stem)
-                if new_dst.exists():
+            elif src_file.is_dir():
+                if src_file.exists():
+                    new_dst = dst.joinpath(src_file.stem)
                     copy_files(src_file, new_dst)
+                else:
+                    print("Not a file or directory?")
+                    print(src_file.absolute().as_posix())
 
     src_as_path = Path(root_src)
     dst_as_path = Path(root_dst)
@@ -79,7 +83,7 @@ def cpdir(root_src: str, root_dst: str) -> None:  # dst_dir must be a full path,
         print("Source directory does not exist?")
 
 
-def cpfile(src: str, dst: str) -> None:
+def cpfile(src: str, dst: str) -> None:  # "/etc/resolv.conf", "/mnt/eupnea/etc/resolv.conf"
     src_as_path = Path(src).absolute()
     dst_as_path = Path(dst).absolute()
     if src_as_path.exists():

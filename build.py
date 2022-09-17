@@ -305,11 +305,9 @@ def extract_rootfs(distro_name: str) -> None:
                 bash(f"kill {main_thread_pid}")
             bash(f"mount {fedora_root_part} /tmp/eupnea-build/fedora-tmp-mnt")
             # copy actual root file to eupnea mount
-            try:
-                cpdir("/tmp/eupnea-build/fedora-tmp-mnt/root/", "/mnt/eupnea/")
-            except RecursionError:
-                print("\033[93m" + "Failed to copy /tmp/eupnea-build/fedora-tmp-mnt/root, using heavier tools\033[0m")
-                bash("cp -rp /tmp/eupnea-build/fedora-tmp-mnt/root/* /mnt/eupnea/")
+            print("Copying fedora rootfs to /mnt/eupnea")
+            # TODO: Fix python copying
+            bash("cp -rp /tmp/eupnea-build/fedora-tmp-mnt/root/* /mnt/eupnea/")  # python fails to copy
 
 
 # Configure distro agnostic options
