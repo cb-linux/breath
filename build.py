@@ -39,7 +39,11 @@ def prepare_host(de_name: str) -> None:
 
     print("Creating mnt point")
     bash("umount -lf /mnt/eupnea 2>/dev/null")  # just in case
-    rmdir("/mnt/eupnea")
+    try:
+        rmdir("/mnt/eupnea")
+    except RecursionError:
+        print("\033[93m" + "Failed to remove /mnt/eupnea, using heavier tools" + "\033[0m")
+        bash("rm -rf /mnt/eupnea/*")
     mkdir("/mnt/eupnea")
 
     print("Remove old files if they exist")
@@ -265,12 +269,20 @@ def extract_rootfs(distro_name: str) -> None:
             bash("tar xfp /tmp/eupnea-build/ubuntu-rootfs.tar.xz -C /mnt/eupnea --checkpoint=.10000")
         case "debian":
             print("Copying debian rootfs")
-            cpdir("/tmp/eupnea-build/debian/", "/mnt/eupnea/")
+            try:
+                cpdir("/tmp/eupnea-build/debian/", "/mnt/eupnea/")
+            except RecursionError:
+                print("\033[93m" + "Failed to copy /tmp/eupnea-build/debian, using heavier tools" + "\033[0m")
+                bash("cp -rp /tmp/eupnea-build/debian/* /mnt/eupnea/")
         case "arch":
             print("Extracting arch rootfs")
             mkdir("/tmp/eupnea-build/arch-rootfs")
             bash("tar xfp /tmp/eupnea-build/ubuntu-rootfs.tar.xz -C /tmp/eupnea-build/arch-rootfs --checkpoint=.10000")
-            cpdir("/tmp/eupnea-build/arch-rootfs/", "/mnt/eupnea/")
+            try:
+                cpdir("/tmp/eupnea-build/arch-rootfs/", "/mnt/eupnea/")
+            except RecursionError:
+                print("\033[93m" + "Failed to copy /tmp/eupnea-build/arch-rootfs, using heavier tools" + "\033[0m")
+                bash("cp -rp /tmp/eupnea-build/arch-rootfs/* /mnt/eupnea/")
 
         case "fedora":
             print("Extracting fedora rootfs")
@@ -286,7 +298,11 @@ def extract_rootfs(distro_name: str) -> None:
                 bash(f"kill {main_thread_pid}")
             bash(f"mount {fedora_root_part} /tmp/eupnea-build/fedora-tmp-mnt")
             # copy actual root file to eupnea mount
-            cpdir("/tmp/eupnea-build/fedora-tmp-mnt/root/", "/mnt/eupnea/")
+            try:
+                cpdir("/tmp/eupnea-build/fedora-tmp-mnt/root/", "/mnt/eupnea/")
+            except RecursionError:
+                print("\033[93m" + "Failed to copy /tmp/eupnea-build/fedora-tmp-mnt/root, using heavier tools\033[0m")
+                bash("cp -rp /tmp/eupnea-build/fedora-tmp-mnt/root/* /mnt/eupnea/")
 
 
 # Configure distro agnostic options
