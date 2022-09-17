@@ -33,7 +33,9 @@ def rmdir(rm_dir: str, keep_dir: bool = True) -> None:
 
 
 # remove a single file
-def rmfile(file: str) -> None:
+def rmfile(file: str, force: bool = False) -> None:
+    if force:
+        Path(file).unlink(missing_ok=True)
     file_as_path = Path(file)
     if file_as_path.exists():
         file_as_path.unlink()
