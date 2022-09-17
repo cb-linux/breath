@@ -66,7 +66,8 @@ def cpdir(root_src: str, root_dst: str) -> None:  # dst_dir must be a full path,
                 dst_file.write_bytes(src_file.read_bytes())
             else:
                 new_dst = dst.joinpath(src_file.stem)
-                copy_files(src_file, new_dst)
+                if new_dst.exists():
+                    copy_files(src_file, new_dst)
 
     src_as_path = Path(root_src)
     dst_as_path = Path(root_dst)
