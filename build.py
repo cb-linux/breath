@@ -37,20 +37,12 @@ def prepare_host(de_name: str) -> None:
     bash("umount -lf /tmp/eupnea-build/fedora-tmp-mnt 2>/dev/null")
 
     print("Creating /tmp/eupnea-build")
-    try:
-        rmdir("/tmp/eupnea-build")
-    except RecursionError:
-        print("\033[93m" + "Failed to remove /tmp/eupnea-build, using heavier tools" + "\033[0m")
-        bash("rm -rf /tmp/eupnea-build/*")
+    rmdir("/tmp/eupnea-build")
     mkdir("/tmp/eupnea-build")
 
     print("Creating mnt point")
     bash("umount -lf /mnt/eupnea 2>/dev/null")  # just in case
-    try:
-        rmdir("/mnt/eupnea")
-    except RecursionError:
-        print("\033[93m" + "Failed to remove /mnt/eupnea, using heavier tools" + "\033[0m")
-        bash("rm -rf /mnt/eupnea/*")
+    rmdir("/mnt/eupnea")
     mkdir("/mnt/eupnea")
 
     print("Remove old files if they exist")
@@ -62,11 +54,12 @@ def prepare_host(de_name: str) -> None:
     if path_exists("/usr/bin/apt"):
         bash("apt install cgpt vboot-kernel-utils -y")
     elif path_exists("/usr/bin/pacman"):
-        bash("pacman -S cgpt vboot-utils --noconfirm")
+        # bash("pacman -S cgpt vboot-utils --noconfirm")
+        print("\033[91m" + "Please install cgpt and vboot-utils using AUR" + "\033[0m")
     elif path_exists("/usr/bin/dnf"):
         bash("dnf install cgpt vboot-utils --assumeyes")
     else:
-        print("\033[91m" + "cgpt and futility not found, please install them using your disotros package manager"
+        print("\033[91mcgpt and vboot-utils(futility) not found, please install them using your distros package manager"
               + "\033[0m")
         exit(1)
 
@@ -276,20 +269,12 @@ def extract_rootfs(distro_name: str) -> None:
             bash("tar xfp /tmp/eupnea-build/ubuntu-rootfs.tar.xz -C /mnt/eupnea --checkpoint=.10000")
         case "debian":
             print("Copying debian rootfs")
-            try:
-                cpdir("/tmp/eupnea-build/debian/", "/mnt/eupnea/")
-            except RecursionError:
-                print("\033[93m" + "Failed to copy /tmp/eupnea-build/debian, using heavier tools" + "\033[0m")
-                bash("cp -rp /tmp/eupnea-build/debian/* /mnt/eupnea/")
+            cpdir("/tmp/eupnea-build/debian/", "/mnt/eupnea/")
         case "arch":
             print("Extracting arch rootfs")
             mkdir("/tmp/eupnea-build/arch-rootfs")
             bash("tar xfp /tmp/eupnea-build/ubuntu-rootfs.tar.xz -C /tmp/eupnea-build/arch-rootfs --checkpoint=.10000")
-            try:
-                cpdir("/tmp/eupnea-build/arch-rootfs/", "/mnt/eupnea/")
-            except RecursionError:
-                print("\033[93m" + "Failed to copy /tmp/eupnea-build/arch-rootfs, using heavier tools" + "\033[0m")
-                bash("cp -rp /tmp/eupnea-build/arch-rootfs/* /mnt/eupnea/")
+            cpdir("/tmp/eupnea-build/arch-rootfs/", "/mnt/eupnea/")
 
         case "fedora":
             print("Extracting fedora rootfs")
@@ -303,11 +288,16 @@ def extract_rootfs(distro_name: str) -> None:
             if fedora_root_part == "":
                 print("\033[91m" + "Couldnt mount fedora image with losetup" + "\033[0m")
                 bash(f"kill {main_thread_pid}")
-            bash(f"mount {fedora_root_part} /tmp/eupnea-build/fedora-tmp-mnt")
+            bash_return(
+                f"mount {fedora_root_part} /tmp/eupnea-build/fedora-tmp-mnt")  # return to check for mount errors
             # copy actual root file to eupnea mount
             print("Copying fedora rootfs to /mnt/eupnea")
             # TODO: Fix python copying
             bash("cp -rp /tmp/eupnea-build/fedora-tmp-mnt/root/* /mnt/eupnea/")  # python fails to copy
+
+            # unmount fedora image to prevent errors
+            bash(f"umount -fl /tmp/eupnea-build/fedora-tmp-mnt")
+            bash(f"losetup -d {fedora_root_part[:-2]}")
 
 
 # Configure distro agnostic options
@@ -346,6 +336,7 @@ def post_extract(username: str, password: str, hostname: str, distro_name: str, 
 
     print("Copying eupnea utils")
     cpdir("postinstall-scripts", "/mnt/eupnea/usr/local/bin/")
+    chroot("chmod 755 /usr/local/bin/*")  # make scripts executable in system
     cpfile("functions.py", "/mnt/eupnea/usr/local/bin/functions.py")
     cpdir("configs", "/mnt/eupnea/usr/local/eupnea-configs")
 
@@ -363,11 +354,10 @@ def post_extract(username: str, password: str, hostname: str, distro_name: str, 
     with open("/mnt/eupnea/etc/modules", "a") as conf:
         conf.write(modules)
 
-    # disable ssh service, as it fails to start
-    # TODO: Fix services
+    # TODO: Fix failing services
+    # The services below fail to start, so they are disabled
     chroot("systemctl disable ssh.service")
-    # Disable remount fs service, as it fails to start
-    chroot("systemctl disable sys-fs-fuse-connections.mount")
+    chroot("systemctl disable systemd-remount-fs.service")
 
 
 # chroot command
