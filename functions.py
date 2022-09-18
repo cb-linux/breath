@@ -82,11 +82,14 @@ def cpdir(root_src: str, root_dst: str) -> None:  # dst_dir must be a full path,
     src_as_path = Path(root_src)
     dst_as_path = Path(root_dst)
     if src_as_path.exists():
+        '''
         try:
             copy_files(src_as_path, dst_as_path)
         except RecursionError:
             print("\033[93m" + f"Failed to copy {root_src} to {root_dst}, using bash" + "\033[0m")
             bash(f"cp -rp {src_as_path.absolute().as_posix()} {dst_as_path.absolute().as_posix()}")
+        '''
+        bash(f"cp -rp {root_src} {root_dst}")
     else:
         print("Source directory does not exist?")
 
