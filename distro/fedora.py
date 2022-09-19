@@ -33,6 +33,7 @@ def config(de_name: str, distro_version: str, root_partuuid: str, verbose_var: b
         case "kde":
             print("Installing kde")
             chroot("dnf group install -y 'KDE Plasma Workspaces'")
+            chroot("systemctl enable sddm.service")
         case "mate":
             print("Installing mate")
             chroot("dnf group install -y 'MATE Desktop'")
