@@ -439,11 +439,13 @@ if __name__ == "__main__":
         cpfile(f"{kernel_path}modules.tar.xz", "/tmp/eupnea-build/modules.tar.xz")
 
     if user_input[9]:
-        img_mnt = prepare_img()[0]
-        root_partuuid = prepare_img()[1]
+        output_temp = prepare_img()
+        img_mnt = output_temp[0]
+        root_partuuid = output_temp[1]
     else:
-        img_mnt = prepare_usb(user_input[4])[0]
-        root_partuuid = prepare_img()[1]
+        output_temp = prepare_usb(user_input[4])
+        img_mnt = output_temp[0]
+        root_partuuid = output_temp[1]
 
     # Print download progress in terminal
     t = Thread(target=download_rootfs, args=(user_input[0], user_input[1], user_input[2],), daemon=True)
