@@ -89,7 +89,7 @@ def cpdir(root_src: str, root_dst: str) -> None:  # dst_dir must be a full path,
             print("\033[93m" + f"Failed to copy {root_src} to {root_dst}, using bash" + "\033[0m")
             bash(f"cp -rp {src_as_path.absolute().as_posix()} {dst_as_path.absolute().as_posix()}")
         '''
-        bash(f"cp -rp {src_as_path.absolute().as_posix()}* {dst_as_path.absolute().as_posix()}")
+        bash(f"cp -rp {src_as_path.absolute().as_posix()}/* {dst_as_path.absolute().as_posix()}")
     else:
         print("Source directory does not exist?")
 
