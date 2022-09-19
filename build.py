@@ -2,6 +2,7 @@
 
 import os
 import argparse
+from typing import Tuple
 from urllib.request import urlretrieve
 from urllib.error import URLError
 from threading import Thread
@@ -125,7 +126,7 @@ def download_kernel() -> None:
 
 
 # Prepare USB, usb is not yet fully implemented
-def prepare_usb(device) -> str:
+def prepare_usb(device) -> Tuple[str, str]:
     print("\033[96m" + "Preparing USB" + "\033[0m")
 
     # fix device name if needed
@@ -141,7 +142,7 @@ def prepare_usb(device) -> str:
 
 
 # Create, mount, partition the img and flash the eupnea kernel
-def prepare_img() -> str:
+def prepare_img() -> Tuple[str, str]:
     print("\033[96m" + "Preparing img" + "\033[0m")
 
     print("Allocating space for image, might take a while")
@@ -160,7 +161,7 @@ def prepare_img() -> str:
     return partition(mnt_point, False)
 
 
-def partition(mnt_point: str, write_usb: bool) -> str:
+def partition(mnt_point: str, write_usb: bool) -> Tuple[str, str]:
     # remove partition table from usb
     if write_usb:
         bash(f"wipefs -af {mnt_point}")
@@ -213,7 +214,7 @@ def partition(mnt_point: str, write_usb: bool) -> str:
         bash(f"mount {mnt_point}2 /mnt/eupnea")
     else:
         bash(f"mount {mnt_point}p2 /mnt/eupnea")
-    return mnt_point  # return loop device, so it can be unmounted at the end
+    return mnt_point, rootfs_partuuid  # return loop device, so it can be unmounted at the end
 
 
 # download the distro rootfs
@@ -438,9 +439,11 @@ if __name__ == "__main__":
         cpfile(f"{kernel_path}modules.tar.xz", "/tmp/eupnea-build/modules.tar.xz")
 
     if user_input[9]:
-        img_mnt = prepare_img()
+        img_mnt = prepare_img()[0]
+        root_partuuid = prepare_img()[1]
     else:
-        img_mnt = prepare_usb(user_input[4])
+        img_mnt = prepare_usb(user_input[4])[0]
+        root_partuuid = prepare_img()[1]
 
     # Print download progress in terminal
     t = Thread(target=download_rootfs, args=(user_input[0], user_input[1], user_input[2],), daemon=True)
@@ -466,7 +469,7 @@ if __name__ == "__main__":
         case _:
             print("\033[91m" + "Something went **really** wrong!!! (Distro name not found)" + "\033[0m")
             exit(1)
-    distro.config(user_input[3], user_input[1], args.verbose)
+    distro.config(user_input[3], user_input[1], root_partuuid, args.verbose)
 
     # Add chromebook layout. Needs to be done after install Xorg/Wayland
     print("Backing up default keymap and setting Chromebook layout")

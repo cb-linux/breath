@@ -1,7 +1,7 @@
 from functions import *
 
 
-def config(de_name: str, distro_version: str, verbose_var: bool) -> None:
+def config(de_name: str, distro_version: str, root_partuuid: str, verbose_var: bool) -> None:
     # set verbose var
     global verbose
     verbose = verbose_var
@@ -70,6 +70,14 @@ def config(de_name: str, distro_version: str, verbose_var: bool) -> None:
         cpfile("/mnt/eupnea/usr/share/doc/util-linux/examples/securetty", "/mnt/eupnea/etc/securetty")
     except FileNotFoundError:
         pass
+
+    # Add eupnea to version(this is purely cosmetic)
+    with open("/mnt/eupnea/etc/os-release", "r") as f:
+        os_release = f.readlines()
+    os_release[1] = os_release[1][:-2] + ' (Eupnea)"\n'
+    os_release[4] = os_release[4][:-2] + ' (Eupnea)"\n'
+    with open("/mnt/eupnea/etc/os-release", "w") as f:
+        f.writelines(os_release)
 
 
 def chroot(command: str) -> None:

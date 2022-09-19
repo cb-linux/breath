@@ -1,7 +1,7 @@
 from functions import *
 
 
-def config(de_name: str, distro_version: str, verbose_var: bool) -> None:
+def config(de_name: str, distro_version: str, root_partuuid: str, verbose_var: bool) -> None:
     # set verbose var
     global verbose
     verbose = verbose_var
@@ -60,6 +60,21 @@ def config(de_name: str, distro_version: str, verbose_var: bool) -> None:
     # Create /.autorelabel to force SELinux to relabel all files
     with open("/mnt/eupnea/.autorelabel", "w") as f:
         f.write("")
+
+    print("Fixing fstab")
+    # The default fstab file has the wrong PARTUUID, so we need to update it
+    with open("config/fstab.fedora", "r") as f:
+        fstab = f.read()
+    fstab = fstab.replace("insert_partuuid", root_partuuid)
+    with open("/mnt/eupnea/etc/fstab", "w") as f:
+        f.write(fstab)
+
+    # Add eupnea to version(this is purely cosmetic)
+    with open("/mnt/eupnea/etc/os-release", "r") as f:
+        os_release = f.read()
+    os_release = os_release.replace("Cloud Edition Prerelease", "Eupnea")
+    with open("/mnt/eupnea/etc/os-release", "w") as f:
+        f.write(os_release)
 
 
 def chroot(command: str) -> None:
