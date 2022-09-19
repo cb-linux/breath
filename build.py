@@ -275,7 +275,7 @@ def extract_rootfs(distro_name: str) -> None:
             print("Extracting arch rootfs")
             mkdir("/tmp/eupnea-build/arch-rootfs")
             bash("tar xfp /tmp/eupnea-build/arch-rootfs.tar.gz -C /tmp/eupnea-build/arch-rootfs --checkpoint=.10000")
-            cpdir("/tmp/eupnea-build/arch-rootfs/", "/mnt/eupnea/")
+            cpdir("/tmp/eupnea-build/arch-rootfs/root.x86_64/", "/mnt/eupnea/")
 
         case "fedora":
             print("Extracting fedora rootfs")
