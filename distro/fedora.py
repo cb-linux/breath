@@ -55,10 +55,10 @@ def config(de_name: str, distro_version: str, verbose_var: bool) -> None:
         case _:
             print("\033[91m" + "Invalid desktop environment!!! Remove all files and retry." + "\033[0m")
             exit(1)
-    print("Set SELinux to permissive")
-    chroot("sed -i 's/SELINUX=enforcing/SELINUX=permissive/g' /etc/sysconfig/selinux")
-    # print("Fix permissions")  # maybe not needed?
-    # chroot("chmod -R 750 /root")
+    print("Fixing SELinux")
+    # Create /.autorelabel to force SELinux to relabel all files
+    with open("/mnt/eupnea/.autorelabel", "w") as f:
+        f.write("")
 
 
 def chroot(command: str) -> None:
