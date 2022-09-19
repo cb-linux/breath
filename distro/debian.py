@@ -24,19 +24,19 @@ def config(de_name: str, distro_version: str, verbose_var: bool) -> None:
     match de_name:
         case "gnome":
             print("Installing gnome")
-            chroot("apt install -y gnome/stable gnome-initial-setup")
+            chroot("DEBIAN_FRONTEND=noninteractive apt install -y gnome/stable gnome-initial-setup")
         case "kde":
             print("Installing kde")
-            chroot("apt install -y task-kde-desktop")
+            chroot("DEBIAN_FRONTEND=noninteractive apt install -y task-kde-desktop")
         case "mate":
             print("Installing mate")
-            chroot("apt install -y mate-desktop-environment")
+            chroot("DEBIAN_FRONTEND=noninteractive apt install -y mate-desktop-environment")
         case "xfce":
             print("Installing xfce")
-            chroot("apt install -y task-xfce-desktop")
+            chroot("DEBIAN_FRONTEND=noninteractive apt install -y task-xfce-desktop")
         case "lxqt":
             print("Installing lxqt")
-            chroot("apt install -y task-lxqt-desktop")
+            chroot("DEBIAN_FRONTEND=noninteractive apt install -y task-lxqt-desktop")
         case "deepin":
             print("\033[91m" + "Deepin is not available for Debian" + "\033[91m")
             exit(1)
@@ -48,7 +48,7 @@ def config(de_name: str, distro_version: str, verbose_var: bool) -> None:
             chroot("systemctl enable lightdm.service")
         case "minimal":
             print("Installing minimal")
-            chroot("apt install -y xfce4 xfce4-terminal --no-install-recommends")
+            chroot("DEBIAN_FRONTEND=noninteractive apt install -y xfce4 xfce4-terminal --no-install-recommends")
         case "cli":
             print("Installing nothing")
         case _:
