@@ -63,7 +63,7 @@ def config(de_name: str, distro_version: str, root_partuuid: str, verbose_var: b
 
     print("Fixing fstab")
     # The default fstab file has the wrong PARTUUID, so we need to update it
-    with open("config/fstab.fedora", "r") as f:
+    with open("configs/fstab.fedora", "r") as f:
         fstab = f.read()
     fstab = fstab.replace("insert_partuuid", root_partuuid)
     with open("/mnt/eupnea/etc/fstab", "w") as f:
