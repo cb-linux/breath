@@ -130,9 +130,6 @@ if __name__ == "__main__":
         os.execlpe('sudo', *sudo_args)
     args = process_args()
 
-    skip_version_question = False
-    skip_dev_question = False
-
     if args.dev_build:
         print("\033[93m" + "Using dev release" + "\033[0m")
         skip_dev_question = True
@@ -152,37 +149,6 @@ if __name__ == "__main__":
     # read root partition mount
     root_part = bash_return("mount | grep ' / ' | cut -d' ' -f 1")
     device = root_part[:len(root_part) - 1]  # get device "name"
-
-    if not skip_version_question:
-        while True:
-            print("\033[92m" + "Which kernel would you like to flash? Press enter for default\n" + "\033[0m")
-            user_input = input(
-                "\033[94m" + "Available options: stable(default), alt(for older devices), mainline(might work better on"
-                             " newer devices, exp(experimental 5.15 kernel)" + "\033[0m" + "\n")
-            match user_input:
-                case "" | "stable" | "Stable" | "Default" | "default":
-                    break
-                case "alt" | "Alt":
-                    args.alt = True
-                    break
-                case "mainline" | "Mainline":
-                    args.mainline = True
-                    break
-                case "exp" | "Experimental" | "experimental" | "Exp":
-                    args.exp = True
-                    break
-                case _:
-                    print("\033[91m" + "Invalid option, check your spelling" + "\033[0m")
-
-    if not skip_dev_question:
-        print("\033[92m" + "Would you like to the developer version of the kernel? Type yes or press Enter for no\n"
-              + "\033[0m")
-        user_input = input(
-            "\033[94m" + "Available options: stable(default), alt(for older devices), mainline(might work better on "
-                         "newer devices, exp(experimental 5.15 kernel)" + "\033[0m" + "\n")
-        if user_input == "yes":
-            args.dev_build = True
-
     prepare_host()
     if args.local_path is None:
         # Print download progress in terminal
