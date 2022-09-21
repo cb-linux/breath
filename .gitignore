@@ -1,3 +1,4 @@
 /.idea/
 eupnea.img
 kernel.flags
+/__pycache__/
