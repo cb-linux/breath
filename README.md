@@ -1,8 +1,12 @@
 # 🙼 [EUPNEA](https://eupnea-linux.github.io/)
-<img src="https://github.com/eupnea-linux/eupnea-linux.github.io/blob/main/assets/banner.png?raw=true" alt="Breath Banner"></img>
+[<img src="https://github.com/eupnea-linux/eupnea-linux.github.io/blob/main/assets/banner.png?raw=true" alt="Breath banner"></img>](https://eupnea-linux.github.io/)
+
 <p align="center">A way to natively boot and run Linux on modern Chromebooks without replacing firmware</p>
 
 <h2 align="center"><a href="https://eupnea-linux.github.io/docs.html#/">‼️➡️ INSTALL INSTRUCTIONS ⬅️‼️</a></h2>
+
+## Join our discord server
+[<img src="https://discordapp.com/api/guilds/994245999822381076/widget.png?style=banner2" alt="Discord banner"></img>](https://discord.gg/jxXb2PwzYz)
 
 ## Supported Devices
 [Supported devices](https://eupnea-linux.github.io/docs.html#/devices)
