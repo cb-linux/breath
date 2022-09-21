@@ -1,0 +1,10 @@
+# /etc/fstab
+# Customized by Apacelus
+#
+# Accessible filesystems, by reference, are maintained under '/dev/disk/'.
+# See man pages fstab(5), findfs(8), mount(8) and/or blkid(8) for more info.
+#
+# After editing this file, run 'systemctl daemon-reload' to update systemd
+# units generated from this file.
+#
+PARTUUID=insert_partuuid        /       btrfs       subvol=root,compress=zstd:1 0   0
