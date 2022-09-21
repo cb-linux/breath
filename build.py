@@ -307,7 +307,7 @@ def extract_rootfs(distro_name: str) -> None:
             bash("unxz -d /tmp/eupnea-build/fedora-rootfs.raw.xz -c > /tmp/eupnea-build/fedora-raw")
 
             # mount fedora raw image
-            fedora_root_part = bash_return("losetup -f --show /tmp/eupnea-build/fedora-raw") + "p5"
+            fedora_root_part = bash_return("losetup -P -f --show /tmp/eupnea-build/fedora-raw") + "p5"
             if fedora_root_part == "":
                 print("\033[91m" + "Couldnt mount fedora image with losetup" + "\033[0m")
                 bash(f"kill {main_thread_pid}")
@@ -361,6 +361,8 @@ def post_extract(username: str, password: str, hostname: str, distro_name: str, 
     cpdir("postinstall-scripts", "/mnt/eupnea/usr/local/bin/")
     chroot("chmod 755 /usr/local/bin/*")  # make scripts executable in system
     cpfile("functions.py", "/mnt/eupnea/usr/local/bin/functions.py")
+
+    mkdir("/mnt/eupnea/usr/local/eupnea-configs")
     cpdir("configs", "/mnt/eupnea/usr/local/eupnea-configs")
 
     # create settings file
