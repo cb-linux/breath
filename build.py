@@ -7,6 +7,7 @@ from urllib.request import urlretrieve
 from urllib.error import URLError
 from threading import Thread
 from time import sleep
+import json
 
 import user_input
 from functions import *
@@ -271,6 +272,17 @@ def download_rootfs(distro_name: str, distro_version: str, distro_link: str) -> 
         bash(f"kill {main_thread_pid}")  # kill main thread, as this function running in a different thread
 
 
+# Download Wi-Fi firmware for later
+def download_firmware():
+    print("Downloading firmware")
+    try:
+        bash("git clone https://chromium.googlesource.com/chromiumos/third_party/linux-firmware/ "
+             "/tmp/eupnea-build/firmware")
+    except URLError:
+        print("\033[91m" + "Couldnt download firmware. Check your internet connection and try again." + "\033[0m")
+        bash(f"kill {main_thread_pid}")
+
+
 # extract the rootfs to the img
 def extract_rootfs(distro_name: str) -> None:
     print("\033[96m" + "Extracting rootfs" + "\033[0m")
@@ -345,11 +357,19 @@ def post_extract(username: str, password: str, hostname: str, distro_name: str, 
     with open("/mnt/eupnea/etc/hostname", "w") as hostname_file:
         hostname_file.write(hostname)
 
-    print("Copying eupnea utils")
+    print("Copying eupnea scripts")
     cpdir("postinstall-scripts", "/mnt/eupnea/usr/local/bin/")
     chroot("chmod 755 /usr/local/bin/*")  # make scripts executable in system
     cpfile("functions.py", "/mnt/eupnea/usr/local/bin/functions.py")
     cpdir("configs", "/mnt/eupnea/usr/local/eupnea-configs")
+
+    # create settings file
+    print("Creating eupnea settings file")
+    with open("configs/eupnea-settings.json", "r") as settings_file:
+        settings = json.load(settings_file)
+    settings["kernel_type"] = kernel_type
+    with open("/mnt/eupnea/usr/local/eupnea-settings.json", "w") as settings_file:
+        json.dump(settings, settings_file)
 
     print("Configuring sleep")
     # disable hibernation aka S4 sleep, READ: https://eupnea-linux.github.io/docs.html#/bootlock
@@ -367,8 +387,30 @@ def post_extract(username: str, password: str, hostname: str, distro_name: str, 
 
     # TODO: Fix failing services
     # The services below fail to start, so they are disabled
-    chroot("systemctl disable ssh.service")
-    chroot("systemctl disable systemd-remount-fs.service")
+    # ssh
+    rmfile("/mnt/eupnea/etc/systemd/system/multi-user.target.wants/ssh.service")
+    rmfile("/mnt/eupnea/etc/systemd/system/sshd.service")
+
+
+# post extract and distro config
+def post_config():
+    # Add chromebook layout. Needs to be done after install Xorg/Wayland
+    print("Backing up default keymap and setting Chromebook layout")
+    cpfile("/mnt/eupnea/usr/share/X11/xkb/symbols/pc", "/mnt/eupnea/usr/share/X11/xkb/symbols/pc.default")
+    cpfile("configs/xkb/xkb.chromebook", "/mnt/eupnea/usr/share/X11/xkb/symbols/pc")
+    if user_input[8]:  # rebind search key to caps lock
+        print("Rebinding search key to Caps Lock")
+        cpfile("/mnt/eupnea/usr/share/X11/xkb/keycodes/evdev", "/mnt/eupnea/usr/share/X11/xkb/keycodes/evdev.default")
+
+    # Add postinstall service
+    print("Adding postinstall service")
+    cpfile("configs/postinstall.service", "/mnt/eupnea/etc/systemd/system/postinstall.service")
+    chroot("systemctl enable postinstall.service")
+
+    # copy previously downloaded firmware
+    print("Copying google firmware")
+    rmdir("/mnt/eupnea/lib/firmware/google")
+    cpdir("/tmp/eupnea-build/firmware", "/mnt/eupnea/lib/firmware")
 
 
 # chroot command
@@ -414,14 +456,18 @@ if __name__ == "__main__":
     args = process_args()
     main_thread_pid = os.getpid()  # for threads to kill mainthread
 
+    kernel_type = "stable"
     if args.dev_build:
         print("\033[93m" + "Using dev release" + "\033[0m")
     if args.alt:
         print("\033[93m" + "Using alt kernel" + "\033[0m")
+        kernel_type = "alt"
     if args.exp:
         print("\033[93m" + "Using experimental kernel" + "\033[0m")
+        kernel_type = "exp"
     if args.mainline:
         print("\033[93m" + "Using mainline kernel" + "\033[0m")
+        kernel_type = "mainline"
     if args.local_path:
         print("\033[93m" + "Using local path" + "\033[0m")
     if args.verbose:
@@ -432,10 +478,10 @@ if __name__ == "__main__":
 
     if args.local_path is None:
         # Print download progress in terminal
-        t = Thread(target=download_kernel, daemon=True)
-        t.start()
+        kernel_download = Thread(target=download_kernel, daemon=True)
+        kernel_download.start()
         sleep(1)  # wait for thread to print info
-        while t.is_alive():
+        while kernel_download.is_alive():
             print(".", end="", flush=True)
             sleep(1)
         print("")  # break line
@@ -458,13 +504,15 @@ if __name__ == "__main__":
         root_partuuid = output_temp[1]
 
     # Print download progress in terminal
-    t = Thread(target=download_rootfs, args=(user_input[0], user_input[1], user_input[2],), daemon=True)
-    t.start()
+    rootfs_download = Thread(target=download_rootfs, args=(user_input[0], user_input[1], user_input[2],), daemon=True)
+    rootfs_download.start()
     sleep(1)  # wait for thread to print info
-    while t.is_alive():
+    while rootfs_download.is_alive():
         print(".", end="", flush=True)
         sleep(1)
     print("")  # break line
+
+    download_firmware()
 
     extract_rootfs(user_input[0])
     post_extract(user_input[5], user_input[6], user_input[7], user_input[0], user_input[3])
@@ -483,18 +531,7 @@ if __name__ == "__main__":
             exit(1)
     distro.config(user_input[3], user_input[1], root_partuuid, args.verbose)
 
-    # Add chromebook layout. Needs to be done after install Xorg/Wayland
-    print("Backing up default keymap and setting Chromebook layout")
-    cpfile("/mnt/eupnea/usr/share/X11/xkb/symbols/pc", "/mnt/eupnea/usr/share/X11/xkb/symbols/pc.default")
-    cpfile("configs/xkb/xkb.chromebook", "/mnt/eupnea/usr/share/X11/xkb/symbols/pc")
-    if user_input[8]:  # rebind search key to caps lock
-        print("Rebinding search key to Caps Lock")
-        cpfile("/mnt/eupnea/usr/share/X11/xkb/keycodes/evdev", "/mnt/eupnea/usr/share/X11/xkb/keycodes/evdev.default")
-
-    # Hook postinstall script, needs to be done after preping system
-    print("Adding postinstall service")
-    cpfile("configs/postinstall.service", "/mnt/eupnea/etc/systemd/system/postinstall.service")
-    chroot("systemctl enable postinstall.service")
+    post_config()
 
     # Unmount everything
     print("\033[96m" + "Finishing setup" + "\033[0m")

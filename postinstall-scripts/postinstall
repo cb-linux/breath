@@ -11,7 +11,7 @@ if __name__ == "__main__":
     # Expand root partition to whole drive
     # read root partition mount
     root_part = bash_return("mount | grep ' / ' | cut -d' ' -f 1")
-    root_part = root_part[:len(root_part) - 1]  # get device "name"
+    root_part = root_part[:-1]  # get device "name"
     bash(f"growpart {root_part} 2")
 
     # Device specific things:
