@@ -13,38 +13,6 @@ import user_input
 from functions import *
 
 
-def update_python():
-    if path_exists("/usr/bin/apt"):
-        print("\033[91m" + "Python 3.10 or higher is required. Attempt to install?" + "\033[0m")
-        if input("\033[94m" + "Recommended if running under Crostini(aka Linux on ChromeOS) or Debian" +
-                 "\033[0m\n").lower() == "y" or "":
-            print("Switching to unstable channel")
-            # switch to unstable channel
-            with open("/etc/apt/sources.list", "r") as file:
-                sources = file.readlines()
-            sources[1] = sources[1].replace("bullseye", "unstable")
-            with open("/etc/apt/sources.list", "w") as file:
-                file.writelines(sources)
-
-            # update and install python
-            print("Installing python 3.10")
-            bash("apt update -y")
-            bash("apt install -y python3")
-
-        else:
-            print("\033[91m" + "Please run the script with python 3.10 or higher" + "\033[0m")
-            exit(1)
-    else:
-        print("\033[91m" + "Please run the script with python 3.10 or higher" + "\033[0m")
-        exit(1)
-
-
-# check python version
-# Its necessary to check here, as the interpreter reads functions before it reads the main code and fails on "match"
-if sys.version_info < (3, 10):  # python 3.10 or higher is required
-    update_python()
-
-
 # parse arguments from the cli. Only for testing/advanced use. 95% of the arguments are handled by the user_input script
 def process_args():
     parser = argparse.ArgumentParser()
