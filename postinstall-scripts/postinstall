@@ -10,12 +10,12 @@ if __name__ == "__main__":
         os.execlpe('sudo', *sudo_args)
     # Expand root partition to whole drive
     # read root partition mount
-    root_part = bash_return("mount | grep ' / ' | cut -d' ' -f 1")
+    root_part = bash("mount | grep ' / ' | cut -d' ' -f 1")
     root_part = root_part[:-1]  # get device "name"
     bash(f"growpart {root_part} 2")
 
     # Device specific things:
-    match bash_return("sudo dmidecode --string system-product-name").lower():
+    match bash("sudo dmidecode --string system-product-name").lower():
         case "sona" | "laser":
             # Apply fix for display driver
             # TODO: Add multitouch support

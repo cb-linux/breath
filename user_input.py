@@ -64,7 +64,10 @@ def user_input() -> Tuple[str, str, str, str, str, str, str, str, bool, bool]:
                     with open("distros.json", "r") as file:
                         distros = json.load(file)
                     if temp_input == "":
-                        distro_version = "36"
+                        # remove rawhide, then get highest version number
+                        temp_fedora_dict = distros["fedora"]
+                        temp_fedora_dict.pop("rawhide")
+                        distro_version = max(temp_fedora_dict)
                         distro_link = distros["fedora"][distro_version]
                         print("Using Fedora version: " + distro_version)
                         break

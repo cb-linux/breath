@@ -36,14 +36,20 @@ def prepare_host(de_name: str) -> None:
     print("\033[96m" + "Preparing host system" + "\033[0m")
 
     # umount fedora temp if exists
-    bash("umount -lf /tmp/eupnea-build/fedora-tmp-mnt 2>/dev/null")
+    try:
+        bash("umount -lf /tmp/eupnea-build/fedora-tmp-mnt 2>/dev/null")
+    except subprocess.CalledProcessError:
+        pass
 
     print("Creating /tmp/eupnea-build")
     rmdir("/tmp/eupnea-build")
     mkdir("/tmp/eupnea-build")
 
     print("Creating mnt point")
-    bash("umount -lf /mnt/eupnea 2>/dev/null")  # just in case
+    try:
+        bash("umount -lf /mnt/eupnea 2>/dev/null")  # just in case
+    except subprocess.CalledProcessError:
+        pass
     rmdir("/mnt/eupnea")
     mkdir("/mnt/eupnea")
 
@@ -54,7 +60,7 @@ def prepare_host(de_name: str) -> None:
     print("Installing necessary packages")
     # install cgpt and futility
     if path_exists("/usr/bin/apt"):
-        bash("apt install cgpt vboot-kernel-utils -y")
+        bash("apt-get install cgpt vboot-kernel-utils -y")
     elif path_exists("/usr/bin/pacman"):
         # bash("pacman -S cgpt vboot-utils --noconfirm")
         # print("\033[91m" + "Please install cgpt and vboot-utils using AUR" + "\033[0m")
@@ -78,7 +84,7 @@ def prepare_host(de_name: str) -> None:
     # install debootstrap for debian
     if de_name == "debian":
         if path_exists("/usr/bin/apt"):
-            bash("apt install debootstrap -y")
+            bash("apt-get install debootstrap -y")
         elif path_exists("/usr/bin/pacman"):
             bash("pacman -S debootstrap --noconfirm")
         elif path_exists("/usr/bin/dnf"):
@@ -91,7 +97,7 @@ def prepare_host(de_name: str) -> None:
     # install arch-chroot for arch
     elif de_name == "arch":
         if path_exists("/usr/bin/apt"):
-            bash("apt install arch-install-scripts -y")
+            bash("apt-get install arch-install-scripts -y")
         elif path_exists("/usr/bin/pacman"):
             bash("pacman -S arch-install-scripts --noconfirm")
         elif path_exists("/usr/bin/dnf"):
@@ -160,11 +166,11 @@ def prepare_img() -> Tuple[str, str]:
     # try fallocate, if it fails use dd
     # TODO: determine img size
     img_size = 10  # 10 for now
-    if not bash_return(f"fallocate -l {img_size}G eupnea.img") == "":
+    if not bash(f"fallocate -l {img_size}G eupnea.img") == "":
         bash("dd if=/dev/zero of=eupnea.img status=progress bs=12884 count=1000070")
 
     print("Mounting empty image")
-    mnt_point = bash_return("losetup -f --show eupnea.img")
+    mnt_point = bash("losetup -f --show eupnea.img")
     if mnt_point == "":
         print("\033[91m" + "Failed to mount image" + "\033[0m")
         exit(1)
@@ -188,9 +194,9 @@ def partition(mnt_point: str, write_usb: bool) -> Tuple[str, str]:
     # get uuid of rootfs partition
     if write_usb:
         # if writing to usb, then no p in partition name
-        rootfs_partuuid = bash_return(f"blkid -o value -s PARTUUID {mnt_point}2")
+        rootfs_partuuid = bash(f"blkid -o value -s PARTUUID {mnt_point}2")
     else:
-        rootfs_partuuid = bash_return(f"blkid -o value -s PARTUUID {mnt_point}p2")
+        rootfs_partuuid = bash(f"blkid -o value -s PARTUUID {mnt_point}p2")
     if rootfs_partuuid == "":
         print("\033[91m" + "Failed to get rootfs partition uuid" + "\033[0m")
         exit(1)
@@ -242,7 +248,7 @@ def download_rootfs(distro_name: str, distro_version: str, distro_link: str) -> 
             case "debian":
                 print("Downloading debian with debootstrap")
                 # Debian sometimes fails for no apparent reason, so we try 2 times
-                debian_result = bash_return(
+                debian_result = bash(
                     "debootstrap stable /tmp/eupnea-build/debian https://deb.debian.org/debian/")
                 if args.verbose:
                     print("Result: " + str(debian_result))  # print results for debugging
@@ -250,7 +256,7 @@ def download_rootfs(distro_name: str, distro_version: str, distro_link: str) -> 
                     print("\033[91m\nDebootstrap failed, retrying once\n\033[0m")
                     # delete the failed rootfs
                     rmdir("/tmp/eupnea-build/debian")
-                    debian_result = bash_return(
+                    debian_result = bash(
                         "debootstrap stable /tmp/eupnea-build/debian https://deb.debian.org/debian/")
                     if args.verbose:
                         print(f"Result: {debian_result}")  # print results for debugging
@@ -307,11 +313,11 @@ def extract_rootfs(distro_name: str) -> None:
             bash("unxz -d /tmp/eupnea-build/fedora-rootfs.raw.xz -c > /tmp/eupnea-build/fedora-raw")
 
             # mount fedora raw image
-            fedora_root_part = bash_return("losetup -P -f --show /tmp/eupnea-build/fedora-raw") + "p5"
+            fedora_root_part = bash("losetup -f --show /tmp/eupnea-build/fedora-raw") + "p5"
             if fedora_root_part == "":
                 print("\033[91m" + "Couldnt mount fedora image with losetup" + "\033[0m")
                 bash(f"kill {main_thread_pid}")
-            bash_return(
+            bash(
                 f"mount {fedora_root_part} /tmp/eupnea-build/fedora-tmp-mnt")  # return to check for mount errors
             # copy actual root file to eupnea mount
             print("Copying fedora rootfs to /mnt/eupnea")
@@ -417,7 +423,7 @@ def post_config():
 
 # chroot command
 def chroot(command: str) -> str:
-    output = bash_return(f'chroot /mnt/eupnea /bin/sh -c "{command}"')
+    output = bash(f'chroot /mnt/eupnea /bin/sh -c "{command}"')
     if args.verbose:
         print(output)
     return output

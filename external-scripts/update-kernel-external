@@ -105,7 +105,7 @@ def flash_kernel() -> None:
     print("")  # break line
 
     # get uuid of rootfs partition
-    rootfs_partuuid = bash_return(f"blkid -o value -s PARTUUID {device}2")
+    rootfs_partuuid = bash(f"blkid -o value -s PARTUUID {device}2")
 
     print("Downloading default command line from github")
     try:

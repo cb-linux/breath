@@ -46,11 +46,11 @@ if __name__ == '__main__':
     args = process_args()
 
     if args.show:
-        print("Current command line:\n" + "\033[96m" + bash_return("cat /proc/cmdline") + "\033[0m")
+        print("Current command line:\n" + "\033[96m" + bash("cat /proc/cmdline") + "\033[0m")
         exit(1)
 
     print("Reading partition table")
-    partitions = bash_return("mount | grep ' / ' | cut -d' ' -f 1")
+    partitions = bash("mount | grep ' / ' | cut -d' ' -f 1")
     partitions = partitions[:len(partitions) - 1]  # get device "name"
     if args.reset:
         print("Resetting to default command line")
@@ -64,7 +64,7 @@ if __name__ == '__main__':
             temp_cmdline = "console=tty1 root=PARTUUID=${USB_ROOTFS} i915.modeset=1 rootwait rw fbcon=logo-pos:center" \
                            ",logo-count:1 loglevel=0 splash"
         # get partuuid of rootfs
-        rootfs_partuuid = bash_return(f"blkid -o value -s PARTUUID {partitions}2")
+        rootfs_partuuid = bash(f"blkid -o value -s PARTUUID {partitions}2")
         new_cmdline = temp_cmdline.replace("${USB_ROOTFS}", rootfs_partuuid)
     else:
         if args.cmdline is None:
@@ -77,7 +77,7 @@ if __name__ == '__main__':
     with open('cmdline', 'w') as file:
         if args.append:
             # Get the current kernel's command line
-            current_cmdline = bash_return("cat /proc/cmdline")
+            current_cmdline = bash("cat /proc/cmdline")
             file.write(f"{current_cmdline} {new_cmdline}")  # space needed as both args have no spaces before and after
         else:
             file.write(new_cmdline)

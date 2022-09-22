@@ -108,10 +108,5 @@ def cpfile(src: str, dst: str) -> None:  # "/etc/resolv.conf", "/mnt/eupnea/etc/
 #######################################################################################
 
 # return the output of a command
-def bash_return(command: str) -> str:
+def bash(command: str) -> str:
     return subprocess.check_output(command, shell=True, text=True).strip()
-
-
-# print output of a command to console
-def bash(command: str) -> None:
-    subprocess.run(command, stderr=sys.stderr, stdout=sys.stdout, shell=True)
