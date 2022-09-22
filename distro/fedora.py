@@ -28,7 +28,7 @@ def config(de_name: str, distro_version: str, root_partuuid: str, verbose_var: b
             chroot(
                 "dnf install -y @base-x gnome-shell gnome-terminal nautilus firefox chrome-gnome-shell gnome-tweaks " +
                 "@development-tools gnome-terminal-nautilus xdg-user-dirs xdg-user-dirs-gtk gnome-calculator " +
-                "gnome-system-monitor gedit file-roller gdm3 gnome-initial-setup")
+                "gnome-system-monitor gedit file-roller gdm gnome-initial-setup")
             chroot("systemctl enable gdm.service")
         case "kde":
             print("Installing kde")
