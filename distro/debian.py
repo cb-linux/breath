@@ -30,7 +30,8 @@ def config(de_name: str, distro_version: str, root_partuuid: str, verbose_var: b
             chroot("DEBIAN_FRONTEND=noninteractive apt install -y task-kde-desktop")
         case "mate":
             print("Installing mate")
-            chroot("DEBIAN_FRONTEND=noninteractive apt install -y mate-desktop-environment")
+            chroot("DEBIAN_FRONTEND=noninteractive apt install -y mate-desktop-environment "
+                   "mate-desktop-environment-extras gdm3")
         case "xfce":
             print("Installing xfce")
             chroot("DEBIAN_FRONTEND=noninteractive apt install -y task-xfce-desktop")
