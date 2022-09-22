@@ -44,9 +44,6 @@ def config(de_name: str, distro_version: str, root_partuuid: str, verbose_var: b
             print("Installing budgie")
             chroot("apt install -y ubuntu-budgie-desktop")
             chroot("dpkg-reconfigure lightdm")
-        case "minimal":
-            print("Installing minimal")
-            chroot("apt install -y xfce4 xfce4-terminal --no-install-recommends")
         case "cli":
             print("Installing nothing")
         case _:

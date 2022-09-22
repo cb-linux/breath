@@ -46,9 +46,6 @@ def config(de_name: str, distro_version: str, root_partuuid: str, verbose_var: b
             chroot("DEBIAN_FRONTEND=noninteractive apt install -y budgie-desktop budgie-indicator-applet budgie-core "
                    "lightdm lightdm-gtk-greeter")
             chroot("systemctl enable lightdm.service")
-        case "minimal":
-            print("Installing minimal")
-            chroot("DEBIAN_FRONTEND=noninteractive apt install -y xfce4 xfce4-terminal --no-install-recommends")
         case "cli":
             print("Installing nothing")
         case _:

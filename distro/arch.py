@@ -82,11 +82,6 @@ def config(de_name: str, distro_version: str, root_partuuid: str, verbose_var: b
             chroot("pacman -S --noconfirm budgie-desktop budgie-desktop-view budgie-screensaver budgie-control-center "
                    "lightdm lightdm-gtk-greeter")
             chroot("systemctl enable lightdm.service")
-        case "minimal":
-            print("Installing xfce")
-            # no wayland support in xfce
-            chroot("pacman -S --noconfirm xfce4 xorg xorg-server lightdm lightdm-gtk-greeter")
-            chroot("systemctl enable lightdm.service")
         case "cli":
             print("Installing nothing")
         case _:

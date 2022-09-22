@@ -37,7 +37,7 @@ def config(de_name: str, distro_version: str, root_partuuid: str, verbose_var: b
         case "mate":
             print("Installing mate")
             chroot("dnf group install -y 'MATE Desktop'")
-        case "xfce" | "minimal":
+        case "xfce":
             print("Installing xfce")
             chroot("dnf group install -y 'Xfce Desktop'")
         case "lxqt":
@@ -49,9 +49,6 @@ def config(de_name: str, distro_version: str, root_partuuid: str, verbose_var: b
         case "budgie":
             print("\033[91m" + "Budgie is not available for Fedora" + "\033[91m")
             exit(1)
-        case "minimal":
-            # TODO: Add minimal
-            print("\033[91m" + "Minimal is not available YET for Fedora" + "\033[91m")
         case "cli":
             print("Installing nothing")
         case _:
