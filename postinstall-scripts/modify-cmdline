@@ -14,7 +14,9 @@ def process_args():
                         help="Append a flag rather than replacing the whole command line")
     parser.add_argument('-r', '--reset', action="store_true", dest="reset", default=False,
                         help="Reset to default command line")
-    parser.add_argument(dest='cmdline', type=str, nargs=1,
+    parser.add_argument('-s', '--show-current', action="store_true", dest="show", default=False,
+                        help="Show current command line")
+    parser.add_argument(dest='cmdline', type=str, nargs="?",
                         help="New, full kernel command line in quotes, example: \n"
                              + r'modify-cmdline "console=tty1 root=PARTUUID=7d83c214-289e-4e8b-93cc-685aea502'
                                r'f59 i915.modeset=1 rootwait rw fbcon=logo-pos:center,logo-count:1 loglevel=0 splash"')
@@ -42,6 +44,11 @@ if __name__ == '__main__':
         os.execlpe('sudo', *sudo_args)
 
     args = process_args()
+
+    if args.show:
+        print("Current command line:\n" + "\033[96m" + bash_return("cat /proc/cmdline") + "\033[0m")
+        exit(1)
+
     print("Reading partition table")
     partitions = bash_return("mount | grep ' / ' | cut -d' ' -f 1")
     partitions = partitions[:len(partitions) - 1]  # get device "name"
@@ -60,6 +67,9 @@ if __name__ == '__main__':
         rootfs_partuuid = bash_return(f"blkid -o value -s PARTUUID {partitions}2")
         new_cmdline = temp_cmdline.replace("${USB_ROOTFS}", rootfs_partuuid)
     else:
+        if args.cmdline is None:
+            print("Please provide the new commandline or use -a to append a flag.")
+            exit(1)
         new_cmdline = args.cmdline[0].strip()
     install_packages()
     kernel_partition = f"{partitions}1"
