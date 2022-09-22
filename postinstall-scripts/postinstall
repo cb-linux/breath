@@ -21,10 +21,24 @@ if __name__ == "__main__":
             # TODO: Add multitouch support
 
             # copy systemd file from config
-            bash("cp /usr/local/config/device-specific/sona_laser/touchscreen-fix.service "
-                 "/etc/systemd/system/touchscreen-fix.service")
+            cpfile("/usr/local/config/device-specific/sona_laser/touchscreen-fix.service",
+                   "/etc/systemd/system/touchscreen-fix.service")
             # enable service
             bash("systemctl enable touchscreen-fix.service")
+
+        # all Picasso/deli amd devices
+        case "berknip" | "dirinboz" | "ezkinil" | "gumboz" | "morphius" | "vilboz" | "vilboz360" | "woomax":
+            # Copy ucm config for amd audio
+            mkdir("/usr/share/alsa/ucm2/AMD/acp3xalc5682m98")
+            # cp ucm configs
+            cpfile("/usr/local/config/device-specific/amd-ucm/HiFi.conf",
+                   "/usr/share/alsa/ucm2/AMD/acp3xalc5682m98/HiFi.conf")
+            cpfile("/usr/local/config/device-specific/amd-ucm/acp3xalc5682m98.conf",
+                   "/usr/share/alsa/ucm2/AMD/acp3xalc5682m98/acp3xalc5682m98.conf")
+            # create conf.d symlink
+            mkdir("/usr/share/alsa/ucm2/conf.d/acp3xalc5682m98")
+            bash("ln -s /usr/share/alsa/ucm2/AMD/acp3xalc5682m98/acp3xalc5682m98.conf "
+                 "/usr/share/alsa/ucm2/conf.d/acp3xalc5682m98/acp3xalc5682m98.conf")
 
     # delete systemd service
     bash("systemctl disable postinstall.service")
