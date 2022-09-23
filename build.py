@@ -62,8 +62,9 @@ def prepare_host(de_name: str) -> None:
     if path_exists("/usr/bin/apt"):
         bash("apt-get install cgpt vboot-kernel-utils -y")
     elif path_exists("/usr/bin/pacman"):
-        # bash("pacman -S cgpt vboot-utils --noconfirm")
-        # print("\033[91m" + "Please install cgpt and vboot-utils using AUR" + "\033[0m")
+        print("\033[91m" + "Please install cgpt and vboot-utils using AUR" + "\033[0m")
+        # temporarily disable aur
+        '''
         bash("pacman -S --needed base-devel --noconfirm")
 
         bash("git clone https://aur.archlinux.org/cgpt-bin.git")
@@ -74,6 +75,7 @@ def prepare_host(de_name: str) -> None:
 
         rmdir("cgpt-bin", keep_dir=False)
         rmdir("vboot-utils", keep_dir=False)
+        '''
     elif path_exists("/usr/bin/dnf"):
         bash("dnf install cgpt vboot-utils --assumeyes")
     else:
