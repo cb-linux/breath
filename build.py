@@ -2,6 +2,7 @@
 
 import os
 import argparse
+import sys
 from typing import Tuple
 from urllib.request import urlretrieve
 from urllib.error import URLError
@@ -156,7 +157,10 @@ def prepare_usb(device) -> Tuple[str, str]:
         device = f"/dev/{device}"
 
     # unmount all partitions
-    bash(f"umount -lf {device}* 2>/dev/null")
+    try:
+        bash(f"umount -lf {device}* 2>/dev/null")
+    except subprocess.CalledProcessError:
+        pass
     return partition(device, True)
 
 

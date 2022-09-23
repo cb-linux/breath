@@ -9,40 +9,40 @@ def config(de_name: str, distro_version: str, root_partuuid: str, verbose_var: b
     print("\033[96m" + "Configuring Ubuntu" + "\033[0m")
 
     print("Installing packages")
-    chroot("apt install -y linux-firmware network-manager software-properties-common cloud-utils")
+    chroot("apt-get install -y linux-firmware network-manager software-properties-common cloud-utils")
 
     # TODO: Find out why we need to reinstall dbus
     print("Reinstalling dbus")
-    chroot("apt reinstall -y dbus")
+    chroot("apt-get reinstall -y dbus")
 
     # de install fails without updating apt
     print("Updating apt")
-    chroot("apt update -y")
+    chroot("apt-get update -y")
     print("\033[96m" + "Downloading and installing de, might take a while" + "\033[0m")
     match de_name:
         case "gnome":
             print("Installing gnome")
-            chroot("apt install -y ubuntu-desktop")
+            chroot("apt-get install -y ubuntu-desktop")
         case "kde":
             print("Installing kde")
-            chroot("apt install -y kde-standard")
+            chroot("apt-get install -y kde-standard")
         case "mate":
             print("Installing mate")
-            chroot("apt install -y ubuntu-mate-desktop")
+            chroot("apt-get install -y ubuntu-mate-desktop")
         case "xfce":
             print("Installing xfce")
-            chroot("apt install -y xubuntu-desktop")
+            chroot("apt-get install -y xubuntu-desktop")
         case "lxqt":
             print("Installing lxqt")
-            chroot("apt install -y lubuntu-desktop")
+            chroot("apt-get install -y lubuntu-desktop")
         case "deepin":
             print("Installing deepin")
             chroot("add-apt-repository ppa:ubuntudde-dev/stable")
-            chroot("apt update")
-            chroot("apt install -y ubuntudde-dde")
+            chroot("apt-get update")
+            chroot("apt-get install -y ubuntudde-dde")
         case "budgie":
             print("Installing budgie")
-            chroot("apt install -y ubuntu-budgie-desktop")
+            chroot("apt-get install -y ubuntu-budgie-desktop")
             chroot("dpkg-reconfigure lightdm")
         case "cli":
             print("Installing nothing")
@@ -58,10 +58,10 @@ def config(de_name: str, distro_version: str, root_partuuid: str, verbose_var: b
             rmfile("/mnt/eupnea/usr/share/xsessions/ubuntu.desktop")
         except FileNotFoundError:
             pass
-        chroot("apt remove -y gnome-shell")
-        chroot("apt autoremove -y")
+        chroot("apt-get remove -y gnome-shell")
+        chroot("apt-get autoremove -y")
     # TODO: Figure out if removing needrestart is necessary
-    chroot("apt remove -y needrestart")
+    chroot("apt-get remove -y needrestart")
     print("Fixing securetty if needed")
     try:
         cpfile("/mnt/eupnea/usr/share/doc/util-linux/examples/securetty", "/mnt/eupnea/etc/securetty")

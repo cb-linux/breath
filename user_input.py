@@ -206,9 +206,12 @@ def user_input() -> Tuple[str, str, str, str, str, str, str, str, bool, bool]:
     while True:
         if input("\033[94m" + "Type 'direct' to use write directly. " +
                  "Press Enter to create an img file" "\033[0m" + "\n") == "direct":
-            print("USB selected")
             create_iso = False
-            bash("lsblk -o NAME,LABEL,SIZE")
+            lsblk_out = bash("lsblk -o NAME,MODEL,SIZE,TRAN").splitlines()
+            for line in lsblk_out[2:]:
+                if not line.find("usb") == -1:
+                    print(line[:-3])
+
             device = input(
                 "\033[92m" + "Please enter the device name (example: sdc) and press enter: \n" + "\033[0m").strip()
         else:

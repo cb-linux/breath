@@ -1,7 +1,6 @@
 # FILE SOURCE: https://github.com/apacelus/pathlib-functions
 from pathlib import Path
 import subprocess
-import sys
 
 
 #######################################################################################

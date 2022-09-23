@@ -9,43 +9,43 @@ def config(de_name: str, distro_version: str, root_partuuid: str, verbose_var: b
     print("\033[96m" + "Configuring Ubuntu" + "\033[0m")
 
     print("Installling add-apt-repository")
-    chroot("apt update -y")
-    chroot("apt install -y software-properties-common")
+    chroot("apt-get update -y")
+    chroot("apt-get install -y software-properties-common")
 
     print("Adding non free repos")
     chroot("apt-add-repository non-free")
-    chroot("apt update -y")
+    chroot("apt-get update -y")
 
     print("Installing packages")
-    chroot("apt install -y network-manager sudo firmware-linux-free cloud-utils firmware-linux-nonfree firmware-iwlwifi"
+    chroot("apt-get install -y network-manager sudo firmware-linux-free cloud-utils firmware-linux-nonfree firmware-iwlwifi"
            " iw git")
 
     print("\033[96m" + "Downloading and installing de, might take a while" + "\033[0m")
     match de_name:
         case "gnome":
             print("Installing gnome")
-            chroot("DEBIAN_FRONTEND=noninteractive apt install -y gnome/stable gnome-initial-setup")
+            chroot("DEBIAN_FRONTEND=noninteractive apt-get install -y gnome/stable gnome-initial-setup")
         case "kde":
             print("Installing kde")
-            chroot("DEBIAN_FRONTEND=noninteractive apt install -y task-kde-desktop")
+            chroot("DEBIAN_FRONTEND=noninteractive apt-get install -y task-kde-desktop")
         case "mate":
             print("Installing mate")
-            chroot("DEBIAN_FRONTEND=noninteractive apt install -y mate-desktop-environment "
+            chroot("DEBIAN_FRONTEND=noninteractive apt-get install -y mate-desktop-environment "
                    "mate-desktop-environment-extras gdm3")
         case "xfce":
             print("Installing xfce")
-            chroot("DEBIAN_FRONTEND=noninteractive apt install -y task-xfce-desktop")
+            chroot("DEBIAN_FRONTEND=noninteractive apt-get install -y task-xfce-desktop")
         case "lxqt":
             print("Installing lxqt")
-            chroot("DEBIAN_FRONTEND=noninteractive apt install -y task-lxqt-desktop")
+            chroot("DEBIAN_FRONTEND=noninteractive apt-get install -y task-lxqt-desktop")
         case "deepin":
             print("\033[91m" + "Deepin is not available for Debian" + "\033[91m")
             exit(1)
         case "budgie":
             print("Installing budgie")
             # DEBIAN_FRONTEND=noninteractive skips locale setup in cli
-            chroot("DEBIAN_FRONTEND=noninteractive apt install -y budgie-desktop budgie-indicator-applet budgie-core "
-                   "lightdm lightdm-gtk-greeter")
+            chroot("DEBIAN_FRONTEND=noninteractive apt-get install -y budgie-desktop budgie-indicator-applet "
+                   "budgie-core lightdm lightdm-gtk-greeter")
             chroot("systemctl enable lightdm.service")
         case "cli":
             print("Installing nothing")
@@ -63,8 +63,8 @@ def config(de_name: str, distro_version: str, root_partuuid: str, verbose_var: b
             rmfile("/mnt/eupnea/usr/share/xsessions/ubuntu.desktop")
         except FileNotFoundError:
             pass
-        chroot("apt remove -y gnome-shell")
-        chroot("apt autoremove -y")
+        chroot("apt-get remove -y gnome-shell")
+        chroot("apt-get autoremove -y")
     print("Fixing securetty if needed")
     try:
         cpfile("/mnt/eupnea/usr/share/doc/util-linux/examples/securetty", "/mnt/eupnea/etc/securetty")
