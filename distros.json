@@ -9,6 +9,7 @@
   },
   "debian": {
   },
+  "arch": "https://geo.mirror.pkgbuild.com/iso/2022.09.03/archlinux-bootstrap-x86_64.tar.gz",
   "fedora": {
     "32": "https://kojipkgs.fedoraproject.org/packages/Fedora-Cloud-Base/32/20210302.0/images/Fedora-Cloud-Base-32-20210302.0.x86_64.raw.xz",
     "33": "https://kojipkgs.fedoraproject.org/packages/Fedora-Cloud-Base/33/20201219.0/images/Fedora-Cloud-Base-33-20201219.0.x86_64.raw.xz",

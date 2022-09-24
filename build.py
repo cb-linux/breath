@@ -272,8 +272,7 @@ def download_rootfs(distro_name: str, distro_version: str, distro_link: str) -> 
                         bash(f"kill {main_thread_pid}")
             case "arch":
                 print("Downloading latest arch rootfs")
-                urlretrieve("https://mirror.rackspace.com/archlinux/iso/latest/archlinux-bootstrap-x86_64.tar.gz",
-                            filename="/tmp/eupnea-build/arch-rootfs.tar.gz")
+                urlretrieve(distro_link, filename="/tmp/eupnea-build/arch-rootfs.tar.gz")
             case "fedora":
                 print(f"Downloading fedora rootfs version: {distro_version}")
                 urlretrieve(distro_link, filename="/tmp/eupnea-build/fedora-rootfs.raw.xz")

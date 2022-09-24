@@ -19,6 +19,8 @@ def user_input() -> Tuple[str, str, str, str, str, str, str, str, bool, bool]:
     print("\033[95m" + "Please answer the following questions." "\033[0m")
     print("(If you dont know what to answer, just press enter and the recommended answer will be used)")
     print("\033[92m" + "Which Linux distro(flavor) would you like to use?" + "\033[0m")
+    with open("distros.json", "r") as file:
+        distros = json.load(file)
     while True:
         temp_distro_name = input("\033[94m" + "Available options: Ubuntu(default, recommended), Debian, Arch, Fedora\n"
                                  + "\033[0m")
@@ -29,8 +31,6 @@ def user_input() -> Tuple[str, str, str, str, str, str, str, str, bool, bool]:
                     print("\033[92m" + "Use latest Ubuntu version?" + "\033[0m")
                     distro_version = input("\033[94mPress enter for yes, or type in the version number(example: "
                                            "'21.10'):\n" + "\033[0m")
-                    with open("distros.json", "r") as file:
-                        distros = json.load(file)
                     if distro_version == "":
                         # get highest version number
                         distro_version = max(distros["ubuntu"])
@@ -55,14 +55,13 @@ def user_input() -> Tuple[str, str, str, str, str, str, str, str, bool, bool]:
             case "Arch" | "arch" | "arch btw":
                 print("Arch selected")
                 distro_name = "arch"
+                distro_link = distros["arch"]
                 break
             case "Fedora" | "fedora":
                 distro_name = "fedora"
                 while True:
                     print("\033[92m" + "Use latest Fedora version?" + "\033[94m")
                     temp_input = input("Press enter for yes, or type in the version number(example: '35').\033[0m\n")
-                    with open("distros.json", "r") as file:
-                        distros = json.load(file)
                     if temp_input == "":
                         # remove rawhide, then get highest version number
                         temp_fedora_dict = distros["fedora"]
