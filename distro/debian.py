@@ -17,8 +17,8 @@ def config(de_name: str, distro_version: str, root_partuuid: str, verbose_var: b
     chroot("apt-get update -y")
 
     print("Installing packages")
-    chroot("apt-get install -y network-manager sudo firmware-linux-free cloud-utils firmware-linux-nonfree firmware-iwlwifi"
-           " iw git")
+    chroot("apt-get install -y network-manager sudo firmware-linux-free cloud-utils firmware-linux-nonfree "
+           "firmware-iwlwifi iw git")
 
     print("\033[96m" + "Downloading and installing de, might take a while" + "\033[0m")
     match de_name:
@@ -70,6 +70,11 @@ def config(de_name: str, distro_version: str, root_partuuid: str, verbose_var: b
         cpfile("/mnt/eupnea/usr/share/doc/util-linux/examples/securetty", "/mnt/eupnea/etc/securetty")
     except FileNotFoundError:
         pass
+
+    # Replace input-synaptics with newer input-libinput, for better touchpad support
+    print("Replacing touchpad drivers")
+    chroot("apt-get remove -y xserver-xorg-input-synaptics")
+    # chroot("apt-get install -y xserver-xorg-input-libinput")
 
     # Add eupnea to version(this is purely cosmetic)
     with open("/mnt/eupnea/etc/os-release", "r") as f:

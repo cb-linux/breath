@@ -77,6 +77,11 @@ def config(de_name: str, distro_version: str, root_partuuid: str, verbose_var: b
     with open("/mnt/eupnea/etc/fstab", "w") as f:
         f.write(fstab)
 
+    # Replace input-synaptics with newer input-libinput, for better touchpad support
+    print("Replacing touchpad drivers")
+    chroot("apt-get remove -y xserver-xorg-input-synaptics")
+    # chroot("apt-get install -y xserver-xorg-input-libinput")
+
     # Add eupnea to version(this is purely cosmetic)
     with open("/mnt/eupnea/etc/os-release", "r") as f:
         os_release = f.readlines()
