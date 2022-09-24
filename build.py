@@ -44,7 +44,7 @@ def prepare_host(de_name: str) -> None:
 
     print("Creating /tmp/eupnea-build")
     rmdir("/tmp/eupnea-build")
-    mkdir("/tmp/eupnea-build")
+    mkdir("/tmp/eupnea-build", True)
 
     print("Creating mnt point")
     try:
@@ -52,7 +52,7 @@ def prepare_host(de_name: str) -> None:
     except subprocess.CalledProcessError:
         pass
     rmdir("/mnt/eupnea")
-    mkdir("/mnt/eupnea")
+    mkdir("/mnt/eupnea", True)
 
     print("Remove old files if they exist")
     rmfile("eupnea.img")
@@ -224,7 +224,7 @@ def partition(mnt_point: str, write_usb: bool) -> Tuple[str, str]:
     else:
         bash(f"dd if=/tmp/eupnea-build/bzImage.signed of={mnt_point}p1")
 
-    print("Formating rootfs")
+    print("Creating rootfs")
     if write_usb:
         # if writing to usb, then no p in partition name
         bash(f"yes 2>/dev/null | mkfs.ext4 {mnt_point}2")  # 2>/dev/null is to supress yes broken pipe warning
@@ -279,7 +279,7 @@ def download_rootfs(distro_name: str, distro_version: str, distro_link: str) -> 
                 urlretrieve(distro_link, filename="/tmp/eupnea-build/fedora-rootfs.raw.xz")
     except URLError:
         print(
-            "\033[91m" + "Couldnt download rootfs. Check your internet connection and try again. If the error" +
+            "\033[91m" + "Couldn't download rootfs. Check your internet connection and try again. If the error" +
             " persists, create an issue with the distro and version in the name" + "\033[0m")
         bash(f"kill {main_thread_pid}")  # kill main thread, as this function running in a different thread
 
@@ -291,7 +291,7 @@ def download_firmware():
         bash("git clone https://chromium.googlesource.com/chromiumos/third_party/linux-firmware/ "
              "/tmp/eupnea-build/firmware")
     except URLError:
-        print("\033[91m" + "Couldnt download firmware. Check your internet connection and try again." + "\033[0m")
+        print("\033[91m" + "Couldn't download firmware. Check your internet connection and try again." + "\033[0m")
         bash(f"kill {main_thread_pid}")
 
 
@@ -321,7 +321,7 @@ def extract_rootfs(distro_name: str) -> None:
             # mount fedora raw image
             fedora_root_part = bash("losetup -f --show /tmp/eupnea-build/fedora-raw") + "p5"
             if fedora_root_part == "":
-                print("\033[91m" + "Couldnt mount fedora image with losetup" + "\033[0m")
+                print("\033[91m" + "Couldn't mount fedora image with losetup" + "\033[0m")
                 bash(f"kill {main_thread_pid}")
             bash(
                 f"mount {fedora_root_part} /tmp/eupnea-build/fedora-tmp-mnt")  # return to check for mount errors
@@ -436,6 +436,26 @@ def chroot(command: str) -> str:
 
 
 if __name__ == "__main__":
+    '''
+    # Install arch packages from AUR, before elevating to root
+    if path_exists("/usr/bin/pacman"):
+        if input("Following packages are required to install Eupnea: cgpt-bin and vboot-utils. Install them now? "
+                 "(y/n)").lower() == "y":
+            bash("pacman -S --needed base-devel --noconfirm")
+
+            bash("git clone https://aur.archlinux.org/cgpt-bin.git")
+            bash("cd cgpt-bin && makepkg -sirc --noconfirm")
+
+            bash("git clone https://aur.archlinux.org/vboot-utils.git")
+            bash("cd vboot-utils && makepkg -sirc --noconfirm")
+
+            rmdir("cgpt-bin", keep_dir=False)
+            rmdir("vboot-utils", keep_dir=False)
+        else:
+            print("\033[91m" + "Please install cgpt and vboot-utils and restart the script" + "\033[0m")
+            print("Continuing")
+    '''
+
     # Elevate script to root
     if not os.geteuid() == 0:
         sudo_args = ['sudo', sys.executable] + sys.argv + [os.environ]

@@ -31,7 +31,8 @@ def config(de_name: str, distro_version: str, root_partuuid: str, verbose_var: b
             chroot("apt-get install -y ubuntu-mate-desktop")
         case "xfce":
             print("Installing xfce")
-            chroot("apt-get install -y xubuntu-desktop")
+            chroot("apt-get install -y --no-install-recommends xubuntu-desktop")
+            chroot("apt-get install -y xfce4-goodies")
         case "lxqt":
             print("Installing lxqt")
             chroot("apt-get install -y lubuntu-desktop")
