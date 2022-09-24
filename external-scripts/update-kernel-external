@@ -32,7 +32,10 @@ def prepare_host() -> None:
     print("\033[96m" + "Preparing host system" + "\033[0m")
 
     print("Creating mnt points")
-    bash("umount -lf /mnt/eupnea_rootfs")  # just in case
+    try:
+        bash("umount -lf /mnt/eupnea_rootfs")  # just in case
+    except subprocess.CalledProcessError:
+        pass
     rmdir("/mnt/eupnea_rootfs")
     mkdir("/mnt/eupnea_rootfs")
 
