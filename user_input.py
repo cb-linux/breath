@@ -165,6 +165,13 @@ def user_input() -> Tuple[str, str, str, str, str, str, str, str, bool, bool]:
             if passwd_temp == "":
                 print("\033[93m" + "Password cannot be empty" + "\033[0m")
                 continue
+            # TODO: Fix ) and ( crashing chpasswd
+            elif passwd_temp.find(")") != -1:
+                print("\033[93m" + "Password cannot contain: )" + "\033[0m")
+                continue
+            elif passwd_temp.find("(") != -1:
+                print("\033[93m" + "Password cannot contain: (" + "\033[0m")
+                continue
             else:
                 passwd_temp_2 = getpass("\033[94m" + "Repeat password: " + "\033[0m")
                 if passwd_temp == passwd_temp_2:
