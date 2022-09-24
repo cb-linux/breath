@@ -353,7 +353,7 @@ def post_extract(username: str, password: str, hostname: str, distro_name: str, 
 
     if not (distro_name == "ubuntu" and de_name == "gnome"):  # Ubuntu + gnome has first time setup
         print("Configuring user")
-        chroot(f"useradd --create-home {username}")
+        chroot(f"useradd --create-home --shell /bin/bash {username}")
         chroot(f'echo "{username}:{password}" | chpasswd')
         match distro_name:
             case "ubuntu" | "debian":
