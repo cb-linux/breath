@@ -318,7 +318,7 @@ def extract_rootfs(distro_name: str) -> None:
             bash("unxz -d /tmp/eupnea-build/fedora-rootfs.raw.xz -c > /tmp/eupnea-build/fedora-raw")
 
             # mount fedora raw image
-            fedora_root_part = bash("losetup -f --show /tmp/eupnea-build/fedora-raw") + "p5"
+            fedora_root_part = bash("losetup -P -f --show /tmp/eupnea-build/fedora-raw") + "p5"
             if fedora_root_part == "":
                 print("\033[91m" + "Couldn't mount fedora image with losetup" + "\033[0m")
                 bash(f"kill {main_thread_pid}")
