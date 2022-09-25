@@ -7,42 +7,42 @@ def config(de_name: str, distro_version: str, root_partuuid: str, verbose_var: b
     verbose = verbose_var
 
     print("\033[96m" + "Configuring Fedora" + "\033[0m")
-    print("Installing packages")
+    print("Updating packages")
     chroot("dnf update -y")
-    chroot("dnf install linux-firmware -y")
-    chroot("dnf group install 'Minimal Install' -y")
-    chroot("dnf install NetworkManager-tui ncurses cloud-utils -y")
-    print("Add nonfree repos")
+    
+    print("Installing Core packages")
+    chroot("dnf group install -y 'Core'")
+    
+    print("Installing Hardware Support packages")
+    chroot("dnf group install -y 'Hardware Support'")
+    chroot("dnf group install -y 'Common NetworkManager Submodules'")
+    chroot("dnf install -y linux-firmware")
+    
+    # TODO: Missing the free repos; add extras from a real Fedora install
+    print("Add RPMFusion nonfree repo")
     chroot(f"dnf install https://download1.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-{distro_version}"
            f".noarch.rpm -y")
-    print("Disabling plymouth")  # may fail sometimes without error
-    # Disabling plymouth fails too
-    # chroot("plymouth-set-default-theme details -R &> /dev/null")
+    
     # TODO: Perhaps zram works with mainline?
     chroot("dnf remove zram-generator-defaults -y")  # remove zram as it fails for some reason
     chroot("systemctl disable systemd-zram-setup@zram0.service")  # disable zram service
+    
     print("\033[96m" + "Downloading and installing DE, might take a while" + "\033[0m")
     match de_name:
         case "gnome":
-            print("Installing gnome")
-            # As gnome is not preinstalled on the cloud version, we need to install it "manually"
-            chroot(
-                "dnf install -y @base-x gnome-shell gnome-terminal nautilus firefox gnome-tweaks " +
-                "@development-tools gnome-terminal-nautilus xdg-user-dirs xdg-user-dirs-gtk gnome-calculator " +
-                "gnome-system-monitor gedit file-roller gdm gnome-initial-setup")
-            chroot("systemctl enable gdm.service")
+            print("Installing GNOME")
+            chroot("dnf group install -y 'Fedora Workstation'")
         case "kde":
-            print("Installing kde")
+            print("Installing KDE")
             chroot("dnf group install -y 'KDE Plasma Workspaces'")
-            chroot("systemctl enable sddm.service")
         case "mate":
-            print("Installing mate")
+            print("Installing MATE")
             chroot("dnf group install -y 'MATE Desktop'")
         case "xfce":
-            print("Installing xfce")
+            print("Installing Xfce")
             chroot("dnf group install -y 'Xfce Desktop'")
         case "lxqt":
-            print("Installing lxqt")
+            print("Installing LXQt")
             chroot("dnf group install -y 'LXQt Desktop'")
         case "deepin":
             print("Installing deepin")
@@ -51,10 +51,15 @@ def config(de_name: str, distro_version: str, root_partuuid: str, verbose_var: b
             print("\033[91m" + "Budgie is not available for Fedora" + "\033[91m")
             exit(1)
         case "cli":
-            print("Installing nothing")
+            print("No Desktop Environment will be installed")
         case _:
             print("\033[91m" + "Invalid desktop environment!!! Remove all files and retry." + "\033[0m")
             exit(1)
+    
+    if not de_name == "cli":
+        print("Setting system to boot to gui")
+        chroot("systemctl set-default graphical.target")
+            
     print("Fixing SELinux")
     # Create /.autorelabel to force SELinux to relabel all files
     with open("/mnt/eupnea/.autorelabel", "w") as f:
