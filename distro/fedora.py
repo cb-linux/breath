@@ -23,11 +23,6 @@ def config(de_name: str, distro_version: str, root_partuuid: str, verbose_var: b
     chroot(f"dnf install https://download1.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-{distro_version}"
            f".noarch.rpm -y")
     
-    # TODO: Plymouth is never disabled, so why print it? Also, why disabling it?
-    #print("Disabling plymouth")  # may fail sometimes without error
-    # Disabling plymouth fails too
-    # chroot("plymouth-set-default-theme details -R &> /dev/null")
-    
     # TODO: Perhaps zram works with mainline?
     chroot("dnf remove zram-generator-defaults -y")  # remove zram as it fails for some reason
     chroot("systemctl disable systemd-zram-setup@zram0.service")  # disable zram service
