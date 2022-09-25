@@ -37,27 +37,21 @@ def config(de_name: str, distro_version: str, root_partuuid: str, verbose_var: b
         case "gnome":
             print("Installing GNOME")
             chroot("dnf group install -y 'Fedora Workstation'")
-            chroot("systemctl set-default graphical.target")
         case "kde":
             print("Installing KDE")
             chroot("dnf group install -y 'KDE Plasma Workspaces'")
-            chroot("systemctl set-default graphical.target")
         case "mate":
             print("Installing MATE")
             chroot("dnf group install -y 'MATE Desktop'")
-            chroot("systemctl set-default graphical.target")
         case "xfce":
             print("Installing Xfce")
             chroot("dnf group install -y 'Xfce Desktop'")
-            chroot("systemctl set-default graphical.target")
         case "lxqt":
             print("Installing LXQt")
             chroot("dnf group install -y 'LXQt Desktop'")
-            chroot("systemctl set-default graphical.target")
         case "deepin":
             print("Installing deepin")
             chroot("dnf group install -y 'Deepin Desktop'")
-            chroot("systemctl set-default graphical.target")
         case "budgie":
             print("\033[91m" + "Budgie is not available for Fedora" + "\033[91m")
             exit(1)
@@ -66,6 +60,10 @@ def config(de_name: str, distro_version: str, root_partuuid: str, verbose_var: b
         case _:
             print("\033[91m" + "Invalid desktop environment!!! Remove all files and retry." + "\033[0m")
             exit(1)
+    
+    if not de_name == "cli":
+        print("Setting system to boot to gui")
+        chroot("systemctl set-default graphical.target")
             
     print("Fixing SELinux")
     # Create /.autorelabel to force SELinux to relabel all files
