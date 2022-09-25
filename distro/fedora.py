@@ -7,42 +7,51 @@ def config(de_name: str, distro_version: str, root_partuuid: str, verbose_var: b
     verbose = verbose_var
 
     print("\033[96m" + "Configuring Fedora" + "\033[0m")
-    print("Installing packages")
+    print("Updating packages")
     chroot("dnf update -y")
+    
+    print("Installing Core packages")
     chroot("dnf group install -y 'Core'")
+    
+    print("Installing Hardware Support packages")
     chroot("dnf group install -y 'Hardware Support'")
     chroot("dnf group install -y 'Common NetworkManager Submodules'")
     chroot("dnf install -y linux-firmware")
     
-    print("Add nonfree repos")
+    # TODO: Missing the free repos; add extras from a real Fedora install
+    print("Add RPMFusion nonfree repo")
     chroot(f"dnf install https://download1.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-{distro_version}"
            f".noarch.rpm -y")
-    print("Disabling plymouth")  # may fail sometimes without error
+    
+    # TODO: Plymouth is never disabled, so why print it? Also, why disabling it?
+    #print("Disabling plymouth")  # may fail sometimes without error
     # Disabling plymouth fails too
     # chroot("plymouth-set-default-theme details -R &> /dev/null")
+    
     # TODO: Perhaps zram works with mainline?
     chroot("dnf remove zram-generator-defaults -y")  # remove zram as it fails for some reason
     chroot("systemctl disable systemd-zram-setup@zram0.service")  # disable zram service
+    
     print("\033[96m" + "Downloading and installing DE, might take a while" + "\033[0m")
     match de_name:
         case "gnome":
-            print("Installing gnome")
+            print("Installing GNOME")
             chroot("dnf group install -y 'Fedora Workstation'")
             chroot("systemctl set-default graphical.target")
         case "kde":
-            print("Installing kde")
+            print("Installing KDE")
             chroot("dnf group install -y 'KDE Plasma Workspaces'")
             chroot("systemctl set-default graphical.target")
         case "mate":
-            print("Installing mate")
+            print("Installing MATE")
             chroot("dnf group install -y 'MATE Desktop'")
             chroot("systemctl set-default graphical.target")
         case "xfce":
-            print("Installing xfce")
+            print("Installing Xfce")
             chroot("dnf group install -y 'Xfce Desktop'")
             chroot("systemctl set-default graphical.target")
         case "lxqt":
-            print("Installing lxqt")
+            print("Installing LXQt")
             chroot("dnf group install -y 'LXQt Desktop'")
             chroot("systemctl set-default graphical.target")
         case "deepin":
@@ -53,10 +62,11 @@ def config(de_name: str, distro_version: str, root_partuuid: str, verbose_var: b
             print("\033[91m" + "Budgie is not available for Fedora" + "\033[91m")
             exit(1)
         case "cli":
-            print("Installing nothing")
+            print("No Desktop Environment will be installed")
         case _:
             print("\033[91m" + "Invalid desktop environment!!! Remove all files and retry." + "\033[0m")
             exit(1)
+            
     print("Fixing SELinux")
     # Create /.autorelabel to force SELinux to relabel all files
     with open("/mnt/eupnea/.autorelabel", "w") as f:
