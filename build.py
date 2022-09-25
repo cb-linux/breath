@@ -256,16 +256,12 @@ def download_rootfs(distro_name: str, distro_version: str, distro_link: str) -> 
                 # Debian sometimes fails for no apparent reason, so we try 2 times
                 debian_result = bash(
                     "debootstrap stable /tmp/eupnea-build/debian https://deb.debian.org/debian/")
-                if args.verbose:
-                    print("Result: " + str(debian_result))  # print results for debugging
                 if debian_result.__contains__("Couldn't download packages:"):
                     print("\033[91m\nDebootstrap failed, retrying once\n\033[0m")
                     # delete the failed rootfs
                     rmdir("/tmp/eupnea-build/debian")
                     debian_result = bash(
                         "debootstrap stable /tmp/eupnea-build/debian https://deb.debian.org/debian/")
-                    if args.verbose:
-                        print(f"Result: {debian_result}")  # print results for debugging
                     if debian_result.__contains__("Couldn't download packages:"):
                         print("\033[91m\nDebootstrap failed again, check your internet connection or try again later" +
                               "\033[0m")
@@ -428,10 +424,7 @@ def post_config():
 
 # chroot command
 def chroot(command: str) -> str:
-    output = bash(f'chroot /mnt/eupnea /bin/sh -c "{command}"')
-    if args.verbose:
-        print(output)
-    return output
+    return bash(f'chroot /mnt/eupnea /bin/sh -c "{command}"')
 
 
 if __name__ == "__main__":
@@ -479,6 +472,7 @@ if __name__ == "__main__":
         print("\033[93m" + "Using local path" + "\033[0m")
     if args.verbose:
         print("\033[93m" + "Verbosity increased" + "\033[0m")
+        enable_verbose()  # enable verbose output in functions.py
 
     user_input = user_input.user_input()  # get user input
     prepare_host(user_input[0])

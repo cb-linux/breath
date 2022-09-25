@@ -2,9 +2,8 @@ from functions import *
 
 
 def config(de_name: str, distro_version: str, root_partuuid: str, verbose_var: bool) -> None:
-    # set verbose var
-    global verbose
-    verbose = verbose_var
+    if verbose_var:
+        enable_verbose()  # enable verbose output in functions.py
 
     print("\033[96m" + "Configuring Ubuntu" + "\033[0m")
 
@@ -61,6 +60,7 @@ def config(de_name: str, distro_version: str, root_partuuid: str, verbose_var: b
             pass
         chroot("apt-get remove -y gnome-shell")
         chroot("apt-get autoremove -y")
+
     # TODO: Figure out if removing needrestart is necessary
     chroot("apt-get remove -y needrestart")
     print("Fixing securetty if needed")

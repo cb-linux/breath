@@ -24,6 +24,7 @@ def process_args():
     parser.add_argument("--mainline", action="store_true", dest="mainline", default=False,
                         help="Use mainline linux kernel instead of modified chromeos kernel. Might provide more "
                              "functionality on newer devices.")
+    parser.add_argument("-v", "--verbose", action="store_true", dest="verbose", default=False, help="Print more output")
     return parser.parse_args()
 
 
@@ -172,6 +173,9 @@ if __name__ == "__main__":
     if args.local_path:
         print("\033[93m" + "Using local path" + "\033[0m")
         skip_question = True
+    if args.verbose:
+        print("\033[93m" + "Verbosity increased" + "\033[0m")
+        enable_verbose()  # enable verbose output in functions.py
 
     # get rootfs partition from user
     bash("lsblk -o NAME,LABEL,SIZE")

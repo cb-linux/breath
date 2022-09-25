@@ -2,6 +2,8 @@
 from pathlib import Path
 import subprocess
 
+verbose = False
+
 
 #######################################################################################
 #                               PATHLIB FUNCTIONS                                     #
@@ -16,7 +18,7 @@ def rmdir(rm_dir: str, keep_dir: bool = True) -> None:
                 else:
                     unlink_files(path_to_rm)
         except FileNotFoundError:
-            # Directory doesn't exist
+            print(f"No such file or directory: {path_to_rm.absolute().as_posix()}")
             return
 
     # convert string to Path object
@@ -24,7 +26,7 @@ def rmdir(rm_dir: str, keep_dir: bool = True) -> None:
     try:
         unlink_files(rm_dir_as_path)
     except RecursionError:  # python doesn't work for folders with a lot of subfolders
-        print("\033[93m" + f"Failed to remove {rm_dir}, using bash" + "\033[0m")
+        print("\033[93m" + f"Failed to remove {rm_dir} with python, using bash" + "\033[0m")
         bash(f"rm -rf {rm_dir_as_path.absolute().as_posix()}")
     # Remove emtpy directory
     if not keep_dir:
@@ -75,8 +77,7 @@ def cpdir(root_src: str, root_dst: str) -> None:  # dst_dir must be a full path,
                     new_dst = dst.joinpath(src_file.stem + src_file.suffix)
                     copy_files(src_file, new_dst)
                 else:
-                    print("Not a file or directory?")
-                    print(src_file.absolute().as_posix())
+                    print(f"No such file or directory: {src_file.absolute().as_posix()}")
 
     src_as_path = Path(root_src)
     dst_as_path = Path(root_dst)
@@ -108,4 +109,16 @@ def cpfile(src: str, dst: str) -> None:  # "/etc/resolv.conf", "/mnt/eupnea/etc/
 
 # return the output of a command
 def bash(command: str) -> str:
-    return subprocess.check_output(command, shell=True, text=True).strip()
+    output = subprocess.check_output(command, shell=True, text=True).strip()
+    if verbose:
+        print(output)
+    return output
+
+
+#######################################################################################
+#                               MISC STUFF                                            #
+#######################################################################################
+
+def enable_verbose() -> None:
+    global verbose
+    verbose = True

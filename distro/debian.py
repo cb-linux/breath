@@ -2,9 +2,8 @@ from functions import *
 
 
 def config(de_name: str, distro_version: str, root_partuuid: str, verbose_var: bool) -> None:
-    # set verbose var
-    global verbose
-    verbose = verbose_var
+    if verbose_var:
+        enable_verbose()  # enable verbose output in functions.py
 
     print("\033[96m" + "Configuring Ubuntu" + "\033[0m")
 
@@ -52,10 +51,12 @@ def config(de_name: str, distro_version: str, root_partuuid: str, verbose_var: b
         case _:
             print("\033[91m" + "Invalid desktop environment!!! Remove all files and retry." + "\033[0m")
             exit(1)
+
     # Ignore libfprint-2-2 fprintd libpam-fprintd errors
     if not de_name == "cli":
         print("Setting system to boot to gui")
         chroot("systemctl set-default graphical.target")
+
     # GDM3 auto installs gnome-minimal. Gotta remove it if user didnt choose gnome
     if not de_name == "gnome":
         print("Fixing gdm3")

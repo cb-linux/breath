@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import os
+import sys
 from urllib.request import urlopen
 from urllib.error import URLError
 import argparse
@@ -20,6 +21,7 @@ def process_args():
                         help="New, full kernel command line in quotes, example: \n"
                              + r'modify-cmdline "console=tty1 root=PARTUUID=7d83c214-289e-4e8b-93cc-685aea502'
                                r'f59 i915.modeset=1 rootwait rw fbcon=logo-pos:center,logo-count:1 loglevel=0 splash"')
+    parser.add_argument("-v", "--verbose", action="store_true", dest="verbose", default=False, help="Print more output")
     return parser.parse_args()
 
 
@@ -48,6 +50,9 @@ if __name__ == '__main__':
     if args.show:
         print("Current command line:\n" + "\033[96m" + bash("cat /proc/cmdline") + "\033[0m")
         exit(1)
+    if args.verbose:
+        print("\033[93m" + "Verbosity increased" + "\033[0m")
+        enable_verbose()  # enable verbose output in functions.py
 
     print("Reading partition table")
     partitions = bash("mount | grep ' / ' | cut -d' ' -f 1")
