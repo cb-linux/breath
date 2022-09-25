@@ -27,7 +27,7 @@ def config(de_name: str, distro_version: str, root_partuuid: str, verbose_var: b
     match de_name:
         case "gnome":
             print("Installing gnome")
-            chroot("dnf group install -y 'Fedora Workstation'"
+            chroot("dnf group install -y 'Fedora Workstation'")
             chroot("systemctl set-default graphical.target")
         case "kde":
             print("Installing kde")
