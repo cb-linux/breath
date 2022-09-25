@@ -18,8 +18,10 @@ from functions import *
 def process_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('-p', '--local-path', dest="local_path",
-                        help="Local path for kernel files, to use instead of downloading from github." +
-                             "(Unsigned kernels only)")
+                        help="Use local files, instead of downloading from the internet (not recommended). Required "
+                             "files: bzImage, modules.tar.xz, folder with firmware(named 'firmware'), Rootfs: "
+                             "ubuntu-rootfs.tar.xz or arch-rootfs.tar.gz or fedora-rootfs.raw.xz or pre-debootstrapped "
+                             "folder(named 'debian')")
     parser.add_argument("--dev", action="store_true", dest="dev_build", default=False,
                         help="Use latest dev build. May be unstable.")
     parser.add_argument("--alt", action="store_true", dest="alt", default=False,
@@ -428,7 +430,6 @@ def chroot(command: str) -> str:
 
 
 if __name__ == "__main__":
-    '''
     # Install arch packages from AUR, before elevating to root
     if path_exists("/usr/bin/pacman"):
         if input("Following packages are required to install Eupnea: cgpt-bin and vboot-utils. Install them now? "
@@ -436,6 +437,7 @@ if __name__ == "__main__":
             bash("pacman -S --needed base-devel --noconfirm")
 
             bash("git clone https://aur.archlinux.org/cgpt-bin.git")
+            cpfile("configs/PKGBUILD", "cgpt-bin/PKGBUILD")
             bash("cd cgpt-bin && makepkg -sirc --noconfirm")
 
             bash("git clone https://aur.archlinux.org/vboot-utils.git")
@@ -446,7 +448,6 @@ if __name__ == "__main__":
         else:
             print("\033[91m" + "Please install cgpt and vboot-utils and restart the script" + "\033[0m")
             print("Continuing")
-    '''
 
     # Elevate script to root
     if not os.geteuid() == 0:
@@ -469,7 +470,7 @@ if __name__ == "__main__":
         print("\033[93m" + "Using mainline kernel" + "\033[0m")
         kernel_type = "mainline"
     if args.local_path:
-        print("\033[93m" + "Using local path" + "\033[0m")
+        print("\033[93m" + "Using local files" + "\033[0m")
     if args.verbose:
         print("\033[93m" + "Verbosity increased" + "\033[0m")
         enable_verbose()  # enable verbose output in functions.py
@@ -478,7 +479,7 @@ if __name__ == "__main__":
     prepare_host(user_input[0])
 
     if args.local_path is None:
-        # Print download progress in terminal
+        # Print kernel download progress in terminal
         kernel_download = Thread(target=download_kernel, daemon=True)
         kernel_download.start()
         sleep(1)  # wait for thread to print info
@@ -486,14 +487,45 @@ if __name__ == "__main__":
             print(".", end="", flush=True)
             sleep(1)
         print("")  # break line
-    else:  # if local path is specified, copy kernel from there
+
+        # Print rootfs download progress in terminal
+        rootfs_download = Thread(target=download_rootfs, args=(user_input[0], user_input[1], user_input[2],),
+                                 daemon=True)
+        rootfs_download.start()
+        sleep(1)  # wait for thread to print info
+        while rootfs_download.is_alive():
+            print(".", end="", flush=True)
+            sleep(1)
+        print("")  # break line
+
+        # Download firmware
+        download_firmware()
+
+    else:  # if local path is specified, copy files from there
         if not args.local_path.endswith("/"):
-            kernel_path = f"{args.local_path}/"
+            local_path_posix = f"{args.local_path}/"
         else:
-            kernel_path = args.local_path
-        print("\033[96m" + "Using local kernel files" + "\033[0m")
-        cpfile(f"{kernel_path}bzImage", "/tmp/eupnea-build/bzImage")
-        cpfile(f"{kernel_path}modules.tar.xz", "/tmp/eupnea-build/modules.tar.xz")
+            local_path_posix = args.local_path
+        print("\033[96m" + "Copying local files to tmp" + "\033[0m")
+        try:
+            cpfile(f"{local_path_posix}bzImage", "/tmp/eupnea-build/bzImage")
+            cpfile(f"{local_path_posix}modules.tar.xz", "/tmp/eupnea-build/modules.tar.xz")
+            cpdir(f"{local_path_posix}firmware", "/mnt/eupnea/lib/firmware/google")
+            match user_input[0]:
+                case "ubuntu":
+                    cpfile(f"{local_path_posix}ubuntu-rootfs.tar.xz", "/tmp/eupnea-build/ubuntu-rootfs.tar.xz")
+                case "debian":
+                    cpdir(f"{local_path_posix}debian", "/tmp/eupnea-build/debian")
+                case "arch":
+                    cpfile(f"{local_path_posix}arch-rootfs.tar.gz", "/tmp/eupnea-build/arch-rootfs.tar.gz")
+                case "fedora":
+                    cpfile(f"{local_path_posix}fedora-rootfs.raw.xz", "/tmp/eupnea-build/fedora-rootfs.raw.xz")
+                case _:
+                    print("\033[91m" + "Something went **really** wrong!!! (Distro name not found)" + "\033[0m")
+                    exit(1)
+        except FileNotFoundError:
+            print("\033[91m" + "Local rootfs file not found, please verify the file name is correct" + "\033[0m")
+            exit(1)
 
     if user_input[9]:
         output_temp = prepare_img()
@@ -503,17 +535,6 @@ if __name__ == "__main__":
         output_temp = prepare_usb(user_input[4])
         img_mnt = output_temp[0]
         root_partuuid = output_temp[1]
-
-    # Print download progress in terminal
-    rootfs_download = Thread(target=download_rootfs, args=(user_input[0], user_input[1], user_input[2],), daemon=True)
-    rootfs_download.start()
-    sleep(1)  # wait for thread to print info
-    while rootfs_download.is_alive():
-        print(".", end="", flush=True)
-        sleep(1)
-    print("")  # break line
-
-    download_firmware()
 
     extract_rootfs(user_input[0])
     post_extract(user_input[5], user_input[6], user_input[7], user_input[0], user_input[3])
