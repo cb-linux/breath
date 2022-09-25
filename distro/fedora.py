@@ -9,9 +9,11 @@ def config(de_name: str, distro_version: str, root_partuuid: str, verbose_var: b
     print("\033[96m" + "Configuring Fedora" + "\033[0m")
     print("Installing packages")
     chroot("dnf update -y")
-    chroot("dnf install linux-firmware -y")
-    chroot("dnf group install 'Minimal Install' -y")
-    chroot("dnf install NetworkManager-tui ncurses cloud-utils -y")
+    chroot("dnf group install -y 'Core'")
+    chroot("dnf group install -y 'Hardware Support'")
+    chroot("dnf group install -y 'Common NetworkManager Submodules'")
+    chroot("dnf install -y linux-firmware")
+    
     print("Add nonfree repos")
     chroot(f"dnf install https://download1.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-{distro_version}"
            f".noarch.rpm -y")
@@ -25,28 +27,28 @@ def config(de_name: str, distro_version: str, root_partuuid: str, verbose_var: b
     match de_name:
         case "gnome":
             print("Installing gnome")
-            # As gnome is not preinstalled on the cloud version, we need to install it "manually"
-            chroot(
-                "dnf install -y @base-x gnome-shell gnome-terminal nautilus firefox gnome-tweaks " +
-                "@development-tools gnome-terminal-nautilus xdg-user-dirs xdg-user-dirs-gtk gnome-calculator " +
-                "gnome-system-monitor gedit file-roller gdm gnome-initial-setup")
-            chroot("systemctl enable gdm.service")
+            chroot("dnf group install -y 'Fedora Workstation'"
+            chroot("systemctl set-default graphical.target")
         case "kde":
             print("Installing kde")
             chroot("dnf group install -y 'KDE Plasma Workspaces'")
-            chroot("systemctl enable sddm.service")
+            chroot("systemctl set-default graphical.target")
         case "mate":
             print("Installing mate")
             chroot("dnf group install -y 'MATE Desktop'")
+            chroot("systemctl set-default graphical.target")
         case "xfce":
             print("Installing xfce")
             chroot("dnf group install -y 'Xfce Desktop'")
+            chroot("systemctl set-default graphical.target")
         case "lxqt":
             print("Installing lxqt")
             chroot("dnf group install -y 'LXQt Desktop'")
+            chroot("systemctl set-default graphical.target")
         case "deepin":
             print("Installing deepin")
             chroot("dnf group install -y 'Deepin Desktop'")
+            chroot("systemctl set-default graphical.target")
         case "budgie":
             print("\033[91m" + "Budgie is not available for Fedora" + "\033[91m")
             exit(1)
