@@ -76,6 +76,7 @@ def config(de_name: str, distro_version: str, root_partuuid: str, verbose_var: b
     with open("/mnt/eupnea/etc/os-release", "r") as f:
         os_release = f.read()
     os_release = os_release.replace("Cloud Edition Prerelease", "Eupnea")
+    os_release = os_release.replace("Cloud Edition", "Eupnea")
     with open("/mnt/eupnea/etc/os-release", "w") as f:
         f.write(os_release)
 
