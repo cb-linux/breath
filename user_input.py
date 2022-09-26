@@ -65,7 +65,7 @@ def user_input() -> Tuple[str, str, str, str, str, str, str, str, bool, bool]:
                     if temp_input == "":
                         # remove rawhide, then get highest version number
                         temp_fedora_dict = distros["fedora"]
-                        temp_fedora_dict.pop("rawhide")
+                        temp_fedora_dict.pop("Rawhide")
                         distro_version = max(temp_fedora_dict)
                         distro_link = distros["fedora"][distro_version]
                         print("Using Fedora version: " + distro_version)
