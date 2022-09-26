@@ -18,7 +18,7 @@ def rmdir(rm_dir: str, keep_dir: bool = True) -> None:
                 else:
                     unlink_files(path_to_rm)
         except FileNotFoundError:
-            print(f"No such file or directory: {path_to_rm.absolute().as_posix()}")
+            print(f"No such file or directory: {path_to_rm.absolute().as_posix()}, ignoring")
             return
 
     # convert string to Path object
@@ -32,8 +32,7 @@ def rmdir(rm_dir: str, keep_dir: bool = True) -> None:
     if not keep_dir:
         try:
             rm_dir_as_path.rmdir()
-        except FileNotFoundError:
-            # Directory doesn't exist
+        except FileNotFoundError:  # Directory doesn't exist, because bash was used
             return
 
 
@@ -77,11 +76,12 @@ def cpdir(root_src: str, root_dst: str) -> None:  # dst_dir must be a full path,
                     new_dst = dst.joinpath(src_file.stem + src_file.suffix)
                     copy_files(src_file, new_dst)
                 else:
-                    print(f"No such file or directory: {src_file.absolute().as_posix()}")
+                    print(f"No such file or directory: {src_file.absolute().as_posix()}, ignoring")
 
     src_as_path = Path(root_src)
     dst_as_path = Path(root_dst)
     if src_as_path.exists():
+        # TODO: Fix python copy dir
         '''
         try:
             copy_files(src_as_path, dst_as_path)
@@ -100,7 +100,7 @@ def cpfile(src: str, dst: str) -> None:  # "/etc/resolv.conf", "/mnt/eupnea/etc/
     if src_as_path.exists():
         dst_as_path.write_bytes(src_as_path.read_bytes())
     else:
-        print("Source file does not exist?")
+        print(f"{src} does not exist, ignoring")
 
 
 #######################################################################################

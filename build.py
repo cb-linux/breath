@@ -62,29 +62,12 @@ def prepare_host(de_name: str) -> None:
 
     print("Installing necessary packages")
     # install cgpt and futility
+    # TODO: Properly check if packages are installed
     if path_exists("/usr/bin/apt"):
         bash("apt-get install cgpt vboot-kernel-utils -y")
-    elif path_exists("/usr/bin/pacman"):
-        print("\033[91m" + "Please install cgpt and vboot-utils using AUR" + "\033[0m")
-        # temporarily disable aur
-        '''
-        bash("pacman -S --needed base-devel --noconfirm")
-
-        bash("git clone https://aur.archlinux.org/cgpt-bin.git")
-        bash("cd cgpt-bin && makepkg -sirc --noconfirm")
-
-        bash("git clone https://aur.archlinux.org/vboot-utils.git")
-        bash("cd vboot-utils && makepkg -sirc --noconfirm")
-
-        rmdir("cgpt-bin", keep_dir=False)
-        rmdir("vboot-utils", keep_dir=False)
-        '''
+    # arch packages are installed before elevating to root
     elif path_exists("/usr/bin/dnf"):
         bash("dnf install cgpt vboot-utils --assumeyes")
-    else:
-        print("\033[91mcgpt and vboot-utils(futility) not found, please install them using your distros package manager"
-              + "\033[0m")
-        exit(1)
 
     # install debootstrap for debian
     if de_name == "debian":
@@ -390,11 +373,8 @@ def post_extract(username: str, password: str, hostname: str, distro_name: str, 
         conf.write("SuspendState=freeze\nHibernateState=freeze")
 
     print("Adding kernel modules")
-    # open kernel-modules.txt and then append read modules to the Eupnea file
-    with open("configs/kernel-modules.txt", "r") as repo_file:
-        modules = repo_file.read()
-    with open("/mnt/eupnea/etc/modules", "a") as conf:
-        conf.write(modules)
+    # Enable loading modules needed for eupnea
+    cpfile("configs/eupnea-modules.conf", "/mnt/eupnea/etc/modules-load.d/eupnea-modules.conf")
 
     # TODO: Fix failing services
     # The services below fail to start, so they are disabled
@@ -420,7 +400,7 @@ def post_config():
 
     # copy previously downloaded firmware
     print("Copying google firmware")
-    rmdir("/mnt/eupnea/lib/firmware/google")
+    rmdir("/mnt/eupnea/lib/firmware")
     cpdir("/tmp/eupnea-build/firmware", "/mnt/eupnea/lib/firmware")
 
 
