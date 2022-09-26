@@ -52,11 +52,12 @@ def prepare_host(de_name: str) -> None:
     try:
         bash("umount -lf /mnt/eupnea 2>/dev/null")  # just in case
     except subprocess.CalledProcessError:
+        print("Failed to unmount /mnt/eupnea, ignoring")
         pass
     rmdir("/mnt/eupnea")
     mkdir("/mnt/eupnea", True)
 
-    print("Remove old files if they exist")
+    print("Removing old files if they exist")
     rmfile("eupnea.img")
     rmfile("kernel.flags")
 

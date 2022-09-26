@@ -62,7 +62,7 @@ def get_full_path(path: str) -> str:
 
 
 # recursively copy files from a dir into another dir
-def cpdir(root_src: str, root_dst: str) -> None:  # dst_dir must be a full path, including the new dir name
+def cpdir(src_as_str: str, dst_as_string: str) -> None:  # dst_dir must be a full path, including the new dir name
     def copy_files(src: Path, dst: Path) -> None:
         # create dst dir if it doesn't exist
         print(f"Copying {src} to {dst}")
@@ -78,9 +78,11 @@ def cpdir(root_src: str, root_dst: str) -> None:  # dst_dir must be a full path,
                 else:
                     print(f"No such file or directory: {src_file.absolute().as_posix()}, ignoring")
 
-    src_as_path = Path(root_src)
-    dst_as_path = Path(root_dst)
+    src_as_path = Path(src_as_str)
+    dst_as_path = Path(dst_as_string)
     if src_as_path.exists():
+        if not dst_as_path.exists():
+            mkdir(dst_as_string)
         # TODO: Fix python copy dir
         '''
         try:
