@@ -23,3 +23,6 @@
 This project uses a slightly modified ChromeOS Kernel and firmware. All devices supported in ChromeOS work in Eupnea. Due to licensing restraints, Eupnea cannot be distributed as an iso. Instead, it has to be build locally on the device.  
 
 [Read more](https://eupnea-linux.github.io/docs.html#/dev-pages/build-script)
+
+## GUI
+Coming soon:tm:
