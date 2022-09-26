@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-
 import os
 import sys
 from typing import Tuple
@@ -526,3 +524,7 @@ def start_build(args, build_options):
         print("\033[95m" + f"The ready Eupnea image is located at {get_full_path('.')}/eupnea.img" + "\033[0m")
     else:
         print("\033[95m" + "The USB is ready to boot Eupnea. " + "\033[0m")
+
+
+if __name__ == "__main__":
+    print("\033[91m" + "Do not run this file directly. Instead, run main.py" + "\033[0m")

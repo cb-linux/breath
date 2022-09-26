@@ -1,4 +1,6 @@
+#!/usr/bin/env python3
 # This script will later become the gui. For now, it's a simple wrapper for the build script.
+
 import argparse
 import sys
 
@@ -27,7 +29,7 @@ def process_args():
     return parser.parse_args()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     # Check python version
     if sys.version_info < (3, 10):  # python 3.10 or higher is required
         if path_exists("/usr/bin/apt"):
@@ -56,3 +58,4 @@ if __name__ == '__main__':
     args = process_args()
     user_input = user_input.user_input()
     build = build.start_build(user_input, args)
+
