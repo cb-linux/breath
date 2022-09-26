@@ -479,9 +479,10 @@ def start_build(verbose: bool, local_path: str, kernel_type: str, dev_release: b
         case "fedora":
             import distro.fedora as distro
         case _:
-            print("\033[91m" + "Something went **really** wrong!!! (Distro name not found)" + "\033[0m")
-            exit(1)
-    distro.config(build_options[3], build_options[1], root_partuuid, verbose)
+            # Just in case
+            print("\033[91m" + "DISTRO NAME NOT FOUND! Selecting Ubuntu as fallback" + "\033[0m")
+            import distro.ubuntu as distro
+    distro.config(build_options[3], build_options[1], root_partuuid)
 
     post_config(build_options[8])
 
