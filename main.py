@@ -1,4 +1,4 @@
-# This script will later become the gui. For now it's a simple wrapper for the build script.
+# This script will later become the gui. For now, it's a simple wrapper for the build script.
 import argparse
 import sys
 
