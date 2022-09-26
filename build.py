@@ -1,7 +1,5 @@
 #!/usr/bin/env python3
 
-import os
-import sys
 from typing import Tuple
 from urllib.request import urlretrieve
 from urllib.error import URLError
@@ -44,7 +42,24 @@ def prepare_host(de_name: str) -> None:
     # TODO: Properly check if packages are installed
     if path_exists("/usr/bin/apt"):
         bash("apt-get install cgpt vboot-kernel-utils -y")
-    # arch packages are installed before elevating to root
+    # TODO: add useruuid thing
+    if path_exists("/usr/bin/pacman"):
+        if input("Following packages are required to install Eupnea: cgpt-bin and vboot-utils. Install them now? "
+                 "(y/n)").lower() == "y":
+            bash("pacman -S --needed base-devel --noconfirm")
+
+            bash("git clone https://aur.archlinux.org/cgpt-bin.git")
+            cpfile("configs/PKGBUILD", "cgpt-bin/PKGBUILD")
+            bash("cd cgpt-bin && makepkg -sirc --noconfirm")
+
+            bash("git clone https://aur.archlinux.org/vboot-utils.git")
+            bash("cd vboot-utils && makepkg -sirc --noconfirm")
+
+            rmdir("cgpt-bin", keep_dir=False)
+            rmdir("vboot-utils", keep_dir=False)
+        else:
+            print("\033[91m" + "Please install cgpt and vboot-utils and restart the script" + "\033[0m")
+            print("Continuing")
     elif path_exists("/usr/bin/dnf"):
         bash("dnf install cgpt vboot-utils --assumeyes")
 
@@ -389,58 +404,12 @@ def chroot(command: str) -> str:
 
 
 # The main build script
-def start_build(args, build_options):
-    # Install arch packages from AUR, before elevating to root
-    if path_exists("/usr/bin/pacman"):
-        if input("Following packages are required to install Eupnea: cgpt-bin and vboot-utils. Install them now? "
-                 "(y/n)").lower() == "y":
-            bash("pacman -S --needed base-devel --noconfirm")
-
-            bash("git clone https://aur.archlinux.org/cgpt-bin.git")
-            cpfile("configs/PKGBUILD", "cgpt-bin/PKGBUILD")
-            bash("cd cgpt-bin && makepkg -sirc --noconfirm")
-
-            bash("git clone https://aur.archlinux.org/vboot-utils.git")
-            bash("cd vboot-utils && makepkg -sirc --noconfirm")
-
-            rmdir("cgpt-bin", keep_dir=False)
-            rmdir("vboot-utils", keep_dir=False)
-        else:
-            print("\033[91m" + "Please install cgpt and vboot-utils and restart the script" + "\033[0m")
-            print("Continuing")
-
-    # Elevate script to root
-    if not os.geteuid() == 0:
-        sudo_args = ['sudo', sys.executable] + sys.argv + [os.environ]
-        os.execlpe('sudo', *sudo_args)
-
-    main_thread_pid = os.getpid()  # for threads to be able to kill main thread
-
-    dev_release = False
-    kernel_type = "stable"
-    if args.dev_build:
-        print("\033[93m" + "Using dev release" + "\033[0m")
-        dev_release = True
-    if args.alt:
-        print("\033[93m" + "Using alt kernel" + "\033[0m")
-        kernel_type = "alt"
-    if args.exp:
-        print("\033[93m" + "Using experimental kernel" + "\033[0m")
-        kernel_type = "exp"
-    if args.mainline:
-        print("\033[93m" + "Using mainline kernel" + "\033[0m")
-        kernel_type = "mainline"
-    if args.local_path:
-        print("\033[93m" + "Using local files" + "\033[0m")
-    if args.verbose:
-        print("\033[93m" + "Verbosity increased" + "\033[0m")
-        enable_verbose()  # enable verbose output in functions.py
-
+def start_build(verbose: bool, local_path: str, kernel_type: str, dev_release: bool, main_pid, build_options):
     prepare_host(build_options[0])
 
-    if args.local_path is None:
+    if local_path is None:
         # Print kernel download progress in terminal
-        kernel_download = Thread(target=download_kernel, args=(kernel_type, dev_release, main_thread_pid,), daemon=True)
+        kernel_download = Thread(target=download_kernel, args=(kernel_type, dev_release, main_pid,), daemon=True)
         kernel_download.start()
         sleep(1)  # wait for thread to print info
         while kernel_download.is_alive():
@@ -450,7 +419,7 @@ def start_build(args, build_options):
 
         # Print rootfs download progress in terminal
         rootfs_download = Thread(target=download_rootfs,
-                                 args=(build_options[0], build_options[1], build_options[2], main_thread_pid,),
+                                 args=(build_options[0], build_options[1], build_options[2], main_pid,),
                                  daemon=True)
         rootfs_download.start()
         sleep(1)  # wait for thread to print info
@@ -460,13 +429,13 @@ def start_build(args, build_options):
         print("")  # break line
 
         # Download firmware
-        download_firmware(main_thread_pid)
+        download_firmware(main_pid)
 
     else:  # if local path is specified, copy files from there
-        if not args.local_path.endswith("/"):
-            local_path_posix = f"{args.local_path}/"
+        if not local_path.endswith("/"):
+            local_path_posix = f"{local_path}/"
         else:
-            local_path_posix = args.local_path
+            local_path_posix = local_path
         print("\033[96m" + "Copying local files to tmp" + "\033[0m")
         try:
             cpfile(f"{local_path_posix}bzImage", "/tmp/eupnea-build/bzImage")
@@ -497,7 +466,7 @@ def start_build(args, build_options):
         img_mnt = output_temp[0]
         root_partuuid = output_temp[1]
 
-    extract_rootfs(build_options[0], main_thread_pid)
+    extract_rootfs(build_options[0], main_pid)
     post_extract(build_options[5], build_options[6], build_options[7], build_options[0], build_options[3], kernel_type)
 
     match build_options[0]:
@@ -512,7 +481,7 @@ def start_build(args, build_options):
         case _:
             print("\033[91m" + "Something went **really** wrong!!! (Distro name not found)" + "\033[0m")
             exit(1)
-    distro.config(build_options[3], build_options[1], root_partuuid, args.verbose)
+    distro.config(build_options[3], build_options[1], root_partuuid, verbose)
 
     post_config(build_options[8])
 

@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 # This script will later become the gui. For now, it's a simple wrapper for the build script.
 
-import argparse
 import sys
+import os
+import argparse
 
 import build
 import user_input
@@ -30,6 +31,11 @@ def process_args():
 
 
 if __name__ == "__main__":
+    # Elevate script to root
+    if not os.geteuid() == 0:
+        sudo_args = ['sudo', sys.executable] + sys.argv + [os.environ]
+        os.execlpe('sudo', *sudo_args)
+
     # Check python version
     if sys.version_info < (3, 10):  # python 3.10 or higher is required
         if path_exists("/usr/bin/apt"):
@@ -55,7 +61,27 @@ if __name__ == "__main__":
             print("Please run the script with python 3.10 or higher")
             exit(1)
 
+    # parse arguments
     args = process_args()
-    user_input = user_input.user_input()
-    build = build.start_build(user_input, args)
-
+    dev_release = False
+    verbose = False
+    kernel_type = "stable"
+    if args.dev_build:
+        print("\033[93m" + "Using dev release" + "\033[0m")
+        dev_release = True
+    if args.alt:
+        print("\033[93m" + "Using alt kernel" + "\033[0m")
+        kernel_type = "alt"
+    if args.exp:
+        print("\033[93m" + "Using experimental kernel" + "\033[0m")
+        kernel_type = "exp"
+    if args.mainline:
+        print("\033[93m" + "Using mainline kernel" + "\033[0m")
+        kernel_type = "mainline"
+    if args.local_path:
+        print("\033[93m" + "Using local files" + "\033[0m")
+    if args.verbose:
+        print("\033[93m" + "Verbosity increased" + "\033[0m")
+        verbose = True
+    build = build.start_build(verbose, local_path=args.local_path, kernel_type=kernel_type, dev_release=dev_release,
+                              main_pid=os.getpid(), build_options=user_input.user_input())

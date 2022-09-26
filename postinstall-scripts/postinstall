@@ -13,7 +13,7 @@ if __name__ == "__main__":
     # read root partition mount
     root_part = bash("mount | grep ' / ' | cut -d' ' -f 1")
     root_part = root_part[:-1]  # get device "name"
-    bash(f"growpart {root_part} 2")
+    bash(f"growpart {root_part} 2 2>/dev/null")
 
     # Device specific things:
     match bash("sudo dmidecode --string system-product-name").lower():
