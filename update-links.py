@@ -14,6 +14,7 @@ if __name__ == '__main__':
 
     print("\033[96m" + "Getting version numbers" + "\033[0m")
     for version in distros_dict["fedora"]:
+        print(f"https://kojipkgs.fedoraproject.org/packages/Fedora-Cloud-Base/{version}/")
         urlretrieve(f"https://kojipkgs.fedoraproject.org/packages/Fedora-Cloud-Base/{version}/",
                     f"fedora_link.html")
         with open(f"fedora_link.html", 'r') as file:
