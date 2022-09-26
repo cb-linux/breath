@@ -1,7 +1,10 @@
 from functions import *
 
 
-def config(de_name: str, distro_version: str, root_partuuid: str) -> None:
+def config(de_name: str, distro_version: str, root_partuuid: str, verbose_var: bool) -> None:
+    if verbose_var:
+        enable_verbose()  # enable verbose output in functions.py
+
     print("\033[96m" + "Configuring Arch" + "\033[0m")
 
     print("Uncomment arch mirror")

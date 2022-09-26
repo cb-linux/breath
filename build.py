@@ -405,6 +405,9 @@ def chroot(command: str) -> str:
 
 # The main build script
 def start_build(verbose: bool, local_path: str, kernel_type: str, dev_release: bool, main_pid, build_options):
+    if verbose:
+        enable_verbose()
+
     prepare_host(build_options[0])
 
     if local_path is None:
@@ -482,7 +485,7 @@ def start_build(verbose: bool, local_path: str, kernel_type: str, dev_release: b
             # Just in case
             print("\033[91m" + "DISTRO NAME NOT FOUND! Selecting Ubuntu as fallback" + "\033[0m")
             import distro.ubuntu as distro
-    distro.config(build_options[3], build_options[1], root_partuuid)
+    distro.config(build_options[3], build_options[1], root_partuuid, verbose)
 
     post_config(build_options[8])
 
