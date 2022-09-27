@@ -262,7 +262,7 @@ def download_rootfs(distro_name: str, distro_version: str, distro_link: str, mai
 def download_firmware(main_pid: int) -> None:
     print("Downloading firmware")
     try:
-        bash("git clone https://chromium.googlesource.com/chromiumos/third_party/linux-firmware/ "
+        bash("git clone --depth=1 https://chromium.googlesource.com/chromiumos/third_party/linux-firmware/ "
              "/tmp/eupnea-build/firmware")
     except URLError:
         print("\033[91m" + "Couldn't download firmware. Check your internet connection and try again." + "\033[0m")

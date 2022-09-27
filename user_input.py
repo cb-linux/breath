@@ -223,7 +223,6 @@ def user_input() -> Tuple[str, str, str, str, str, str, str, str, bool, bool]:
                 print(line[:-3])
                 found_usb = True
         if not found_usb:
-            print("No USB devices found")
             print("\033[92m" + 'No available USBs/SD-cards found. Building image file.' + "\033[0m" + "\n")
             device = "image"
         else:

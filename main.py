@@ -43,7 +43,8 @@ if __name__ == "__main__":
                 print("Switching to unstable channel")
                 # switch to unstable channel
                 with open("/etc/apt/sources.list", "r") as file:
-                    sources = file.readlines()
+                    original_sources = file.readlines()
+                sources = original_sources
                 sources[1] = sources[1].replace("bullseye", "unstable")
                 with open("/etc/apt/sources.list", "w") as file:
                     file.writelines(sources)
@@ -54,7 +55,11 @@ if __name__ == "__main__":
                 bash("apt-get install -y python3")
                 print("Python 3.10 installed")
 
-                print("\033[92m" + 'Please restart the script with: "python3 ./main.py"' + "\033[0m")
+                # revert to stable channel
+                with open("/etc/apt/sources.list", "w") as file:
+                    file.writelines(original_sources)
+
+                print("\033[92m" + 'Please restart the script with: "./main.py"' + "\033[0m")
                 exit(1)
 
             else:
