@@ -11,7 +11,7 @@ from functions import *
 
 
 # Clean /tmp from eupnea files
-def prepare_host(de_name: str) -> None:
+def prepare_host(de_name: str, user_id: str) -> None:
     print("\033[96m" + "Preparing host system" + "\033[0m")
 
     # umount fedora temp if exists
@@ -42,26 +42,20 @@ def prepare_host(de_name: str) -> None:
     # TODO: Properly check if packages are installed
     if path_exists("/usr/bin/apt"):
         bash("apt-get install cgpt vboot-kernel-utils -y")
-    # TODO: add useruuid thing
     if path_exists("/usr/bin/pacman"):
-        if input("Following packages are required to install Eupnea: cgpt-bin and vboot-utils. Install them now? "
-                 "(y/n)").lower() == "y":
-            bash("pacman -S --needed base-devel --noconfirm")
+        bash("pacman -S --needed base-devel --noconfirm")
 
-            bash("git clone https://aur.archlinux.org/cgpt-bin.git")
-            cpfile("configs/PKGBUILD", "cgpt-bin/PKGBUILD")
-            bash("cd cgpt-bin && makepkg -sirc --noconfirm")
+        bash("git clone https://aur.archlinux.org/cgpt-bin.git")
+        cpfile("configs/PKGBUILD", "cgpt-bin/PKGBUILD")  # Using custom PKGBUILD as the one in the AUR is broken
+        bash(f'su -c "cd cgpt-bin && makepkg -sirc --noconfirm" {user_id}')  # makepkg doesnt run as root
 
-            bash("git clone https://aur.archlinux.org/vboot-utils.git")
-            bash("cd vboot-utils && makepkg -sirc --noconfirm")
+        bash("git clone https://aur.archlinux.org/vboot-utils.git")
+        bash(f'su -c "cd vboot-utils && makepkg -sirc --noconfirm" {user_id}')  # makepkg doesnt run as root
 
-            rmdir("cgpt-bin", keep_dir=False)
-            rmdir("vboot-utils", keep_dir=False)
-        else:
-            print("\033[91m" + "Please install cgpt and vboot-utils and restart the script" + "\033[0m")
-            print("Continuing")
+        rmdir("cgpt-bin", keep_dir=False)
+        rmdir("vboot-utils", keep_dir=False)
     elif path_exists("/usr/bin/dnf"):
-        bash("dnf install cgpt vboot-utils --assumeyes")
+        bash("dnf install vboot-utils --assumeyes")  # cgpt is included in vboot-utils on fedora
 
     # install debootstrap for debian
     if de_name == "debian":
@@ -404,11 +398,12 @@ def chroot(command: str) -> str:
 
 
 # The main build script
-def start_build(verbose: bool, local_path: str, kernel_type: str, dev_release: bool, main_pid, build_options):
+def start_build(verbose: bool, local_path: str, kernel_type: str, dev_release: bool, main_pid: int, user_id: str,
+                build_options):
     if verbose:
         enable_verbose()
 
-    prepare_host(build_options[0])
+    prepare_host(build_options[0], user_id)
 
     if local_path is None:
         # Print kernel download progress in terminal

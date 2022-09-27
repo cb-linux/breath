@@ -29,6 +29,9 @@ def process_args():
 
 
 if __name__ == "__main__":
+    # get username
+    user_id = os.getlogin()
+
     # Elevate script to root
     if not os.geteuid() == 0:
         sudo_args = ['sudo', sys.executable] + sys.argv + [os.environ]
@@ -96,4 +99,4 @@ if __name__ == "__main__":
         print("\033[93m" + "Verbosity increased" + "\033[0m")
         verbose = True
     build = build.start_build(verbose, local_path=args.local_path, kernel_type=kernel_type, dev_release=dev_release,
-                              main_pid=os.getpid(), build_options=user_input.user_input())
+                              main_pid=os.getpid(), user_id=user_id, build_options=user_input.user_input())
