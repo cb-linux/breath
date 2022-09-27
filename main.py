@@ -5,8 +5,6 @@ import sys
 import os
 import argparse
 
-import build
-import user_input
 from functions import *
 
 
@@ -40,7 +38,8 @@ if __name__ == "__main__":
     if sys.version_info < (3, 10):  # python 3.10 or higher is required
         if path_exists("/usr/bin/apt"):
             if input(
-                    "\033[92m" + "Python 3.10 or higher is required. Attempt to install?" + "\033[0m").lower() == "y" or "":
+                    "\033[92m" + "Python 3.10 or higher is required. Attempt to install? (Y/n)\n" +
+                    "\033[0m").lower() == "y" or "":
                 print("Switching to unstable channel")
                 # switch to unstable channel
                 with open("/etc/apt/sources.list", "r") as file:
@@ -51,8 +50,12 @@ if __name__ == "__main__":
 
                 # update and install python
                 print("Installing python 3.10")
-                bash("apt update -y")
-                bash("apt install -y python3")
+                bash("apt-get update -y")
+                bash("apt-get install -y python3")
+                print("Python 3.10 installed")
+
+                print("\033[92m" + 'Please restart the script with: "python3 ./main.py"' + "\033[0m")
+                exit(1)
 
             else:
                 print("Please run the script with python 3.10 or higher")
@@ -60,6 +63,10 @@ if __name__ == "__main__":
         else:
             print("Please run the script with python 3.10 or higher")
             exit(1)
+
+    # import files after python version check is successful
+    import build
+    import user_input
 
     # parse arguments
     args = process_args()
