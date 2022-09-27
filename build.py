@@ -40,9 +40,9 @@ def prepare_host(de_name: str, user_id: str) -> None:
     print("Installing necessary packages")
     # install cgpt and futility
     # TODO: Properly check if packages are installed
-    if path_exists("/usr/bin/apt"):
+    if path_exists("/usr/bin/apt"):  # Ubuntu + debian
         bash("apt-get install cgpt vboot-kernel-utils -y")
-    if path_exists("/usr/bin/pacman"):
+    elif path_exists("/usr/bin/pacman"):  # Arch
         bash("pacman -S --needed base-devel --noconfirm")
 
         bash("git clone https://aur.archlinux.org/cgpt-bin.git")
@@ -54,8 +54,10 @@ def prepare_host(de_name: str, user_id: str) -> None:
 
         rmdir("cgpt-bin", keep_dir=False)
         rmdir("vboot-utils", keep_dir=False)
-    elif path_exists("/usr/bin/dnf"):
+    elif path_exists("/usr/bin/dnf"):  # Fedora
         bash("dnf install vboot-utils --assumeyes")  # cgpt is included in vboot-utils on fedora
+    elif path_exists("/usr/bin/zypper"):  # openSUSE
+        bash("zypper --non-interactive install vboot")
 
     # install debootstrap for debian
     if de_name == "debian":
