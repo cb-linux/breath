@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import os
+import sys
 from urllib.request import urlretrieve, urlopen
 from urllib.error import URLError
 from time import sleep
@@ -95,7 +96,7 @@ def flash_kernel() -> None:
     print("")  # break line
 
     # get uuid of rootfs partition
-    rootfs_partuuid = bash_return(f"blkid -o value -s PARTUUID {device}2")
+    rootfs_partuuid = bash(f"blkid -o value -s PARTUUID {device}2")
     if rootfs_partuuid == "":
         print("\033[91m" + "Failed to get rootfs partition uuid" + "\033[0m")
         exit(1)
@@ -147,7 +148,7 @@ if __name__ == "__main__":
         skip_version_question = True
 
     # read root partition mount
-    root_part = bash_return("mount | grep ' / ' | cut -d' ' -f 1")
+    root_part = bash("mount | grep ' / ' | cut -d' ' -f 1")
     device = root_part[:len(root_part) - 1]  # get device "name"
     prepare_host()
     if args.local_path is None:
