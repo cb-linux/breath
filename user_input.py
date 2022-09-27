@@ -217,13 +217,18 @@ def user_input() -> Tuple[str, str, str, str, str, str, str, str, bool, bool]:
     while True:
         # Print USB devices only
         lsblk_out = bash("lsblk -o NAME,MODEL,SIZE,TRAN").splitlines()
+        found_usb = False
         for line in lsblk_out[2:]:
             if not line.find("usb") == -1:
                 print(line[:-3])
-
-        # get device name
-        device = input(
-            "\033[92m" + 'Enter usb/sdcard name(example: sdb) or "image" to build an image' + "\033[0m" + "\n").strip()
+                found_usb = True
+        if not found_usb:
+            print("No USB devices found")
+            print("\033[92m" + 'No available USBs/SD-cards found. Building image file.' + "\033[0m" + "\n")
+            device = "image"
+        else:
+            device = input("\033[92m" + 'Enter usb/sdcard name(example: sdb) or "image" to build an image'
+                           + "\033[0m" + "\n").strip()
         if device == "image":
             create_iso = True
             print("Building image instead of writing directly")
