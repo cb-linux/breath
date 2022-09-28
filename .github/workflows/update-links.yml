@@ -5,7 +5,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  prepare:
+  update-links:
     runs-on: ubuntu-latest
     steps:
       - name: Checking out repository code
