@@ -169,6 +169,7 @@ def install_vboot(user_id: str) -> None:
 def start_progress(force_show: bool = False) -> None:
     if not force_show and verbose:
         return
+    rmfile(".stop_progress")
     Thread(target=__print_progress_dots, daemon=True).start()
 
 

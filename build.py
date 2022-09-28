@@ -266,9 +266,9 @@ def extract_rootfs(distro_name: str, main_pid) -> None:
             print_status("Extracting arch rootfs")
             mkdir("/tmp/eupnea-build/arch-rootfs")
             bash("tar xfp /tmp/eupnea-build/arch-rootfs.tar.gz -C /tmp/eupnea-build/arch-rootfs --checkpoint=.10000")
-            start_progress()  # start fake progress
+            start_progress(force_show=True)  # start fake progress
             cpdir("/tmp/eupnea-build/arch-rootfs/root.x86_64/", "/mnt/eupnea/")
-            stop_progress()  # stop fake progress
+            stop_progress(force_show=True)  # stop fake progress
         case "fedora":
             print_status("Extracting fedora rootfs")
             # extract raw image to temp location
