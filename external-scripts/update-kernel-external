@@ -8,6 +8,8 @@ from urllib.error import URLError
 from urllib.request import urlretrieve, urlopen
 from time import sleep
 
+from functions import *
+
 
 # parse arguments from the cli. Only for testing/advanced use. 95% of the arguments are handled by the user_input script
 def process_args():
@@ -29,7 +31,7 @@ def process_args():
 
 
 # Clean /tmp from eupnea files
-def prepare_host() -> None:
+def prepare_host(user_id) -> None:
     print("\033[96m" + "Preparing host system" + "\033[0m")
 
     print("Creating mnt points")
@@ -49,18 +51,7 @@ def prepare_host() -> None:
     rmdir("/tmp/eupnea-update")
     mkdir("/tmp/eupnea-update")
 
-    print("Installing necessary packages")
-    # install cgpt and futility
-    if path_exists("/usr/bin/apt"):
-        bash("apt install cgpt vboot-kernel-utils -y")
-    elif path_exists("/usr/bin/pacman"):
-        bash("pacman -S cgpt vboot-utils --noconfirm")
-    elif path_exists("/usr/bin/dnf"):
-        bash("dnf install cgpt vboot-utils --assumeyes")
-    else:
-        print("\033[91m" + "cgpt and futility not found, please install them using your disotros package manager"
-              + "\033[0m")
-        exit(1)
+    install_vboot(user_id)
 
 
 # download kernel files from GitHub
@@ -135,24 +126,23 @@ def flash_kernel() -> None:
 
 
 if __name__ == "__main__":
-    # Restart script as root if not already
-    if os.geteuid() != 0:
-        args = ['sudo', sys.executable] + sys.argv + [os.environ]
-        os.execlpe('sudo', *args)
+    if os.geteuid() == 0 and not path_exists("/tmp/username"):
+        print_error("Please start the script as non-root/without sudo")
+        exit(1)
 
-    # Try importing functions.py
-    try:
-        from functions import *
-    except ModuleNotFoundError:
-        print("\033[96m" + "Downloading functions.py from github" + "\033[0m")
-        try:
-            urlretrieve("https://raw.githubusercontent.com/eupnea-linux/eupnea/main/functions.py",
-                        filename="functions.py")
-        except URLError:
-            print("\033[91m" + "Functions.py not found. Internet connection not available. Please clone the whole repo."
-                  + "\033[0m")
-            exit(1)
-        from functions import *
+    args = process_args()  # process args before elevating to root for better ux
+
+    # Restart script as root
+    if not os.geteuid() == 0:
+        # save username
+        with open("/tmp/username", "w") as file:
+            file.write(bash("whoami").strip())  # get non root username. os.getlogin() seems to fail in chroots
+        sudo_args = ['sudo', sys.executable] + sys.argv + [os.environ]
+        os.execlpe('sudo', *sudo_args)
+
+    # read username
+    with open("/tmp/username", "r") as file:
+        user_id = file.read()
 
     args = process_args()
 
@@ -216,7 +206,7 @@ if __name__ == "__main__":
         if user_input == "yes":
             args.dev_build = True
 
-    prepare_host()
+    prepare_host(user_id)
     if args.local_path is None:
         # Print download progress in terminal
         t = Thread(target=download_kernel)
