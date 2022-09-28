@@ -21,7 +21,7 @@ def config(de_name: str, distro_version: str, root_partuuid: str, verbose_var: b
     match de_name:
         case "gnome":
             print("Installing gnome")
-            chroot("apt-get install -y ubuntu-desktop gnome-software firefox")
+            chroot("apt-get install -y ubuntu-desktop gnome-software")
         case "kde":
             print("Installing kde")
             chroot("apt-get install -y kde-standard")
@@ -31,7 +31,7 @@ def config(de_name: str, distro_version: str, root_partuuid: str, verbose_var: b
         case "xfce":
             print("Installing xfce")
             chroot("apt-get install -y --no-install-recommends xubuntu-desktop")
-            chroot("apt-get install -y xfce4-goodies firefox")
+            chroot("apt-get install -y xfce4-goodies")
         case "lxqt":
             print("Installing lxqt")
             chroot("apt-get install -y lubuntu-desktop")
