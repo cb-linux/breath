@@ -1,5 +1,7 @@
 # FILE SOURCE: https://github.com/apacelus/pathlib-functions
 from pathlib import Path
+from time import sleep
+from threading import Thread
 import subprocess
 
 verbose = False
@@ -52,13 +54,12 @@ def mkdir(mk_dir: str, create_parents: bool = False) -> None:
         mk_dir_as_path.mkdir(parents=create_parents)
 
 
-def path_exists(path: str) -> bool:
-    path = Path(path)
-    return path.exists()
+def path_exists(path_str: str) -> bool:
+    return Path(path_str).exists()
 
 
-def get_full_path(path: str) -> str:
-    return Path(path).absolute().as_posix()
+def get_full_path(path_str: str) -> str:
+    return Path(path_str).absolute().as_posix()
 
 
 # recursively copy files from a dir into another dir
@@ -165,24 +166,51 @@ def install_vboot(user_id: str) -> None:
         bash("zypper --non-interactive install vboot")
 
 
+def start_progress(force_show: bool = False) -> None:
+    if not force_show and verbose:
+        return
+    Thread(target=__print_progress_dots, daemon=True).start()
+
+
+def stop_progress(force_show: bool = False) -> None:
+    if not force_show and verbose:
+        return
+    with open(".stop_progress", "w") as file:
+        file.write("")
+    sleep(2)
+
+
 #######################################################################################
 #                                    PRINT FUNCTIONS                                  #
 #######################################################################################
 
 def print_warning(message: str) -> None:
-    print("\033[93m" + message + "\033[0m")
+    print("\033[93m" + message + "\033[0m", flush=True)
 
 
 def print_error(message: str) -> None:
-    print("\033[91m" + message + "\033[0m")
+    print("\033[91m" + message + "\033[0m", flush=True)
 
 
 def print_status(message: str) -> None:
-    print("\033[94m" + message + "\033[0m")
+    print("\033[94m" + message + "\033[0m", flush=True)
 
 
-def print_green(message: str) -> None:
-    print("\033[92m" + message + "\033[0m")
+def print_question(message: str) -> None:
+    print("\033[92m" + message + "\033[0m", flush=True)
+
+
+def print_header(message: str) -> None:
+    print("\033[95m" + message + "\033[0m", flush=True)
+
+
+def __print_progress_dots() -> None:  # Do not call this function directly, use start_progress() instead
+    while True:
+        if not path_exists(".stop_progress"):
+            print(".", end="", flush=True)
+            sleep(3)
+        else:
+            return
 
 
 if __name__ == "__main__":
