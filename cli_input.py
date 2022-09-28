@@ -211,7 +211,7 @@ def get_user_input() -> dict:
             break
 
     print_question("Would you like to rebind the Search/Super/Win key to Caps Lock?(NOT RECOMMENDED)")
-    if input("\033[94m" + "Type yes to rebind. Press enter to keep old binding" "\033[0m" + "\n") == "yes":
+    if input("\033[94m" + "Type yes to rebind. Press enter to keep old binding" "\033[0m") == "yes":
         print("Search key will be a CAPS LOCK key")
         rebind_search = True
     else:
@@ -224,8 +224,8 @@ def get_user_input() -> dict:
         lsblk_out = bash("lsblk -o NAME,MODEL,SIZE,TRAN").splitlines()
         for line in lsblk_out[2:]:
             # MassStorageClass is not a real device, so ignore it
-            if not (line.find("usb") == -1 and line.find("MassStorageClass") == -1):  # Print USB devices only
-                usb_array.append(line[:-3])
+            if not line.find("usb") == -1 and line.find("MassStorageClass") == -1:  # Print USB devices only
+                usb_array.append(line[:3])
                 print(line[:-3])  # this is for the user to see the list
         if len(usb_array) == 0:
             print_status("No available USBs/SD-cards found. Building image file.")
