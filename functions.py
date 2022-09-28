@@ -141,22 +141,24 @@ def install_vboot(user_id: str) -> None:
         rmdir("/tmp/eupnea-packages/cgpt-bin", keep_dir=False)
         rmdir("/tmp/eupnea-packages/vboot-utils", keep_dir=False)
         mkdir("/tmp/eupnea-packages")
-        bash("chmod 557 /tmp/eupnea-packages")  # this is needed for the normal user to be able to access the dir
 
         bash("pacman -S --needed base-devel --noconfirm")  # install base-devel for mkpkg
 
+        # clone packages
         bash("git clone https://aur.archlinux.org/cgpt-bin.git /tmp/eupnea-packages/cgpt-bin")
-        # Using custom PKGBUILD as the one in the AUR is broken
+        bash("git clone https://aur.archlinux.org/vboot-utils.git /tmp/eupnea-packages/vboot-utils")
+        bash("chmod -R 557 /tmp/eupnea-packages")  # update perms so normal user can access
+
+        # Using custom PKGBUILD, as the one in the AUR is broken
         try:
             cpfile("configs/PKGBUILD", "/tmp/eupnea-packages/cgpt-bin/PKGBUILD")  # config while building
         except FileNotFoundError:
             cpfile("/usr/local/eupnea-configs/PKGBUILD", "/tmp/eupnea-packages/cgpt-bin/PKGBUILD")  # config in Eupnea
+
         # makepkg wont run as root
         bash(f'su -c "cd /tmp/eupnea-packages/cgpt-bin && makepkg -sirc --noconfirm" {user_id}')
-
-        bash("git clone https://aur.archlinux.org/vboot-utils.git /tmp/eupnea-packages/vboot-utils")
-        # makepkg wont run as root
         bash(f'su -c "cd /tmp/eupnea-packages/vboot-utils && makepkg -sirc --noconfirm" {user_id}')
+
     elif path_exists("/usr/bin/dnf"):  # Fedora
         bash("dnf install vboot-utils --assumeyes")  # cgpt is included in vboot-utils on fedora
     elif path_exists("/usr/bin/zypper"):  # openSUSE
