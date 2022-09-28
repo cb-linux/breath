@@ -35,13 +35,12 @@ if __name__ == "__main__":
         exit(1)
 
     args = process_args()  # process args before elevating to root for better ux
-    user_id = os.getlogin()  # get username
 
     # Restart script as root
     if not os.geteuid() == 0:
         # save username
         with open("/tmp/username", "w") as file:
-            file.write(os.getlogin())  # get non root username
+            file.write(bash("whoami").strip())  # get non root username. os.getlogin() seems to fail in chroots
         sudo_args = ['sudo', sys.executable] + sys.argv + [os.environ]
         os.execlpe('sudo', *sudo_args)
 
