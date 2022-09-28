@@ -3,56 +3,53 @@ from functions import *
 
 def config(de_name: str, distro_version: str, root_partuuid: str, verbose: bool) -> None:
     set_verbose(verbose)
+    print_status("Configuring Ubuntu")
 
-    print("\033[96m" + "Configuring Ubuntu" + "\033[0m")
-
-    print("Installing packages")
+    print_status("Installing dependencies")
+    chroot("apt-get update -y")
     chroot("apt-get install -y linux-firmware network-manager software-properties-common cloud-utils")
 
     # TODO: Find out why we need to reinstall dbus
     print("Reinstalling dbus")
     chroot("apt-get reinstall -y dbus")
 
-    # de install fails without updating apt
-    print("Updating apt")
-    chroot("apt-get update -y")
-    print("\033[96m" + "Downloading and installing de, might take a while" + "\033[0m")
+    print_status("Downloading and installing de, might take a while")
+    start_progress()  # start fake progress
     match de_name:
         case "gnome":
-            print("Installing gnome")
+            print_status("Installing GNOME")
             chroot("apt-get install -y ubuntu-desktop gnome-software")
         case "kde":
-            print("Installing kde")
+            print_status("Installing KDE")
             chroot("apt-get install -y kde-standard")
         case "mate":
-            print("Installing mate")
+            print_status("Installing MATE")
             chroot("apt-get install -y ubuntu-mate-desktop")
         case "xfce":
-            print("Installing xfce")
+            print_status("Installing Xfce")
             chroot("apt-get install -y --no-install-recommends xubuntu-desktop")
             chroot("apt-get install -y xfce4-goodies")
         case "lxqt":
-            print("Installing lxqt")
+            print_status("Installing LXQt")
             chroot("apt-get install -y lubuntu-desktop")
         case "deepin":
-            print("Installing deepin")
+            print_status("Installing deepin")
             chroot("add-apt-repository ppa:ubuntudde-dev/stable")
-            chroot("apt-get update")
+            chroot("apt-get update -y")
             chroot("apt-get install -y ubuntudde-dde")
         case "budgie":
-            print("Installing budgie")
+            print_status("Installing Budgie")
             chroot("apt-get install -y ubuntu-budgie-desktop")
             chroot("dpkg-reconfigure lightdm")
         case "cli":
-            print("Installing nothing")
+            print_status("Skipping desktop environment install")
         case _:
-            print("\033[91m" + "Invalid desktop environment!!! Remove all files and retry." + "\033[0m")
+            print_error("Invalid desktop environment! Please create an issue")
             exit(1)
-    # Ignore libfprint-2-2 fprintd libpam-fprintd errors
+    stop_progress()  # stop fake progress
 
-    # GDM3 auto installs gnome-minimal. Remove the session link as it's not needed
+    # GDM3 auto installs gnome-minimal. Gotta remove it if user didn't choose gnome
     if not de_name == "gnome":
-        print("Fixing gdm3")
         try:
             rmfile("/mnt/eupnea/usr/share/xsessions/ubuntu.desktop")
         except FileNotFoundError:
@@ -60,15 +57,16 @@ def config(de_name: str, distro_version: str, root_partuuid: str, verbose: bool)
         chroot("apt-get remove -y gnome-shell")
         chroot("apt-get autoremove -y")
 
-    # TODO: Figure out if removing needrestart is necessary
-    chroot("apt-get remove -y needrestart")
-    print("Fixing securetty if needed")
+    # Fix gdm3, https://askubuntu.com/questions/1239503/ubuntu-20-04-and-20-10-etc-securetty-no-such-file-or-directory
     try:
         cpfile("/mnt/eupnea/usr/share/doc/util-linux/examples/securetty", "/mnt/eupnea/etc/securetty")
     except FileNotFoundError:
         pass
+    print_status("Desktop environment setup complete")
 
-    print("Fixing fstab")
+    # TODO: Figure out if removing needrestart is necessary
+    chroot("apt-get remove -y needrestart")
+
     # The default fstab file causes systemd-remount-fs to fail
     with open("configs/fstab/ubuntu.fstab", "r") as f:
         fstab = f.read()
@@ -77,7 +75,7 @@ def config(de_name: str, distro_version: str, root_partuuid: str, verbose: bool)
         f.write(fstab)
 
     # Replace input-synaptics with newer input-libinput, for better touchpad support
-    print("Replacing touchpad drivers")
+    print_status("Upgrading touchpad drivers")
     chroot("apt-get remove -y xserver-xorg-input-synaptics")
     # chroot("apt-get install -y xserver-xorg-input-libinput")
 
@@ -89,6 +87,8 @@ def config(de_name: str, distro_version: str, root_partuuid: str, verbose: bool)
     with open("/mnt/eupnea/etc/os-release", "w") as f:
         f.writelines(os_release)
 
+    print_status("Ubuntu setup complete")
+
 
 def chroot(command: str) -> None:
     if verbose:
@@ -98,4 +98,4 @@ def chroot(command: str) -> None:
 
 
 if __name__ == "__main__":
-    print("Do not run this file. Use build.py")
+    print_error("Do not run this file. Use main.py")

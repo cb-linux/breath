@@ -3,10 +3,22 @@ from functions import *
 
 def config(de_name: str, distro_version: str, root_partuuid: str, verbose: bool) -> None:
     set_verbose(verbose)
+    print_status("Configuring Arch")
 
-    print("\033[96m" + "Configuring Arch" + "\033[0m")
+    # Configure sudo
+    with open("/mnt/eupnea/etc/sudoers", "r") as conf:
+        temp_sudoers = conf.readlines()
+    # uncomment wheel group
+    temp_sudoers[84] = temp_sudoers[84][2:]
+    temp_sudoers[87] = temp_sudoers[87][2:]
+    temp_sudoers[90] = temp_sudoers[90][2:]
 
-    print("Uncomment arch mirror")
+    # enable networkmanager systemd service
+    chroot("systemctl enable NetworkManager.service")
+
+    with open("/mnt/eupnea/etc/sudoers", "w") as conf:
+        conf.writelines(temp_sudoers)
+    # Uncomment worldwide arch mirror
     with open("/mnt/eupnea/etc/pacman.d/mirrorlist", "r") as read:
         mirrors = read.readlines()
     # Uncomment first worldwide mirror
@@ -14,79 +26,72 @@ def config(de_name: str, distro_version: str, root_partuuid: str, verbose: bool)
     with open("/mnt/eupnea/etc/pacman.d/mirrorlist", "w") as write:
         write.writelines(mirrors)
 
-    print("Applying pacman fixes")
+    # Apply temporary fix for pacman
     bash("mount --bind /mnt/eupnea /mnt/eupnea")
     with open("/mnt/eupnea/etc/pacman.conf", "r") as conf:
         temp_pacman = conf.readlines()
-    # temporarily comment out CheckSpace, coz Pacman fails otherwise
+    # temporarily comment out CheckSpace, coz Pacman fails to check available storage space when run from a chroot
     temp_pacman[34] = f"#{temp_pacman[34]}"
     with open("/mnt/eupnea/etc/pacman.conf", "w") as conf:
         conf.writelines(temp_pacman)
 
-    print("Prepare pacman")
+    print_status("Preparing pacman")
     chroot("pacman-key --init")
     chroot("pacman-key --populate archlinux")
     chroot("pacman -Syy --noconfirm")
     chroot("pacman -Syu --noconfirm")
 
-    print("Installing packages")
+    print_status("Installing packages")
+    start_progress()  # start fake progress
     chroot("pacman -S --noconfirm base base-devel nano networkmanager xkeyboard-config linux-firmware sudo cloud-utils")
-    # linux-firmware is for Wi-Fi
-    # cloud-utils is for grow-part
+    stop_progress()  # stop fake progress
 
-    print("Configuring sudo")
-    with open("/mnt/eupnea/etc/sudoers", "r") as conf:
-        temp_sudoers = conf.readlines()
-    # uncomment wheel group
-    temp_sudoers[84] = temp_sudoers[84][2:]
-    temp_sudoers[87] = temp_sudoers[87][2:]
-    temp_sudoers[90] = temp_sudoers[90][2:]
-    with open("/mnt/eupnea/etc/sudoers", "w") as conf:
-        conf.writelines(temp_sudoers)
-
-    print("\033[96m" + "Downloading and installing de, might take a while" + "\033[0m")
+    print_status("Downloading and installing de, might take a while")
+    start_progress()  # start fake progress
     match de_name:
         case "gnome":
-            print("Installing gnome")
+            print_status("Installing GNOME")
             chroot("pacman -S --noconfirm gnome gnome-extra gnome-initial-setup")
             chroot("systemctl enable gdm.service")
         case "kde":
-            print("Installing kde")
+            print_status("Installing KDE")
             chroot("pacman -S --noconfirm plasma-meta plasma-wayland-session kde-applications")
             chroot("systemctl enable sddm.service")
         case "mate":
-            print("Installing mate")
+            print_status("Installing MATE")
             # no wayland support in mate
             chroot("pacman -S --noconfirm mate mate-extra xorg xorg-server lightdm lightdm-gtk-greeter")
             chroot("systemctl enable lightdm.service")
         case "xfce":
-            print("Installing xfce")
+            print_status("Installing Xfce")
             # no wayland support in xfce
             chroot("pacman -S --noconfirm xfce4 xfce4-goodies xorg xorg-server lightdm lightdm-gtk-greeter")
             chroot("systemctl enable lightdm.service")
-        case "lxqt":
-            print("Installing lxqt")
+        case "LXQt":
+            print_status("Installing LXQt")
             chroot("pacman -S --noconfirm lxqt breeze-icons xorg xorg-server sddm")
             chroot("systemctl enable sddm.service")
         case "deepin":
-            print("Installing deepin")
+            print_status("Installing deepin")
             chroot("pacman -S --noconfirm deepin deepin-kwin deepin-extra xorg xorg-server lightdm")
-            # enable deepin specific login
+            # enable deepin specific login style
             with open("/mnt/eupnea/etc/lightdm/lightdm.conf", "a") as conf:
                 conf.write("greeter-session=lightdm-deepin-greeter")
             chroot("systemctl enable lightdm.service")
         case "budgie":
-            print("Installing budgie")
+            print_status("Installing Budgie")
             chroot("pacman -S --noconfirm budgie-desktop budgie-desktop-view budgie-screensaver budgie-control-center "
                    "lightdm lightdm-gtk-greeter")
             chroot("systemctl enable lightdm.service")
         case "cli":
-            print("Installing nothing")
+            print_status("Skipping desktop environment install")
         case _:
-            print("\033[91m" + "Invalid desktop environment!!! Remove all files and retry." + "\033[0m")
-    # enable network service
-    chroot("systemctl enable NetworkManager.service")
-    print("Restoring pacman config")
+            print_error("Invalid desktop environment! Please create an issue")
+            exit(1)
+    stop_progress()  # stop fake progress
+    print_status("Desktop environment setup complete")
+
+    print_status("Restoring pacman config")
     with open("/mnt/eupnea/etc/pacman.conf", "r") as conf:
         temp_pacman = conf.readlines()
     # comment out CheckSpace
@@ -94,6 +99,7 @@ def config(de_name: str, distro_version: str, root_partuuid: str, verbose: bool)
     with open("/mnt/eupnea/etc/pacman.conf", "w") as conf:
         conf.writelines(temp_pacman)
 
+    # TODO: add eupnea to arch name
     '''
     # Add eupnea to version(this is purely cosmetic)
     with open("/mnt/eupnea/etc/os-release", "r") as f:
@@ -103,6 +109,7 @@ def config(de_name: str, distro_version: str, root_partuuid: str, verbose: bool)
     with open("/mnt/eupnea/etc/os-release", "w") as f:
         f.writelines(os_release)
     '''
+    print_status("Arch configuration complete")
 
 
 # using arch-chroot for arch
@@ -114,4 +121,4 @@ def chroot(command: str):
 
 
 if __name__ == "__main__":
-    print("Do not run this file. Use build.py")
+    print_error("Do not run this file. Use main.py")

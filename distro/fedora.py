@@ -3,73 +3,74 @@ from functions import *
 
 def config(de_name: str, distro_version: str, root_partuuid: str, verbose: bool) -> None:
     set_verbose(verbose)
+    print_status("Configuring Fedora")
 
-    print("\033[96m" + "Configuring Fedora" + "\033[0m")
-    print("Updating packages")
-    chroot("dnf update -y")
-
-    print("Installing Core packages")
+    print("Installing dependencies")
+    start_progress()  # start fake progress
+    chroot("dnf update -y")  # update repos list
+    # Install core packages
     chroot("dnf group install -y 'Core'")
-
-    print("Installing Hardware Support packages")
+    # Install hardware support packages
     chroot("dnf group install -y 'Hardware Support'")
     chroot("dnf group install -y 'Common NetworkManager Submodules'")
     chroot("dnf install -y linux-firmware")
-
     # TODO: Missing the free repos; add extras from a real Fedora install
     print("Add RPMFusion nonfree repo")
     chroot(f"dnf install https://download1.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-{distro_version}"
            f".noarch.rpm -y")
+    stop_progress()  # stop fake progress
 
-    # TODO: Perhaps zram works with mainline?
-    chroot("dnf remove zram-generator-defaults -y")  # remove zram as it fails for some reason
-    chroot("systemctl disable systemd-zram-setup@zram0.service")  # disable zram service
-
-    print("\033[96m" + "Downloading and installing DE, might take a while" + "\033[0m")
+    print_status("Downloading and installing DE, might take a while")
+    start_progress()  # start fake progress
     match de_name:
         case "gnome":
-            print("Installing GNOME")
-            chroot("dnf group install -y 'Fedora Workstation'")
+            print_status("Installing GNOME")
+            chroot("dnf group install -y 'Fedora Workstation'")  # Fedora has gnome by default in a workstation install
         case "kde":
-            print("Installing KDE")
+            print_status("Installing KDE")
             chroot("dnf group install -y 'KDE Plasma Workspaces'")
         case "mate":
-            print("Installing MATE")
+            print_status("Installing MATE")
             chroot("dnf group install -y 'MATE Desktop'")
         case "xfce":
-            print("Installing Xfce")
+            print_status("Installing Xfce")
             chroot("dnf group install -y 'Xfce Desktop'")
         case "lxqt":
-            print("Installing LXQt")
+            print_status("Installing LXQt")
             chroot("dnf group install -y 'LXQt Desktop'")
         case "deepin":
-            print("Installing deepin")
+            print_status("Installing deepin")
             chroot("dnf group install -y 'Deepin Desktop'")
         case "budgie":
-            print("\033[91m" + "Budgie is not available for Fedora" + "\033[91m")
+            print_error("Budgie is not available for Fedora")
             exit(1)
         case "cli":
-            print("No Desktop Environment will be installed")
+            print_status("Skipping desktop environment install")
         case _:
-            print("\033[91m" + "Invalid desktop environment!!! Remove all files and retry." + "\033[0m")
+            print_error("Invalid desktop environment! Please create an issue")
             exit(1)
+    stop_progress()  # stop fake progress
 
     if not de_name == "cli":
-        print("Setting system to boot to gui")
+        # Set system to boot to gui
         chroot("systemctl set-default graphical.target")
+    print_status("Desktop environment setup complete")
 
-    print("Fixing SELinux")
     # Create /.autorelabel to force SELinux to relabel all files
+    # If this is not done, the system won't let users login, even if set to permissive
     with open("/mnt/eupnea/.autorelabel", "w") as f:
         f.write("")
 
-    print("Fixing fstab")
-    # The default fstab file has the wrong PARTUUID, so we need to update it
+    # The default fstab file has the wrong PARTUUID -> system boots in emergency mode if not fixed
     with open("configs/fstab/fedora.fstab", "r") as f:
         fstab = f.read()
     fstab = fstab.replace("insert_partuuid", root_partuuid)
     with open("/mnt/eupnea/etc/fstab", "w") as f:
         f.write(fstab)
+
+    # TODO: Perhaps zram works with mainline?
+    chroot("dnf remove zram-generator-defaults -y")  # remove zram as it fails for some reason
+    chroot("systemctl disable systemd-zram-setup@zram0.service")  # disable zram service
 
     # Add eupnea to version(this is purely cosmetic)
     with open("/mnt/eupnea/etc/os-release", "r") as f:
@@ -78,6 +79,8 @@ def config(de_name: str, distro_version: str, root_partuuid: str, verbose: bool)
     os_release = os_release.replace("Cloud Edition", "Eupnea")
     with open("/mnt/eupnea/etc/os-release", "w") as f:
         f.write(os_release)
+
+    print_status("Debian setup complete")
 
 
 def chroot(command: str) -> None:
@@ -88,4 +91,4 @@ def chroot(command: str) -> None:
 
 
 if __name__ == "__main__":
-    print("Do not run this file. Use build.py")
+    print_error("Do not run this file. Use main.py")

@@ -3,8 +3,6 @@
 from typing import Tuple
 from urllib.request import urlretrieve
 from urllib.error import URLError
-from threading import Thread
-from time import sleep
 import json
 
 from functions import *
@@ -12,64 +10,67 @@ from functions import *
 
 # Clean /tmp from eupnea files
 def prepare_host(de_name: str, user_id: str) -> None:
-    print("\033[96m" + "Preparing host system" + "\033[0m")
+    print_status("Preparing host system")
 
-    # umount fedora temp if exists
     try:
-        bash("umount -lf /tmp/eupnea-build/fedora-tmp-mnt 2>/dev/null")
+        bash("umount -lf /tmp/eupnea-build/fedora-tmp-mnt 2>/dev/null")  # umount fedora temp if exists
     except subprocess.CalledProcessError:
+        print("Failed to unmount /tmp/eupnea-build/fedora-tmp-mnt, ignore")
         pass
 
-    print("Creating /tmp/eupnea-build")
+    print_status("Cleaning + preparing host system")
     rmdir("/tmp/eupnea-build")
-    mkdir("/tmp/eupnea-build", True)
+    mkdir("/tmp/eupnea-build", create_parents=True)
 
-    print("Creating mnt point")
+    print_status("Creating mount points")
     try:
         bash("umount -lf /mnt/eupnea 2>/dev/null")  # just in case
     except subprocess.CalledProcessError:
-        print("Failed to unmount /mnt/eupnea, ignoring")
+        print("Failed to unmount /mnt/eupnea, ignore")
         pass
     rmdir("/mnt/eupnea")
     mkdir("/mnt/eupnea", True)
 
-    print("Removing old files if they exist")
     rmfile("eupnea.img")
     rmfile("kernel.flags")
 
     install_vboot(user_id)
 
     # install debootstrap for debian
-    if de_name == "debian":
+    if de_name == "debian" and not path_exists("/usr/sbin/debootstrap"):
+        print_status("Installing debootstrap")
         if path_exists("/usr/bin/apt"):
             bash("apt-get install debootstrap -y")
         elif path_exists("/usr/bin/pacman"):
             bash("pacman -S debootstrap --noconfirm")
         elif path_exists("/usr/bin/dnf"):
             bash("dnf install debootstrap --assumeyes")
+        elif path_exists("/usr/bin/zypper"):  # openSUSE
+            bash("zypper --non-interactive install debootstrap")
         else:
-            print("\033[91m" + "Debootstrap not found, please install it using your disotros package manager or select"
-                  + " another distro instead of debian" + "\033[0m")
+            print_warning("Debootstrap not found, please install it using your disotros package manager or select "
+                          "another distro instead of debian")
             exit(1)
 
     # install arch-chroot for arch
-    elif de_name == "arch":
+    if de_name == "arch" and not path_exists("/usr/bin/arch-chroot"):
+        print_status("Installing arch-chroot")
         if path_exists("/usr/bin/apt"):
             bash("apt-get install arch-install-scripts -y")
         elif path_exists("/usr/bin/pacman"):
             bash("pacman -S arch-install-scripts --noconfirm")
         elif path_exists("/usr/bin/dnf"):
             bash("dnf install arch-install-scripts --assumeyes")
+        elif path_exists("/usr/bin/zypper"):  # openSUSE
+            bash("zypper --non-interactive install arch-install-scripts")
         else:
-            print(
-                "\033[91m" + "Arch-install-scripts not found, please install it using your disotros package manager" +
-                " or select another distro instead of arch" + "\033[0m")
+            print_warning("Arch-install-scripts not found, please install it using your distros package manager or "
+                          "select another distro instead of arch")
             exit(1)
 
 
 # download kernel files from GitHub
 def download_kernel(kernel_type: str, dev_release: bool, main_pid: int) -> None:
-    print("\033[96m" + "Downloading kernel binaries from github" + "\033[0m")
     # select correct link
     if dev_release:
         url = "https://github.com/eupnea-linux/kernel/releases/download/dev-build/"
@@ -77,27 +78,33 @@ def download_kernel(kernel_type: str, dev_release: bool, main_pid: int) -> None:
         url = "https://github.com/eupnea-linux/kernel/releases/latest/download/"
 
     # download kernel files
+    start_progress()  # show fake progress
     try:
         match kernel_type:
             case "mainline":
+                print_status("Downloading mainline kernel")
                 url = "https://github.com/eupnea-linux/mainline-kernel/releases/latest/download/"
                 urlretrieve(f"{url}bzImage-stable", filename="/tmp/eupnea-build/bzImage")
                 urlretrieve(f"{url}modules-stable.tar.xz", filename="/tmp/eupnea-build/modules.tar.xz")
                 urlretrieve(f"{url}headers-stable.tar.xz", filename="/tmp/eupnea-build/headers.tar.xz")
             case "alt":
-                print("Downloading alt kernel")
+                print_status("Downloading alt kernel")
                 urlretrieve(f"{url}bzImage-alt", filename="/tmp/eupnea-build/bzImage")
                 urlretrieve(f"{url}modules-alt.tar.xz", filename="/tmp/eupnea-build/modules.tar.xz")
             case "exp":
-                print("Downloading experimental 5.15 kernel")
+                print_status("Downloading experimental 5.15 kernel")
                 urlretrieve(f"{url}bzImage-exp", filename="/tmp/eupnea-build/bzImage")
                 urlretrieve(f"{url}modules-exp.tar.xz", filename="/tmp/eupnea-build/modules.tar.xz")
             case "stable":
+                print_status("Downloading stable 5.10 kernel")
                 urlretrieve(f"{url}bzImage", filename="/tmp/eupnea-build/bzImage")
                 urlretrieve(f"{url}modules.tar.xz", filename="/tmp/eupnea-build/modules.tar.xz")
     except URLError:
-        print("\033[91m" + "Failed to reach github. Check your internet connection and try again" + "\033[0m")
-        bash(f"kill {main_pid}")
+        print_error("Failed to reach github. Check your internet connection and try again or use local files with -l")
+        bash(f"kill {main_pid}")  # stop whole script
+
+    stop_progress()  # stop fake progress
+    print_status("Kernel files downloaded successfully")
 
 
 # Prepare USB, usb is not yet fully implemented
@@ -197,114 +204,151 @@ def partition(mnt_point: str, write_usb: bool) -> Tuple[str, str]:
 
 # download the distro rootfs
 def download_rootfs(distro_name: str, distro_version: str, distro_link: str, main_pid: int) -> None:
-    print("\033[96m" + "Downloading rootfs." + "\033[0m")
     try:
         match distro_name:
             case "ubuntu":
-                print(f"Downloading ubuntu rootfs {distro_version}")
+                print_status(f"Downloading ubuntu rootfs {distro_version}")
+                start_progress(force_show=True)  # start fake progress
                 urlretrieve(
                     f"https://cloud-images.ubuntu.com/releases/{distro_version}/release/ubuntu-{distro_version}"
                     f"-server-cloudimg-amd64-root.tar.xz",
                     filename="/tmp/eupnea-build/ubuntu-rootfs.tar.xz")
+                stop_progress(force_show=True)
             case "debian":
-                print("Downloading debian with debootstrap")
-                # Debian sometimes fails for no apparent reason, so we try 2 times
+                print_status("Creating debian with debootstrap")
+                start_progress()  # start fake progress
+                # Debian is debootstrapped directly to the device
                 debian_result = bash(
-                    "debootstrap stable /tmp/eupnea-build/debian https://deb.debian.org/debian/")
+                    "debootstrap stable /mnt/eupnea https://deb.debian.org/debian/")
+                stop_progress()  # stop fake progress
                 if debian_result.__contains__("Couldn't download packages:"):
-                    print("\033[91m\nDebootstrap failed, retrying once\n\033[0m")
-                    # delete the failed rootfs
-                    rmdir("/tmp/eupnea-build/debian")
-                    debian_result = bash(
-                        "debootstrap stable /tmp/eupnea-build/debian https://deb.debian.org/debian/")
-                    if debian_result.__contains__("Couldn't download packages:"):
-                        print("\033[91m\nDebootstrap failed again, check your internet connection or try again later" +
-                              "\033[0m")
-                        bash(f"kill {main_pid}")
+                    print_error("Debootstrap failed, check your internet connection or try again later")
+                    bash(f"kill {main_pid}")
             case "arch":
-                print("Downloading latest arch rootfs")
+                print_status("Downloading latest arch rootfs")
+                start_progress(force_show=True)  # start fake progress
                 urlretrieve(distro_link, filename="/tmp/eupnea-build/arch-rootfs.tar.gz")
+                stop_progress(force_show=True)  # stop fake progress
             case "fedora":
-                print(f"Downloading fedora rootfs version: {distro_version}")
+                print_status(f"Downloading fedora rootfs version: {distro_version}")
+                start_progress(force_show=True)  # start fake progress
                 urlretrieve(distro_link, filename="/tmp/eupnea-build/fedora-rootfs.raw.xz")
+                stop_progress(force_show=True)  # stop fake progress
     except URLError:
-        print(
-            "\033[91m" + "Couldn't download rootfs. Check your internet connection and try again. If the error" +
-            " persists, create an issue with the distro and version in the name" + "\033[0m")
-        bash(f"kill {main_pid}")  # kill main thread, as this function running in a different thread
+        print_error("Couldn't download rootfs. Check your internet connection and try again. If the error persists, "
+                    "create an issue with the distro and version in the name")
+        bash(f"kill {main_pid}")  # stop whole script
 
 
-# Download Wi-Fi firmware for later
+# Download firmware for later
 def download_firmware(main_pid: int) -> None:
-    print("Downloading firmware")
+    print_status("Downloading firmware")
+    start_progress()  # start fake progress
     try:
         bash("git clone --depth=1 https://chromium.googlesource.com/chromiumos/third_party/linux-firmware/ "
              "/tmp/eupnea-build/firmware")
     except URLError:
         print("\033[91m" + "Couldn't download firmware. Check your internet connection and try again." + "\033[0m")
         bash(f"kill {main_pid}")
+    stop_progress()  # stop fake progress
 
 
-# extract the rootfs to the img
-def extract_rootfs(distro_name: str, main_pid: int) -> None:
-    print("\033[96m" + "Extracting rootfs" + "\033[0m")
+# extract the rootfs to /mnt/eupnea
+def extract_rootfs(distro_name: str) -> None:
+    print_status("Extracting rootfs")
     match distro_name:
         case "ubuntu":
-            print("Extracting ubuntu rootfs")
+            print_status("Extracting ubuntu rootfs")
+            # --checkpoint is for printing real tar progress
             bash("tar xfp /tmp/eupnea-build/ubuntu-rootfs.tar.xz -C /mnt/eupnea --checkpoint=.10000")
         case "debian":
-            print("Copying debian rootfs")
-            cpdir("/tmp/eupnea-build/debian/", "/mnt/eupnea/")
+            # Debian gets debootstrapped directly to the device, no need to copy
+            print_status("Copying debian was debootstrapped, skipping")
         case "arch":
-            print("Extracting arch rootfs")
+            print_status("Extracting arch rootfs")
             mkdir("/tmp/eupnea-build/arch-rootfs")
             bash("tar xfp /tmp/eupnea-build/arch-rootfs.tar.gz -C /tmp/eupnea-build/arch-rootfs --checkpoint=.10000")
+            start_progress()  # start fake progress
             cpdir("/tmp/eupnea-build/arch-rootfs/root.x86_64/", "/mnt/eupnea/")
-
+            stop_progress()  # stop fake progress
         case "fedora":
-            print("Extracting fedora rootfs")
-            # extract to temp location, find rootfs and extract it to mounted image
+            print_status("Extracting fedora rootfs")
+            # extract raw image to temp location
             mkdir("/tmp/eupnea-build/fedora-tmp-mnt")
             # using unxz instead of tar
             bash("unxz -d /tmp/eupnea-build/fedora-rootfs.raw.xz -c > /tmp/eupnea-build/fedora-raw")
 
-            # mount fedora raw image
-            fedora_root_part = bash("losetup -P -f --show /tmp/eupnea-build/fedora-raw") + "p5"
-            if fedora_root_part == "":
-                print("\033[91m" + "Couldn't mount fedora image with losetup" + "\033[0m")
-                bash(f"kill {main_pid}")
-            bash(
-                f"mount {fedora_root_part} /tmp/eupnea-build/fedora-tmp-mnt")  # return to check for mount errors
-            # copy actual root file to eupnea mount
-            print("Copying fedora rootfs to /mnt/eupnea")
-            # TODO: Fix python copying
-            bash("cp -rp /tmp/eupnea-build/fedora-tmp-mnt/root/* /mnt/eupnea/")  # python fails to copy
+            # mount fedora raw image as loop device
+            fedora_root_part = bash("losetup -P -f --show /tmp/eupnea-build/fedora-raw") + "p5"  # part 5 is the rootfs
+            bash(f"mount {fedora_root_part} /tmp/eupnea-build/fedora-tmp-mnt")  # mount 5th root partition as filesystem
+            print_status("Copying fedora rootfs to /mnt/eupnea")
+            cpdir("/tmp/eupnea-build/fedora-tmp-mnt/root/", "/mnt/eupnea/")  # copy mounted rootfs to /mnt/eupnea
 
-            # unmount fedora image to prevent errors
+            # unmount fedora image to prevent errors and unused loop devices
             bash(f"umount -fl /tmp/eupnea-build/fedora-tmp-mnt")
             bash(f"losetup -d {fedora_root_part[:-2]}")
+    print_status("\n" + "Rootfs extraction complete")
 
 
 # Configure distro agnostic options
 def post_extract(username: str, password: str, hostname: str, distro_name: str, de_name: str, kernel_type: str) -> None:
-    print("\n\033[96m" + "Configuring Eupnea" + "\033[0m")
+    print_status("Applying distro agnostic configuration")
 
-    print("Copying resolv.conf")
-    # delete broken symlink
-    rmfile("/mnt/eupnea/etc/resolv.conf", True)
-    cpfile("/etc/resolv.conf", "/mnt/eupnea/etc/resolv.conf")
-
-    print("Extracting kernel modules")
-    bash("rm -rf /mnt/eupnea/lib/modules/*")  # delete old modules
-
-    # modules tar contains /lib/modules, so it's extracted to / and --skip-old-files is used to prevent overwriting
-    # other files in /lib
+    # Extract kernel modules
+    rmdir("/mnt/eupnea/lib/modules/")  # delete old modules, if present
+    # modules.tar.xz contains /lib/modules, so it's extracted to / and --skip-old-files is used to prevent it from
+    # overwriting other files in /lib
     bash("tar xpf /tmp/eupnea-build/modules.tar.xz --skip-old-files -C /mnt/eupnea/ --checkpoint=.10000")
     print("")  # break line after tar
 
-    if not (distro_name == "ubuntu" and de_name == "gnome"):  # Ubuntu + gnome has first time setup
-        print("Configuring user")
+    # Extract kernel headers
+    print_status("Extracting kernel headers")
+    # TODO: extract kernel headers
+
+    # Copy resolv.conf from host to eupnea
+    rmfile("/mnt/eupnea/etc/resolv.conf", True)  # delete broken symlink
+    cpfile("/etc/resolv.conf", "/mnt/eupnea/etc/resolv.conf")
+
+    # Set device hostname
+    with open("/mnt/eupnea/etc/hostname", "w") as hostname_file:
+        hostname_file.write(hostname)
+
+    # Copy eupnea scripts and config
+    cpdir("postinstall-scripts", "/mnt/eupnea/usr/local/bin/")
+    chroot("chmod 755 /usr/local/bin/*")  # make scripts executable in system
+    cpfile("functions.py", "/mnt/eupnea/usr/local/bin/functions.py")  # copy functions file
+    # copy configs
+    mkdir("/mnt/eupnea/usr/local/eupnea-configs")
+    cpdir("configs", "/mnt/eupnea/usr/local/eupnea-configs")
+
+    # create eupnea settings file for future needs
+    with open("configs/eupnea-settings.json", "r") as settings_file:
+        settings = json.load(settings_file)
+    settings["kernel_type"] = kernel_type
+    with open("/mnt/eupnea/usr/local/eupnea-settings.json", "w") as settings_file:
+        json.dump(settings, settings_file)
+
+    # disable hibernation aka S4 sleep, READ: https://eupnea-linux.github.io/docs.html#/bootlock
+    # TODO: Fix sleep, maybe
+    mkdir("/mnt/eupnea/etc/systemd/")  # just in case systemd path doesn't exist
+    with open("/mnt/eupnea/etc/systemd/sleep.conf", "a") as conf:
+        conf.write("SuspendState=freeze\nHibernateState=freeze")
+
+    # Enable loading modules needed for eupnea
+    cpfile("configs/eupnea-modules.conf", "/mnt/eupnea/etc/modules-load.d/eupnea-modules.conf")
+
+    # TODO: Fix failing services
+    # The services below fail to start, so they are disabled
+
+    # ssh
+    rmfile("/mnt/eupnea/etc/systemd/system/multi-user.target.wants/ssh.service")
+    rmfile("/mnt/eupnea/etc/systemd/system/sshd.service")
+
+    # Add user to system if the DE has no first time setup
+    if not (distro_name == "ubuntu" and de_name == "gnome"):  # Ubuntu + gnome has a first time setup
+        print_status("Configuring user")
         chroot(f"useradd --create-home --shell /bin/bash {username}")
+        # TODO: Fix ) and ( crashing chpasswd
         chroot(f'echo "{username}:{password}" | chpasswd')
         match distro_name:
             case "ubuntu" | "debian":
@@ -312,50 +356,10 @@ def post_extract(username: str, password: str, hostname: str, distro_name: str, 
             case "arch" | "fedora":
                 chroot(f"usermod -aG wheel {username}")
 
-    print("Extracting kernel headers")
-    # TODO: extract kernel headers
-
-    print("Setting hostname")
-    with open("/mnt/eupnea/etc/hostname", "w") as hostname_file:
-        hostname_file.write(hostname)
-
-    print("Copying eupnea scripts")
-    cpdir("postinstall-scripts", "/mnt/eupnea/usr/local/bin/")
-    chroot("chmod 755 /usr/local/bin/*")  # make scripts executable in system
-    cpfile("functions.py", "/mnt/eupnea/usr/local/bin/functions.py")
-
-    mkdir("/mnt/eupnea/usr/local/eupnea-configs")
-    cpdir("configs", "/mnt/eupnea/usr/local/eupnea-configs")
-
-    # create settings file
-    print("Creating eupnea settings file")
-    with open("configs/eupnea-settings.json", "r") as settings_file:
-        settings = json.load(settings_file)
-    settings["kernel_type"] = kernel_type
-    with open("/mnt/eupnea/usr/local/eupnea-settings.json", "w") as settings_file:
-        json.dump(settings, settings_file)
-
-    print("Configuring sleep")
-    # disable hibernation aka S4 sleep, READ: https://eupnea-linux.github.io/docs.html#/bootlock
-    # TODO: Fix sleep
-    mkdir("/mnt/eupnea/etc/systemd/")  # just in case systemd path doesn't exist
-    with open("/mnt/eupnea/etc/systemd/sleep.conf", "a") as conf:
-        conf.write("SuspendState=freeze\nHibernateState=freeze")
-
-    print("Adding kernel modules")
-    # Enable loading modules needed for eupnea
-    cpfile("configs/eupnea-modules.conf", "/mnt/eupnea/etc/modules-load.d/eupnea-modules.conf")
-
-    # TODO: Fix failing services
-    # The services below fail to start, so they are disabled
-    # ssh
-    rmfile("/mnt/eupnea/etc/systemd/system/multi-user.target.wants/ssh.service")
-    rmfile("/mnt/eupnea/etc/systemd/system/sshd.service")
-
 
 # post extract and distro config
-def post_config(rebind_search: bool):
-    # Add chromebook layout. Needs to be done after install Xorg/Wayland
+def post_config(rebind_search: bool) -> None:
+    # Add chromebook layout. Needs to be done after install Xorg
     print("Backing up default keymap and setting Chromebook layout")
     cpfile("/mnt/eupnea/usr/share/X11/xkb/symbols/pc", "/mnt/eupnea/usr/share/X11/xkb/symbols/pc.default")
     cpfile("configs/xkb/xkb.chromebook", "/mnt/eupnea/usr/share/X11/xkb/symbols/pc")
@@ -371,7 +375,9 @@ def post_config(rebind_search: bool):
     # copy previously downloaded firmware
     print("Copying google firmware")
     rmdir("/mnt/eupnea/lib/firmware")
+    start_progress(force_show=True)  # start fake progress
     cpdir("/tmp/eupnea-build/firmware", "/mnt/eupnea/lib/firmware")
+    stop_progress(force_show=True)  # stop fake progress
 
 
 # chroot command
@@ -383,43 +389,37 @@ def chroot(command: str) -> str:
 def start_build(verbose: bool, local_path: str, kernel_type: str, dev_release: bool, main_pid: int, user_id: str,
                 build_options):
     set_verbose(verbose)
-    prepare_host(build_options[0], user_id)
+
+    # Most errors happen in the preparation. To avoid unnecessary downloads the storage device is prepared before
+    # downloading files
+    prepare_host(build_options["distro_name"], user_id)
+    if build_options["device"] == "image":
+        output_temp = prepare_img()
+        img_mnt = output_temp[0]
+        root_partuuid = output_temp[1]
+    else:
+        output_temp = prepare_usb(build_options["device"])
+        img_mnt = output_temp[0]
+        root_partuuid = output_temp[1]
 
     if local_path is None:
-        # Print kernel download progress in terminal
-        kernel_download = Thread(target=download_kernel, args=(kernel_type, dev_release, main_pid,), daemon=True)
-        kernel_download.start()
-        sleep(1)  # wait for thread to print info
-        while kernel_download.is_alive():
-            print(".", end="", flush=True)
-            sleep(1)
-        print("")  # break line
-
-        # Print rootfs download progress in terminal
-        rootfs_download = Thread(target=download_rootfs,
-                                 args=(build_options[0], build_options[1], build_options[2], main_pid,),
-                                 daemon=True)
-        rootfs_download.start()
-        sleep(1)  # wait for thread to print info
-        while rootfs_download.is_alive():
-            print(".", end="", flush=True)
-            sleep(1)
-        print("")  # break line
-
-        # Download firmware
+        download_kernel(kernel_type, dev_release, main_pid)
+        download_rootfs(build_options["distro_name"], build_options["distro_version"], build_options["distro_link"],
+                        main_pid)
         download_firmware(main_pid)
-
-    else:  # if local path is specified, copy files from there
+    else:  # if local path is specified, copy files from it, instead of downloading from the internet
+        # clean local path string
         if not local_path.endswith("/"):
             local_path_posix = f"{local_path}/"
         else:
             local_path_posix = local_path
-        print("\033[96m" + "Copying local files to tmp" + "\033[0m")
+
+        print_status("Copying local files to tmp")
         try:
             cpfile(f"{local_path_posix}bzImage", "/tmp/eupnea-build/bzImage")
             cpfile(f"{local_path_posix}modules.tar.xz", "/tmp/eupnea-build/modules.tar.xz")
             cpdir(f"{local_path_posix}firmware", "/mnt/eupnea/lib/firmware/google")
-            match build_options[0]:
+            match build_options["distro_name"]:
                 case "ubuntu":
                     cpfile(f"{local_path_posix}ubuntu-rootfs.tar.xz", "/tmp/eupnea-build/ubuntu-rootfs.tar.xz")
                 case "debian":
@@ -429,25 +429,17 @@ def start_build(verbose: bool, local_path: str, kernel_type: str, dev_release: b
                 case "fedora":
                     cpfile(f"{local_path_posix}fedora-rootfs.raw.xz", "/tmp/eupnea-build/fedora-rootfs.raw.xz")
                 case _:
-                    print("\033[91m" + "Something went **really** wrong!!! (Distro name not found)" + "\033[0m")
+                    print_error("Distro name not found, please create an issue")
                     exit(1)
         except FileNotFoundError:
-            print("\033[91m" + "Local rootfs file not found, please verify the file name is correct" + "\033[0m")
+            print_error("Local rootfs not found, please verify the file name is correct")
             exit(1)
 
-    if build_options[4] == "image":
-        output_temp = prepare_img()
-        img_mnt = output_temp[0]
-        root_partuuid = output_temp[1]
-    else:
-        output_temp = prepare_usb(build_options[4])
-        img_mnt = output_temp[0]
-        root_partuuid = output_temp[1]
+    extract_rootfs(build_options["distro_name"])
+    post_extract(build_options["username"], build_options["password"], build_options["hostname"],
+                 build_options["distro_name"], build_options["de_name"], kernel_type)
 
-    extract_rootfs(build_options[0], main_pid)
-    post_extract(build_options[5], build_options[6], build_options[7], build_options[0], build_options[3], kernel_type)
-
-    match build_options[0]:
+    match build_options["distro_name"]:
         case "ubuntu":
             import distro.ubuntu as distro
         case "debian":
@@ -458,23 +450,22 @@ def start_build(verbose: bool, local_path: str, kernel_type: str, dev_release: b
             import distro.fedora as distro
         case _:
             # Just in case
-            print("\033[91m" + "DISTRO NAME NOT FOUND! Selecting Ubuntu as fallback" + "\033[0m")
-            import distro.ubuntu as distro
-    distro.config(build_options[3], build_options[1], root_partuuid, verbose)
+            print_error("DISTRO NAME NOT FOUND! Please create an issue")
+            exit(1)
+    distro.config(build_options["de_name"], build_options["distro_version"], root_partuuid, verbose)
 
-    post_config(build_options[8])
+    post_config(build_options["rebind_search"])
 
-    # Unmount everything
-    print("\033[96m" + "Finishing setup" + "\033[0m")
-    print("Unmounting rootfs")
+    # Post-install cleanupp
+    print_status("Cleaning up host system after build")
     bash("umount -f /mnt/eupnea")
-    if build_options[4] == "image":
-        print("Unmounting img")
+    if build_options["device"] == "image":
         bash(f"losetup -d {img_mnt}")
-        print("\033[95m" + f"The ready Eupnea image is located at {get_full_path('.')}/eupnea.img" + "\033[0m")
+        print_header(f"The ready-to-boot Eupnea image is located at {get_full_path('.')}/eupnea.img")
     else:
-        print("\033[95m" + "The USB is ready to boot Eupnea. " + "\033[0m")
+        print_header("It is safe to remove the USB-drive/SD-card now.")
+    print_header("Thank you for using Eupnea!")
 
 
 if __name__ == "__main__":
-    print("\033[91m" + "Do not run this file directly. Instead, run main.py" + "\033[0m")
+    print_error("Do not run this file directly. Instead, run main.py")

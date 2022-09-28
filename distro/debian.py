@@ -3,76 +3,78 @@ from functions import *
 
 def config(de_name: str, distro_version: str, root_partuuid: str, verbose: bool) -> None:
     set_verbose(verbose)
+    print_status("Configuring Debian")
 
-    print("\033[96m" + "Configuring Ubuntu" + "\033[0m")
-
-    print("Installling add-apt-repository")
+    print_status("Installing dependencies")
+    start_progress()  # start fake progress
+    # install apt-add-repository
     chroot("apt-get update -y")
     chroot("apt-get install -y software-properties-common")
-
-    print("Adding non free repos")
-    chroot("apt-add-repository non-free")
+    # add non-free repos
+    chroot("add-apt-repository -y non-free")
     chroot("apt-get update -y")
-
-    print("Installing packages")
+    # Install dependencies
     chroot("apt-get install -y network-manager sudo firmware-linux-free cloud-utils firmware-linux-nonfree "
            "firmware-iwlwifi iw git")
+    stop_progress()  # stop fake progress
 
-    print("\033[96m" + "Downloading and installing de, might take a while" + "\033[0m")
+    print_status("Downloading and installing de, might take a while")
+    start_progress()  # start fake progress
+    # DEBIAN_FRONTEND=noninteractive skips locale setup questions
     match de_name:
         case "gnome":
-            print("Installing gnome")
+            print_status("Installing GNOME")
             chroot("DEBIAN_FRONTEND=noninteractive apt-get install -y gnome/stable gnome-initial-setup")
         case "kde":
-            print("Installing kde")
+            print_status("Installing KDE")
             chroot("DEBIAN_FRONTEND=noninteractive apt-get install -y task-kde-desktop")
         case "mate":
-            print("Installing mate")
+            print_status("Installing MATE")
             chroot("DEBIAN_FRONTEND=noninteractive apt-get install -y mate-desktop-environment "
                    "mate-desktop-environment-extras gdm3")
         case "xfce":
-            print("Installing xfce")
+            print_status("Installing Xfce")
             chroot("DEBIAN_FRONTEND=noninteractive apt-get install -y task-xfce-desktop")
         case "lxqt":
-            print("Installing lxqt")
+            print_status("Installing LXQt")
             chroot("DEBIAN_FRONTEND=noninteractive apt-get install -y task-lxqt-desktop")
         case "deepin":
-            print("\033[91m" + "Deepin is not available for Debian" + "\033[91m")
+            print_error("Deepin is not available for Debian")
             exit(1)
         case "budgie":
-            print("Installing budgie")
-            # DEBIAN_FRONTEND=noninteractive skips locale setup in cli
+            print_status("Installing Budgie")
             chroot("DEBIAN_FRONTEND=noninteractive apt-get install -y budgie-desktop budgie-indicator-applet "
                    "budgie-core lightdm lightdm-gtk-greeter")
             chroot("systemctl enable lightdm.service")
         case "cli":
-            print("Installing nothing")
+            print_status("Skipping desktop environment install")
         case _:
-            print("\033[91m" + "Invalid desktop environment!!! Remove all files and retry." + "\033[0m")
+            print_error("Invalid desktop environment! Please create an issue")
             exit(1)
+    stop_progress()  # stop fake progress
 
-    # Ignore libfprint-2-2 fprintd libpam-fprintd errors
     if not de_name == "cli":
-        print("Setting system to boot to gui")
+        # Set system to boot to gui
         chroot("systemctl set-default graphical.target")
 
-    # GDM3 auto installs gnome-minimal. Gotta remove it if user didnt choose gnome
+    # GDM3 auto installs gnome-minimal. Gotta remove it if user didn't choose gnome
     if not de_name == "gnome":
-        print("Fixing gdm3")
         try:
             rmfile("/mnt/eupnea/usr/share/xsessions/ubuntu.desktop")
         except FileNotFoundError:
             pass
         chroot("apt-get remove -y gnome-shell")
         chroot("apt-get autoremove -y")
-    print("Fixing securetty if needed")
+
+    # Fix gdm3, https://askubuntu.com/questions/1239503/ubuntu-20-04-and-20-10-etc-securetty-no-such-file-or-directory
     try:
         cpfile("/mnt/eupnea/usr/share/doc/util-linux/examples/securetty", "/mnt/eupnea/etc/securetty")
     except FileNotFoundError:
         pass
+    print_status("Desktop environment setup complete")
 
     # Replace input-synaptics with newer input-libinput, for better touchpad support
-    print("Replacing touchpad drivers")
+    print_status("Upgrading touchpad drivers")
     chroot("apt-get remove -y xserver-xorg-input-synaptics")
     # chroot("apt-get install -y xserver-xorg-input-libinput")
 
@@ -85,6 +87,8 @@ def config(de_name: str, distro_version: str, root_partuuid: str, verbose: bool)
     with open("/mnt/eupnea/etc/os-release", "w") as f:
         f.writelines(os_release)
 
+    print_status("Debian setup complete")
+
 
 def chroot(command: str) -> None:
     if verbose:
@@ -94,4 +98,4 @@ def chroot(command: str) -> None:
 
 
 if __name__ == "__main__":
-    print("Do not run this file. Use build.py")
+    print_error("Do not run this file. Use main.py")
