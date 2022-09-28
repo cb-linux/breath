@@ -120,15 +120,7 @@ def download_rootfs(distro_name: str, distro_version: str, distro_link: str, mai
                     filename="/tmp/eupnea-build/ubuntu-rootfs.tar.xz")
                 stop_progress(force_show=True)
             case "debian":
-                print_status("Creating debian with debootstrap")
-                start_progress()  # start fake progress
-                # Debian is debootstrapped directly to the device
-                debian_result = bash(
-                    "debootstrap stable /mnt/eupnea https://deb.debian.org/debian/")
-                stop_progress()  # stop fake progress
-                if debian_result.__contains__("Couldn't download packages:"):
-                    print_error("Debootstrap failed, check your internet connection or try again later")
-                    bash(f"kill {main_pid}")
+                print_status("Debian is installed later, skipping download")
             case "arch":
                 print_status("Downloading latest arch rootfs")
                 start_progress(force_show=True)  # start fake progress
@@ -153,34 +145,33 @@ def download_firmware(main_pid: int) -> None:
         bash("git clone --depth=1 https://chromium.googlesource.com/chromiumos/third_party/linux-firmware/ "
              "/tmp/eupnea-build/firmware")
     except URLError:
-        print("\033[91m" + "Couldn't download firmware. Check your internet connection and try again." + "\033[0m")
+        print_error("Couldn't download firmware. Check your internet connection and try again.")
         bash(f"kill {main_pid}")
     stop_progress()  # stop fake progress
 
 
 # Create, mount, partition the img and flash the eupnea kernel
 def prepare_img() -> Tuple[str, str]:
-    print("\033[96m" + "Preparing img" + "\033[0m")
+    print_status("Preparing image")
 
-    print("Allocating space for image, might take a while")
-    # try fallocate, if it fails use dd
-    # TODO: determine img size
-    img_size = 10  # 10 for now
-    if not bash(f"fallocate -l {img_size}G eupnea.img") == "":
+    # TODO: dynamic img size
+    img_size = 10
+    try:
+        bash(f"fallocate -l {img_size}G eupnea.img")
+    except subprocess.CalledProcessError:  # try fallocate, if it fails use dd
         bash("dd if=/dev/zero of=eupnea.img status=progress bs=12884 count=1000070")
 
-    print("Mounting empty image")
+    print_status("Mounting empty image")
     mnt_point = bash("losetup -f --show eupnea.img")
     if mnt_point == "":
-        print("\033[91m" + "Failed to mount image" + "\033[0m")
+        print_error("\033[91m" + "Failed to mount image" + "\033[0m")
         exit(1)
-    print("Image mounted at" + mnt_point)
     return partition(mnt_point, False)
 
 
 # Prepare USB, usb is not yet fully implemented
 def prepare_usb(device: str) -> Tuple[str, str]:
-    print("\033[96m" + "Preparing USB" + "\033[0m")
+    print_status("Preparing USB")
 
     # fix device name if needed
     if device.endswith("/") or device.endswith("1") or device.endswith("2"):
@@ -254,7 +245,7 @@ def partition(mnt_point: str, write_usb: bool) -> Tuple[str, str]:
 
 
 # extract the rootfs to /mnt/eupnea
-def extract_rootfs(distro_name: str) -> None:
+def extract_rootfs(distro_name: str, main_pid) -> None:
     print_status("Extracting rootfs")
     match distro_name:
         case "ubuntu":
@@ -262,8 +253,15 @@ def extract_rootfs(distro_name: str) -> None:
             # --checkpoint is for printing real tar progress
             bash("tar xfp /tmp/eupnea-build/ubuntu-rootfs.tar.xz -C /mnt/eupnea --checkpoint=.10000")
         case "debian":
-            # Debian gets debootstrapped directly to the device, no need to copy
-            print_status("Copying debian was debootstrapped, skipping")
+            print_status("Debootstraping into /mnt/eupnea")
+            start_progress()  # start fake progress
+            # debootstrapping directly to /mnt/eupnea
+            debian_result = bash(
+                "debootstrap stable /mnt/eupnea https://deb.debian.org/debian/")
+            stop_progress()  # stop fake progress
+            if debian_result.__contains__("Couldn't download packages:"):
+                print_error("Debootstrap failed, check your internet connection or try again later")
+                bash(f"kill {main_pid}")
         case "arch":
             print_status("Extracting arch rootfs")
             mkdir("/tmp/eupnea-build/arch-rootfs")
@@ -360,7 +358,7 @@ def post_extract(username: str, password: str, hostname: str, distro_name: str, 
 # post extract and distro config
 def post_config(rebind_search: bool) -> None:
     # Add chromebook layout. Needs to be done after install Xorg
-    print("Backing up default keymap and setting Chromebook layout")
+    print_status("Backing up default keymap and setting Chromebook layout")
     cpfile("/mnt/eupnea/usr/share/X11/xkb/symbols/pc", "/mnt/eupnea/usr/share/X11/xkb/symbols/pc.default")
     cpfile("configs/xkb/xkb.chromebook", "/mnt/eupnea/usr/share/X11/xkb/symbols/pc")
     if rebind_search:  # rebind search key to caps lock
@@ -368,12 +366,12 @@ def post_config(rebind_search: bool) -> None:
         cpfile("/mnt/eupnea/usr/share/X11/xkb/keycodes/evdev", "/mnt/eupnea/usr/share/X11/xkb/keycodes/evdev.default")
 
     # Add postinstall service
-    print("Adding postinstall service")
+    print_status("Adding postinstall service")
     cpfile("configs/postinstall.service", "/mnt/eupnea/etc/systemd/system/postinstall.service")
     chroot("systemctl enable postinstall.service")
 
     # copy previously downloaded firmware
-    print("Copying google firmware")
+    print_status("Copying google firmware")
     rmdir("/mnt/eupnea/lib/firmware")
     start_progress(force_show=True)  # start fake progress
     cpdir("/tmp/eupnea-build/firmware", "/mnt/eupnea/lib/firmware")
@@ -438,7 +436,7 @@ def start_build(verbose: bool, local_path: str, kernel_type: str, dev_release: b
         root_partuuid = output_temp[1]
 
     # Extract rootfs and configure distro agnostic settings
-    extract_rootfs(build_options["distro_name"])
+    extract_rootfs(build_options["distro_name"], main_pid)
     post_extract(build_options["username"], build_options["password"], build_options["hostname"],
                  build_options["distro_name"], build_options["de_name"], kernel_type)
 

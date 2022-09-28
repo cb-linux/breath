@@ -159,9 +159,14 @@ def get_user_input() -> dict:
                 print("Using 'localuser' as username")
                 output_dict["username"] = "localuser"
                 break
+            found_invalid_char = False
             for char in output_dict["username"]:
                 if char not in "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789._-":
-                    print("\033[93m" + "Username contains invalid character: " + char + "\033[0m")
+                    print_warning(f"Hostname contains invalid character: {char}")
+                    found_invalid_char = True
+                    break
+                if not found_invalid_char:
+                    print(f"Using {output_dict['username']} as username")
                     break
 
         print_question("Please set a secure password")
@@ -211,7 +216,7 @@ def get_user_input() -> dict:
             break
 
     print_question("Would you like to rebind the Search/Super/Win key to Caps Lock?(NOT RECOMMENDED)")
-    if input("\033[94m" + "Type yes to rebind. Press enter to keep old binding" "\033[0m") == "yes":
+    if input("\033[94m" + "Type yes to rebind. Press enter to keep old binding: " "\033[0m") == "yes":
         print("Search key will be a CAPS LOCK key")
         rebind_search = True
     else:
