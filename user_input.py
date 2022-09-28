@@ -6,7 +6,7 @@ from getpass import getpass
 from functions import bash
 
 
-def user_input() -> Tuple[str, str, str, str, str, str, str, str, bool, bool]:
+def user_input() -> Tuple[str, str, str, str, str, str, str, str, bool]:
     # set default values
     distro_version = 0
     distro_link = ""
@@ -230,19 +230,16 @@ def user_input() -> Tuple[str, str, str, str, str, str, str, str, bool, bool]:
             device = input("\033[92m" + 'Enter usb/sdcard name(example: sdb) or "image" to build an image'
                            + "\033[0m" + "\n").strip()
             if device == "image":
-                create_iso = True
                 print("Building image instead of writing directly")
                 break
             elif device == "":
                 print("\033[93m" + "Device name cannot be empty" + "\033[0m")
             else:
-                create_iso = False
                 print(f"Writing directly to /dev/{device}")
                 break
 
     print("User input complete")
-    return distro_name, distro_version, distro_link, de_name, device, username, password, hostname, rebind_search, \
-           create_iso
+    return distro_name, distro_version, distro_link, de_name, device, username, password, hostname, rebind_search
 
 
 if __name__ == "__main__":

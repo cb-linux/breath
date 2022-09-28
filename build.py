@@ -457,7 +457,7 @@ def start_build(verbose: bool, local_path: str, kernel_type: str, dev_release: b
             print("\033[91m" + "Local rootfs file not found, please verify the file name is correct" + "\033[0m")
             exit(1)
 
-    if build_options[9]:
+    if build_options[4] == "image":
         output_temp = prepare_img()
         img_mnt = output_temp[0]
         root_partuuid = output_temp[1]
@@ -490,7 +490,7 @@ def start_build(verbose: bool, local_path: str, kernel_type: str, dev_release: b
     print("\033[96m" + "Finishing setup" + "\033[0m")
     print("Unmounting rootfs")
     bash("umount -f /mnt/eupnea")
-    if build_options[9]:
+    if build_options[4] == "image":
         print("Unmounting img")
         bash(f"losetup -d {img_mnt}")
         print("\033[95m" + f"The ready Eupnea image is located at {get_full_path('.')}/eupnea.img" + "\033[0m")
