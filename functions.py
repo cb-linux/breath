@@ -183,3 +183,7 @@ def print_status(message: str) -> None:
 
 def print_green(message: str) -> None:
     print("\033[92m" + message + "\033[0m")
+
+
+if __name__ == "__main__":
+    print_error("There is nothing to be run in this file!")

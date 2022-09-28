@@ -15,6 +15,8 @@ def process_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('-p', '--local-path', dest="local_path",
                         help="Local path for kernel files to use instead of downloading from github.")
+    parser.add_argument("-v", "--verbose", action="store_true", dest="verbose", default=False,
+                        help="Print more output")
     parser.add_argument("--dev", action="store_true", dest="dev_build", default=False,
                         help="Use kernels from latest dev build. May be unstable.")
     parser.add_argument("--alt", action="store_true", dest="alt", default=False,
@@ -146,6 +148,7 @@ if __name__ == "__main__":
     if args.local_path:
         print("\033[93m" + "Using local path" + "\033[0m")
         skip_version_question = True
+    set_verbose(args.verbose)  # set verbose in functions.py
 
     # read root partition mount
     root_part = bash("mount | grep ' / ' | cut -d' ' -f 1")

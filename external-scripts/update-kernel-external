@@ -135,10 +135,11 @@ def flash_kernel() -> None:
 
 
 if __name__ == "__main__":
-    # Elevate script to root
+    # Restart script as root if not already
     if os.geteuid() != 0:
         args = ['sudo', sys.executable] + sys.argv + [os.environ]
         os.execlpe('sudo', *args)
+
     # Try importing functions.py
     try:
         from functions import *
@@ -173,9 +174,7 @@ if __name__ == "__main__":
     if args.local_path:
         print("\033[93m" + "Using local path" + "\033[0m")
         skip_question = True
-    if args.verbose:
-        print("\033[93m" + "Verbosity increased" + "\033[0m")
-        enable_verbose()  # enable verbose output in functions.py
+    set_verbose(args.verbose)  # set verbose in functions.py
 
     # get rootfs partition from user
     bash("lsblk -o NAME,LABEL,SIZE")

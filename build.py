@@ -382,9 +382,7 @@ def chroot(command: str) -> str:
 # The main build script
 def start_build(verbose: bool, local_path: str, kernel_type: str, dev_release: bool, main_pid: int, user_id: str,
                 build_options):
-    if verbose:
-        enable_verbose()
-
+    set_verbose(verbose)
     prepare_host(build_options[0], user_id)
 
     if local_path is None:
