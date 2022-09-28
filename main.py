@@ -24,11 +24,14 @@ def process_args():
                         help="Use experimental 5.15 kernel.")
     parser.add_argument("--mainline", action="store_true", dest="mainline", default=False,
                         help="Use mainline linux kernel instead of modified chromeos kernel.")
-    parser.add_argument("-v", "--verbose", action="store_true", dest="verbose", default=False, help="Print more output")
+    parser.add_argument("-v", "--verbose", action="store_true", dest="verbose_asd", default=False,
+                        help="Print more output")
     return parser.parse_args()
 
 
 if __name__ == "__main__":
+    args = process_args()  # process args before elevating to root for better ux
+
     # get username
     user_id = os.getlogin()
 
@@ -77,9 +80,8 @@ if __name__ == "__main__":
     import user_input
 
     # parse arguments
-    args = process_args()
     dev_release = False
-    verbose = False
+    verbose_asd = False
     kernel_type = "stable"
     if args.dev_build:
         print("\033[93m" + "Using dev release" + "\033[0m")
@@ -97,6 +99,6 @@ if __name__ == "__main__":
         print("\033[93m" + "Using local files" + "\033[0m")
     if args.verbose:
         print("\033[93m" + "Verbosity increased" + "\033[0m")
-        verbose = True
-    build = build.start_build(verbose, local_path=args.local_path, kernel_type=kernel_type, dev_release=dev_release,
+        verbose_asd = True
+    build = build.start_build(verbose_asd, local_path=args.local_path, kernel_type=kernel_type, dev_release=dev_release,
                               main_pid=os.getpid(), user_id=user_id, build_options=user_input.user_input())

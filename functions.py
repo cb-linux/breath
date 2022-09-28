@@ -121,6 +121,6 @@ def bash(command: str) -> str:
 #                               MISC STUFF                                            #
 #######################################################################################
 
-def enable_verbose() -> None:
+def set_verbose(new_state: bool) -> None:
     global verbose
-    verbose = True
+    verbose = new_state

@@ -15,12 +15,13 @@ def process_args():
                         help="Append a flag rather than replacing the whole command line")
     parser.add_argument('-r', '--reset', action="store_true", dest="reset", default=False,
                         help="Reset to default command line")
-    parser.add_argument('-s', '--show-current', action="store_true", dest="show", default=False,
+    parser.add_argument('-p', '--print-current', action="store_true", dest="show", default=False,
                         help="Show current command line")
-    parser.add_argument(dest='cmdline', type=str, nargs="?",
-                        help="New, full kernel command line in quotes, example: \n"
-                             + r'modify-cmdline "console=tty1 root=PARTUUID=7d83c214-289e-4e8b-93cc-685aea502'
-                               r'f59 i915.modeset=1 rootwait rw fbcon=logo-pos:center,logo-count:1 loglevel=0 splash"')
+    parser.add_argument('-s', '--set', action="store_true", dest="show", default=False,
+                        help="Set new cmdline, must be followed by the new cmdline in quotes, example: \n" +
+                             r'modify-cmdline -s "console=tty1 root=PARTUUID=7d83c214-289e-4e8b-93cc-685aea502 '
+                             r'f59 i915.modeset=1 rootwait rw fbcon=logo-pos:center,logo-count:1 loglevel=0 splash"')
+    parser.add_argument(dest='cmdline', type=str, nargs="?")
     parser.add_argument("-v", "--verbose", action="store_true", dest="verbose", default=False, help="Print more output")
     return parser.parse_args()
 
@@ -40,19 +41,17 @@ def install_packages() -> None:
 
 
 if __name__ == '__main__':
+
+    args = process_args() # process args before elevating to root for better ux
+    if args.show:
+        print("Current command line:\n" + "\033[96m" + bash("cat /proc/cmdline") + "\033[0m")
+        exit(1)
+    set_verbose(args.verbose)  # enable verbose output in functions.py
+
     # Elevate script to root
     if not os.geteuid() == 0:
         sudo_args = ['sudo', sys.executable] + sys.argv + [os.environ]
         os.execlpe('sudo', *sudo_args)
-
-    args = process_args()
-
-    if args.show:
-        print("Current command line:\n" + "\033[96m" + bash("cat /proc/cmdline") + "\033[0m")
-        exit(1)
-    if args.verbose:
-        print("\033[93m" + "Verbosity increased" + "\033[0m")
-        enable_verbose()  # enable verbose output in functions.py
 
     print("Reading partition table")
     partitions = bash("mount | grep ' / ' | cut -d' ' -f 1")
