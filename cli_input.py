@@ -6,7 +6,7 @@ from getpass import getpass
 from functions import *
 
 
-def user_input() -> dict:
+def get_user_input() -> dict:
     output_dict = {
         "distro_name": "ubuntu",
         "distro_version": "",

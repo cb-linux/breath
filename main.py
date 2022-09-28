@@ -106,4 +106,4 @@ if __name__ == "__main__":
     if args.verbose:
         print("\033[93m" + "Verbosity increased" + "\033[0m")
     build = build.start_build(verbose, local_path=args.local_path, kernel_type=kernel_type, dev_release=dev_release,
-                              main_pid=os.getpid(), user_id=user_id, build_options=user_input.user_input())
+                              main_pid=os.getpid(), user_id=user_id, build_options=cli_input.get_user_input())
