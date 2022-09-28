@@ -17,12 +17,13 @@ def process_args():
                         help="Reset to default command line")
     parser.add_argument('-p', '--print-current', action="store_true", dest="show", default=False,
                         help="Show current command line")
-    parser.add_argument('-s', '--set', action="store_true", dest="show", default=False,
+    parser.add_argument("-v", "--verbose", action="store_true", dest="verbose", default=False, help="Print more output")
+    # --set is more for ux than actual use
+    parser.add_argument('-s', '--set', action="store_true",
                         help="Set new cmdline, must be followed by the new cmdline in quotes, example: \n" +
                              r'modify-cmdline -s "console=tty1 root=PARTUUID=7d83c214-289e-4e8b-93cc-685aea502 '
                              r'f59 i915.modeset=1 rootwait rw fbcon=logo-pos:center,logo-count:1 loglevel=0 splash"')
     parser.add_argument(dest='cmdline', type=str, nargs="?")
-    parser.add_argument("-v", "--verbose", action="store_true", dest="verbose", default=False, help="Print more output")
     return parser.parse_args()
 
 
@@ -42,7 +43,7 @@ def install_packages() -> None:
 
 if __name__ == '__main__':
 
-    args = process_args() # process args before elevating to root for better ux
+    args = process_args()  # process args before elevating to root for better ux
     if args.show:
         print("Current command line:\n" + "\033[96m" + bash("cat /proc/cmdline") + "\033[0m")
         exit(1)
