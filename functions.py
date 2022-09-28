@@ -118,9 +118,56 @@ def bash(command: str) -> str:
 
 
 #######################################################################################
-#                               MISC STUFF                                            #
+#                                    MISC STUFF                                       #
 #######################################################################################
 
 def set_verbose(new_state: bool) -> None:
     global verbose
     verbose = new_state
+
+
+def install_vboot(user_id: str) -> None:
+    print("Installing vboot and cgpt packages")
+    # TODO: Properly check if packages are installed
+    if path_exists("/usr/bin/apt"):  # Ubuntu + debian
+        bash("apt-get install cgpt vboot-kernel-utils -y")
+    elif path_exists("/usr/bin/pacman"):  # Arch
+        bash("pacman -S --needed base-devel --noconfirm")
+
+        bash("git clone https://aur.archlinux.org/cgpt-bin.git")
+        # Using custom PKGBUILD as the one in the AUR is broken
+        try:
+            cpfile("configs/PKGBUILD", "cgpt-bin/PKGBUILD")  # config location while building
+        except FileNotFoundError:
+            cpfile("/usr/local/eupnea-configs/PKGBUILD", "cgpt-bin/PKGBUILD")  # config location in eupnea install
+        bash(f'su -c "cd cgpt-bin && makepkg -sirc --noconfirm" {user_id}')  # makepkg doesnt run as root
+
+        bash("git clone https://aur.archlinux.org/vboot-utils.git")
+        bash(f'su -c "cd vboot-utils && makepkg -sirc --noconfirm" {user_id}')  # makepkg doesnt run as root
+
+        rmdir("cgpt-bin", keep_dir=False)
+        rmdir("vboot-utils", keep_dir=False)
+    elif path_exists("/usr/bin/dnf"):  # Fedora
+        bash("dnf install vboot-utils --assumeyes")  # cgpt is included in vboot-utils on fedora
+    elif path_exists("/usr/bin/zypper"):  # openSUSE
+        bash("zypper --non-interactive install vboot")
+
+
+#######################################################################################
+#                                    PRINT FUNCTIONS                                  #
+#######################################################################################
+
+def print_warning(message: str) -> None:
+    print("\033[93m" + message + "\033[0m")
+
+
+def print_error(message: str) -> None:
+    print("\033[91m" + message + "\033[0m")
+
+
+def print_status(message: str) -> None:
+    print("\033[94m" + message + "\033[0m")
+
+
+def print_green(message: str) -> None:
+    print("\033[92m" + message + "\033[0m")

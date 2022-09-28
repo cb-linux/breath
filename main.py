@@ -30,10 +30,11 @@ def process_args():
 
 
 if __name__ == "__main__":
-    args = process_args()  # process args before elevating to root for better ux
+    if os.geteuid() == 0:
+        print_error("Please start the script as non-root/without sudo")
 
-    # get username
-    user_id = os.getlogin()
+    args = process_args()  # process args before elevating to root for better ux
+    user_id = os.getlogin()  # get username
 
     # Elevate script to root
     if not os.geteuid() == 0:

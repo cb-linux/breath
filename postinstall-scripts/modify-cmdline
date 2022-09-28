@@ -27,56 +27,45 @@ def process_args():
     return parser.parse_args()
 
 
-def install_packages() -> None:
-    if not path_exists('/usr/bin/futility'):
-        if path_exists('/usr/bin/apt'):
-            bash('sudo apt install -y vboot-kernel-utils')
-        elif path_exists("/usr/bin/pacman"):
-            bash("pacman -S vboot-kernel-utils --noconfirm")
-        elif path_exists("/usr/bin/dnf"):
-            bash("dnf install vboot-kernel-utils --assumeyes")
-        else:
-            print("Vboot-kernel-utils not found. Please install vboot-kernel-utils or vboot-utils using your distros" +
-                  " package manager.")
-            exit(1)
-
-
 if __name__ == '__main__':
+    if os.geteuid() == 0:
+        print_error("Please start the script as non-root/without sudo")
 
     args = process_args()  # process args before elevating to root for better ux
     if args.show:
-        print("Current command line:\n" + "\033[96m" + bash("cat /proc/cmdline") + "\033[0m")
+        print_status("Current command line: ")
+        print_green(bash("cat /proc/cmdline"))
         exit(1)
     set_verbose(args.verbose)  # enable verbose output in functions.py
+    user_id = os.getlogin()  # get non root username
 
     # Elevate script to root
     if not os.geteuid() == 0:
         sudo_args = ['sudo', sys.executable] + sys.argv + [os.environ]
         os.execlpe('sudo', *sudo_args)
 
-    print("Reading partition table")
+    print_status("Reading partition table")
     partitions = bash("mount | grep ' / ' | cut -d' ' -f 1")
     partitions = partitions[:len(partitions) - 1]  # get device "name"
     if args.reset:
-        print("Resetting to default command line")
-        print("Downloading default command line from github")
+        print_status("Resetting to default command line")
+        print_status("Downloading default command line from github")
         try:
             temp_cmdline = urlopen(
                 "https://raw.githubusercontent.com/eupnea-linux/eupnea/main/configs/kernel.flags").read().decode(
                 "utf-8")
         except URLError:
-            print("\033[91m" + "Failed to reach github. Fallback to hardcoded default cmdline" + "\033[0m")
+            print_warning("Failed to reach github. Falling back to hardcoded default cmdline")
             temp_cmdline = "console=tty1 root=PARTUUID=${USB_ROOTFS} i915.modeset=1 rootwait rw fbcon=logo-pos:center" \
                            ",logo-count:1 loglevel=0 splash"
-        # get partuuid of rootfs
-        rootfs_partuuid = bash(f"blkid -o value -s PARTUUID {partitions}2")
-        new_cmdline = temp_cmdline.replace("${USB_ROOTFS}", rootfs_partuuid)
+        rootfs_partuuid = bash(f"blkid -o value -s PARTUUID {partitions}2")  # get partuuid of rootfs
+        new_cmdline = temp_cmdline.replace("${USB_ROOTFS}", rootfs_partuuid)  # replace PARTUUID in default cmdline
     else:
         if args.cmdline is None:
-            print("Please provide the new commandline or use -a to append a flag.")
+            print_error("No cmdline provided. Use --help for help")
             exit(1)
         new_cmdline = args.cmdline[0].strip()
-    install_packages()
+    install_vboot(user_id)
     kernel_partition = f"{partitions}1"
     # Write the new kernel commandline to a file
     with open('cmdline', 'w') as file:
@@ -87,10 +76,10 @@ if __name__ == '__main__':
         else:
             file.write(new_cmdline)
     # Copy old kernel partition
-    bash(f"dd if={kernel_partition} of=kernel_part")
+    bash(f"dd if={kernel_partition} of=old_kernel")
     print("Signing new kernel")
-    bash("futility vbutil_kernel --repack new_kernel_part --version 1 --keyblock " +
+    bash("futility vbutil_kernel --repack new_kernel --version 1 --keyblock " +
          "/usr/share/vboot/devkeys/kernel.keyblock --signprivate /usr/share/vboot/devkeys/kernel_data_key.vbprivk " +
-         "--oldblob kernel_part --config cmdline")
+         "--oldblob old_kernel --config cmdline")
     print("Flashing new kernel")
-    bash(f'sudo dd if=new_kernel_part of={kernel_partition}')
+    bash(f'sudo dd if=new_kernel of={kernel_partition}')
