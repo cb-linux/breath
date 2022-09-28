@@ -45,6 +45,10 @@ if __name__ == "__main__":
         sudo_args = ['sudo', sys.executable] + sys.argv + [os.environ]
         os.execlpe('sudo', *sudo_args)
 
+    # read username
+    with open("/tmp/username", "r") as file:
+        user_id = file.read()
+
     # Check python version
     if sys.version_info < (3, 10):  # python 3.10 or higher is required
         if path_exists("/usr/bin/apt"):

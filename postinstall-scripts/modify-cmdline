@@ -47,6 +47,10 @@ if __name__ == '__main__':
         sudo_args = ['sudo', sys.executable] + sys.argv + [os.environ]
         os.execlpe('sudo', *sudo_args)
 
+    # read username
+    with open("/tmp/username", "r") as file:
+        user_id = file.read()
+
     print_status("Reading partition table")
     partitions = bash("mount | grep ' / ' | cut -d' ' -f 1")
     partitions = partitions[:len(partitions) - 1]  # get device "name"
