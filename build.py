@@ -81,9 +81,9 @@ def download_kernel(kernel_type: str, dev_release: bool, main_pid: int) -> None:
         match kernel_type:
             case "mainline":
                 url = "https://github.com/eupnea-linux/mainline-kernel/releases/latest/download/"
-                urlretrieve(f"{url}bzImage", filename="/tmp/eupnea-build/bzImage")
-                urlretrieve(f"{url}modules.tar.xz", filename="/tmp/eupnea-build/modules.tar.xz")
-                urlretrieve(f"{url}headers.tar.xz", filename="/tmp/eupnea-build/headers.tar.xz")
+                urlretrieve(f"{url}bzImage-stable", filename="/tmp/eupnea-build/bzImage")
+                urlretrieve(f"{url}modules-stable.tar.xz", filename="/tmp/eupnea-build/modules.tar.xz")
+                urlretrieve(f"{url}headers-stable.tar.xz", filename="/tmp/eupnea-build/headers.tar.xz")
             case "alt":
                 print("Downloading alt kernel")
                 urlretrieve(f"{url}bzImage-alt", filename="/tmp/eupnea-build/bzImage")
