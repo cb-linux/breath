@@ -165,9 +165,9 @@ def get_user_input() -> dict:
                     print_warning(f"Hostname contains invalid character: {char}")
                     found_invalid_char = True
                     break
-                if not found_invalid_char:
-                    print(f"Using {output_dict['username']} as username")
-                    break
+            if not found_invalid_char:
+                print(f"Using {output_dict['username']} as username")
+                break
 
         print_question("Please set a secure password")
         while True:
