@@ -132,6 +132,10 @@ def install_vboot(user_id: str) -> None:
     if path_exists("/usr/bin/apt"):  # Ubuntu + debian
         bash("apt-get install cgpt vboot-kernel-utils -y")
     elif path_exists("/usr/bin/pacman"):  # Arch
+        # remove old files if present
+        rmdir("cgpt-bin", keep_dir=False)
+        rmdir("vboot-utils", keep_dir=False)
+
         bash("pacman -S --needed base-devel --noconfirm")
 
         bash("git clone https://aur.archlinux.org/cgpt-bin.git")
@@ -144,9 +148,6 @@ def install_vboot(user_id: str) -> None:
 
         bash("git clone https://aur.archlinux.org/vboot-utils.git")
         bash(f'su -c "cd vboot-utils && makepkg -sirc --noconfirm" {user_id}')  # makepkg doesnt run as root
-
-        rmdir("cgpt-bin", keep_dir=False)
-        rmdir("vboot-utils", keep_dir=False)
     elif path_exists("/usr/bin/dnf"):  # Fedora
         bash("dnf install vboot-utils --assumeyes")  # cgpt is included in vboot-utils on fedora
     elif path_exists("/usr/bin/zypper"):  # openSUSE
