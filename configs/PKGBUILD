@@ -10,7 +10,7 @@ license=('BSD')
 depends=('glibc' 'libuuid.so')
 provides=('cgpt')
 source=("cgpt.deb::http://archive.ubuntu.com/ubuntu/pool/universe/v/vboot-utils/cgpt_0~${_rel}-${pkgver}-${pkgrel}_amd64.deb")
-sha512sums=("30db4b646fe55a296afde8bfb9fa02939fbfa401c13e27302ffa51f7e40bd22bea4037a7014f606cbc5046cd9eaace63827078775c7d040e34d5b27ebe69b0f6")
+sha512sums=("3e6b94d718365cb4118ae9b84495998787ab35c0d66b685ec229f593adf11c35d71a2d18ee8fc48e6ef88cdc3a4275d76c6a73c3d70d37b0b80d2973a912188a")
 
 package() {
 	cd "$srcdir"
