@@ -107,101 +107,6 @@ def download_kernel(kernel_type: str, dev_release: bool, main_pid: int) -> None:
     print_status("Kernel files downloaded successfully")
 
 
-# Prepare USB, usb is not yet fully implemented
-def prepare_usb(device: str) -> Tuple[str, str]:
-    print("\033[96m" + "Preparing USB" + "\033[0m")
-
-    # fix device name if needed
-    if device.endswith("/") or device.endswith("1") or device.endswith("2"):
-        device = device[:-1]
-    # add /dev/ to device name, if needed
-    if not device.startswith("/dev/"):
-        device = f"/dev/{device}"
-
-    # unmount all partitions
-    try:
-        bash(f"umount -lf {device}* 2>/dev/null")
-    except subprocess.CalledProcessError:
-        pass
-    return partition(device, True)
-
-
-# Create, mount, partition the img and flash the eupnea kernel
-def prepare_img() -> Tuple[str, str]:
-    print("\033[96m" + "Preparing img" + "\033[0m")
-
-    print("Allocating space for image, might take a while")
-    # try fallocate, if it fails use dd
-    # TODO: determine img size
-    img_size = 10  # 10 for now
-    if not bash(f"fallocate -l {img_size}G eupnea.img") == "":
-        bash("dd if=/dev/zero of=eupnea.img status=progress bs=12884 count=1000070")
-
-    print("Mounting empty image")
-    mnt_point = bash("losetup -f --show eupnea.img")
-    if mnt_point == "":
-        print("\033[91m" + "Failed to mount image" + "\033[0m")
-        exit(1)
-    print("Image mounted at" + mnt_point)
-    return partition(mnt_point, False)
-
-
-def partition(mnt_point: str, write_usb: bool) -> Tuple[str, str]:
-    # remove partition table from usb
-    if write_usb:
-        bash(f"wipefs -af {mnt_point}")
-
-    # format as per depthcharge requirements,
-    # READ: https://wiki.gentoo.org/wiki/Creating_bootable_media_for_depthcharge_based_devices
-    print("Partitioning mounted image and adding flags")
-    bash(f"parted -s {mnt_point} mklabel gpt")
-    bash(f"parted -s -a optimal {mnt_point} unit mib mkpart Kernel 1 65")  # kernel partition
-    bash(f"parted -s -a optimal {mnt_point} unit mib mkpart Root 65 100%")  # rootfs partition
-    bash(f"cgpt add -i 1 -t kernel -S 1 -T 5 -P 15 {mnt_point}")  # depthcharge flags
-
-    # get uuid of rootfs partition
-    if write_usb:
-        # if writing to usb, then no p in partition name
-        rootfs_partuuid = bash(f"blkid -o value -s PARTUUID {mnt_point}2")
-    else:
-        rootfs_partuuid = bash(f"blkid -o value -s PARTUUID {mnt_point}p2")
-    if rootfs_partuuid == "":
-        print("\033[91m" + "Failed to get rootfs partition uuid" + "\033[0m")
-        exit(1)
-    # read and modify kernel flags
-    with open("configs/kernel.flags", "r") as flags:
-        temp = flags.read().replace("${USB_ROOTFS}", rootfs_partuuid).strip()
-    with open("kernel.flags", "w") as config:
-        config.write(temp)
-
-    print("Signing kernel")
-    bash("futility vbutil_kernel --arch x86_64 --version 1 --keyblock /usr/share/vboot/devkeys/kernel.keyblock"
-         + " --signprivate /usr/share/vboot/devkeys/kernel_data_key.vbprivk --bootloader kernel.flags" +
-         " --config kernel.flags --vmlinuz /tmp/eupnea-build/bzImage --pack /tmp/eupnea-build/bzImage.signed")
-
-    print("Flashing kernel")
-    if write_usb:
-        # if writing to usb, then no p in partition name
-        bash(f"dd if=/tmp/eupnea-build/bzImage.signed of={mnt_point}1")
-    else:
-        bash(f"dd if=/tmp/eupnea-build/bzImage.signed of={mnt_point}p1")
-
-    print("Creating rootfs")
-    if write_usb:
-        # if writing to usb, then no p in partition name
-        bash(f"yes 2>/dev/null | mkfs.ext4 {mnt_point}2")  # 2>/dev/null is to supress yes broken pipe warning
-    else:
-        bash(f"yes 2>/dev/null | mkfs.ext4 {mnt_point}p2")  # 2>/dev/null is to supress yes broken pipe warning
-
-    print("Mounting rootfs to /mnt/eupnea")
-    if write_usb:
-        # if writing to usb, then no p in partition name
-        bash(f"mount {mnt_point}2 /mnt/eupnea")
-    else:
-        bash(f"mount {mnt_point}p2 /mnt/eupnea")
-    return mnt_point, rootfs_partuuid  # return loop device, so it can be unmounted at the end
-
-
 # download the distro rootfs
 def download_rootfs(distro_name: str, distro_version: str, distro_link: str, main_pid: int) -> None:
     try:
@@ -251,6 +156,101 @@ def download_firmware(main_pid: int) -> None:
         print("\033[91m" + "Couldn't download firmware. Check your internet connection and try again." + "\033[0m")
         bash(f"kill {main_pid}")
     stop_progress()  # stop fake progress
+
+
+# Create, mount, partition the img and flash the eupnea kernel
+def prepare_img() -> Tuple[str, str]:
+    print("\033[96m" + "Preparing img" + "\033[0m")
+
+    print("Allocating space for image, might take a while")
+    # try fallocate, if it fails use dd
+    # TODO: determine img size
+    img_size = 10  # 10 for now
+    if not bash(f"fallocate -l {img_size}G eupnea.img") == "":
+        bash("dd if=/dev/zero of=eupnea.img status=progress bs=12884 count=1000070")
+
+    print("Mounting empty image")
+    mnt_point = bash("losetup -f --show eupnea.img")
+    if mnt_point == "":
+        print("\033[91m" + "Failed to mount image" + "\033[0m")
+        exit(1)
+    print("Image mounted at" + mnt_point)
+    return partition(mnt_point, False)
+
+
+# Prepare USB, usb is not yet fully implemented
+def prepare_usb(device: str) -> Tuple[str, str]:
+    print("\033[96m" + "Preparing USB" + "\033[0m")
+
+    # fix device name if needed
+    if device.endswith("/") or device.endswith("1") or device.endswith("2"):
+        device = device[:-1]
+    # add /dev/ to device name, if needed
+    if not device.startswith("/dev/"):
+        device = f"/dev/{device}"
+
+    # unmount all partitions
+    try:
+        bash(f"umount -lf {device}* 2>/dev/null")
+    except subprocess.CalledProcessError:
+        pass
+    return partition(device, True)
+
+
+def partition(mnt_point: str, write_usb: bool) -> Tuple[str, str]:
+    print_status("Preparing device/image")
+
+    # Determine rootfs part name
+    if write_usb:
+        # if writing to usb, then no p in partition name
+        rootfs_mnt = mnt_point + "2"
+    else:
+        # image is a loop device -> needs p in part name
+        rootfs_mnt = mnt_point + "p2"
+
+    # remove pre-existing partition table from usb
+    if write_usb:
+        bash(f"wipefs -af {mnt_point}")
+
+    # format as per depthcharge requirements,
+    # READ: https://wiki.gentoo.org/wiki/Creating_bootable_media_for_depthcharge_based_devices
+    bash(f"parted -s {mnt_point} mklabel gpt")
+    bash(f"parted -s -a optimal {mnt_point} unit mib mkpart Kernel 1 65")  # kernel partition
+    bash(f"parted -s -a optimal {mnt_point} unit mib mkpart Root 65 100%")  # rootfs partition
+    bash(f"cgpt add -i 1 -t kernel -S 1 -T 5 -P 15 {mnt_point}")  # depthcharge flags
+
+    # get uuid of rootfs partition
+    rootfs_partuuid = bash(f"blkid -o value -s PARTUUID {rootfs_mnt}")
+
+    # write PARTUUID to kernel flags and save it as a file
+    with open("configs/kernel.flags", "r") as flags:
+        temp = flags.read().replace("${USB_ROOTFS}", rootfs_partuuid).strip()
+    with open("kernel.flags", "w") as config:
+        config.write(temp)
+
+    print_status("Flashing kernel to device/image")
+    # Sign kernel
+    bash("futility vbutil_kernel --arch x86_64 --version 1 --keyblock /usr/share/vboot/devkeys/kernel.keyblock"
+         + " --signprivate /usr/share/vboot/devkeys/kernel_data_key.vbprivk --bootloader kernel.flags" +
+         " --config kernel.flags --vmlinuz /tmp/eupnea-build/bzImage --pack /tmp/eupnea-build/bzImage.signed")
+
+    # Flash kernel
+    if write_usb:
+        # if writing to usb, then no p in partition name
+        bash(f"dd if=/tmp/eupnea-build/bzImage.signed of={mnt_point}1")
+    else:
+        # image is a loop device -> needs p in part name
+        bash(f"dd if=/tmp/eupnea-build/bzImage.signed of={mnt_point}p1")
+
+    print_status("Creating rootfs part")
+    # Create rootfs ext4 partition
+    bash(f"yes 2>/dev/null | mkfs.ext4 {rootfs_mnt}")  # 2>/dev/null is to supress yes broken pipe warning
+
+    # Mount rootfs partition
+    bash(f"mount {rootfs_mnt} /mnt/eupnea")
+
+    print_status("Device/image preparation complete")
+    return mnt_point, rootfs_partuuid  # return loop device, so it can be unmounted at the end
 
 
 # extract the rootfs to /mnt/eupnea
@@ -389,19 +389,11 @@ def chroot(command: str) -> str:
 def start_build(verbose: bool, local_path: str, kernel_type: str, dev_release: bool, main_pid: int, user_id: str,
                 build_options):
     set_verbose(verbose)
+    print_status("Starting build")
 
-    # Most errors happen in the preparation. To avoid unnecessary downloads the storage device is prepared before
-    # downloading files
     prepare_host(build_options["distro_name"], user_id)
-    if build_options["device"] == "image":
-        output_temp = prepare_img()
-        img_mnt = output_temp[0]
-        root_partuuid = output_temp[1]
-    else:
-        output_temp = prepare_usb(build_options["device"])
-        img_mnt = output_temp[0]
-        root_partuuid = output_temp[1]
 
+    # Download files first
     if local_path is None:
         download_kernel(kernel_type, dev_release, main_pid)
         download_rootfs(build_options["distro_name"], build_options["distro_version"], build_options["distro_link"],
@@ -435,6 +427,17 @@ def start_build(verbose: bool, local_path: str, kernel_type: str, dev_release: b
             print_error("Local rootfs not found, please verify the file name is correct")
             exit(1)
 
+    # Setup device
+    if build_options["device"] == "image":
+        output_temp = prepare_img()
+        img_mnt = output_temp[0]
+        root_partuuid = output_temp[1]
+    else:
+        output_temp = prepare_usb(build_options["device"])
+        img_mnt = output_temp[0]
+        root_partuuid = output_temp[1]
+
+    # Extract rootfs and configure distro agnostic settings
     extract_rootfs(build_options["distro_name"])
     post_extract(build_options["username"], build_options["password"], build_options["hostname"],
                  build_options["distro_name"], build_options["de_name"], kernel_type)
@@ -456,7 +459,7 @@ def start_build(verbose: bool, local_path: str, kernel_type: str, dev_release: b
 
     post_config(build_options["rebind_search"])
 
-    # Post-install cleanupp
+    # Post-install cleanup
     print_status("Cleaning up host system after build")
     bash("umount -f /mnt/eupnea")
     if build_options["device"] == "image":
