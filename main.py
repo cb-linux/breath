@@ -30,14 +30,18 @@ def process_args():
 
 
 if __name__ == "__main__":
-    if os.geteuid() == 0:
+    if os.geteuid() == 0 and not path_exists("/tmp/username"):
         print_error("Please start the script as non-root/without sudo")
+        exit(1)
 
     args = process_args()  # process args before elevating to root for better ux
     user_id = os.getlogin()  # get username
 
-    # Elevate script to root
+    # Restart script as root
     if not os.geteuid() == 0:
+        # save username
+        with open("/tmp/username", "w") as file:
+            file.write(os.getlogin())  # get non root username
         sudo_args = ['sudo', sys.executable] + sys.argv + [os.environ]
         os.execlpe('sudo', *sudo_args)
 
