@@ -177,7 +177,7 @@ def stop_progress(force_show: bool = False) -> None:
         return
     with open(".stop_progress", "w") as file:
         file.write("")
-    sleep(2)
+    sleep(3)
 
 
 #######################################################################################
@@ -208,7 +208,7 @@ def __print_progress_dots() -> None:  # Do not call this function directly, use 
     while True:
         if not path_exists(".stop_progress"):
             print(".", end="", flush=True)
-            sleep(3)
+            sleep(2)
         else:
             return
 
