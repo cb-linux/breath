@@ -138,24 +138,25 @@ def install_vboot(user_id: str) -> None:
         bash("apt-get install cgpt vboot-kernel-utils -y")
     elif path_exists("/usr/bin/pacman"):  # Arch
         # remove old files if present
-        rmdir("/tmp/eupnea-build/cgpt-bin", keep_dir=False)
-        rmdir("/tmp/eupnea-build/vboot-utils", keep_dir=False)
-        mkdir("/tmp/eupnea-build")
+        rmdir("/tmp/eupnea-packages/cgpt-bin", keep_dir=False)
+        rmdir("/tmp/eupnea-packages/vboot-utils", keep_dir=False)
+        mkdir("/tmp/eupnea-packages")
+        bash("chmod 557 /tmp/eupnea-packages")  # this is needed for the normal user to be able to access the dir
 
         bash("pacman -S --needed base-devel --noconfirm")  # install base-devel for mkpkg
 
-        bash("git clone https://aur.archlinux.org/cgpt-bin.git /tmp/eupnea-build/cgpt-bin")
+        bash("git clone https://aur.archlinux.org/cgpt-bin.git /tmp/eupnea-packages/cgpt-bin")
         # Using custom PKGBUILD as the one in the AUR is broken
         try:
-            cpfile("configs/PKGBUILD", "/tmp/eupnea-build/cgpt-bin/PKGBUILD")  # config while building
+            cpfile("configs/PKGBUILD", "/tmp/eupnea-packages/cgpt-bin/PKGBUILD")  # config while building
         except FileNotFoundError:
-            cpfile("/usr/local/eupnea-configs/PKGBUILD", "/tmp/eupnea-build/cgpt-bin/PKGBUILD")  # config in Eupnea
+            cpfile("/usr/local/eupnea-configs/PKGBUILD", "/tmp/eupnea-packages/cgpt-bin/PKGBUILD")  # config in Eupnea
         # makepkg wont run as root
-        bash(f'su -c "cd /tmp/eupnea-build/cgpt-bin && makepkg -sirc --noconfirm" {user_id}')
+        bash(f'su -c "cd /tmp/eupnea-packages/cgpt-bin && makepkg -sirc --noconfirm" {user_id}')
 
-        bash("git clone https://aur.archlinux.org/vboot-utils.git /tmp/eupnea-build/vboot-utils")
+        bash("git clone https://aur.archlinux.org/vboot-utils.git /tmp/eupnea-packages/vboot-utils")
         # makepkg wont run as root
-        bash(f'su -c "cd /tmp/eupnea-build/vboot-utils && makepkg -sirc --noconfirm" {user_id}')
+        bash(f'su -c "cd /tmp/eupnea-packages/vboot-utils && makepkg -sirc --noconfirm" {user_id}')
     elif path_exists("/usr/bin/dnf"):  # Fedora
         bash("dnf install vboot-utils --assumeyes")  # cgpt is included in vboot-utils on fedora
     elif path_exists("/usr/bin/zypper"):  # openSUSE
