@@ -71,10 +71,7 @@ if __name__ == '__main__':
         if args.cmdline is None:
             print_error("No cmdline provided. Use --help for help")
             exit(1)
-        if args.append:
-            new_cmdline = args.cmdline.strip()
-        else:
-            new_cmdline = args.cmdline[0].strip()
+        new_cmdline = args.cmdline.strip()
     install_vboot(user_id)
     kernel_partition = f"{partitions}1"
     # Write the new kernel commandline to a file
@@ -84,6 +81,7 @@ if __name__ == '__main__':
             current_cmdline = bash("cat /proc/cmdline")
             file.write(f"{current_cmdline} {new_cmdline}")  # space needed as both args have no spaces before and after
         else:
+            current_cmdline = ""  # this is for the print at the end
             file.write(new_cmdline)
     # Copy old kernel partition
     bash(f"dd if={kernel_partition} of=old_kernel")
