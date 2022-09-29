@@ -15,9 +15,11 @@ def config(de_name: str, distro_version: str, root_partuuid: str, verbose: bool)
     chroot("dnf group install -y 'Common NetworkManager Submodules'")
     chroot("dnf install -y linux-firmware")
     # TODO: Missing the free repos; add extras from a real Fedora install
-    print("Add RPMFusion nonfree repo")
-    chroot(f"dnf install https://download1.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-{distro_version}"
-           f".noarch.rpm -y")
+    # Add RPMFusion repos
+    chroot(f"dnf install -y https://download1.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-"
+           f"{distro_version}.noarch.rpm")
+    chroot(f"dnf install -y https://download1.rpmfusion.org/free/fedora/rpmfusion-free-release-"
+           f"{distro_version}.noarch.rpm")
     stop_progress()  # stop fake progress
 
     print_status("Downloading and installing DE, might take a while")
