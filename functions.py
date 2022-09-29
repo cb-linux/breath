@@ -190,6 +190,7 @@ def stop_download_progress() -> None:
     with open(".stop_download_progress", "w") as file:
         file.write("")
     sleep(0.1)
+    print("\n", end="")
 
 
 #######################################################################################
@@ -226,10 +227,10 @@ def __print_progress_dots() -> None:  # Do not call this function directly, use 
 
 
 def __print_download_progress(file_path: Path) -> None:
-    sleep(1) # wait for download to start
+    sleep(1)  # wait for download to start
     while True:
         if not path_exists(".stop_download_progress"):
-            print(f"\rDownloaded: {file_path.stat().st_size / 1048576}", end="", flush=True)
+            print("\rDownloaded: " + "%.0f" % int(file_path.stat().st_size / 1048576) + "mb", end="", flush=True)
         else:
             return
 

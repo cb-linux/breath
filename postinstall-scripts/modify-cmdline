@@ -35,7 +35,7 @@ if __name__ == '__main__':
     args = process_args()  # process args before elevating to root for better ux
     if args.show:
         print_status("Current command line: ")
-        print_green(bash("cat /proc/cmdline"))
+        print_question(bash("cat /proc/cmdline"))  # green color
         exit(1)
     set_verbose(args.verbose)  # enable verbose output in functions.py
 
