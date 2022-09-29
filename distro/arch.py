@@ -5,9 +5,6 @@ def config(de_name: str, distro_version: str, root_partuuid: str, verbose: bool)
     set_verbose(verbose)
     print_status("Configuring Arch")
 
-    # enable networkmanager systemd service
-    chroot("systemctl enable NetworkManager.service")
-
     # Uncomment worldwide arch mirror
     with open("/mnt/eupnea/etc/pacman.d/mirrorlist", "r") as read:
         mirrors = read.readlines()
@@ -80,6 +77,9 @@ def config(de_name: str, distro_version: str, root_partuuid: str, verbose: bool)
             exit(1)
     stop_progress()  # stop fake progress
     print_status("Desktop environment setup complete")
+
+    # enable networkmanager systemd service
+    chroot("systemctl enable NetworkManager.service")
 
     # Configure sudo
     with open("/mnt/eupnea/etc/sudoers", "r") as conf:
