@@ -95,4 +95,4 @@ if __name__ == '__main__':
     bash(f'sudo dd if=new_kernel of={kernel_partition}')
     print_status("New cmdline: ")
     print_question(f"{current_cmdline} {new_cmdline}")  # green color
-    print_header("\n" + "Reboot to apply changes")
+    print_header("Reboot to apply changes")
