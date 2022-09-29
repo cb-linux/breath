@@ -81,7 +81,6 @@ if __name__ == '__main__':
             current_cmdline = bash("cat /proc/cmdline")
             file.write(f"{current_cmdline} {new_cmdline}")  # space needed as both args have no spaces before and after
         else:
-            current_cmdline = ""  # this is for the print at the end
             file.write(new_cmdline)
     # Copy old kernel partition
     bash(f"dd if={kernel_partition} of=old_kernel")
@@ -92,5 +91,8 @@ if __name__ == '__main__':
     print("Flashing new kernel")
     bash(f'sudo dd if=new_kernel of={kernel_partition}')
     print_status("New cmdline: ")
-    print_question(f"{current_cmdline} {new_cmdline}")  # green color
+    if args.append:
+        print_question(f"{current_cmdline} {new_cmdline}")  # green color
+    else:
+        print_question(f"{new_cmdline}")
     print_header("Reboot to apply changes")
