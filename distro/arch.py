@@ -5,19 +5,9 @@ def config(de_name: str, distro_version: str, root_partuuid: str, verbose: bool)
     set_verbose(verbose)
     print_status("Configuring Arch")
 
-    # Configure sudo
-    with open("/mnt/eupnea/etc/sudoers", "r") as conf:
-        temp_sudoers = conf.readlines()
-    # uncomment wheel group
-    temp_sudoers[84] = temp_sudoers[84][2:]
-    temp_sudoers[87] = temp_sudoers[87][2:]
-    temp_sudoers[90] = temp_sudoers[90][2:]
-
     # enable networkmanager systemd service
     chroot("systemctl enable NetworkManager.service")
 
-    with open("/mnt/eupnea/etc/sudoers", "w") as conf:
-        conf.writelines(temp_sudoers)
     # Uncomment worldwide arch mirror
     with open("/mnt/eupnea/etc/pacman.d/mirrorlist", "r") as read:
         mirrors = read.readlines()
@@ -90,6 +80,16 @@ def config(de_name: str, distro_version: str, root_partuuid: str, verbose: bool)
             exit(1)
     stop_progress()  # stop fake progress
     print_status("Desktop environment setup complete")
+
+    # Configure sudo
+    with open("/mnt/eupnea/etc/sudoers", "r") as conf:
+        temp_sudoers = conf.readlines()
+    # uncomment wheel group
+    temp_sudoers[84] = temp_sudoers[84][2:]
+    temp_sudoers[87] = temp_sudoers[87][2:]
+    temp_sudoers[90] = temp_sudoers[90][2:]
+    with open("/mnt/eupnea/etc/sudoers", "w") as conf:
+        conf.writelines(temp_sudoers)
 
     print_status("Restoring pacman config")
     with open("/mnt/eupnea/etc/pacman.conf", "r") as conf:
