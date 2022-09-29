@@ -235,7 +235,6 @@ def get_user_input() -> dict:
                 print(line[:-3])  # this is for the user to see the list
         if len(usb_array) == 0:
             print_status("No available USBs/SD-cards found. Building image file.")
-            device = "image"
             break
         else:
             device = input("\033[92m" + 'Enter USB-drive/SD-card name(example: sdb) or "image" to build an image'
@@ -245,6 +244,7 @@ def get_user_input() -> dict:
                 break
             elif device in usb_array:
                 print(f"Writing directly to /dev/{device}")
+                output_dict["device"] = device
                 break
             else:
                 print_warning("No such device. Check your spelling and try again")

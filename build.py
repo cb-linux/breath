@@ -189,7 +189,7 @@ def prepare_usb(device: str) -> Tuple[str, str]:
 
 
 def partition(mnt_point: str, write_usb: bool) -> Tuple[str, str]:
-    print_status("Preparing device/image")
+    print_status("Preparing device/image partition")
 
     # Determine rootfs part name
     if write_usb:
