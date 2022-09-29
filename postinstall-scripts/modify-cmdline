@@ -71,7 +71,10 @@ if __name__ == '__main__':
         if args.cmdline is None:
             print_error("No cmdline provided. Use --help for help")
             exit(1)
-        new_cmdline = args.cmdline[0].strip()
+        if args.append:
+            new_cmdline = args.cmdline.strip()
+        else:
+            new_cmdline = args.cmdline[0].strip()
     install_vboot(user_id)
     kernel_partition = f"{partitions}1"
     # Write the new kernel commandline to a file
@@ -90,3 +93,6 @@ if __name__ == '__main__':
          "--oldblob old_kernel --config cmdline")
     print("Flashing new kernel")
     bash(f'sudo dd if=new_kernel of={kernel_partition}')
+    print_status("New cmdline: ")
+    print_question(f"{current_cmdline} {new_cmdline}")  # green color
+    print_header("\n" + "Reboot to apply changes")
