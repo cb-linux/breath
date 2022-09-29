@@ -113,24 +113,24 @@ def download_rootfs(distro_name: str, distro_version: str, distro_link: str, mai
         match distro_name:
             case "ubuntu":
                 print_status(f"Downloading ubuntu rootfs {distro_version}")
-                start_progress(force_show=True)  # start fake progress
+                start_download_progress("/tmp/eupnea-build/ubuntu-rootfs.tar.xz")
                 urlretrieve(
                     f"https://cloud-images.ubuntu.com/releases/{distro_version}/release/ubuntu-{distro_version}"
                     f"-server-cloudimg-amd64-root.tar.xz",
                     filename="/tmp/eupnea-build/ubuntu-rootfs.tar.xz")
-                stop_progress(force_show=True)
+                stop_download_progress()
             case "debian":
-                print_status("Debian is installed later, skipping download")
+                print_status("Debian is downloaded later, skipping download")
             case "arch":
                 print_status("Downloading latest arch rootfs")
-                start_progress(force_show=True)  # start fake progress
+                start_download_progress("/tmp/eupnea-build/arch-rootfs.tar.gz")
                 urlretrieve(distro_link, filename="/tmp/eupnea-build/arch-rootfs.tar.gz")
-                stop_progress(force_show=True)  # stop fake progress
+                stop_download_progress()
             case "fedora":
                 print_status(f"Downloading fedora rootfs version: {distro_version}")
-                start_progress(force_show=True)  # start fake progress
+                start_download_progress("/tmp/eupnea-build/fedora-rootfs.raw.xz")
                 urlretrieve(distro_link, filename="/tmp/eupnea-build/fedora-rootfs.raw.xz")
-                stop_progress(force_show=True)  # stop fake progress
+                stop_download_progress()
     except URLError:
         print_error("Couldn't download rootfs. Check your internet connection and try again. If the error persists, "
                     "create an issue with the distro and version in the name")

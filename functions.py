@@ -181,7 +181,7 @@ def stop_progress(force_show: bool = False) -> None:
     sleep(3)
 
 
-def show_download_progress(file_path_str: str) -> None:
+def start_download_progress(file_path_str: str) -> None:
     rmfile(".stop_download_progress")
     Thread(target=__print_download_progress, args=(Path(file_path_str),), daemon=True).start()
 
@@ -226,6 +226,7 @@ def __print_progress_dots() -> None:  # Do not call this function directly, use 
 
 
 def __print_download_progress(file_path: Path) -> None:
+    sleep(1) # wait for download to start
     while True:
         if not path_exists(".stop_download_progress"):
             print(f"\rDownloaded: {file_path.stat().st_size / 1048576}", end="", flush=True)

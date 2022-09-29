@@ -65,7 +65,7 @@ def get_user_input() -> dict:
             case "Fedora" | "fedora":
                 output_dict["distro_name"] = "fedora"
                 while True:
-                    print("\033[92m" + "Use latest Fedora version?" + "\033[94m")
+                    print_question("Use latest Fedora version?")
                     output_dict["distro_version"] = input("\033[94m" + "Press enter for yes, or type in the version "
                                                                        "number(example: '36'): " + "\033[0m")
                     if output_dict["distro_version"] == "":
@@ -78,6 +78,7 @@ def get_user_input() -> dict:
                         break
                     else:
                         if output_dict["distro_version"] in distros["fedora"]:
+                            output_dict["distro_link"] = distros["fedora"][output_dict["distro_version"]]
                             print("Fedora: " + output_dict["distro_version"] + " selected")
                             break
                         else:
