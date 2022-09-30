@@ -88,22 +88,22 @@ if __name__ == "__main__":
 
     # parse arguments
     dev_release = args.dev_build
-    verbose = args.verbose
     kernel_type = "stable"
     if args.dev_build:
-        print("\033[93m" + "Using dev release" + "\033[0m")
+        print_warning("Using dev release")
     if args.alt:
-        print("\033[93m" + "Using alt kernel" + "\033[0m")
+        print_warning("Using alt kernel")
         kernel_type = "alt"
     if args.exp:
-        print("\033[93m" + "Using experimental kernel" + "\033[0m")
+        print_warning("Using experimental kernel")
         kernel_type = "exp"
     if args.mainline:
-        print("\033[93m" + "Using mainline kernel" + "\033[0m")
+        print_warning("Using mainline kernel")
         kernel_type = "mainline"
     if args.local_path:
-        print("\033[93m" + "Using local files" + "\033[0m")
+        print_warning("Using local files")
     if args.verbose:
-        print("\033[93m" + "Verbosity increased" + "\033[0m")
-    build = build.start_build(verbose, local_path=args.local_path, kernel_type=kernel_type, dev_release=dev_release,
+        print_warning("Verbosity increased")
+    build = build.start_build(args.verbose, local_path=args.local_path, kernel_type=kernel_type,
+                              dev_release=dev_release,
                               main_pid=os.getpid(), user_id=user_id, build_options=cli_input.get_user_input())
