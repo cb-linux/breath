@@ -12,7 +12,7 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Cloning Apacelus/python-os-functions repo
-        run: https://github.com/Apacelus/python-os-functions
+        run: git clone https://github.com/Apacelus/python-os-functions
 
       - name: Updating functions.py
         run: cp ./python-os-functions/functions.py ./functions.py
