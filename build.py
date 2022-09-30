@@ -349,7 +349,7 @@ def post_extract(username: str, password: str, hostname: str, distro_name: str, 
     rmfile("/mnt/eupnea/etc/systemd/system/sshd.service")
 
     # Gnome has a first time setup if no users are detected
-    if not distro_name == "gnome":
+    if not de_name == "gnome":
         print_status("Configuring user")
         chroot(f"useradd --create-home --shell /bin/bash {username}")
         # TODO: Fix ) and ( crashing chpasswd
