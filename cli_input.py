@@ -224,7 +224,6 @@ def get_user_input() -> dict:
         print("Search key will be Super/Win key")
         rebind_search = False
 
-    # TODO: Add better device name check
     while True:
         usb_array = []
         lsblk_out = bash("lsblk -o NAME,MODEL,SIZE,TRAN").splitlines()
