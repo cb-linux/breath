@@ -1,4 +1,4 @@
-# FILE SOURCE: https://github.com/apacelus/pathlib-functions
+# FILE SOURCE: https://github.com/apacelus/python-os-functions
 from pathlib import Path
 from time import sleep
 from threading import Thread
