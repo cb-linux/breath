@@ -198,11 +198,8 @@ if __name__ == "__main__":
                     print("\033[91m" + "Invalid option, check your spelling" + "\033[0m")
 
     if not skip_dev_question:
-        print("\033[92m" + "Would you like to the developer version of the kernel? Type yes or press Enter for no\n"
-              + "\033[0m")
-        user_input = input(
-            "\033[94m" + "Available options: stable(default), alt(for older devices), mainline(might work better on "
-                         "newer devices, exp(experimental 5.15 kernel)" + "\033[0m" + "\n")
+        user_input = input("\033[92m" + "Would you like to the developer version of the kernel? Type yes or press Enter"
+                                        " for no: " + "\033[0m")
         if user_input == "yes":
             args.dev_build = True
 

@@ -9,7 +9,7 @@ from functions import *
 
 if __name__ == '__main__':
     print("\033[96m" + "Starting update script" + "\033[0m")
-    with open('distros.json', 'r') as file:
+    with open('../../distros.json', 'r') as file:
         distros_dict = json.load(file)
 
     print("\033[96m" + "Getting version numbers" + "\033[0m")
@@ -29,7 +29,7 @@ if __name__ == '__main__':
         print(f"Fedora version {version} full link: {full_link}")
 
     print("\033[96m" + "Writing new distro.json" + "\033[0m")
-    with open('distros.json', 'w') as file:
+    with open('../../distros.json', 'w') as file:
         json.dump(distros_dict, file, indent=4)
 
     print("\033[96m" + "Removing html file" + "\033[0m")
