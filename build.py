@@ -345,8 +345,8 @@ def post_extract(username: str, password: str, hostname: str, distro_name: str, 
     rmfile("/mnt/eupnea/etc/systemd/system/multi-user.target.wants/ssh.service")
     rmfile("/mnt/eupnea/etc/systemd/system/sshd.service")
 
-    # Add user to system if the DE has no first time setup
-    if not (distro_name == "ubuntu" and de_name == "gnome"):  # Ubuntu + gnome has a first time setup
+    # Gnome has a first time setup if no users are detected
+    if not distro_name == "gnome":
         print_status("Configuring user")
         chroot(f"useradd --create-home --shell /bin/bash {username}")
         # TODO: Fix ) and ( crashing chpasswd

@@ -151,8 +151,8 @@ def get_user_input() -> dict:
             case _:
                 print_warning("No such Desktop environment. Check your spelling and try again")
 
-    # Ubuntu + gnome now has a first time setup, so skip this part for ubuntu with gnome
-    if not (output_dict["distro_name"] == "ubuntu" and output_dict["de_name"] == "gnome"):
+    # Gnome has a first time setup -> skip this part for gnome, as there will be a first time setup
+    if not output_dict["de_name"] == "gnome":
         print_question("Enter username to be used in Eupnea")
         while True:
             output_dict["username"] = input("\033[94m" + "Username(default: 'localuser'): " + "\033[0m")
