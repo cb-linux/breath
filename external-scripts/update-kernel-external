@@ -108,7 +108,11 @@ def flash_kernel() -> None:
     print("")  # break line after tar
 
     print_status("Extracting kernel headers")
-    # TODO: extract kernel headers
+    # Extract kernel headers
+    print_status("Extracting kernel headers")
+    # headers.tar.xz contains /include, so it's extracted to /usr/ and --skip-old-files is used to prevent it from
+    # overwriting other files in /usr/include
+    bash("tar xpf /tmp/eupnea-update/headers.tar.xz --skip-old-files -C /mnt/eupnea/usr/ --checkpoint=.10000")
     print("")  # break line after tar
 
     rootfs_partuuid = bash(f"blkid -o value -s PARTUUID {device}2")  # get uuid of rootfs partition

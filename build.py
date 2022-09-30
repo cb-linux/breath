@@ -304,7 +304,10 @@ def post_extract(username: str, password: str, hostname: str, distro_name: str, 
 
     # Extract kernel headers
     print_status("Extracting kernel headers")
-    # TODO: extract kernel headers
+    # headers.tar.xz contains /include, so it's extracted to /usr/ and --skip-old-files is used to prevent it from
+    # overwriting other files in /usr/include
+    bash("tar xpf /tmp/eupnea-build/headers.tar.xz --skip-old-files -C /mnt/eupnea/usr/ --checkpoint=.10000")
+    print("")  # break line after tar
 
     # Copy resolv.conf from host to eupnea
     rmfile("/mnt/eupnea/etc/resolv.conf", True)  # delete broken symlink
