@@ -2,21 +2,21 @@
 
 import os
 import sys
-from urllib.request import urlretrieve, urlopen
-from urllib.error import URLError
-from time import sleep
-from threading import Thread
+import json
 import argparse
+from urllib.error import URLError
+from urllib.request import urlretrieve, urlopen
+
 from functions import *
 
 
-# parse arguments from the cli. Only for testing/advanced use. 95% of the arguments are handled by the user_input script
+# parse arguments from the cli.
 def process_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('-p', '--local-path', dest="local_path",
                         help="Local path for kernel files to use instead of downloading from github.")
-    parser.add_argument("-v", "--verbose", action="store_true", dest="verbose", default=False,
-                        help="Print more output")
+    parser.add_argument("--stable", action="store_true", dest="stable_build", default=False,
+                        help="Use kernels from latest dev build. May be unstable.")
     parser.add_argument("--dev", action="store_true", dest="dev_build", default=False,
                         help="Use kernels from latest dev build. May be unstable.")
     parser.add_argument("--alt", action="store_true", dest="alt", default=False,
@@ -27,43 +27,66 @@ def process_args():
     parser.add_argument("--mainline", action="store_true", dest="mainline", default=False,
                         help="Use mainline linux kernel instead of modified chromeos kernel. Might provide more "
                              "functionality on newer devices.")
+    parser.add_argument("-v", "--verbose", action="store_true", dest="verbose", default=False, help="Print more output")
     return parser.parse_args()
+
+
+# Clean /tmp from eupnea files
+def prepare_host() -> None:
+    print_status("Preparing host system")
+
+    print_status("Cleaning + preparing host system")
+    rmdir("/tmp/eupnea-update")
+    mkdir("/tmp/eupnea-update", create_parents=True)
+    install_vboot(user_id)
 
 
 # download kernel files from GitHub
 def download_kernel() -> None:
-    print("\033[96m" + "Downloading kernel binaries from github" + "\033[0m")
+    # select correct link
     if args.dev_build:
         url = "https://github.com/eupnea-linux/kernel/releases/download/dev-build/"
     else:
         url = "https://github.com/eupnea-linux/kernel/releases/latest/download/"
+
+    # download kernel files
+    start_progress()  # show fake progress
     try:
-        if args.mainline:
-            url = "https://github.com/eupnea-linux/mainline-kernel/releases/latest/download/"
-            urlretrieve(f"{url}bzImage", filename="/tmp/eupnea-update/bzImage")
-            urlretrieve(f"{url}modules.tar.xz", filename="/tmp/eupnea-update/modules.tar.xz")
-        else:
-            if args.alt:
-                print("Downloading alt kernel")
-                urlretrieve(f"{url}bzImage-alt", filename="/tmp/eupnea-update/bzImage")
-                urlretrieve(f"{url}modules-alt.tar.xz", filename="/tmp/eupnea-update/modules.tar.xz")
-            elif args.exp:
-                print("Downloading experimental 5.15 kernel")
-                urlretrieve(f"{url}bzImage-exp", filename="/tmp/eupnea-update/bzImage")
-                urlretrieve(f"{url}modules-exp.tar.xz", filename="/tmp/eupnea-update/modules.tar.xz")
-            else:
-                urlretrieve(f"{url}bzImage", filename="/tmp/eupnea-update/bzImage")
-                urlretrieve(f"{url}modules.tar.xz", filename="/tmp/eupnea-update/modules.tar.xz")
+        match selected_kernel_type:
+            case "mainline":
+                print_status("Downloading mainline kernel")
+                url = "https://github.com/eupnea-linux/mainline-kernel/releases/latest/download/"
+                urlretrieve(f"{url}bzImage-stable", filename="/tmp/eupnea-external/bzImage")
+                urlretrieve(f"{url}modules-stable.tar.xz", filename="/tmp/eupnea-external/modules.tar.xz")
+                urlretrieve(f"{url}headers-stable.tar.xz", filename="/tmp/eupnea-external/headers.tar.xz")
+            case "alt":
+                print_status("Downloading alt kernel")
+                urlretrieve(f"{url}bzImage-alt", filename="/tmp/eupnea-external/bzImage")
+                urlretrieve(f"{url}modules-alt.tar.xz", filename="/tmp/eupnea-external/modules.tar.xz")
+                urlretrieve(f"{url}headers-alt.tar.xz", filename="/tmp/eupnea-external/headers.tar.xz")
+            case "exp":
+                print_status("Downloading experimental 5.15 kernel")
+                urlretrieve(f"{url}bzImage-exp", filename="/tmp/eupnea-external/bzImage")
+                urlretrieve(f"{url}modules-exp.tar.xz", filename="/tmp/eupnea-external/modules.tar.xz")
+                urlretrieve(f"{url}headers-exp.tar.xz", filename="/tmp/eupnea-external/headers.tar.xz")
+            case "stable":
+                print_status("Downloading stable 5.10 kernel")
+                urlretrieve(f"{url}bzImage", filename="/tmp/eupnea-external/bzImage")
+                urlretrieve(f"{url}modules.tar.xz", filename="/tmp/eupnea-external/modules.tar.xz")
+                urlretrieve(f"{url}headers.tar.xz", filename="/tmp/eupnea-external/headers.tar.xz")
     except URLError:
-        print("\033[91m" + "Failed to reach github. Check your internet connection and try again" + "\033[0m")
+        print_error("Failed to reach github. Check your internet connection and try again or use local files with -l")
         exit(1)
+
+    stop_progress()  # stop fake progress
+    print_status("Kernel files downloaded successfully")
 
 
 # Configure distro agnostic options
 def flash_kernel() -> None:
-    print("\n\033[96m" + "Flashing new kernel" + "\033[0m")
+    print_status("Flashing new kernel")
 
-    print("Extracting kernel modules")
+    print_status("Extracting kernel modules")
     rmdir("/lib/modules")
 
     # modules tar contains /lib/modules, so it's extracted to / and --skip-old-files is used to prevent overwriting
@@ -71,36 +94,32 @@ def flash_kernel() -> None:
     bash(f"tar xpf /tmp/eupnea-update/modules.tar.xz --skip-old-files -C / --checkpoint=.10000")
     print("")  # break line after tar
 
-    print("Extracting kernel headers")
+    print_status("Extracting kernel headers")
     # TODO: extract kernel headers
-    print("")  # break line
+    print("")  # break line after tar
 
-    # get uuid of rootfs partition
-    rootfs_partuuid = bash(f"blkid -o value -s PARTUUID {device}2")
-    if rootfs_partuuid == "":
-        print("\033[91m" + "Failed to get rootfs partition uuid" + "\033[0m")
-        exit(1)
+    rootfs_partuuid = bash(f"blkid -o value -s PARTUUID {device}2")  # get uuid of rootfs partition
 
-    print("Downloading default command line from github")
+    print_status("Downloading default command line from github")
     try:
         temp_cmdline = urlopen(
             "https://raw.githubusercontent.com/eupnea-linux/eupnea/main/configs/kernel.flags").read().decode(
             "utf-8")
     except URLError:
-        print("\033[91m" + "Failed to reach github. Fallback to hardcoded default cmdline" + "\033[0m")
+        print_warning("Failed to reach github. Fallback to hardcoded default cmdline")
         temp_cmdline = "console=tty1 root=PARTUUID=${USB_ROOTFS} i915.modeset=1 rootwait rw fbcon=logo-pos:center" \
                        ",logo-count:1 loglevel=0 splash"
-    # get partuuid of rootfs
-    new_cmdline = temp_cmdline.replace("${USB_ROOTFS}", rootfs_partuuid)
+
+    new_cmdline = temp_cmdline.replace("${USB_ROOTFS}", rootfs_partuuid)  # add partuuid of rootfs
     with open("kernel.flags", "w") as file:
         file.write(new_cmdline)
 
-    print("Signing kernel")
+    print_status("Signing kernel")
     bash("futility vbutil_kernel --arch x86_64 --version 1 --keyblock /usr/share/vboot/devkeys/kernel.keyblock"
          + " --signprivate /usr/share/vboot/devkeys/kernel_data_key.vbprivk --bootloader kernel.flags" +
          " --config kernel.flags --vmlinuz /tmp/eupnea-update/bzImage --pack /tmp/eupnea-update/bzImage.signed")
 
-    print("Flashing kernel")
+    print_status("Flashing kernel")
     bash(f"dd if=/tmp/eupnea-update/bzImage.signed of={device}1")
 
 
@@ -123,51 +142,48 @@ if __name__ == "__main__":
     with open("/tmp/username", "r") as file:
         user_id = file.read()
 
+    if args.stable:
+        print_warning("Using stable kernel")
+        selected_kernel_type = "stable"
     if args.dev_build:
-        print("\033[93m" + "Using dev release" + "\033[0m")
-        skip_dev_question = True
+        print_warning("Using dev release")
     if args.alt:
-        print("\033[93m" + "Using alt kernel" + "\033[0m")
-        skip_version_question = True
+        print_warning("Using alt kernel")
+        selected_kernel_type = "alt"
     if args.exp:
-        print("\033[93m" + "Using experimental kernel" + "\033[0m")
-        skip_version_question = True
+        print_warning("Using experimental kernel")
+        selected_kernel_type = "exp"
     if args.mainline:
-        print("\033[93m" + "Using mainline kernel" + "\033[0m")
-        skip_version_question = True
+        print_warning("Using mainline kernel")
+        selected_kernel_type = "mainline"
     if args.local_path:
-        print("\033[93m" + "Using local path" + "\033[0m")
-        skip_version_question = True
+        print_warning("Using local path")
     set_verbose(args.verbose)  # set verbose in functions.py
+
+    # If user hasn't passed a kernel type cli option
+    if not (args.stable or args.alt or args.exp or args.mainline):
+        # read kernel version from eupnea settings file
+        with open("/usr/local/eupnea-configs/eupnea-settings.json", "r") as file:
+            selected_kernel_type = json.load(file)["kernel_type"]
 
     # read root partition mount
     root_part = bash("mount | grep ' / ' | cut -d' ' -f 1")
     device = root_part[:len(root_part) - 1]  # get device "name"
 
-    # Prepare host
-    print("\033[96m" + "Preparing host system" + "\033[0m")
-    print("Creating /tmp/eupnea-update")
-    rmdir("/tmp/eupnea-update")
-    mkdir("/tmp/eupnea-update")
-    install_vboot(user_id)
-
-    if args.local_path is None:
-        # Print download progress in terminal
-        t = Thread(target=download_kernel)
-        t.start()
-        sleep(1)
-        while t.is_alive():
-            print(".", end="", flush=True)
-            sleep(1)
-        print("")
-    else:
+    prepare_host()
+    if args.local_path is None:  # Download files from GitHub
+        download_kernel()
+    else:  # if local path is specified, copy files from it, instead of downloading from the internet
+        # clean local path string
         if not args.local_path.endswith("/"):
             kernel_path = f"{args.local_path}/"
         else:
             kernel_path = args.local_path
-        print("\033[96m" + "Using local kernel files" + "\033[0m")
+        print_status("Copying local files to /tmp/eupnea-external")
         cpfile(f"{kernel_path}bzImage", "/tmp/eupnea-update/bzImage")
         cpfile(f"{kernel_path}modules.tar.xz", "/tmp/eupnea-update/modules.tar.xz")
+        cpfile(f"{kernel_path}headers.tar.xz", "/tmp/eupnea-update/headers.tar.xz")
 
     flash_kernel()
-    print("\033[92m" + "Kernel update complete!" + "\033[0m")
+    print_header("Kernel update complete! ")
+    print_header("It is safe to remove the USB-drive/SD-card now.")
