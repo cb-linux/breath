@@ -127,16 +127,16 @@ def set_verbose(new_state: bool) -> None:
     verbose = new_state
 
 
-def install_vboot(user_id: str) -> None:
-    print("Installing vboot and cgpt packages")
+def install_build_packages(user_id: str) -> None:
+    print_status("Installing: vboot, cgpt, parted")
 
     # check if packages are already installed
-    if path_exists("/usr/bin/vbutil_kernel") and path_exists("/usr/bin/cgpt"):
-        print("Packages already installed")
+    if path_exists("/usr/bin/vbutil_kernel") and path_exists("/usr/bin/cgpt") and path_exists("/usr/sbin/parted"):
+        print_status("Packages already installed")
         return
 
     if path_exists("/usr/bin/apt"):  # Ubuntu + debian
-        bash("apt-get install cgpt vboot-kernel-utils -y")
+        bash("apt-get install cgpt vboot-kernel-utils parted -y")
     elif path_exists("/usr/bin/pacman"):  # Arch
         # remove old files if present
         rmdir("/tmp/eupnea-packages/cgpt-bin", keep_dir=False)
@@ -160,10 +160,13 @@ def install_vboot(user_id: str) -> None:
         bash(f'su -c "cd /tmp/eupnea-packages/cgpt-bin && makepkg -sirc --noconfirm" {user_id}')
         bash(f'su -c "cd /tmp/eupnea-packages/vboot-utils && makepkg -sirc --noconfirm" {user_id}')
 
+        # install parted
+        bash("pacman -S parted --noconfirm")
+
     elif path_exists("/usr/bin/dnf"):  # Fedora
-        bash("dnf install vboot-utils --assumeyes")  # cgpt is included in vboot-utils on fedora
+        bash("dnf install vboot-utils parted --assumeyes")  # cgpt is included in vboot-utils on fedora
     elif path_exists("/usr/bin/zypper"):  # openSUSE
-        bash("zypper --non-interactive install vboot")
+        bash("zypper --non-interactive install vboot parted")
 
 
 def start_progress(force_show: bool = False) -> None:
@@ -189,7 +192,7 @@ def start_download_progress(file_path_str: str) -> None:
 def stop_download_progress() -> None:
     with open(".stop_download_progress", "w") as file:
         file.write("")
-    sleep(0.1)
+    sleep(1)
     print("\n", end="")
 
 
@@ -227,10 +230,12 @@ def __print_progress_dots() -> None:  # Do not call this function directly, use 
 
 
 def __print_download_progress(file_path: Path) -> None:
-    sleep(3)  # wait for download to start
     while True:
         if not path_exists(".stop_download_progress"):
-            print("\rDownloaded: " + "%.0f" % int(file_path.stat().st_size / 1048576) + "mb", end="", flush=True)
+            try:
+                print("\rDownloaded: " + "%.0f" % int(file_path.stat().st_size / 1048576) + "mb", end="", flush=True)
+            except FileNotFoundError:
+                sleep(0.5)  # in case download hasn't started yet
         else:
             return
 
