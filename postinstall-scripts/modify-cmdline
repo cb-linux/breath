@@ -63,8 +63,8 @@ if __name__ == '__main__':
                 "utf-8")
         except URLError:
             print_warning("Failed to reach github. Falling back to hardcoded default cmdline")
-            temp_cmdline = "console=tty1 root=PARTUUID=${USB_ROOTFS} i915.modeset=1 rootwait rw fbcon=logo-pos:center," \
-                           "logo-count:1 loglevel=0 quiet splash"
+            temp_cmdline = "console=tty1 root=PARTUUID=${USB_ROOTFS} i915.modeset=1 rootwait rw fbcon=logo-pos:" \
+                           "center,logo-count:1 loglevel=0 quiet splash"
         rootfs_partuuid = bash(f"blkid -o value -s PARTUUID {partitions}2")  # get partuuid of rootfs
         new_cmdline = temp_cmdline.replace("${USB_ROOTFS}", rootfs_partuuid)  # replace PARTUUID in default cmdline
     else:
@@ -72,8 +72,9 @@ if __name__ == '__main__':
             print_error("No cmdline provided. Use --help for help")
             exit(1)
         new_cmdline = args.cmdline.strip()
-    install_vboot(user_id)
-    kernel_partition = f"{partitions}1"
+
+    install_build_packages(user_id)
+
     # Write the new kernel commandline to a file
     with open('cmdline', 'w') as file:
         if args.append:
@@ -82,7 +83,9 @@ if __name__ == '__main__':
             file.write(f"{current_cmdline} {new_cmdline}")  # space needed as both args have no spaces before and after
         else:
             file.write(new_cmdline)
+
     # Copy old kernel partition
+    kernel_partition = f"{partitions}1"
     bash(f"dd if={kernel_partition} of=old_kernel")
     print("Signing new kernel")
     bash("futility vbutil_kernel --repack new_kernel --version 1 --keyblock " +

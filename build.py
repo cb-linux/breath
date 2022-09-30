@@ -22,7 +22,7 @@ def prepare_host(de_name: str, user_id: str) -> None:
     print_status("Cleaning + preparing host system")
     rmdir("/tmp/eupnea-build")
     mkdir("/tmp/eupnea-build", create_parents=True)
-    install_vboot(user_id)
+    install_build_packages(user_id)
 
     print_status("Creating mount points")
     try:

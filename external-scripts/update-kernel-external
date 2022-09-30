@@ -37,7 +37,7 @@ def prepare_host() -> None:
     print_status("Cleaning + preparing host system")
     rmdir("/tmp/eupnea-update")
     mkdir("/tmp/eupnea-update", create_parents=True)
-    install_vboot(user_id)
+    install_build_packages(user_id)
 
     print_status("Creating mount points and preparing device")
     try:
