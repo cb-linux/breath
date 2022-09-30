@@ -63,8 +63,8 @@ if __name__ == '__main__':
                 "utf-8")
         except URLError:
             print_warning("Failed to reach github. Falling back to hardcoded default cmdline")
-            temp_cmdline = "console=tty1 root=PARTUUID=${USB_ROOTFS} i915.modeset=1 rootwait rw fbcon=logo-pos:center" \
-                           ",logo-count:1 loglevel=0 splash"
+            temp_cmdline = "console=tty1 root=PARTUUID=${USB_ROOTFS} i915.modeset=1 rootwait rw fbcon=logo-pos:center," \
+                           "logo-count:1 loglevel=0 quiet splash"
         rootfs_partuuid = bash(f"blkid -o value -s PARTUUID {partitions}2")  # get partuuid of rootfs
         new_cmdline = temp_cmdline.replace("${USB_ROOTFS}", rootfs_partuuid)  # replace PARTUUID in default cmdline
     else:
