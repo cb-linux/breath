@@ -7,4 +7,4 @@ assignees: ''
 
 ---
 
-**Please create audio-related issues in the appropriate [audio-scripts](https://github.com/eupnea-linux/audio-scripts) repository!**
+**PLEASE CREATE AUDIO ISSUES IN THE [audio-scripts](https://github.com/eupnea-linux/audio-scripts) REPOSITORY!**
