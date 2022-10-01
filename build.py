@@ -318,6 +318,7 @@ def post_extract(username: str, password: str, hostname: str, distro_name: str, 
         hostname_file.write(hostname)
 
     # Copy eupnea scripts and config
+    print_status("Copying eupnea scripts and config")
     cpdir("postinstall-scripts", "/mnt/eupnea/usr/local/bin/")
     chroot("chmod 755 /usr/local/bin/*")  # make scripts executable in system
     cpfile("functions.py", "/mnt/eupnea/usr/local/bin/functions.py")  # copy functions file
@@ -325,13 +326,14 @@ def post_extract(username: str, password: str, hostname: str, distro_name: str, 
     mkdir("/mnt/eupnea/usr/local/eupnea-configs")
     cpdir("configs", "/mnt/eupnea/usr/local/eupnea-configs")
 
-    # create eupnea settings file for future needs
+    # create eupnea settings file for postinstall scripts
     with open("configs/eupnea-settings.json", "r") as settings_file:
         settings = json.load(settings_file)
     settings["kernel_type"] = kernel_type
     with open("/mnt/eupnea/usr/local/eupnea-settings.json", "w") as settings_file:
         json.dump(settings, settings_file)
 
+    print_status("Fixing sleep")
     # disable hibernation aka S4 sleep, READ: https://eupnea-linux.github.io/docs.html#/bootlock
     # TODO: Fix sleep, maybe
     mkdir("/mnt/eupnea/etc/systemd/")  # just in case systemd path doesn't exist
@@ -359,6 +361,8 @@ def post_extract(username: str, password: str, hostname: str, distro_name: str, 
                 chroot(f"usermod -aG sudo {username}")
             case "arch" | "fedora":
                 chroot(f"usermod -aG wheel {username}")
+
+    print_status("Distro agnostic configuration complete")
 
 
 # post extract and distro config
