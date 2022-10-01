@@ -2,3 +2,4 @@
 eupnea.img
 kernel.flags
 /__pycache__/
+/venv/

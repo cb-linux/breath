@@ -153,6 +153,32 @@ def download_firmware() -> None:
     stop_progress()  # stop fake progress
 
 
+# Download postinstall scripts
+def download_postinstall_scripts() -> None:
+    print_status("Downloading postinstall scripts")
+    start_progress()  # start fake progress
+    try:
+        bash("git clone --depth=1 https://github.com/eupnea-linux/postinstall-scripts "
+             "/tmp/eupnea-build/postinstall-scripts")
+    except URLError:
+        print_error("Couldn't download postinstall scripts. Check your internet connection and try again.")
+        exit(1)
+    stop_progress()  # stop fake progress
+
+
+# Download postinstall scripts
+def download_audio_scripts() -> None:
+    print_status("Downloading audio scripts")
+    start_progress()  # start fake progress
+    try:
+        bash("git clone --depth=1 https://github.com/eupnea-linux/audio-scripts "
+             "/tmp/eupnea-build/audio-scripts")
+    except URLError:
+        print_error("Couldn't download audio scripts. Check your internet connection and try again.")
+        exit(1)
+    stop_progress()  # stop fake progress
+
+
 # Create, mount, partition the img and flash the eupnea kernel
 def prepare_img() -> Tuple[str, str]:
     print_status("Preparing image")
@@ -286,7 +312,10 @@ def extract_rootfs(distro_name: str) -> None:
             cpdir("/tmp/eupnea-build/fedora-tmp-mnt/root/", "/mnt/eupnea/")  # copy mounted rootfs to /mnt/eupnea
 
             # unmount fedora image to prevent errors and unused loop devices
-            bash(f"umount -fl /tmp/eupnea-build/fedora-tmp-mnt")
+            try:
+                bash(f"umount -fl /tmp/eupnea-build/fedora-tmp-mnt")
+            except subprocess.CalledProcessError:  # fails on Crostini
+                pass
             bash(f"losetup -d {fedora_root_part[:-2]}")
     print_status("\n" + "Rootfs extraction complete")
 
@@ -318,15 +347,27 @@ def post_extract(username: str, password: str, hostname: str, distro_name: str, 
         hostname_file.write(hostname)
 
     # Copy eupnea scripts and config
-    print_status("Copying eupnea scripts and config")
-    cpdir("postinstall-scripts", "/mnt/eupnea/usr/local/bin/")
+    print_status("Copying eupnea scripts and configs")
+    # Copy postinstall scripts
+    for file in Path("postinstall-scripts").iterdir():
+        if file.is_file():
+            if file.name == "LICENSE" or file.name == "README.md" or file.name == ".gitignore":
+                continue  # dont copy license, readme and gitignore
+            else:
+                cpfile(file.absolute().as_posix(), f"/mnt/eupnea/usr/local/bin/{file.name}")
+    # copy audio setup script
+    cpfile("setup-audio", "/mnt/eupnea/usr/local/bin/setup-audio")
     chroot("chmod 755 /usr/local/bin/*")  # make scripts executable in system
-    cpfile("functions.py", "/mnt/eupnea/usr/local/bin/functions.py")  # copy functions file
+    # copy functions file
+    cpfile("functions.py", "/mnt/eupnea/usr/local/bin/functions.py")
+
     # copy configs
     mkdir("/mnt/eupnea/usr/local/eupnea-configs")
-    cpdir("configs", "/mnt/eupnea/usr/local/eupnea-configs")
+    cpdir("configs", "/mnt/eupnea/usr/local/eupnea-configs")  # installer configs
+    cpdir("postinstall-scripts/configs", "/mnt/eupnea/usr/local/eupnea-configs")  # installer configs
+    cpdir("audio-scripts/configs", "/mnt/eupnea/usr/local/eupnea-configs")  # installer configs
 
-    # create eupnea settings file for postinstall scripts
+    # create eupnea settings file for postinstall scripts to read
     with open("configs/eupnea-settings.json", "r") as settings_file:
         settings = json.load(settings_file)
     settings["kernel_type"] = kernel_type
@@ -406,6 +447,8 @@ def start_build(verbose: bool, local_path: str, kernel_type: str, dev_release: b
         download_kernel(kernel_type, dev_release)
         download_rootfs(build_options["distro_name"], build_options["distro_version"], build_options["distro_link"])
         download_firmware()
+        download_postinstall_scripts()
+        download_audio_scripts()
     else:  # if local path is specified, copy files from it, instead of downloading from the internet
         # clean local path string
         if not local_path.endswith("/"):
