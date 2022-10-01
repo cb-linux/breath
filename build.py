@@ -349,14 +349,14 @@ def post_extract(username: str, password: str, hostname: str, distro_name: str, 
     # Copy eupnea scripts and config
     print_status("Copying eupnea scripts and configs")
     # Copy postinstall scripts
-    for file in Path("postinstall-scripts").iterdir():
+    for file in Path("/tmp/eupnea-build/postinstall-scripts").iterdir():
         if file.is_file():
             if file.name == "LICENSE" or file.name == "README.md" or file.name == ".gitignore":
                 continue  # dont copy license, readme and gitignore
             else:
                 cpfile(file.absolute().as_posix(), f"/mnt/eupnea/usr/local/bin/{file.name}")
     # copy audio setup script
-    cpfile("setup-audio", "/mnt/eupnea/usr/local/bin/setup-audio")
+    cpfile("/tmp/eupnea-build/audio-scripts/setup-audio", "/mnt/eupnea/usr/local/bin/setup-audio")
     chroot("chmod 755 /usr/local/bin/*")  # make scripts executable in system
     # copy functions file
     cpfile("functions.py", "/mnt/eupnea/usr/local/bin/functions.py")
@@ -364,8 +364,8 @@ def post_extract(username: str, password: str, hostname: str, distro_name: str, 
     # copy configs
     mkdir("/mnt/eupnea/usr/local/eupnea-configs")
     cpdir("configs", "/mnt/eupnea/usr/local/eupnea-configs")  # installer configs
-    cpdir("postinstall-scripts/configs", "/mnt/eupnea/usr/local/eupnea-configs")  # installer configs
-    cpdir("audio-scripts/configs", "/mnt/eupnea/usr/local/eupnea-configs")  # installer configs
+    cpdir("/tmp/eupnea-build/postinstall-scripts/configs", "/mnt/eupnea/usr/local/eupnea-configs")  # installer configs
+    cpdir("/tmp/eupnea-build/audio-scripts/configs", "/mnt/eupnea/usr/local/eupnea-configs")  # installer configs
 
     # create eupnea settings file for postinstall scripts to read
     with open("configs/eupnea-settings.json", "r") as settings_file:
