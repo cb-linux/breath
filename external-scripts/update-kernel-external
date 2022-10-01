@@ -35,8 +35,8 @@ def prepare_host() -> None:
     print_status("Preparing host system")
 
     print_status("Cleaning + preparing host system")
-    rmdir("/tmp/eupnea-update")
-    mkdir("/tmp/eupnea-update", create_parents=True)
+    rmdir("/tmp/eupnea-external")
+    mkdir("/tmp/eupnea-external", create_parents=True)
     install_build_packages(user_id)
 
     print_status("Creating mount points and preparing device")
@@ -104,7 +104,7 @@ def flash_kernel() -> None:
 
     # modules tar contains /lib/modules, so it's extracted to / and --skip-old-files is used to prevent overwriting
     # other files in /lib
-    bash(f"tar xpf /tmp/eupnea-update/modules.tar.xz --skip-old-files -C /mnt/eupnea-external/ --checkpoint=.10000")
+    bash(f"tar xpf /tmp/eupnea-external/modules.tar.xz --skip-old-files -C /mnt/eupnea-external/ --checkpoint=.10000")
     print("")  # break line after tar
 
     print_status("Extracting kernel headers")
@@ -112,7 +112,7 @@ def flash_kernel() -> None:
     print_status("Extracting kernel headers")
     # headers.tar.xz contains /include, so it's extracted to /usr/ and --skip-old-files is used to prevent it from
     # overwriting other files in /usr/include
-    bash("tar xpf /tmp/eupnea-update/headers.tar.xz --skip-old-files -C /mnt/eupnea/usr/ --checkpoint=.10000")
+    bash("tar xpf /tmp/eupnea-external/headers.tar.xz --skip-old-files -C /mnt/eupnea/usr/ --checkpoint=.10000")
     print("")  # break line after tar
 
     rootfs_partuuid = bash(f"blkid -o value -s PARTUUID {device}2")  # get uuid of rootfs partition
@@ -134,10 +134,10 @@ def flash_kernel() -> None:
     print_status("Signing kernel")
     bash("futility vbutil_kernel --arch x86_64 --version 1 --keyblock /usr/share/vboot/devkeys/kernel.keyblock"
          + " --signprivate /usr/share/vboot/devkeys/kernel_data_key.vbprivk --bootloader kernel.flags" +
-         " --config kernel.flags --vmlinuz /tmp/eupnea-update/bzImage --pack /tmp/eupnea-update/bzImage.signed")
+         " --config kernel.flags --vmlinuz /tmp/eupnea-external/bzImage --pack /tmp/eupnea-external/bzImage.signed")
 
     print_status("Flashing kernel")
-    bash(f"dd if=/tmp/eupnea-update/bzImage.signed of={device}1")
+    bash(f"dd if=/tmp/eupnea-external/bzImage.signed of={device}1")
 
 
 if __name__ == "__main__":
@@ -237,9 +237,9 @@ if __name__ == "__main__":
         else:
             kernel_path = args.local_path
         print_status("Copying local files to /tmp/eupnea-external")
-        cpfile(f"{kernel_path}bzImage", "/tmp/eupnea-update/bzImage")
-        cpfile(f"{kernel_path}modules.tar.xz", "/tmp/eupnea-update/modules.tar.xz")
-        cpfile(f"{kernel_path}headers.tar.xz", "/tmp/eupnea-update/headers.tar.xz")
+        cpfile(f"{kernel_path}bzImage", "/tmp/eupnea-external/bzImage")
+        cpfile(f"{kernel_path}modules.tar.xz", "/tmp/eupnea-external/modules.tar.xz")
+        cpfile(f"{kernel_path}headers.tar.xz", "/tmp/eupnea-external/headers.tar.xz")
 
     flash_kernel()
     print_header("Kernel update complete! ")
