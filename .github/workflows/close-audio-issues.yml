@@ -1,0 +1,16 @@
+name: Close audio issue
+on:
+  issues:
+    types: [opened]
+
+jobs:
+  close-audio-issues:
+    runs-on: ubuntu-latest
+    steps:
+      - if: startsWith(github.event.issue.title, '[AUDIO]') == 'true'
+        name: Close Issue
+        uses: peter-evans/close-issue@v2
+        with:
+          comment: |
+            Please post audio issues in [audio-scripts](https://github.com/eupnea-linux/audio-scripts) repository.
+            Auto-closing this issue.
