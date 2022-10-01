@@ -100,15 +100,14 @@ def config(de_name: str, distro_version: str, root_partuuid: str, verbose: bool)
         conf.writelines(temp_pacman)
 
     # TODO: add eupnea to arch name
-    '''
     # Add eupnea to version(this is purely cosmetic)
     with open("/mnt/eupnea/etc/os-release", "r") as f:
         os_release = f.readlines()
+    os_release[0] = os_release[0][:-2] + ' (Eupnea)"\n'
     os_release[1] = os_release[1][:-2] + ' (Eupnea)"\n'
-    os_release[4] = os_release[4][:-2] + ' (Eupnea)"\n'
     with open("/mnt/eupnea/etc/os-release", "w") as f:
         f.writelines(os_release)
-    '''
+
     print_status("Arch configuration complete")
 
 
