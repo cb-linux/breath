@@ -9,7 +9,7 @@
 [<img src="https://discordapp.com/api/guilds/994245999822381076/widget.png?style=banner2" alt="Discord banner"></img>](https://discord.gg/jxXb2PwzYz)
 
 ## Supported Devices
-[Supported devices](https://eupnea-linux.github.io/docs.html#/devices)
+[Supported devices](https://eupnea-linux.github.io/docs.html#/pages/devices)
 
 ## Eupnea vs mainline
 **Stock Ubuntu:**
