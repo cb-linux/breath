@@ -22,7 +22,6 @@ def prepare_host(de_name: str, user_id: str) -> None:
     print_status("Cleaning + preparing host system")
     rmdir("/tmp/eupnea-build")
     mkdir("/tmp/eupnea-build", create_parents=True)
-    install_kernel_packages(user_id)
 
     print_status("Creating mount points")
     try:
@@ -36,8 +35,8 @@ def prepare_host(de_name: str, user_id: str) -> None:
     rmfile("eupnea.img")
     rmfile("kernel.flags")
 
-    # check if packages are already installed
-
+    # Install dependencies
+    install_kernel_packages(user_id)
     # Install parted
     if not path_exists("/usr/sbin/parted"):
         print_status("Installing parted")
@@ -214,7 +213,7 @@ def prepare_img() -> Tuple[str, str]:
     if mnt_point == "":
         print_error("\033[91m" + "Failed to mount image" + "\033[0m")
         exit(1)
-    return partition(mnt_point, False)
+    return partition_and_flash_kernel(mnt_point, False)
 
 
 # Prepare USB, usb is not yet fully implemented
@@ -233,10 +232,10 @@ def prepare_usb(device: str) -> Tuple[str, str]:
         bash(f"umount -lf {device}*")
     except subprocess.CalledProcessError:
         pass
-    return partition(device, True)
+    return partition_and_flash_kernel(device, True)
 
 
-def partition(mnt_point: str, write_usb: bool) -> Tuple[str, str]:
+def partition_and_flash_kernel(mnt_point: str, write_usb: bool) -> Tuple[str, str]:
     print_status("Preparing device/image partition")
 
     # Determine rootfs part name
@@ -281,7 +280,7 @@ def partition(mnt_point: str, write_usb: bool) -> Tuple[str, str]:
         # image is a loop device -> needs p in part name
         bash(f"dd if=/tmp/eupnea-build/bzImage.signed of={mnt_point}p1")
 
-    print_status("Creating rootfs part")
+    print_status("Formatting rootfs part")
     # Create rootfs ext4 partition
     bash(f"yes 2>/dev/null | mkfs.ext4 {rootfs_mnt}")  # 2>/dev/null is to supress yes broken pipe warning
 
