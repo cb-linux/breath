@@ -30,7 +30,8 @@ def config(de_name: str, distro_version: str, root_partuuid: str, verbose: bool)
 
     print_status("Installing packages")
     start_progress()  # start fake progress
-    chroot("pacman -S --noconfirm base base-devel nano networkmanager xkeyboard-config linux-firmware sudo cloud-utils")
+    chroot("pacman -S --noconfirm base base-devel nano networkmanager xkeyboard-config linux-firmware sudo cloud-utils "
+           "dmidecode")
     stop_progress()  # stop fake progress
 
     print_status("Downloading and installing de, might take a while")
