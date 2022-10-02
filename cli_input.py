@@ -242,7 +242,7 @@ def get_user_input() -> dict:
                 print("Building image instead of writing directly")
                 break
             elif device in usb_array:
-                print(f"Writing directly to /dev/{device}")
+                print(f"Writing directly to {device}")
                 output_dict["device"] = device
                 break
             else:

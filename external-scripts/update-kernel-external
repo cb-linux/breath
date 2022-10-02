@@ -37,7 +37,7 @@ def prepare_host() -> None:
     print_status("Cleaning + preparing host system")
     rmdir("/tmp/eupnea-external")
     mkdir("/tmp/eupnea-external", create_parents=True)
-    install_build_packages(user_id)
+    install_kernel_packages(user_id)
 
     print_status("Creating mount points and preparing device")
     try:
@@ -197,7 +197,7 @@ if __name__ == "__main__":
                 # add /dev/ to device name, if needed
                 if not device.startswith("/dev/"):
                     device = f"/dev/{device}"
-                print_status(f"Writing directly to /dev/{device}")
+                print_status(f"Updating {device}")
                 break
             else:
                 print_warning("USB not found. Check your spelling and try again")

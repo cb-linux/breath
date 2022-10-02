@@ -22,7 +22,7 @@ def prepare_host(de_name: str, user_id: str) -> None:
     print_status("Cleaning + preparing host system")
     rmdir("/tmp/eupnea-build")
     mkdir("/tmp/eupnea-build", create_parents=True)
-    install_build_packages(user_id)
+    install_kernel_packages(user_id)
 
     print_status("Creating mount points")
     try:
@@ -36,6 +36,25 @@ def prepare_host(de_name: str, user_id: str) -> None:
     rmfile("eupnea.img")
     rmfile("kernel.flags")
 
+    # check if packages are already installed
+
+    # Install parted
+    if not path_exists("/usr/sbin/parted"):
+        print_status("Installing parted")
+        if path_exists("/usr/bin/apt"):  # Ubuntu + debian
+            bash("apt-get install parted -y")
+        elif path_exists("/usr/bin/pacman"):  # Arch
+            # install parted
+            bash("pacman -S parted --noconfirm")
+
+        elif path_exists("/usr/bin/dnf"):  # Fedora
+            bash("dnf install parted --assumeyes")  # cgpt is included in vboot-utils on fedora
+        elif path_exists("/usr/bin/zypper"):  # openSUSE
+            bash("zypper --non-interactive install parted")
+        else:
+            print_warning("Parted not found, please install it using your distros package manager")
+            exit(1)
+
     # install debootstrap for debian
     if de_name == "debian" and not path_exists("/usr/sbin/debootstrap"):
         print_status("Installing debootstrap")
@@ -48,7 +67,7 @@ def prepare_host(de_name: str, user_id: str) -> None:
         elif path_exists("/usr/bin/zypper"):  # openSUSE
             bash("zypper --non-interactive install debootstrap")
         else:
-            print_warning("Debootstrap not found, please install it using your disotros package manager or select "
+            print_warning("Debootstrap not found, please install it using your distros package manager or select "
                           "another distro instead of debian")
             exit(1)
 
