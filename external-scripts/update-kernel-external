@@ -177,7 +177,7 @@ if __name__ == "__main__":
         print_warning("Using local path")
     set_verbose(args.verbose)  # set verbose in functions.py
 
-    # get rootfs partition from user
+    # ask user for device name
     while True:
         usb_array = []
         lsblk_out = bash("lsblk -o NAME,MODEL,SIZE,TRAN").splitlines()
