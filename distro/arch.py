@@ -54,7 +54,7 @@ def config(de_name: str, distro_version: str, root_partuuid: str, verbose: bool)
             # no wayland support in xfce
             chroot("pacman -S --noconfirm xfce4 xfce4-goodies xorg xorg-server lightdm lightdm-gtk-greeter")
             chroot("systemctl enable lightdm.service")
-        case "LXQt":
+        case "lxqt":
             print_status("Installing LXQt")
             chroot("pacman -S --noconfirm lxqt breeze-icons xorg xorg-server sddm")
             chroot("systemctl enable sddm.service")
