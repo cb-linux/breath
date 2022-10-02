@@ -323,6 +323,8 @@ def extract_rootfs(distro_name: str) -> None:
             # using unxz instead of tar
             bash("unxz -d /tmp/eupnea-build/fedora-rootfs.raw.xz -c > /tmp/eupnea-build/fedora-raw")
 
+            bash("modprobe btrfs")  # some systems don't have btrfs module loaded by default.
+
             # mount fedora raw image as loop device
             fedora_root_part = bash("losetup -P -f --show /tmp/eupnea-build/fedora-raw") + "p5"  # part 5 is the rootfs
             bash(f"mount {fedora_root_part} /tmp/eupnea-build/fedora-tmp-mnt")  # mount 5th root partition as filesystem
