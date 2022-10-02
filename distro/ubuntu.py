@@ -18,7 +18,7 @@ def config(de_name: str, distro_version: str, root_partuuid: str, verbose: bool)
     match de_name:
         case "gnome":
             print_status("Installing GNOME")
-            chroot("apt-get install -y ubuntu-desktop gnome-software")
+            chroot("apt-get install -y ubuntu-desktop gnome-software epiphany-browser")
         case "kde":
             print_status("Installing KDE")
             chroot("apt-get install -y kde-standard")
