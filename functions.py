@@ -127,46 +127,22 @@ def set_verbose(new_state: bool) -> None:
     verbose = new_state
 
 
-def install_build_packages(user_id: str) -> None:
-    print_status("Installing: vboot, cgpt, parted")
+def install_kernel_packages(user_id: str) -> None:
+    print_status("Installing: vboot, cgpt")
 
     # check if packages are already installed
-    if path_exists("/usr/bin/vbutil_kernel") and path_exists("/usr/bin/cgpt") and path_exists("/usr/sbin/parted"):
+    if path_exists("/usr/bin/vbutil_kernel") and path_exists("/usr/bin/cgpt"):
         print_status("Packages already installed")
         return
 
     if path_exists("/usr/bin/apt"):  # Ubuntu + debian
-        bash("apt-get install cgpt vboot-kernel-utils parted -y")
+        bash("apt-get install cgpt vboot-kernel-utils -y")
     elif path_exists("/usr/bin/pacman"):  # Arch
-        # remove old files if present
-        rmdir("/tmp/eupnea-packages/cgpt-bin", keep_dir=False)
-        rmdir("/tmp/eupnea-packages/vboot-utils", keep_dir=False)
-        mkdir("/tmp/eupnea-packages")
-
-        bash("pacman -S --needed base-devel --noconfirm")  # install base-devel for mkpkg
-
-        # clone packages
-        bash("git clone https://aur.archlinux.org/cgpt-bin.git /tmp/eupnea-packages/cgpt-bin")
-        bash("git clone https://aur.archlinux.org/vboot-utils.git /tmp/eupnea-packages/vboot-utils")
-        bash("chmod -R 557 /tmp/eupnea-packages")  # update perms so normal user can access
-
-        # Using custom PKGBUILD, as the one in the AUR is broken
-        try:
-            cpfile("configs/PKGBUILD", "/tmp/eupnea-packages/cgpt-bin/PKGBUILD")  # config while building
-        except FileNotFoundError:
-            cpfile("/usr/local/eupnea-configs/PKGBUILD", "/tmp/eupnea-packages/cgpt-bin/PKGBUILD")  # config in Eupnea
-
-        # makepkg wont run as root
-        bash(f'su -c "cd /tmp/eupnea-packages/cgpt-bin && makepkg -sirc --noconfirm" {user_id}')
-        bash(f'su -c "cd /tmp/eupnea-packages/vboot-utils && makepkg -sirc --noconfirm" {user_id}')
-
-        # install parted
-        bash("pacman -S parted --noconfirm")
-
+        print_error("Arch is not supported temporarily, please install the packages manually: cgpt vboot-kernel-utils")
     elif path_exists("/usr/bin/dnf"):  # Fedora
-        bash("dnf install vboot-utils parted --assumeyes")  # cgpt is included in vboot-utils on fedora
+        bash("dnf install vboot-utils --assumeyes")  # cgpt is included in vboot-utils on fedora
     elif path_exists("/usr/bin/zypper"):  # openSUSE
-        bash("zypper --non-interactive install vboot parted")
+        bash("zypper --non-interactive install vboot")
 
 
 #######################################################################################
