@@ -379,7 +379,7 @@ def post_extract(username: str, password: str, hostname: str, distro_name: str, 
     # TODO: Fix sleep, maybe
     mkdir("/mnt/eupnea/etc/systemd/")  # just in case systemd path doesn't exist
     with open("/mnt/eupnea/etc/systemd/sleep.conf", "a") as conf:
-        conf.write("SuspendState=freeze\nHibernateState=freeze")
+        conf.write("SuspendState=freeze\nHibernateState=freeze\n")
 
     # Enable loading modules needed for eupnea
     cpfile("configs/eupnea-modules.conf", "/mnt/eupnea/etc/modules-load.d/eupnea-modules.conf")
