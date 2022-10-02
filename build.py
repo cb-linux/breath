@@ -340,7 +340,7 @@ def extract_rootfs(distro_name: str) -> None:
 
 
 # Configure distro agnostic options
-def post_extract(username: str, password: str, hostname: str, distro_name: str, de_name: str, kernel_type: str) -> None:
+def post_extract(build_options, kernel_type: str) -> None:
     print_status("Applying distro agnostic configuration")
 
     # Extract kernel modules
@@ -363,7 +363,7 @@ def post_extract(username: str, password: str, hostname: str, distro_name: str, 
 
     # Set device hostname
     with open("/mnt/eupnea/etc/hostname", "w") as hostname_file:
-        hostname_file.write(hostname)
+        hostname_file.write(build_options["hostname"])
 
     # Copy eupnea scripts and config
     print_status("Copying eupnea scripts and configs")
@@ -390,6 +390,8 @@ def post_extract(username: str, password: str, hostname: str, distro_name: str, 
     with open("configs/eupnea-settings.json", "r") as settings_file:
         settings = json.load(settings_file)
     settings["kernel_type"] = kernel_type
+    if not build_options["device"] == "image":
+        settings["eupnea_build_type"] = "direct"
     with open("/mnt/eupnea/usr/local/eupnea-settings.json", "w") as settings_file:
         json.dump(settings, settings_file)
 
@@ -410,13 +412,15 @@ def post_extract(username: str, password: str, hostname: str, distro_name: str, 
     rmfile("/mnt/eupnea/etc/systemd/system/multi-user.target.wants/ssh.service")
     rmfile("/mnt/eupnea/etc/systemd/system/sshd.service")
 
+    username = build_options["username"]  # quotes interfere with functions below
+    password = build_options["password"]  # quotes interfere with functions below
     # Gnome has a first time setup if no users are detected
-    if not de_name == "gnome":
+    if not build_options["de_name"] == "gnome":
         print_status("Configuring user")
         chroot(f"useradd --create-home --shell /bin/bash {username}")
         # TODO: Fix ) and ( crashing chpasswd
         chroot(f'echo "{username}:{password}" | chpasswd')
-        match distro_name:
+        match build_options["distro_name"]:
             case "ubuntu" | "debian":
                 chroot(f"usermod -aG sudo {username}")
             case "arch" | "fedora":
@@ -509,8 +513,7 @@ def start_build(verbose: bool, local_path: str, kernel_type: str, dev_release: b
 
     # Extract rootfs and configure distro agnostic settings
     extract_rootfs(build_options["distro_name"])
-    post_extract(build_options["username"], build_options["password"], build_options["hostname"],
-                 build_options["distro_name"], build_options["de_name"], kernel_type)
+    post_extract(build_options, kernel_type)
 
     match build_options["distro_name"]:
         case "ubuntu":
