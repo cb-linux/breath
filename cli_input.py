@@ -86,7 +86,7 @@ def get_user_input() -> dict:
                             continue
                 break
             case _:
-                print("\033[93mCheck your spelling and try again" + "\033[0m")
+                print_warning("Check your spelling and try again")
                 continue
 
     print_question("Which desktop environment(Desktop GUI) would you like to use?")
@@ -129,14 +129,14 @@ def get_user_input() -> dict:
                 break
             case "deepin":
                 if output_dict["distro_name"] == "debian":
-                    print("\033[93m" + "Deepin is not available for Debian, please choose another DE" + "\033[0m")
+                    print_warning("Deepin is not available for Debian, please choose another DE")
                 else:
                     print("Deepin selected")
                     output_dict["de_name"] = "deepin"
                     break
             case "budgie":
                 if output_dict["distro_name"] == "fedora":
-                    print("\033[93m" + "Budgie is not available for Fedora, please choose another DE" + "\033[0m")
+                    print_warning("Budgie is not available for Fedora, please choose another DE")
                 else:
                     print("Budgie selected")
                     output_dict["de_name"] = "budgie"
