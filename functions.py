@@ -145,6 +145,15 @@ def install_kernel_packages(user_id: str) -> None:
         bash("zypper --non-interactive install vboot")
 
 
+def prevent_idle() -> None:
+    Thread(target=__prevent_idle, daemon=True).start()
+
+
+def __prevent_idle():
+    bash('systemd-inhibit /bin/bash -c "sleep 7200" --what="idle"')  # sleep indefinitely, thereby preventing idle
+    print_error("Been copying for 2 HOURS?!?!? now..... Please create an issue")
+
+
 #######################################################################################
 #                                    PROCESS MONITOR FUNCTIONS                        #
 #######################################################################################
