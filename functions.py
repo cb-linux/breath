@@ -169,6 +169,9 @@ def install_build_packages(user_id: str) -> None:
         bash("zypper --non-interactive install vboot parted")
 
 
+#######################################################################################
+#                                    PROCESS MONITOR FUNCTIONS                        #
+#######################################################################################
 def start_progress(force_show: bool = False) -> None:
     if not force_show and verbose:
         return
@@ -196,6 +199,26 @@ def stop_download_progress() -> None:
     print("\n", end="")
 
 
+def __print_progress_dots() -> None:  # Do not call this function directly, use start_progress() instead
+    while True:
+        if not path_exists(".stop_progress"):
+            print(".", end="", flush=True)
+            sleep(2)
+        else:
+            return
+
+
+def __print_download_progress(file_path: Path) -> None:
+    while True:
+        if not path_exists(".stop_download_progress"):
+            try:
+                print("\rDownloaded: " + "%.0f" % int(file_path.stat().st_size / 1048576) + "mb", end="", flush=True)
+            except FileNotFoundError:
+                sleep(0.5)  # in case download hasn't started yet
+        else:
+            return
+
+
 #######################################################################################
 #                                    PRINT FUNCTIONS                                  #
 #######################################################################################
@@ -218,26 +241,6 @@ def print_question(message: str) -> None:
 
 def print_header(message: str) -> None:
     print("\033[95m" + message + "\033[0m", flush=True)
-
-
-def __print_progress_dots() -> None:  # Do not call this function directly, use start_progress() instead
-    while True:
-        if not path_exists(".stop_progress"):
-            print(".", end="", flush=True)
-            sleep(2)
-        else:
-            return
-
-
-def __print_download_progress(file_path: Path) -> None:
-    while True:
-        if not path_exists(".stop_download_progress"):
-            try:
-                print("\rDownloaded: " + "%.0f" % int(file_path.stat().st_size / 1048576) + "mb", end="", flush=True)
-            except FileNotFoundError:
-                sleep(0.5)  # in case download hasn't started yet
-        else:
-            return
 
 
 if __name__ == "__main__":
