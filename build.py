@@ -26,7 +26,7 @@ def prepare_host(de_name: str, user_id: str) -> None:
 
     print_status("Creating mount points")
     try:
-        bash("umount -lf /mnt/eupnea 2>/dev/null")  # just in case
+        bash("umount -lf /mnt/eupnea")  # just in case
     except subprocess.CalledProcessError:
         print("Failed to unmount /mnt/eupnea, ignore")
         pass
@@ -211,7 +211,7 @@ def prepare_usb(device: str) -> Tuple[str, str]:
 
     # unmount all partitions
     try:
-        bash(f"umount -lf {device}* 2>/dev/null")
+        bash(f"umount -lf {device}*")
     except subprocess.CalledProcessError:
         pass
     return partition(device, True)
