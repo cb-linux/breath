@@ -362,7 +362,7 @@ def post_extract(build_options, kernel_type: str) -> None:
 
     # Set device hostname
     with open("/mnt/eupnea/etc/hostname", "w") as hostname_file:
-        hostname_file.write(build_options["hostname"])
+        hostname_file.write(build_options["hostname"] + "\n")
 
     # Copy eupnea scripts and config
     print_status("Copying eupnea scripts and configs")
