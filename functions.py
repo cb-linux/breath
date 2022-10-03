@@ -127,7 +127,7 @@ def set_verbose(new_state: bool) -> None:
     verbose = new_state
 
 
-def install_kernel_packages(user_id: str) -> None:
+def install_kernel_packages() -> None:
     print_status("Installing: vboot, cgpt")
 
     # check if packages are already installed
@@ -138,7 +138,31 @@ def install_kernel_packages(user_id: str) -> None:
     if path_exists("/usr/bin/apt"):  # Ubuntu + debian
         bash("apt-get install cgpt vboot-kernel-utils -y")
     elif path_exists("/usr/bin/pacman"):  # Arch
-        print_error("Arch is not supported temporarily, please install the packages manually: cgpt vboot-kernel-utils")
+        # remove old files if present
+        rmdir("/tmp/eupnea-packages/")
+        mkdir("/tmp/eupnea-packages")
+
+        bash("pacman -S --needed base-devel --noconfirm")  # install base-devel for makepkg
+
+        # clone packages
+        bash("git clone https://aur.archlinux.org/cgpt-bin.git /tmp/eupnea-packages/cgpt-bin")
+        # trousers is a dependency of vboot-utils
+        bash("git clone https://aur.archlinux.org/cgpt-bin.git /tmp/eupnea-packages/trousers")
+        bash("git clone https://aur.archlinux.org/vboot-utils.git /tmp/eupnea-packages/vboot-utils")
+
+        # Copy fixed PKGBUILD from repo as the aur one is broken
+        try:
+            cpfile("configs/PKGBUILD", "/tmp/eupnea-packages/cgpt-bin/PKGBUILD")
+        except FileNotFoundError:
+            cpfile("/usr/local/eupnea-configs/PKGBUILD", "/tmp/eupnea-packages/cgpt-bin/PKGBUILD")  # config in Eupnea
+
+        # Build and install packages
+        bash("cd /tmp/eupnea-packages/cgpt-bin && makepkg -sirc --noconfirm")
+        bash("cd /tmp/eupnea-packages/trousers && makepkg -sirc --noconfirm")
+        bash("cd /tmp/eupnea-packages/vboot-utils && makepkg -sirc --noconfirm")
+
+        # remove repos
+        rmdir("/tmp/eupnea-packages/")
     elif path_exists("/usr/bin/dnf"):  # Fedora
         bash("dnf install vboot-utils --assumeyes")  # cgpt is included in vboot-utils on fedora
     elif path_exists("/usr/bin/zypper"):  # openSUSE
@@ -150,8 +174,8 @@ def prevent_idle() -> None:
 
 
 def __prevent_idle():
-    bash('systemd-inhibit /bin/bash -c "sleep 7200" --what="idle"')  # sleep indefinitely, thereby preventing idle
-    print_error("Been copying for 2 HOURS?!?!? now..... Please create an issue")
+    bash('systemd-inhibit /bin/bash -c "sleep 14400" --what="idle"')  # sleep indefinitely, thereby preventing idle
+    print_error("Been copying for 4 HOURS?!?!? Please create an issue")
 
 
 #######################################################################################
