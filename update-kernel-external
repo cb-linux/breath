@@ -37,7 +37,6 @@ def prepare_host() -> None:
     print_status("Cleaning + preparing host system")
     rmdir("/tmp/eupnea-external")
     mkdir("/tmp/eupnea-external", create_parents=True)
-    install_kernel_packages(user_id)
 
     print_status("Creating mount points and preparing device")
     try:
@@ -141,23 +140,25 @@ def flash_kernel() -> None:
 
 
 if __name__ == "__main__":
-    if os.geteuid() == 0 and not path_exists("/tmp/username"):
+    if os.geteuid() == 0 and not path_exists("/tmp/.eupnea_root_ok"):
         print_error("Please start the script as non-root/without sudo")
         exit(1)
 
     args = process_args()  # process args before elevating to root for better ux
 
+    # install kernel packages before elevating to root, as makepkg needs to be run as non-root
+    install_kernel_packages()
+
     # Restart script as root
     if not os.geteuid() == 0:
-        # save username
-        with open("/tmp/username", "w") as file:
-            file.write(bash("whoami").strip())  # get non root username. os.getlogin() seems to fail in chroots
+        # create empty file to confirm script was started as non-root
+        with open("/tmp/.eupnea_root_ok", "w") as file:
+            file.write("")
         sudo_args = ['sudo', sys.executable] + sys.argv + [os.environ]
         os.execlpe('sudo', *sudo_args)
 
-    # read username
-    with open("/tmp/username", "r") as file:
-        user_id = file.read()
+    # delete file to confirm script was started as root
+    rmfile("/tmp/.eupnea_root_ok")
 
     if args.stable:
         print_warning("Using stable kernel")
