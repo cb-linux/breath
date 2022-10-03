@@ -30,23 +30,25 @@ def process_args():
 
 
 if __name__ == "__main__":
-    if os.geteuid() == 0 and not path_exists("/tmp/username"):
+    if os.geteuid() == 0 and not path_exists("/tmp/.eupnea_root_ok"):
         print_error("Please start the script as non-root/without sudo")
         exit(1)
 
     args = process_args()  # process args before elevating to root for better ux
 
+    # install kernel packages before elevating to root, as makepkg needs to be run as non-root
+    install_kernel_packages()
+
     # Restart script as root
     if not os.geteuid() == 0:
-        # save username
-        with open("/tmp/username", "w") as file:
-            file.write(bash("whoami").strip())  # get non root username. os.getlogin() seems to fail in chroots
+        # create empty file to confirm script was started as non-root
+        with open("/tmp/.eupnea_root_ok", "w") as file:
+            file.write("")
         sudo_args = ['sudo', sys.executable] + sys.argv + [os.environ]
         os.execlpe('sudo', *sudo_args)
 
-    # read username
-    with open("/tmp/username", "r") as file:
-        user_id = file.read()
+    # delete file to confirm script was started as root
+    rmfile("/tmp/.eupnea_root_ok")
 
     # Check python version
     if sys.version_info < (3, 10):  # python 3.10 or higher is required
@@ -105,4 +107,4 @@ if __name__ == "__main__":
     if args.verbose:
         print_warning("Verbosity increased")
     build = build.start_build(args.verbose, local_path=args.local_path, kernel_type=kernel_type,
-                              dev_release=dev_release, user_id=user_id, build_options=cli_input.get_user_input())
+                              dev_release=dev_release, build_options=cli_input.get_user_input())

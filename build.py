@@ -9,7 +9,7 @@ from functions import *
 
 
 # Clean /tmp from eupnea files
-def prepare_host(de_name: str, user_id: str) -> None:
+def prepare_host(de_name: str) -> None:
     print_status("Preparing host system")
 
     # unmount fedora remains before attempting to remove /tmp/eupnea-build
@@ -36,18 +36,16 @@ def prepare_host(de_name: str, user_id: str) -> None:
     rmfile("kernel.flags")
 
     # Install dependencies
-    install_kernel_packages(user_id)
+    install_kernel_packages()
     # Install parted
     if not path_exists("/usr/sbin/parted"):
         print_status("Installing parted")
         if path_exists("/usr/bin/apt"):  # Ubuntu + debian
             bash("apt-get install parted -y")
         elif path_exists("/usr/bin/pacman"):  # Arch
-            # install parted
             bash("pacman -S parted --noconfirm")
-
         elif path_exists("/usr/bin/dnf"):  # Fedora
-            bash("dnf install parted --assumeyes")  # cgpt is included in vboot-utils on fedora
+            bash("dnf install parted --assumeyes")
         elif path_exists("/usr/bin/zypper"):  # openSUSE
             bash("zypper --non-interactive install parted")
         else:
@@ -459,12 +457,11 @@ def chroot(command: str) -> str:
 
 
 # The main build script
-def start_build(verbose: bool, local_path: str, kernel_type: str, dev_release: bool, user_id: str,
-                build_options):
+def start_build(verbose: bool, local_path: str, kernel_type: str, dev_release: bool, build_options):
     set_verbose(verbose)
     print_status("Starting build")
 
-    prepare_host(build_options["distro_name"], user_id)
+    prepare_host(build_options["distro_name"])
 
     # Download files first
     if local_path is None:
