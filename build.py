@@ -390,7 +390,7 @@ def post_extract(build_options, kernel_type: str) -> None:
         settings = json.load(settings_file)
     settings["kernel_type"] = kernel_type
     if not build_options["device"] == "image":
-        settings["eupnea_build_type"] = "direct"
+        settings["eupnea_install_type"] = "direct"
     with open("/mnt/eupnea/usr/local/eupnea-settings.json", "w") as settings_file:
         json.dump(settings, settings_file)
 

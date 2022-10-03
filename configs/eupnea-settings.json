@@ -2,5 +2,5 @@
   "kernel_type": "stable",
   "kernel_version": "5.10.131",
   "eupnea_version": "0.6.1",
-  "eupnea_build_type": "image"
+  "eupnea_install_type": "image"
 }
