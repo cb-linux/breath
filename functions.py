@@ -142,7 +142,7 @@ def install_kernel_packages() -> None:
         rmdir("/tmp/eupnea-packages/")
         mkdir("/tmp/eupnea-packages")
 
-        bash("pacman -S --needed base-devel --noconfirm")  # install base-devel for makepkg
+        bash("sudo pacman -S --needed base-devel --noconfirm")  # install base-devel for makepkg
 
         # clone packages
         bash("git clone https://aur.archlinux.org/cgpt-bin.git /tmp/eupnea-packages/cgpt-bin")
