@@ -145,7 +145,7 @@ def install_kernel_packages() -> None:
         bash("sudo pacman -S --needed base-devel --noconfirm")  # install base-devel for makepkg
 
         # clone packages
-        bash("git clone https://aur.archlinux.org/cgpt-bin.git /tmp/eupnea-packages/cgpt-bin")
+        mkdir("/tmp/eupnea-packages/cgpt-bin", create_parents=True)  # dont clone cgpt, PKGBUILD is broken
         # trousers is a dependency of vboot-utils
         bash("git clone https://aur.archlinux.org/cgpt-bin.git /tmp/eupnea-packages/trousers")
         bash("git clone https://aur.archlinux.org/vboot-utils.git /tmp/eupnea-packages/vboot-utils")
@@ -161,7 +161,7 @@ def install_kernel_packages() -> None:
         bash("cd /tmp/eupnea-packages/trousers && makepkg -sirc --noconfirm")
         bash("cd /tmp/eupnea-packages/vboot-utils && makepkg -sirc --noconfirm")
 
-        # remove repos
+        # remove local repo clones
         rmdir("/tmp/eupnea-packages/")
     elif path_exists("/usr/bin/dnf"):  # Fedora
         bash("dnf install vboot-utils --assumeyes")  # cgpt is included in vboot-utils on fedora
