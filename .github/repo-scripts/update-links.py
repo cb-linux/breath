@@ -5,8 +5,6 @@
 from urllib.request import urlretrieve
 import json
 
-from functions import *
-
 if __name__ == '__main__':
     print("\033[96m" + "Starting update script" + "\033[0m")
     with open('../../distros.json', 'r') as file:
@@ -31,6 +29,3 @@ if __name__ == '__main__':
     print("\033[96m" + "Writing new distro.json" + "\033[0m")
     with open('../../distros.json', 'w') as file:
         json.dump(distros_dict, file, indent=4)
-
-    print("\033[96m" + "Removing html file" + "\033[0m")
-    rmfile("fedora_link.html")
