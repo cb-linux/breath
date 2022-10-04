@@ -1,0 +1,21 @@
+# Fixed PKGBUILD File from the Eupnea project
+pkgname=cgpt-bin
+pkgver=14469.B
+pkgrel=2
+_rel=R99
+pkgdesc="GPT manipulation tool with support for Chromium OS extensions"
+arch=('x86_64')
+url="https://chromium.googlesource.com/chromiumos/platform/vboot_reference/"
+license=('BSD')
+depends=('glibc' 'libuuid.so')
+provides=('cgpt')
+source=("cgpt.deb::http://archive.ubuntu.com/ubuntu/pool/universe/v/vboot-utils/cgpt_0~${_rel}-${pkgver}-${pkgrel}_amd64.deb")
+sha512sums=("3e6b94d718365cb4118ae9b84495998787ab35c0d66b685ec229f593adf11c35d71a2d18ee8fc48e6ef88cdc3a4275d76c6a73c3d70d37b0b80d2973a912188a")
+
+package() {
+	cd "$srcdir"
+	bsdtar -x -f data.tar.zst -C "$pkgdir"
+	cd "$pkgdir"
+	install -Dm644 ./usr/share/doc/cgpt/copyright "$pkgdir"/usr/share/licenses/cgpt/COPYRIGHT
+	rm -r ./usr/share/doc
+}
