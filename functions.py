@@ -147,7 +147,7 @@ def install_kernel_packages() -> None:
         # clone packages
         mkdir("/tmp/eupnea-packages/cgpt-bin", create_parents=True)  # dont clone cgpt, PKGBUILD is broken
         # trousers is a dependency of vboot-utils
-        bash("git clone https://aur.archlinux.org/cgpt-bin.git /tmp/eupnea-packages/trousers")
+        bash("git clone https://aur.archlinux.org/trousers.git /tmp/eupnea-packages/trousers")
         bash("git clone https://aur.archlinux.org/vboot-utils.git /tmp/eupnea-packages/vboot-utils")
 
         # Copy fixed PKGBUILD from repo as the aur one is broken
