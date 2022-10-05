@@ -118,7 +118,3 @@ def chroot(command: str):
         bash(f'arch-chroot /mnt/eupnea bash -c "{command}"')
     else:
         bash(f'arch-chroot /mnt/eupnea bash -c "{command}" 2>/dev/null 1>/dev/null')  # supress all output
-
-
-if __name__ == "__main__":
-    print_error("Do not run this file. Use main.py")
