@@ -5,6 +5,7 @@ import sys
 import argparse
 from urllib.error import URLError
 from urllib.request import urlretrieve, urlopen
+import json
 
 from functions import *
 
@@ -64,7 +65,7 @@ def download_kernel() -> None:
     # download kernel files
     start_progress()  # show fake progress
     try:
-        match selected_kernel_type:
+        match kernel_type:
             case "mainline":
                 print_status("Downloading mainline kernel")
                 url = "https://github.com/eupnea-linux/mainline-kernel/releases/latest/download/"
@@ -111,7 +112,7 @@ def flash_kernel() -> None:
     print_status("Extracting kernel headers")
     # headers.tar.xz contains /include, so it's extracted to /usr/ and --skip-old-files is used to prevent it from
     # overwriting other files in /usr/include
-    bash("tar xpf /tmp/eupnea-external/headers.tar.xz --skip-old-files -C /mnt/eupnea/usr/ --checkpoint=.10000")
+    bash("tar xpf /tmp/eupnea-external/headers.tar.xz --skip-old-files -C /mnt/eupnea-external/usr/ --checkpoint=.10000")
     print("")  # break line after tar
 
     rootfs_partuuid = bash(f"blkid -o value -s PARTUUID {device}2")  # get uuid of rootfs partition
@@ -138,6 +139,13 @@ def flash_kernel() -> None:
     print_status("Flashing kernel")
     bash(f"dd if=/tmp/eupnea-external/bzImage.signed of={device}1")
 
+    # update kernel type in eupnea-settings
+    with open("/mnt/eupnea-external/etc/eupnea-settings.json", "w") as settings_file:
+        settings = json.load(settings_file)
+    settings["kernel_type"] = kernel_type
+    with open("/mnt/eupnea-external/etc/eupnea-settings.json", "w") as settings_file:
+        json.dump(settings, settings_file)
+
 
 if __name__ == "__main__":
     if os.geteuid() == 0 and not path_exists("/tmp/.eupnea_root_ok"):
@@ -162,18 +170,18 @@ if __name__ == "__main__":
 
     if args.stable:
         print_warning("Using stable kernel")
-        selected_kernel_type = "stable"
+        kernel_type = "stable"
     if args.dev_build:
         print_warning("Using dev release")
     if args.alt:
         print_warning("Using alt kernel")
-        selected_kernel_type = "alt"
+        kernel_type = "alt"
     if args.exp:
         print_warning("Using experimental kernel")
-        selected_kernel_type = "exp"
+        kernel_type = "exp"
     if args.mainline:
         print_warning("Using mainline kernel")
-        selected_kernel_type = "mainline"
+        kernel_type = "mainline"
     if args.local_path:
         print_warning("Using local path")
     set_verbose(args.verbose)  # set verbose in functions.py
@@ -213,16 +221,16 @@ if __name__ == "__main__":
                              " newer devices, exp(experimental 5.15 kernel)" + "\033[0m" + "\n")
             match user_input:
                 case "" | "stable" | "Stable" | "Default" | "default":
-                    selected_kernel_type = "stable"
+                    kernel_type = "stable"
                     break
                 case "alt" | "Alt":
-                    selected_kernel_type = "alt"
+                    kernel_type = "alt"
                     break
                 case "mainline" | "Mainline":
-                    selected_kernel_type = "mainline"
+                    kernel_type = "mainline"
                     break
                 case "exp" | "Experimental" | "experimental" | "Exp":
-                    selected_kernel_type = "exp"
+                    kernel_type = "exp"
                     break
                 case _:
                     print_warning("Invalid kernel type, check your spelling")

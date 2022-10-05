@@ -391,7 +391,7 @@ def post_extract(build_options, kernel_type: str) -> None:
     settings["kernel_type"] = kernel_type
     if not build_options["device"] == "image":
         settings["eupnea_install_type"] = "direct"
-    with open("/mnt/eupnea/usr/local/eupnea-settings.json", "w") as settings_file:
+    with open("/mnt/eupnea/etc/eupnea-settings.json", "w") as settings_file:
         json.dump(settings, settings_file)
 
     print_status("Fixing sleep")
