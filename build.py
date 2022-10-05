@@ -380,18 +380,18 @@ def post_extract(build_options, kernel_type: str) -> None:
     cpfile("functions.py", "/mnt/eupnea/usr/local/bin/functions.py")
 
     # copy configs
-    mkdir("/mnt/eupnea/usr/local/eupnea-configs")
-    cpdir("configs", "/mnt/eupnea/usr/local/eupnea-configs")  # installer configs
-    cpdir("/tmp/eupnea-build/postinstall-scripts/configs", "/mnt/eupnea/usr/local/eupnea-configs")  # installer configs
-    cpdir("/tmp/eupnea-build/audio-scripts/configs", "/mnt/eupnea/usr/local/eupnea-configs")  # installer configs
+    mkdir("/mnt/eupnea/etc/eupnea")
+    cpdir("configs", "/mnt/eupnea/etc/eupnea")  # eupnea-builder configs
+    cpdir("/tmp/eupnea-build/postinstall-scripts/configs", "/mnt/eupnea/etc/eupnea")  # postinstall configs
+    cpdir("/tmp/eupnea-build/audio-scripts/configs", "/mnt/eupnea/etc/eupnea")  # audio configs
 
     # create eupnea settings file for postinstall scripts to read
-    with open("configs/eupnea-settings.json", "r") as settings_file:
+    with open("configs/eupnea.json", "r") as settings_file:
         settings = json.load(settings_file)
     settings["kernel_type"] = kernel_type
     if not build_options["device"] == "image":
         settings["eupnea_install_type"] = "direct"
-    with open("/mnt/eupnea/etc/eupnea-settings.json", "w") as settings_file:
+    with open("/mnt/eupnea/etc/eupnea.json", "w") as settings_file:
         json.dump(settings, settings_file)
 
     print_status("Fixing sleep")

@@ -140,10 +140,10 @@ def flash_kernel() -> None:
     bash(f"dd if=/tmp/eupnea-external/bzImage.signed of={device}1")
 
     # update kernel type in eupnea-settings
-    with open("/mnt/eupnea-external/etc/eupnea-settings.json", "w") as settings_file:
+    with open("/mnt/eupnea-external/etc/eupnea.json", "w") as settings_file:
         settings = json.load(settings_file)
     settings["kernel_type"] = kernel_type
-    with open("/mnt/eupnea-external/etc/eupnea-settings.json", "w") as settings_file:
+    with open("/mnt/eupnea-external/etc/eupnea.json", "w") as settings_file:
         json.dump(settings, settings_file)
 
 
