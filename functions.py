@@ -136,7 +136,7 @@ def install_kernel_packages() -> None:
         return
 
     if path_exists("/usr/bin/apt"):  # Ubuntu + debian
-        bash("apt-get install cgpt vboot-kernel-utils -y")
+        bash("sudo apt-get install cgpt vboot-kernel-utils -y")
     elif path_exists("/usr/bin/pacman"):  # Arch
         # remove old files if present
         rmdir("/tmp/eupnea-packages/")
@@ -155,9 +155,9 @@ def install_kernel_packages() -> None:
         # remove local repo clones
         rmdir("/tmp/eupnea-packages/")
     elif path_exists("/usr/bin/dnf"):  # Fedora
-        bash("dnf install vboot-utils --assumeyes")  # cgpt is included in vboot-utils on fedora
+        bash("sudo dnf install vboot-utils --assumeyes")  # cgpt is included in vboot-utils on fedora
     elif path_exists("/usr/bin/zypper"):  # openSUSE
-        bash("zypper --non-interactive install vboot")
+        bash("sudo zypper --non-interactive install vboot")
 
 
 def prevent_idle() -> None:
