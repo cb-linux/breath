@@ -132,11 +132,11 @@ def install_kernel_packages() -> None:
 
     # check if packages are already installed
     if path_exists("/usr/bin/vbutil_kernel") and path_exists("/usr/bin/cgpt"):
-        print_status("Packages already installed")
+        print_status("Packages already installed, skipping")
         return
 
     if path_exists("/usr/bin/apt"):  # Ubuntu + debian
-        bash("apt-get install cgpt vboot-kernel-utils -y")
+        bash("sudo apt-get install cgpt vboot-kernel-utils -y")
     elif path_exists("/usr/bin/pacman"):  # Arch
         # remove old files if present
         rmdir("/tmp/eupnea-packages/")
@@ -144,29 +144,20 @@ def install_kernel_packages() -> None:
 
         bash("sudo pacman -S --needed base-devel --noconfirm")  # install base-devel for makepkg
 
-        # clone packages
-        mkdir("/tmp/eupnea-packages/cgpt-bin", create_parents=True)  # dont clone cgpt, PKGBUILD is broken
         # trousers is a dependency of vboot-utils
         bash("git clone https://aur.archlinux.org/trousers.git /tmp/eupnea-packages/trousers")
         bash("git clone https://aur.archlinux.org/vboot-utils.git /tmp/eupnea-packages/vboot-utils")
 
-        # Copy fixed PKGBUILD from repo as the aur one is broken
-        try:
-            cpfile("configs/PKGBUILD", "/tmp/eupnea-packages/cgpt-bin/PKGBUILD")
-        except FileNotFoundError:
-            cpfile("/usr/local/eupnea-configs/PKGBUILD", "/tmp/eupnea-packages/cgpt-bin/PKGBUILD")  # config in Eupnea
-
-        # Build and install packages
-        bash("cd /tmp/eupnea-packages/cgpt-bin && makepkg -sirc --noconfirm")
         bash("cd /tmp/eupnea-packages/trousers && makepkg -sirc --noconfirm")
-        bash("cd /tmp/eupnea-packages/vboot-utils && makepkg -sirc --noconfirm")
+        # using subprocess.run instead of bash because makepkg has some C errors
+        subprocess.run("cd /tmp/eupnea-packages/vboot-utils && makepkg -sirc --noconfirm", shell=True)
 
         # remove local repo clones
         rmdir("/tmp/eupnea-packages/")
     elif path_exists("/usr/bin/dnf"):  # Fedora
-        bash("dnf install vboot-utils --assumeyes")  # cgpt is included in vboot-utils on fedora
+        bash("sudo dnf install vboot-utils --assumeyes")  # cgpt is included in vboot-utils on fedora
     elif path_exists("/usr/bin/zypper"):  # openSUSE
-        bash("zypper --non-interactive install vboot")
+        bash("sudo zypper --non-interactive install vboot")
 
 
 def prevent_idle() -> None:
@@ -250,7 +241,3 @@ def print_question(message: str) -> None:
 
 def print_header(message: str) -> None:
     print("\033[95m" + message + "\033[0m", flush=True)
-
-
-if __name__ == "__main__":
-    print_error("There is nothing to be run in this file!")
