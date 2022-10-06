@@ -81,20 +81,21 @@ def config(de_name: str, distro_version: str, root_partuuid: str, verbose: bool)
     # Pre-update python to 3.10 as some eupnea postinstall scripts require it
     print_status("Upgrading python to 3.10")
     # switch to unstable channel
-    with open("/etc/apt/sources.list", "r") as file:
+    with open("/mnt/eupnea/etc/apt/sources.list", "r") as file:
         original_sources = file.readlines()
     sources = original_sources
     sources[1] = sources[1].replace("stable", "unstable")
-    with open("/etc/apt/sources.list", "w") as file:
+    with open("/mnt/eupnea/etc/apt/sources.list", "w") as file:
         file.writelines(sources)
     # update and install python
     print_status("Installing python 3.10")
-    bash("apt-get update -y")
-    bash("apt-get install -y python3")
+    chroot("apt-get update -y")
+    chroot("apt-get install -y python3")
     print_status("Python 3.10 installed")
     # revert to stable channel
-    with open("/etc/apt/sources.list", "w") as file:
+    with open("/mnt/eupnea/etc/apt/sources.list", "w") as file:
         file.writelines(original_sources)
+    chroot("apt-get update -y")
 
     # Add eupnea to version(this is purely cosmetic)
     with open("/mnt/eupnea/etc/os-release", "r") as f:
