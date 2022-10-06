@@ -18,7 +18,7 @@ def get_user_input() -> dict:
         "device": "image",
         "rebind_search": False
     }
-    with open("distros.json", "r") as file:
+    with open("distro-links.json", "r") as file:
         distros = json.load(file)
 
     # Print welcome message
