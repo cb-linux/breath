@@ -17,8 +17,10 @@ Steps to reproduce the behavior:
 3. Select ... as desktop environment
 4. ...
 
-**Screenshots**
-If applicable, add screenshots to help explain your problem.
+**Full log**
+<!-- Please run the script with the -v option and upload the full terminal output below -->
+Verbose log:
+
 
 **Build system (please complete the following information):**
  - OS: [e.g. Ubuntu, Windows 11, Crostini(aka Linux on ChromeOS)]
