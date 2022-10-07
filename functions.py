@@ -185,6 +185,7 @@ def stop_progress(force_show: bool = False) -> None:
     with open(".stop_progress", "w") as file:
         file.write("")
     sleep(3)
+    print("\n", end="")
 
 
 def start_download_progress(file_path_str: str) -> None:
