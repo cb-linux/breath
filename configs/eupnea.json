@@ -1,6 +1,8 @@
 {
-  "kernel_type": "stable",
-  "kernel_version": "5.10.131",
-  "eupnea_version": "0.6.1",
-  "eupnea_install_type": "image"
+  "kernel_type": "",
+  "kernel_version": "none",
+  "eupnea_version": "0.6.1-alpha",
+  "eupnea_install_type": "image",
+  "distro": "",
+  "de_name": ""
 }

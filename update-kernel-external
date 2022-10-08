@@ -107,26 +107,21 @@ def flash_kernel() -> None:
     bash(f"tar xpf /tmp/eupnea-external/modules.tar.xz --skip-old-files -C /mnt/eupnea-external/ --checkpoint=.10000")
     print("")  # break line after tar
 
-    print_status("Extracting kernel headers")
     # Extract kernel headers
     print_status("Extracting kernel headers")
-    # headers.tar.xz contains /include, so it's extracted to /usr/ and --skip-old-files is used to prevent it from
-    # overwriting other files in /usr/include
-    bash("tar xpf /tmp/eupnea-external/headers.tar.xz --skip-old-files -C /mnt/eupnea-external/usr/ --checkpoint=.10000")
+    # TODO: set actual kernel version
+    kernel_version = "eupnea"
+    rmdir(f"/mnt/eupnea-external/usr/src/linux-headers-{kernel_version}", keep_dir=False)
+    mkdir(f"/mnt/eupnea-external/usr/src/linux-headers-{kernel_version}", create_parents=True)
+    bash(f"tar xpf /tmp/eupnea-external/headers.tar.xz -C /mnt/eupnea-external/usr/src/linux-headers-{kernel_version}/ "
+         f"--checkpoint=.10000")
     print("")  # break line after tar
+    chroot("ln -s /usr/src/linux-headers-*/ /lib/modules/*/build")  # use chroot for correct symlink
 
+    # Using hardcoded command line
     rootfs_partuuid = bash(f"blkid -o value -s PARTUUID {device}2")  # get uuid of rootfs partition
-
-    print_status("Downloading default command line from github")
-    try:
-        temp_cmdline = urlopen(
-            "https://raw.githubusercontent.com/eupnea-linux/eupnea/main/configs/kernel.flags").read().decode(
-            "utf-8")
-    except URLError:
-        print_warning("Failed to reach github. Fallback to hardcoded default cmdline")
-        temp_cmdline = "console=tty1 root=PARTUUID=${USB_ROOTFS} i915.modeset=1 rootwait rw fbcon=logo-pos:center" \
-                       ",logo-count:1 loglevel=0 splash"
-
+    temp_cmdline = "console=tty1 root=PARTUUID=${USB_ROOTFS} i915.modeset=1 rootwait rw fbcon=logo-pos:center" \
+                   ",logo-count:1 loglevel=0 splash"
     new_cmdline = temp_cmdline.replace("${USB_ROOTFS}", rootfs_partuuid)  # add partuuid of rootfs
     with open("kernel.flags", "w") as file:
         file.write(new_cmdline)
@@ -145,6 +140,11 @@ def flash_kernel() -> None:
     settings["kernel_type"] = kernel_type
     with open("/mnt/eupnea-external/etc/eupnea.json", "w") as settings_file:
         json.dump(settings, settings_file)
+
+
+# chroot command
+def chroot(command: str) -> str:
+    return bash(f'chroot /mnt/eupnea-external /bin/sh -c "{command}"')
 
 
 if __name__ == "__main__":
