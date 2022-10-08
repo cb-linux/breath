@@ -453,8 +453,7 @@ def post_extract(build_options, kernel_type: str) -> None:
             case "arch" | "fedora":
                 chroot(f"usermod -aG wheel {username}")
             case "pop-os":
-                # WHY IT DON'T WORK !!!!!!
-                sleep(5)
+                sleep(5) # need to sleep for some reasons
                 chroot(f"usermod -aG adm,sudo,lpadmin {username}")
 
         # set timezone build system timezone on eupnea
