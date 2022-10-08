@@ -353,11 +353,12 @@ def post_extract(build_options, kernel_type: str) -> None:
     print_status("Extracting kernel headers")
     # TODO: set actual kernel version
     kernel_version = "eupnea"
+    rmdir(f"/mnt/eupnea/usr/src/linux-headers-{kernel_version}", keep_dir=False)
     mkdir(f"/mnt/eupnea/usr/src/linux-headers-{kernel_version}", create_parents=True)
-    bash(f"tar xpf /tmp/eupnea-build/headers.tar.xz -C /mnt/eupnea/usr/src/linux-headers-{kernel_version}/ "
+    bash(f"tar xpf /tmp/eupnea/headers.tar.xz -C /mnt/eupnea/usr/src/linux-headers-{kernel_version}/ "
          f"--checkpoint=.10000")
     print("")  # break line after tar
-    bash("ln -s /mnt/eupnea/usr/src/linux-headers-*/ /mnt/eupnea/lib/modules/*/build")
+    chroot("ln -s /usr/src/linux-headers-*/ /lib/modules/*/build")  # use chroot for correct symlink
 
     # Copy resolv.conf from host to eupnea
     rmfile("/mnt/eupnea/etc/resolv.conf", True)  # delete broken symlink
