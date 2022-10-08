@@ -196,7 +196,7 @@ def download_audio_scripts() -> None:
 
 
 # Create, mount, partition the img and flash the eupnea kernel
-def prepare_img() -> Tuple[str, str]:
+def prepare_img(distro_name: str) -> Tuple[str, str]:
     print_status("Preparing image")
 
     # TODO: dynamic img size
@@ -211,11 +211,11 @@ def prepare_img() -> Tuple[str, str]:
     if mnt_point == "":
         print_error("\033[91m" + "Failed to mount image" + "\033[0m")
         exit(1)
-    return partition_and_flash_kernel(mnt_point, False)
+    return partition_and_flash_kernel(mnt_point, False, distro_name)
 
 
 # Prepare USB, usb is not yet fully implemented
-def prepare_usb(device: str) -> Tuple[str, str]:
+def prepare_usb(device: str, distro_name: str) -> Tuple[str, str]:
     print_status("Preparing USB")
 
     # fix device name if needed
@@ -230,10 +230,10 @@ def prepare_usb(device: str) -> Tuple[str, str]:
         bash(f"umount -lf {device}*")
     except subprocess.CalledProcessError:
         pass
-    return partition_and_flash_kernel(device, True)
+    return partition_and_flash_kernel(device, True, distro_name)
 
 
-def partition_and_flash_kernel(mnt_point: str, write_usb: bool) -> Tuple[str, str]:
+def partition_and_flash_kernel(mnt_point: str, write_usb: bool, distro_name: str) -> Tuple[str, str]:
     print_status("Preparing device/image partition")
 
     # Determine rootfs part name
@@ -259,10 +259,10 @@ def partition_and_flash_kernel(mnt_point: str, write_usb: bool) -> Tuple[str, st
     rootfs_partuuid = bash(f"blkid -o value -s PARTUUID {rootfs_mnt}")
 
     # write PARTUUID to kernel flags and save it as a file
-    with open("configs/kernel.flags", "r") as flags:
-        temp = flags.read().replace("${USB_ROOTFS}", rootfs_partuuid).strip()
+    with open(f"configs/cmdlines/{distro_name}.flags", "r") as flags:
+        temp_cmdline = flags.read().replace("${USB_ROOTFS}", rootfs_partuuid).strip()
     with open("kernel.flags", "w") as config:
-        config.write(temp)
+        config.write(temp_cmdline)
 
     print_status("Flashing kernel to device/image")
     # Sign kernel
@@ -389,6 +389,8 @@ def post_extract(build_options, kernel_type: str) -> None:
     with open("configs/eupnea.json", "r") as settings_file:
         settings = json.load(settings_file)
     settings["kernel_type"] = kernel_type
+    settings["distro"] = build_options["distro"]
+    settings["de_name"] = build_options["de_name"]
     if not build_options["device"] == "image":
         settings["eupnea_install_type"] = "direct"
     with open("/mnt/eupnea/etc/eupnea.json", "w") as settings_file:
@@ -507,11 +509,11 @@ def start_build(verbose: bool, local_path: str, kernel_type: str, dev_release: b
 
     # Setup device
     if build_options["device"] == "image":
-        output_temp = prepare_img()
+        output_temp = prepare_img(build_options["distro_name"])
         img_mnt = output_temp[0]
         root_partuuid = output_temp[1]
     else:
-        output_temp = prepare_usb(build_options["device"])
+        output_temp = prepare_usb(build_options["device"], build_options["distro_name"])
         img_mnt = output_temp[0]
         root_partuuid = output_temp[1]
 
@@ -529,7 +531,6 @@ def start_build(verbose: bool, local_path: str, kernel_type: str, dev_release: b
         case "fedora":
             import distro.fedora as distro
         case _:
-            # Just in case
             print_error("DISTRO NAME NOT FOUND! Please create an issue")
             exit(1)
     distro.config(build_options["de_name"], build_options["distro_version"], root_partuuid, verbose)
