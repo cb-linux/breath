@@ -351,10 +351,13 @@ def post_extract(build_options, kernel_type: str) -> None:
 
     # Extract kernel headers
     print_status("Extracting kernel headers")
-    # headers.tar.xz contains /include, so it's extracted to /usr/ and --skip-old-files is used to prevent it from
-    # overwriting other files in /usr/include
-    bash("tar xpf /tmp/eupnea-build/headers.tar.xz --skip-old-files -C /mnt/eupnea/usr/ --checkpoint=.10000")
+    # TODO: set actual kernel version
+    kernel_version = "eupnea"
+    mkdir(f"/mnt/eupnea/usr/src/linux-headers-{kernel_version}", create_parents=True)
+    bash(f"tar xpf /tmp/eupnea-build/headers.tar.xz -C /mnt/eupnea/usr/src/linux-headers-{kernel_version}/ "
+         f"--checkpoint=.10000")
     print("")  # break line after tar
+    bash("ln -s /mnt/eupnea/usr/src/linux-headers-*/ /mnt/eupnea/lib/modules/*/build")
 
     # Copy resolv.conf from host to eupnea
     rmfile("/mnt/eupnea/etc/resolv.conf", True)  # delete broken symlink
@@ -389,6 +392,7 @@ def post_extract(build_options, kernel_type: str) -> None:
     with open("configs/eupnea.json", "r") as settings_file:
         settings = json.load(settings_file)
     settings["kernel_type"] = kernel_type
+    # TODO: set kernel_version
     settings["distro"] = build_options["distro"]
     settings["de_name"] = build_options["de_name"]
     if not build_options["device"] == "image":
