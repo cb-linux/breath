@@ -19,6 +19,13 @@ def prepare_host(de_name: str) -> None:
         print("Failed to unmount /tmp/eupnea-build/fedora-tmp-mnt, ignore")
         pass
 
+    # unmount cdrom remains before attempting to remove /tmp/eupnea-build
+    try:
+        bash("umount -lf /tmp/eupnea-build/cdrom 2>/dev/null")  # umount fedora temp if exists
+    except subprocess.CalledProcessError:
+        print("Failed to unmount /tmp/eupnea-build/cdrom, ignore")
+        pass
+    
     print_status("Cleaning + preparing host system")
     rmdir("/tmp/eupnea-build")
     mkdir("/tmp/eupnea-build", create_parents=True)
@@ -150,6 +157,15 @@ def download_rootfs(distro_name: str, distro_version: str, distro_link: str) -> 
                 start_download_progress("/tmp/eupnea-build/fedora-rootfs.raw.xz")
                 urlretrieve(distro_link, filename="/tmp/eupnea-build/fedora-rootfs.raw.xz")
                 stop_download_progress()
+            case "pop-os":
+                print_status(f"Downloading Pop!_OS iso {distro_version}")
+                if not path_exists("/tmp/persistant/pop-os.iso"):
+                    mkdir("/tmp/persistant")
+                    start_download_progress("/tmp/persistant/pop-os.iso")
+                    urlretrieve(
+                        "https://iso.pop-os.org/22.04/amd64/intel/14/pop-os_22.04_amd64_intel_14.iso",
+                        filename="/tmp/persistant/pop-os.iso")
+                    stop_download_progress()
     except URLError:
         print_error("Couldn't download rootfs. Check your internet connection and try again. If the error persists, "
                     "create an issue with the distro and version in the name")
@@ -291,6 +307,7 @@ def partition_and_flash_kernel(mnt_point: str, write_usb: bool) -> Tuple[str, st
 
 # extract the rootfs to /mnt/eupnea
 def extract_rootfs(distro_name: str) -> None:
+    global mnt_iso # pop-os support
     print_status("Extracting rootfs")
     match distro_name:
         case "ubuntu":
@@ -335,6 +352,16 @@ def extract_rootfs(distro_name: str) -> None:
             except subprocess.CalledProcessError:  # fails on Crostini
                 pass
             bash(f"losetup -d {fedora_root_part[:-2]}")
+        case "pop-os":
+            print_status("Extracting Pop!_OS squashfs from iso")
+            # Create a mount point for the iso to extract the squashfs
+            mkdir("/tmp/eupnea-build/iso")
+            mnt_iso=bash(f"losetup -f --show /tmp/persistant/pop-os.iso")
+            mkdir("/tmp/eupnea-build/cdrom")
+            bash(f"mount {mnt_iso} /tmp/eupnea-build/cdrom")
+            bash("unsquashfs -f -d /mnt/eupnea /tmp/eupnea-build/cdrom/casper/filesystem.squashfs")
+
+
     print_status("\n" + "Rootfs extraction complete")
 
 
@@ -425,6 +452,10 @@ def post_extract(build_options, kernel_type: str) -> None:
                 chroot(f"usermod -aG sudo {username}")
             case "arch" | "fedora":
                 chroot(f"usermod -aG wheel {username}")
+            case "pop-os":
+                # WHY IT DON'T WORK !!!!!!
+                sleep(5)
+                chroot(f"usermod -aG adm,sudo,lpadmin {username}")
 
         # set timezone build system timezone on eupnea
         host_time_zone = bash("file /etc/localtime")  # read host timezone link
@@ -498,6 +529,8 @@ def start_build(verbose: bool, local_path: str, kernel_type: str, dev_release: b
                     cpfile(f"{local_path_posix}arch-rootfs.tar.gz", "/tmp/eupnea-build/arch-rootfs.tar.gz")
                 case "fedora":
                     cpfile(f"{local_path_posix}fedora-rootfs.raw.xz", "/tmp/eupnea-build/fedora-rootfs.raw.xz")
+                case "pop-os":
+                    cpfile(f"{local_path_posix}pop-os.iso", "/tmp/eupnea-build/pop-os.iso")
                 case _:
                     print_error("Distro name not found, please create an issue")
                     exit(1)
@@ -528,6 +561,8 @@ def start_build(verbose: bool, local_path: str, kernel_type: str, dev_release: b
             import distro.arch as distro
         case "fedora":
             import distro.fedora as distro
+        case "pop-os":
+            import distro.popos as distro
         case _:
             # Just in case
             print_error("DISTRO NAME NOT FOUND! Please create an issue")
@@ -540,6 +575,9 @@ def start_build(verbose: bool, local_path: str, kernel_type: str, dev_release: b
     print_status("Cleaning up host system after build")
     try:
         bash("umount -f /mnt/eupnea")
+        if build_options["distro_name"]=="pop-os":
+            bash("umount -f /tmp/eupnea-build/cdrom") # pop-os loop device
+            bash(f"losetup -d {mnt_iso} ")
     except subprocess.CalledProcessError:  # on crostini umount fails for some reason
         pass
     if build_options["device"] == "image":

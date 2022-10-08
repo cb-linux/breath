@@ -30,7 +30,7 @@ def get_user_input() -> dict:
     print_question("Which Linux distro(flavor) would you like to use?")
 
     while True:
-        temp_distro_name = input("\033[94m" + "Available options: Ubuntu(default, recommended), Debian, Arch, Fedora\n"
+        temp_distro_name = input("\033[94m" + "Available options: Ubuntu(default, recommended), Debian, Arch, Fedora, Pop!_OS (still WIP)\n"
                                  + "\033[0m")
         match temp_distro_name:
             case "Ubuntu" | "ubuntu" | "":
@@ -85,71 +85,79 @@ def get_user_input() -> dict:
                             print_warning("Version not available, please choose another")
                             continue
                 break
+            case "Pop!_OS"|"PopOS"|"POP!_OS"|"Pop_OS"|"Pop!OS"|"pop!_os":
+                print("Pop!_OS selected")
+                output_dict["distro_name"] = "pop-os"
+                break
+
             case _:
                 print_warning("Check your spelling and try again")
                 continue
+    
+    if output_dict["distro_name"] !="pop-os":
+        print_question("Which desktop environment(Desktop GUI) would you like to use?")
+        match output_dict["distro_name"]:
+            case "ubuntu":
+                available_de = "Gnome(default, recommended), KDE(recommended), MATE, Xfce(recommended for weak devices), " \
+                            "LXQt(recommended for weak devices), deepin, budgie, cli"
+            case "debian":
+                available_de = "Gnome(default, recommended), KDE(recommended), MATE, Xfce(recommended for weak devices), " \
+                            "LXQt(recommended for weak devices), budgie, cli"
+            case "arch":
+                available_de = "Gnome(default, recommended), KDE(recommended), MATE, Xfce(recommended for weak devices), " \
+                            "LXQt(recommended for weak devices), deepin, budgie, cli"
+            case "fedora":
+                available_de = "Gnome(default, recommended), KDE(recommended), MATE, Xfce(recommended for weak devices), " \
+                            "LXQt(recommended for weak devices), deepin, cli"
 
-    print_question("Which desktop environment(Desktop GUI) would you like to use?")
-    match output_dict["distro_name"]:
-        case "ubuntu":
-            available_de = "Gnome(default, recommended), KDE(recommended), MATE, Xfce(recommended for weak devices), " \
-                           "LXQt(recommended for weak devices), deepin, budgie, cli"
-        case "debian":
-            available_de = "Gnome(default, recommended), KDE(recommended), MATE, Xfce(recommended for weak devices), " \
-                           "LXQt(recommended for weak devices), budgie, cli"
-        case "arch":
-            available_de = "Gnome(default, recommended), KDE(recommended), MATE, Xfce(recommended for weak devices), " \
-                           "LXQt(recommended for weak devices), deepin, budgie, cli"
-        case "fedora":
-            available_de = "Gnome(default, recommended), KDE(recommended), MATE, Xfce(recommended for weak devices), " \
-                           "LXQt(recommended for weak devices), deepin, cli"
-
-    while True:
-        temp_de_name = input("\033[94m" + "Available options: " + available_de + "\033[0m" + "\n")
-        match temp_de_name:
-            case "Gnome" | "gnome" | "":
-                print("Gnome selected")
-                output_dict["de_name"] = "gnome"
-                break
-            case "KDE" | "kde":
-                print("KDE selected")
-                output_dict["de_name"] = "kde"
-                break
-            case "MATE" | "mate":
-                print("MATE selected")
-                output_dict["de_name"] = "mate"
-                break
-            case "xfce" | "Xfce":
-                print("Xfce selected")
-                output_dict["de_name"] = "xfce"
-                break
-            case "lxqt" | "Lxqt":
-                print("Lxqt selected")
-                output_dict["de_name"] = "lxqt"
-                break
-            case "deepin":
-                if output_dict["distro_name"] == "debian":
-                    print_warning("Deepin is not available for Debian, please choose another DE")
-                else:
-                    print("Deepin selected")
-                    output_dict["de_name"] = "deepin"
+        while True:
+            temp_de_name = input("\033[94m" + "Available options: " + available_de + "\033[0m" + "\n")
+            match temp_de_name:
+                case "Gnome" | "gnome" | "":
+                    print("Gnome selected")
+                    output_dict["de_name"] = "gnome"
                     break
-            case "budgie":
-                if output_dict["distro_name"] == "fedora":
-                    print_warning("Budgie is not available for Fedora, please choose another DE")
-                else:
-                    print("Budgie selected")
-                    output_dict["de_name"] = "budgie"
+                case "KDE" | "kde":
+                    print("KDE selected")
+                    output_dict["de_name"] = "kde"
                     break
-            case "cli" | "none":
-                print_warning("Warning: No desktop environment will be installed!")
-                if input("\033[94mType 'yes' to continue or Press Enter to choose a desktop environment" +
-                         "\033[0m\n") == "yes":
-                    print("No desktop will be installed")
-                    output_dict["de_name"] = "cli"
+                case "MATE" | "mate":
+                    print("MATE selected")
+                    output_dict["de_name"] = "mate"
                     break
-            case _:
-                print_warning("No such Desktop environment. Check your spelling and try again")
+                case "xfce" | "Xfce":
+                    print("Xfce selected")
+                    output_dict["de_name"] = "xfce"
+                    break
+                case "lxqt" | "Lxqt":
+                    print("Lxqt selected")
+                    output_dict["de_name"] = "lxqt"
+                    break
+                case "deepin":
+                    if output_dict["distro_name"] == "debian":
+                        print_warning("Deepin is not available for Debian, please choose another DE")
+                    else:
+                        print("Deepin selected")
+                        output_dict["de_name"] = "deepin"
+                        break
+                case "budgie":
+                    if output_dict["distro_name"] == "fedora":
+                        print_warning("Budgie is not available for Fedora, please choose another DE")
+                    else:
+                        print("Budgie selected")
+                        output_dict["de_name"] = "budgie"
+                        break
+                case "cli" | "none":
+                    print_warning("Warning: No desktop environment will be installed!")
+                    if input("\033[94mType 'yes' to continue or Press Enter to choose a desktop environment" +
+                            "\033[0m\n") == "yes":
+                        print("No desktop will be installed")
+                        output_dict["de_name"] = "cli"
+                        break
+                case _:
+                    print_warning("No such Desktop environment. Check your spelling and try again")
+    else:
+        output_dict["de_name"] = None
 
     # Gnome has a first time setup -> skip this part for gnome, as there will be a first time setup
     if not output_dict["de_name"] == "gnome":
