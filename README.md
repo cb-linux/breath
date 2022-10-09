@@ -1,3 +1,4 @@
+### Eupnea is currently in alpha
 # 🙼 [EUPNEA](https://eupnea-linux.github.io/)
 [<img src="https://github.com/eupnea-linux/eupnea-linux.github.io/blob/main/assets/banner.png?raw=true" alt="Breath banner"></img>](https://eupnea-linux.github.io/)
 
