@@ -382,7 +382,7 @@ def post_extract(build_options, kernel_type: str) -> None:
     kernel_version = "eupnea"
     rmdir(f"/mnt/eupnea/usr/src/linux-headers-{kernel_version}", keep_dir=False)
     mkdir(f"/mnt/eupnea/usr/src/linux-headers-{kernel_version}", create_parents=True)
-    bash(f"tar xpf /tmp/eupnea/headers.tar.xz -C /mnt/eupnea/usr/src/linux-headers-{kernel_version}/ "
+    bash(f"tar xpf /tmp/eupnea-build/headers.tar.xz -C /mnt/eupnea/usr/src/linux-headers-{kernel_version}/ "
          f"--checkpoint=.10000")
     print("")  # break line after tar
     chroot("ln -s /usr/src/linux-headers-*/ /lib/modules/*/build")  # use chroot for correct symlink
