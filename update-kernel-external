@@ -99,24 +99,23 @@ def download_kernel() -> None:
 def flash_kernel() -> None:
     print_status("Flashing new kernel")
 
+    # Extract modules
     print_status("Extracting kernel modules")
-    rmdir("/mnt/eupnea-external/lib/modules")
-
-    # modules tar contains /lib/modules, so it's extracted to / and --skip-old-files is used to prevent overwriting
-    # other files in /lib
-    bash(f"tar xpf /tmp/eupnea-external/modules.tar.xz --skip-old-files -C /mnt/eupnea-external/ --checkpoint=.10000")
+    rmdir("/mnt/eupnea-external/lib/modules")  # remove all old modules
+    mkdir("/mnt/eupnea-external/lib/modules")
+    bash(f"tar xpf /tmp/eupnea-external/modules.tar.xz -C /mnt/eupnea-external/lib/modules/ --checkpoint=.10000")
     print("")  # break line after tar
 
     # Extract kernel headers
     print_status("Extracting kernel headers")
-    # TODO: set actual kernel version
-    kernel_version = "eupnea"
-    rmdir(f"/mnt/eupnea-external/usr/src/linux-headers-{kernel_version}", keep_dir=False)
-    mkdir(f"/mnt/eupnea-external/usr/src/linux-headers-{kernel_version}", create_parents=True)
-    bash(f"tar xpf /tmp/eupnea-external/headers.tar.xz -C /mnt/eupnea-external/usr/src/linux-headers-{kernel_version}/ "
-         f"--checkpoint=.10000")
+    dir_kernel_version = bash(f"ls /mnt/eupnea-external/lib/modules/").strip()  # get modules dir name
+    rmdir(f"/mnt/eupnea-external/usr/src/linux-headers-{dir_kernel_version}", keep_dir=False)  # remove old headers
+    mkdir(f"/mnt/eupnea-external/usr/src/linux-headers-{dir_kernel_version}", create_parents=True)
+    bash(f"tar xpf /tmp/eupnea-external/headers.tar.xz -C /mnt/eupnea-external/usr/src/linux-headers-"
+         f"{dir_kernel_version}/ --checkpoint=.10000")
     print("")  # break line after tar
-    chroot("ln -s /usr/src/linux-headers-*/ /lib/modules/*/build")  # use chroot for correct symlink
+    chroot(f"ln -s /usr/src/linux-headers-{dir_kernel_version}/ "
+           f"/lib/modules/{dir_kernel_version}/build")  # use chroot for correct symlink
 
     # Using hardcoded command line
     rootfs_partuuid = bash(f"blkid -o value -s PARTUUID {device}2")  # get uuid of rootfs partition
