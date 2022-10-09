@@ -394,7 +394,7 @@ def post_extract(build_options, kernel_type: str) -> None:
         settings = json.load(settings_file)
     settings["kernel_type"] = kernel_type
     # TODO: set kernel_version
-    settings["distro"] = build_options["distro"]
+    settings["distro_name"] = build_options["distro_name"]
     settings["de_name"] = build_options["de_name"]
     if not build_options["device"] == "image":
         settings["eupnea_install_type"] = "direct"
