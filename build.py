@@ -90,6 +90,22 @@ def prepare_host(de_name: str) -> None:
             print_warning("Arch-install-scripts not found, please install it using your distros package manager or "
                           "select another distro instead of arch")
             exit(1)
+    
+    # install unsquashfs for pop-os
+    if de_name == "pop-os" and not path_exists("/usr/bin/unsquashfs"):
+        print_status("Installing unsquashfs")
+        if path_exists("/usr/bin/apt"):
+            bash("apt-get install squashfs-tools -y")
+        elif path_exists("/usr/bin/pacman"):
+            bash("pacman -S squashfs-tools --noconfirm")
+        elif path_exists("/usr/bin/dnf"):
+            bash("dnf install squashfs-tools --assumeyes")
+        elif path_exists("/usr/bin/zypper"):  # openSUSE
+            bash("zypper --non-interactive install squashfs-tools")
+        else:
+            print_warning("'squashfs-tools' not found, please install it using your distros package manager or select "
+                          "another distro instead of Pop!_OS")
+            exit(1)    
 
 
 # download kernel files from GitHub
@@ -385,7 +401,7 @@ def post_extract(build_options, kernel_type: str) -> None:
     bash(f"tar xpf /tmp/eupnea-build/headers.tar.xz -C /mnt/eupnea/usr/src/linux-headers-{kernel_version}/ "
          f"--checkpoint=.10000")
     print("")  # break line after tar
-    chroot("ln -s /usr/src/linux-headers-*/ /lib/modules/*/build")  # use chroot for correct symlink
+    #chroot("ln -s /usr/src/linux-headers-*/ /lib/modules/*/build")  # use chroot for correct symlink
 
     # Copy resolv.conf from host to eupnea
     rmfile("/mnt/eupnea/etc/resolv.conf", True)  # delete broken symlink
@@ -421,7 +437,7 @@ def post_extract(build_options, kernel_type: str) -> None:
         settings = json.load(settings_file)
     settings["kernel_type"] = kernel_type
     # TODO: set kernel_version
-    settings["distro"] = build_options["distro"]
+    settings["distro_name"] = build_options["distro_name"]
     settings["de_name"] = build_options["de_name"]
     if not build_options["device"] == "image":
         settings["eupnea_install_type"] = "direct"
