@@ -1,7 +1,7 @@
 from functions import *
 
 
-def config(de_name: str, distro_version: str, root_partuuid: str, verbose: bool) -> None:
+def config(de_name: str, distro_version: str, username: str, root_partuuid: str, verbose: bool) -> None:
     set_verbose(verbose)
     print_status("Configuring Debian")
 
@@ -44,7 +44,7 @@ def config(de_name: str, distro_version: str, root_partuuid: str, verbose: bool)
         case "budgie":
             print_status("Installing Budgie")
             chroot("DEBIAN_FRONTEND=noninteractive apt-get install -y budgie-desktop budgie-indicator-applet "
-                   "budgie-core lightdm lightdm-gtk-greeter")
+                   "budgie-core lightdm lightdm-gtk-greeter gnome-terminal firefox")
             chroot("systemctl enable lightdm.service")
         case "cli":
             print_status("Skipping desktop environment install")

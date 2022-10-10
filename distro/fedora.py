@@ -1,7 +1,7 @@
 from functions import *
 
 
-def config(de_name: str, distro_version: str, root_partuuid: str, verbose: bool) -> None:
+def config(de_name: str, distro_version: str, username: str, root_partuuid: str, verbose: bool) -> None:
     set_verbose(verbose)
     print_status("Configuring Fedora")
 

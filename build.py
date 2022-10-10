@@ -538,7 +538,7 @@ def start_build(verbose: bool, local_path: str, kernel_type: str, dev_release: b
         case _:
             print_error("DISTRO NAME NOT FOUND! Please create an issue")
             exit(1)
-    distro.config(build_options["de_name"], build_options["distro_version"], root_partuuid, verbose)
+    distro.config(build_options["de_name"], build_options["distro_version"], build_options["username"], root_partuuid, verbose)
 
     post_config(build_options["rebind_search"])
 
