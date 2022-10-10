@@ -28,7 +28,7 @@ def config(de_name: str, distro_version: str, username: str, root_partuuid: str,
         case "xfce":
             print_status("Installing Xfce")
             chroot("apt-get install -y --no-install-recommends xubuntu-desktop gnome-software")
-            chroot("apt-get install -y xfce4-goodies ubuntu-software")
+            chroot("apt-get install -y xfce4-goodies")
         case "lxqt":
             print_status("Installing LXQt")
             chroot("apt-get install -y lubuntu-desktop")
