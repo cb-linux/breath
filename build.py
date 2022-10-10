@@ -385,23 +385,23 @@ def extract_rootfs(distro_name: str) -> None:
 def post_extract(build_options, kernel_type: str) -> None:
     print_status("Applying distro agnostic configuration")
 
-    # Extract kernel modules
-    rmdir("/mnt/eupnea/lib/modules/")  # delete old modules, if present
-    # modules.tar.xz contains /lib/modules, so it's extracted to / and --skip-old-files is used to prevent it from
-    # overwriting other files in /lib
-    bash("tar xpf /tmp/eupnea-build/modules.tar.xz --skip-old-files -C /mnt/eupnea/ --checkpoint=.10000")
+    # Extract modules
+    print_status("Extracting kernel modules")
+    rmdir("/mnt/eupnea/lib/modules")  # remove all old modules
+    mkdir("/mnt/eupnea/lib/modules")
+    bash(f"tar xpf /tmp/eupnea-build/modules.tar.xz -C /mnt/eupnea/lib/modules/ --checkpoint=.10000")
     print("")  # break line after tar
 
     # Extract kernel headers
     print_status("Extracting kernel headers")
-    # TODO: set actual kernel version
-    kernel_version = "eupnea"
-    rmdir(f"/mnt/eupnea/usr/src/linux-headers-{kernel_version}", keep_dir=False)
-    mkdir(f"/mnt/eupnea/usr/src/linux-headers-{kernel_version}", create_parents=True)
-    bash(f"tar xpf /tmp/eupnea-build/headers.tar.xz -C /mnt/eupnea/usr/src/linux-headers-{kernel_version}/ "
+    dir_kernel_version = bash(f"ls /mnt/eupnea/lib/modules/").strip()  # get modules dir name
+    rmdir(f"/mnt/eupnea/usr/src/linux-headers-{dir_kernel_version}", keep_dir=False)  # remove old headers
+    mkdir(f"/mnt/eupnea/usr/src/linux-headers-{dir_kernel_version}", create_parents=True)
+    bash(f"tar xpf /tmp/eupnea-build/headers.tar.xz -C /mnt/eupnea/usr/src/linux-headers-{dir_kernel_version}/ "
          f"--checkpoint=.10000")
     print("")  # break line after tar
-    #chroot("ln -s /usr/src/linux-headers-*/ /lib/modules/*/build")  # use chroot for correct symlink
+    chroot(f"ln -s /usr/src/linux-headers-{dir_kernel_version}/ "
+           f"/lib/modules/{dir_kernel_version}/build")  # use chroot for correct symlink
 
     # Copy resolv.conf from host to eupnea
     rmfile("/mnt/eupnea/etc/resolv.conf", True)  # delete broken symlink

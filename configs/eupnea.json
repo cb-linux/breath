@@ -3,6 +3,6 @@
   "kernel_version": "none",
   "eupnea_version": "0.6.1-alpha",
   "eupnea_install_type": "image",
-  "distro": "",
+  "distro_name": "",
   "de_name": ""
 }
