@@ -85,7 +85,7 @@ def get_user_input() -> dict:
                             print_warning("Version not available, please choose another")
                             continue
                 break
-            case "Pop!_OS"|"PopOS"|"POP!_OS"|"Pop_OS"|"Pop!OS"|"pop!_os":
+            case "Pop!_OS" | "PopOS" | "POP!_OS" | "Pop_OS" | "Pop!OS" | "pop!_os" | "popos" | "pop-os":
                 print("Pop!_OS selected")
                 output_dict["distro_name"] = "pop-os"
                 break
@@ -94,7 +94,7 @@ def get_user_input() -> dict:
                 print_warning("Check your spelling and try again")
                 continue
     
-    if output_dict["distro_name"] !="pop-os":
+    if not output_dict["distro_name"] =="pop-os":
         print_question("Which desktop environment(Desktop GUI) would you like to use?")
         match output_dict["distro_name"]:
             case "ubuntu":
