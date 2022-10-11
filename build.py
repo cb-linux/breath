@@ -321,7 +321,6 @@ def partition_and_flash_kernel(mnt_point: str, write_usb: bool, distro_name: str
 
 # extract the rootfs to /mnt/eupnea
 def extract_rootfs(distro_name: str) -> None:
-    global mnt_iso # pop-os support
     print_status("Extracting rootfs")
     match distro_name:
         case "ubuntu":
