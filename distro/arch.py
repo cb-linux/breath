@@ -57,13 +57,11 @@ def config(de_name: str, distro_version: str, username: str, root_partuuid: str,
             chroot(
                 "pacman -S --noconfirm xfce4 xfce4-goodies xorg xorg-server lightdm lightdm-gtk-greeter firefox network-manager-applet nm-connection-editor")
             chroot("systemctl enable lightdm.service")
-            install_pamac(username)
         case "lxqt":
             print_status("Installing LXQt")
             chroot(
                 "pacman -S --noconfirm lxqt breeze-icons xorg xorg-server sddm firefox networkmanager-qt network-manager-applet nm-connection-editor")
             chroot("systemctl enable sddm.service")
-            install_pamac(username)
         case "deepin":
             print_status("Installing deepin")
             chroot(
@@ -82,6 +80,11 @@ def config(de_name: str, distro_version: str, username: str, root_partuuid: str,
         case _:
             print_error("Invalid desktop environment! Please create an issue")
             exit(1)
+
+    if de_name == "xfce" or de_name == "lxqt":  # xfce and lxqt don't have a built-in gui software manager
+        chroot(f'su - {username} -c "cd /tmp; git clone https://aur.archlinux.org/pamac-nosnap.git"')
+        chroot(f'su - {username} -s /usr/bin/bash -c "cd /tmp/pamac-nosnap; makepkg -si --noconfirm"')
+
     stop_progress()  # stop fake progress
     print_status("Desktop environment setup complete")
 
@@ -122,9 +125,3 @@ def chroot(command: str):
         bash(f'arch-chroot /mnt/eupnea bash -c "{command}"')
     else:
         bash(f'arch-chroot /mnt/eupnea bash -c "{command}" 2>/dev/null 1>/dev/null')  # supress all output
-
-
-# Installs a gui packages manager on DEs that don't include one.
-def install_pamac(username: str):
-    bash(f'su - {username} -c "cd /tmp; git clone https://aur.archlinux.org/pamac-nosnap.git"')
-    bash(f'su - {username} -s /usr/bin/bash -c "cd /tmp/pamac-nosnap; makepkg -si --noconfirm"')
