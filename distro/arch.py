@@ -122,4 +122,4 @@ def chroot(command: str):
 # Installs a gui packages manager on DEs that don't include one.
 def install_pamac(username: str):
     bash(f'su - {username} -c "cd /tmp; git clone https://aur.archlinux.org/pamac-nosnap.git"')
-    bash(f'su - {username} -s /usr/bin/bash -c "cd /tmp/pamac-nosnap; makepkg -si --noconfirm"}')
+    bash(f'su - {username} -s /usr/bin/bash -c "cd /tmp/pamac-nosnap; makepkg -si --noconfirm"')
