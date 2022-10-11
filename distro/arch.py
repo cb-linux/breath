@@ -83,7 +83,7 @@ def config(de_name: str, distro_version: str, username: str, root_partuuid: str,
 
     if de_name == "xfce" or de_name == "lxqt":  # xfce and lxqt don't have a built-in gui software manager
         chroot(f'su - {username} -c "cd /tmp; git clone https://aur.archlinux.org/pamac-nosnap.git"')
-        chroot(f'su - {username} -s /usr/bin/bash -c "cd /tmp/pamac-nosnap; makepkg -si --noconfirm"')
+        chroot(f'su - {username} -s /usr/bin/bash -c "cd /tmp/pamac-nosnap; /usr/bin/makepkg -si --noconfirm"')
 
     stop_progress()  # stop fake progress
     print_status("Desktop environment setup complete")
