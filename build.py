@@ -33,7 +33,7 @@ def prepare_host(de_name: str) -> None:
     print_status("Creating mount points")
     try:
         bash("umount -lf /mnt/eupnea")  # just in case
-        sleep(1)  # wait for umount to finish
+        sleep(5)  # wait for umount to finish
     except subprocess.CalledProcessError:
         print("Failed to unmount /mnt/eupnea, ignore")
         pass
