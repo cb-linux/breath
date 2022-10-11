@@ -241,7 +241,7 @@ def prepare_img(distro_name: str) -> Tuple[str, str]:
     print_status("Mounting empty image")
     mnt_point = bash("losetup -f --show eupnea.img")
     if mnt_point == "":
-        print_error("\033[91m" + "Failed to mount image" + "\033[0m")
+        print_error("Failed to mount image")
         exit(1)
     return partition_and_flash_kernel(mnt_point, False, distro_name)
 
@@ -422,9 +422,9 @@ def post_extract(build_options, kernel_type: str) -> None:
                 cpfile(file.absolute().as_posix(), f"/mnt/eupnea/usr/local/bin/{file.name}")
     # copy audio setup script
     cpfile("/tmp/eupnea-build/audio-scripts/setup-audio", "/mnt/eupnea/usr/local/bin/setup-audio")
-    chroot("chmod 755 /usr/local/bin/*")  # make scripts executable in system
     # copy functions file
     cpfile("functions.py", "/mnt/eupnea/usr/local/bin/functions.py")
+    chroot("chmod 755 /usr/local/bin/*")  # make scripts executable in system
 
     # copy configs
     mkdir("/mnt/eupnea/etc/eupnea")
@@ -445,7 +445,7 @@ def post_extract(build_options, kernel_type: str) -> None:
         json.dump(settings, settings_file)
 
     print_status("Fixing sleep")
-    # disable hibernation aka S4 sleep, READ: https://eupnea-linux.github.io/docs.html#/bootlock
+    # disable hibernation aka S4 sleep, READ: https://eupnea-linux.github.io/docs.html#/pages/bootlock
     # TODO: Fix sleep, maybe
     mkdir("/mnt/eupnea/etc/systemd/")  # just in case systemd path doesn't exist
     with open("/mnt/eupnea/etc/systemd/sleep.conf", "a") as conf:
@@ -588,7 +588,7 @@ def start_build(verbose: bool, local_path: str, kernel_type: str, dev_release: b
         case _:
             print_error("DISTRO NAME NOT FOUND! Please create an issue")
             exit(1)
-    distro.config(build_options["de_name"], build_options["distro_version"], root_partuuid, verbose)
+    distro.config(build_options["de_name"], build_options["distro_version"], build_options["username"], root_partuuid, verbose)
 
     post_config(build_options["rebind_search"])
 

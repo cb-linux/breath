@@ -1,7 +1,7 @@
 from functions import *
 
 
-def config(de_name: str, distro_version: str, root_partuuid: str, verbose: bool) -> None:
+def config(de_name: str, distro_version: str, username: str, root_partuuid: str, verbose: bool) -> None:
     set_verbose(verbose)
     print_status("Configuring Fedora")
 
@@ -14,7 +14,6 @@ def config(de_name: str, distro_version: str, root_partuuid: str, verbose: bool)
     chroot("dnf group install -y 'Hardware Support'")
     chroot("dnf group install -y 'Common NetworkManager Submodules'")
     chroot("dnf install -y linux-firmware")
-    # TODO: Missing the free repos; add extras from a real Fedora install
     # Add RPMFusion repos
     chroot(f"dnf install -y https://download1.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-"
            f"{distro_version}.noarch.rpm")
@@ -70,7 +69,7 @@ def config(de_name: str, distro_version: str, root_partuuid: str, verbose: bool)
     with open("/mnt/eupnea/etc/fstab", "w") as f:
         f.write(fstab)
 
-    # TODO: Perhaps zram works with mainline?
+    # TODO: Fix zram
     chroot("dnf remove zram-generator-defaults -y")  # remove zram as it fails for some reason
     chroot("systemctl disable systemd-zram-setup@zram0.service")  # disable zram service
 
