@@ -406,9 +406,9 @@ def post_extract(build_options, kernel_type: str) -> None:
     chroot(f"ln -s /usr/src/linux-headers-{dir_kernel_version}/ "
            f"/lib/modules/{dir_kernel_version}/build")  # use chroot for correct symlink
 
-    # Copy resolv.conf from host to eupnea
-    rmfile("/mnt/eupnea/etc/resolv.conf", True)  # delete broken symlink
-    cpfile("/etc/resolv.conf", "/mnt/eupnea/etc/resolv.conf")
+    # Create a temporary resolv.conf for internet inside the chroot
+    mkdir("/mnt/eupnea/run/systemd/resolve", create_parents=True)  # dir doesnt exist coz systemd didnt run
+    cpfile("/etc/resolv.conf", "/mnt/eupnea/run/systemd/resolve/stub-resolv.conf")  # copy hosts resolv.conf to chroot
 
     # Set device hostname
     with open("/mnt/eupnea/etc/hostname", "w") as hostname_file:
