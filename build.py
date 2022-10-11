@@ -374,7 +374,7 @@ def extract_rootfs(distro_name: str) -> None:
             bash(f"mount {mnt_iso} /tmp/eupnea-build/cdrom")
             bash("unsquashfs -f -d /mnt/eupnea /tmp/eupnea-build/cdrom/casper/filesystem.squashfs")
             try:
-                bash("umount -f /tmp/eupnea-build/cdrom") # pop-os loop device
+                bash("umount -fl /tmp/eupnea-build/cdrom") # pop-os loop device
                 bash(f"losetup -d {mnt_iso} ")
             except subprocess.CalledProcessError:
                 pass  # on crostini umount fails for some reason
