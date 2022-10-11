@@ -48,24 +48,24 @@ def config(de_name: str, distro_version: str, username: str, root_partuuid: str,
         case "mate":
             print_status("Installing MATE")
             # no wayland support in mate
-            chroot(
-                "pacman -S --noconfirm mate mate-extra xorg xorg-server lightdm lightdm-gtk-greeter firefox network-manager-applet nm-connection-editor")
+            chroot("pacman -S --noconfirm mate mate-extra xorg xorg-server lightdm lightdm-gtk-greeter firefox "
+                   "network-manager-applet nm-connection-editor")
             chroot("systemctl enable lightdm.service")
         case "xfce":
             print_status("Installing Xfce")
             # no wayland support in xfce
-            chroot(
-                "pacman -S --noconfirm xfce4 xfce4-goodies xorg xorg-server lightdm lightdm-gtk-greeter firefox network-manager-applet nm-connection-editor")
+            chroot("pacman -S --noconfirm xfce4 xfce4-goodies xorg xorg-server lightdm lightdm-gtk-greeter firefox "
+                   "network-manager-applet nm-connection-editor")
             chroot("systemctl enable lightdm.service")
         case "lxqt":
             print_status("Installing LXQt")
-            chroot(
-                "pacman -S --noconfirm lxqt breeze-icons xorg xorg-server sddm firefox networkmanager-qt network-manager-applet nm-connection-editor")
+            chroot("pacman -S --noconfirm lxqt breeze-icons xorg xorg-server sddm firefox networkmanager-qt "
+                   "network-manager-applet nm-connection-editor")
             chroot("systemctl enable sddm.service")
         case "deepin":
             print_status("Installing deepin")
-            chroot(
-                "pacman -S --noconfirm deepin deepin-kwin deepin-extra xorg xorg-server lightdm kde-applications firefox")
+            chroot("pacman -S --noconfirm deepin deepin-kwin deepin-extra xorg xorg-server lightdm kde-applications "
+                   "firefox")
             # enable deepin specific login style
             with open("/mnt/eupnea/etc/lightdm/lightdm.conf", "a") as conf:
                 conf.write("greeter-session=lightdm-deepin-greeter")
