@@ -175,13 +175,11 @@ def download_rootfs(distro_name: str, distro_version: str, distro_link: str) -> 
                 stop_download_progress()
             case "pop-os":
                 print_status(f"Downloading Pop!_OS iso {distro_version}")
-                if not path_exists("/tmp/persistant/pop-os.iso"):
-                    mkdir("/tmp/persistant")
-                    start_download_progress("/tmp/persistant/pop-os.iso")
-                    urlretrieve(
-                        "https://iso.pop-os.org/22.04/amd64/intel/14/pop-os_22.04_amd64_intel_14.iso",
-                        filename="/tmp/persistant/pop-os.iso")
-                    stop_download_progress()
+                start_download_progress("/tmp/persistant/pop-os.iso")
+                urlretrieve(
+                    "https://iso.pop-os.org/22.04/amd64/intel/14/pop-os_22.04_amd64_intel_14.iso",
+                    filename="/tmp/eupnea-build/pop-os.iso")
+                stop_download_progress()
     except URLError:
         print_error("Couldn't download rootfs. Check your internet connection and try again. If the error persists, "
                     "create an issue with the distro and version in the name")
@@ -372,10 +370,15 @@ def extract_rootfs(distro_name: str) -> None:
             print_status("Extracting Pop!_OS squashfs from iso")
             # Create a mount point for the iso to extract the squashfs
             mkdir("/tmp/eupnea-build/iso")
-            mnt_iso=bash(f"losetup -f --show /tmp/persistant/pop-os.iso")
+            mnt_iso=bash(f"losetup -f --show /tmp/eupnea-build/pop-os.iso")
             mkdir("/tmp/eupnea-build/cdrom")
             bash(f"mount {mnt_iso} /tmp/eupnea-build/cdrom")
             bash("unsquashfs -f -d /mnt/eupnea /tmp/eupnea-build/cdrom/casper/filesystem.squashfs")
+            try:
+                bash("umount -f /tmp/eupnea-build/cdrom") # pop-os loop device
+                bash(f"losetup -d {mnt_iso} ")
+            except subprocess.CalledProcessError:
+                pass  # on crostini umount fails for some reason
 
 
     print_status("\n" + "Rootfs extraction complete")

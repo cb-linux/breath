@@ -30,7 +30,7 @@ def get_user_input() -> dict:
     print_question("Which Linux distro(flavor) would you like to use?")
 
     while True:
-        temp_distro_name = input("\033[94m" + "Available options: Ubuntu(default, recommended), Debian, Arch, Fedora, Pop!_OS (still WIP)\n"
+        temp_distro_name = input("\033[94m" + "Available options: Ubuntu(default, recommended), Debian, Arch, Fedora, Pop!_OS\n"
                                  + "\033[0m")
         match temp_distro_name:
             case "Ubuntu" | "ubuntu" | "":
