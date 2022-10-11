@@ -175,7 +175,7 @@ def download_rootfs(distro_name: str, distro_version: str, distro_link: str) -> 
                 stop_download_progress()
             case "pop-os":
                 print_status(f"Downloading Pop!_OS iso {distro_version}")
-                start_download_progress("/tmp/persistant/pop-os.iso")
+                start_download_progress("/tmp/eupnea-build/pop-os.iso")
                 urlretrieve(
                     "https://iso.pop-os.org/22.04/amd64/intel/14/pop-os_22.04_amd64_intel_14.iso",
                     filename="/tmp/eupnea-build/pop-os.iso")
@@ -599,9 +599,6 @@ def start_build(verbose: bool, local_path: str, kernel_type: str, dev_release: b
     print_status("Cleaning up host system after build")
     try:
         bash("umount -f /mnt/eupnea")
-        if build_options["distro_name"]=="pop-os":
-            bash("umount -f /tmp/eupnea-build/cdrom") # pop-os loop device
-            bash(f"losetup -d {mnt_iso} ")
     except subprocess.CalledProcessError:  # on crostini umount fails for some reason
         pass
     if build_options["device"] == "image":

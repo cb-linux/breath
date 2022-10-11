@@ -10,7 +10,8 @@ def config(de_name: str, distro_version: str, username:str,root_partuuid: str, v
            " gparted gparted-common grub-common grub2-common kpartx kpartx-boot libdistinst libdmraid1.0.0.rc16 "
            "libinih1 libnss-mymachines localechooser-data os-prober pop-installer pop-installer-casper pop-shop-casper "
            "squashfs-tools systemd-container tcl-expect user-setup xfsprogs -y")
-    chroot("apt-get install cloud-utils")
+    chroot("apt-get update")
+    chroot("apt-get install cloud-utils -y")
 
     # Replace input-synaptics with newer input-libinput, for better touchpad support
     print_status("Upgrading touchpad drivers")
