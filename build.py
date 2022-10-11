@@ -25,7 +25,7 @@ def prepare_host(de_name: str) -> None:
     except subprocess.CalledProcessError:
         print("Failed to unmount /tmp/eupnea-build/cdrom, ignore")
         pass
-    
+
     print_status("Cleaning + preparing host system")
     rmdir("/tmp/eupnea-build")
     mkdir("/tmp/eupnea-build", create_parents=True)
@@ -33,6 +33,7 @@ def prepare_host(de_name: str) -> None:
     print_status("Creating mount points")
     try:
         bash("umount -lf /mnt/eupnea")  # just in case
+        sleep(1)  # wait for umount to finish
     except subprocess.CalledProcessError:
         print("Failed to unmount /mnt/eupnea, ignore")
         pass
@@ -90,7 +91,7 @@ def prepare_host(de_name: str) -> None:
             print_warning("Arch-install-scripts not found, please install it using your distros package manager or "
                           "select another distro instead of arch")
             exit(1)
-    
+
     # install unsquashfs for pop-os
     if de_name == "pop-os" and not path_exists("/usr/bin/unsquashfs"):
         print_status("Installing unsquashfs")
@@ -105,10 +106,11 @@ def prepare_host(de_name: str) -> None:
         else:
             print_warning("'squashfs-tools' not found, please install it using your distros package manager or select "
                           "another distro instead of Pop!_OS")
-            exit(1)    
+            exit(1)
+
+        # download kernel files from GitHub
 
 
-# download kernel files from GitHub
 def download_kernel(kernel_type: str, dev_release: bool) -> None:
     # select correct link
     if dev_release:
@@ -369,16 +371,15 @@ def extract_rootfs(distro_name: str) -> None:
             print_status("Extracting Pop!_OS squashfs from iso")
             # Create a mount point for the iso to extract the squashfs
             mkdir("/tmp/eupnea-build/iso")
-            mnt_iso=bash(f"losetup -f --show /tmp/eupnea-build/pop-os.iso")
+            mnt_iso = bash(f"losetup -f --show /tmp/eupnea-build/pop-os.iso")
             mkdir("/tmp/eupnea-build/cdrom")
             bash(f"mount {mnt_iso} /tmp/eupnea-build/cdrom")
             bash("unsquashfs -f -d /mnt/eupnea /tmp/eupnea-build/cdrom/casper/filesystem.squashfs")
             try:
-                bash("umount -fl /tmp/eupnea-build/cdrom") # pop-os loop device
+                bash("umount -fl /tmp/eupnea-build/cdrom")  # pop-os loop device
                 bash(f"losetup -d {mnt_iso} ")
             except subprocess.CalledProcessError:
                 pass  # on crostini umount fails for some reason
-
 
     print_status("\n" + "Rootfs extraction complete")
 
@@ -478,7 +479,7 @@ def post_extract(build_options, kernel_type: str) -> None:
             case "arch" | "fedora":
                 chroot(f"usermod -aG wheel {username}")
             case "pop-os":
-                sleep(5) # need to sleep for some reasons
+                sleep(5)  # need to sleep for some reasons
                 chroot(f"usermod -aG adm,sudo,lpadmin {username}")
 
         # set timezone build system timezone on eupnea
@@ -590,7 +591,8 @@ def start_build(verbose: bool, local_path: str, kernel_type: str, dev_release: b
         case _:
             print_error("DISTRO NAME NOT FOUND! Please create an issue")
             exit(1)
-    distro.config(build_options["de_name"], build_options["distro_version"], build_options["username"], root_partuuid, verbose)
+    distro.config(build_options["de_name"], build_options["distro_version"], build_options["username"], root_partuuid,
+                  verbose)
 
     post_config(build_options["rebind_search"])
 
