@@ -84,7 +84,7 @@ def config(de_name: str, distro_version: str, username: str, root_partuuid: str,
     with open("/mnt/depthboot/etc/apt/sources.list", "r") as file:
         original_sources = file.readlines()
     sources = original_sources
-    sources[1] = sources[1].replace("stable", "unstable")
+    sources[0] = sources[0].replace("stable", "unstable")
     with open("/mnt/depthboot/etc/apt/sources.list", "w") as file:
         file.writelines(sources)
     # update and install python
