@@ -609,6 +609,16 @@ def start_build(verbose: bool, local_path: str, kernel_type: str, dev_release: b
     except subprocess.CalledProcessError:  # on crostini umount fails for some reason
         pass
     if build_options["device"] == "image":
+        # Shrink image to actual size
+        print_status("Shrinking image")
+        bash(f"resize2fs -M {img_mnt}p2")
+        block_count = int(bash(f"dumpe2fs -h {img_mnt}p2 | grep 'Block count:'")[12:].split()[0])
+        actual_fs_in_bytes = block_count * 4096
+        # the kernel part is always the same size -> sector amount: 131072 * 512 => 67108864 bytes
+        actual_fs_in_bytes += 67108864
+        actual_fs_in_bytes += 102400  # add 100kb for linux to be able to boot
+        bash(f"truncate --size={actual_fs_in_bytes} ./depthboot.img")
+
         bash(f"losetup -d {img_mnt}")
         print_header(f"The ready-to-boot Depthboot image is located at {get_full_path('.')}/depthboot.img")
     else:
