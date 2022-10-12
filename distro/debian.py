@@ -78,6 +78,8 @@ def config(de_name: str, distro_version: str, username: str, root_partuuid: str,
     chroot("apt-get remove -y xserver-xorg-input-synaptics")
     # chroot("apt-get install -y xserver-xorg-input-libinput")
 
+    # Pre-updating to python3.10 breaks the gnome first time installer...
+    '''
     # Pre-update python to 3.10 as some postinstall scripts require it
     print_status("Upgrading python to 3.10")
     # switch to unstable channel
@@ -96,6 +98,7 @@ def config(de_name: str, distro_version: str, username: str, root_partuuid: str,
     with open("/mnt/depthboot/etc/apt/sources.list", "w") as file:
         file.writelines(original_sources)
     chroot("apt-get update -y")
+    '''
 
     # Add depthboot to version(this is purely cosmetic)
     with open("/mnt/depthboot/etc/os-release", "r") as f:
