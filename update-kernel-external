@@ -31,27 +31,27 @@ def process_args():
     return parser.parse_args()
 
 
-# Clean /tmp from eupnea files
+# Clean old depthboot files from /tmp
 def prepare_host() -> None:
     print_status("Preparing host system")
 
     print_status("Cleaning + preparing host system")
-    rmdir("/tmp/eupnea-external")
-    mkdir("/tmp/eupnea-external", create_parents=True)
+    rmdir("/tmp/depthboot-external")
+    mkdir("/tmp/depthboot-external", create_parents=True)
 
     print_status("Creating mount points and preparing device")
     try:
-        bash("umount -lf /mnt/eupnea-external 2>/dev/null")  # just in case
+        bash("umount -lf /mnt/depthboot-external 2>/dev/null")  # just in case
     except subprocess.CalledProcessError:
-        print("Failed to unmount /mnt/eupnea-external, ignore")
+        print("Failed to unmount /mnt/depthboot-external, ignore")
         pass
-    rmdir("/mnt/eupnea-external")
-    mkdir("/mnt/eupnea-external", create_parents=True)
+    rmdir("/mnt/depthboot-external")
+    mkdir("/mnt/depthboot-external", create_parents=True)
 
     # remount USB/SD-card
     bash(f"umount {device}1")
     bash(f"umount {device}2")
-    bash(f"mount {device}2 /mnt/eupnea-external")
+    bash(f"mount {device}2 /mnt/depthboot-external")
 
 
 # download kernel files from GitHub
@@ -69,24 +69,24 @@ def download_kernel() -> None:
             case "mainline":
                 print_status("Downloading mainline kernel")
                 url = "https://github.com/eupnea-linux/mainline-kernel/releases/latest/download/"
-                urlretrieve(f"{url}bzImage-stable", filename="/tmp/eupnea-external/bzImage")
-                urlretrieve(f"{url}modules-stable.tar.xz", filename="/tmp/eupnea-external/modules.tar.xz")
-                urlretrieve(f"{url}headers-stable.tar.xz", filename="/tmp/eupnea-external/headers.tar.xz")
+                urlretrieve(f"{url}bzImage-stable", filename="/tmp/depthboot-external/bzImage")
+                urlretrieve(f"{url}modules-stable.tar.xz", filename="/tmp/depthboot-external/modules.tar.xz")
+                urlretrieve(f"{url}headers-stable.tar.xz", filename="/tmp/depthboot-external/headers.tar.xz")
             case "alt":
                 print_status("Downloading alt kernel")
-                urlretrieve(f"{url}bzImage-alt", filename="/tmp/eupnea-external/bzImage")
-                urlretrieve(f"{url}modules-alt.tar.xz", filename="/tmp/eupnea-external/modules.tar.xz")
-                urlretrieve(f"{url}headers-alt.tar.xz", filename="/tmp/eupnea-external/headers.tar.xz")
+                urlretrieve(f"{url}bzImage-alt", filename="/tmp/depthboot-external/bzImage")
+                urlretrieve(f"{url}modules-alt.tar.xz", filename="/tmp/depthboot-external/modules.tar.xz")
+                urlretrieve(f"{url}headers-alt.tar.xz", filename="/tmp/depthboot-external/headers.tar.xz")
             case "exp":
                 print_status("Downloading experimental 5.15 kernel")
-                urlretrieve(f"{url}bzImage-exp", filename="/tmp/eupnea-external/bzImage")
-                urlretrieve(f"{url}modules-exp.tar.xz", filename="/tmp/eupnea-external/modules.tar.xz")
-                urlretrieve(f"{url}headers-exp.tar.xz", filename="/tmp/eupnea-external/headers.tar.xz")
+                urlretrieve(f"{url}bzImage-exp", filename="/tmp/depthboot-external/bzImage")
+                urlretrieve(f"{url}modules-exp.tar.xz", filename="/tmp/depthboot-external/modules.tar.xz")
+                urlretrieve(f"{url}headers-exp.tar.xz", filename="/tmp/depthboot-external/headers.tar.xz")
             case "stable":
                 print_status("Downloading stable 5.10 kernel")
-                urlretrieve(f"{url}bzImage", filename="/tmp/eupnea-external/bzImage")
-                urlretrieve(f"{url}modules.tar.xz", filename="/tmp/eupnea-external/modules.tar.xz")
-                urlretrieve(f"{url}headers.tar.xz", filename="/tmp/eupnea-external/headers.tar.xz")
+                urlretrieve(f"{url}bzImage", filename="/tmp/depthboot-external/bzImage")
+                urlretrieve(f"{url}modules.tar.xz", filename="/tmp/depthboot-external/modules.tar.xz")
+                urlretrieve(f"{url}headers.tar.xz", filename="/tmp/depthboot-external/headers.tar.xz")
     except URLError:
         print_error("Failed to reach github. Check your internet connection and try again or use local files with -l")
         exit(1)
@@ -101,17 +101,17 @@ def flash_kernel() -> None:
 
     # Extract modules
     print_status("Extracting kernel modules")
-    rmdir("/mnt/eupnea-external/lib/modules")  # remove all old modules
-    mkdir("/mnt/eupnea-external/lib/modules")
-    bash(f"tar xpf /tmp/eupnea-external/modules.tar.xz -C /mnt/eupnea-external/lib/modules/ --checkpoint=.10000")
+    rmdir("/mnt/depthboot-external/lib/modules")  # remove all old modules
+    mkdir("/mnt/depthboot-external/lib/modules")
+    bash(f"tar xpf /tmp/depthboot-external/modules.tar.xz -C /mnt/depthboot-external/lib/modules/ --checkpoint=.10000")
     print("")  # break line after tar
 
     # Extract kernel headers
     print_status("Extracting kernel headers")
-    dir_kernel_version = bash(f"ls /mnt/eupnea-external/lib/modules/").strip()  # get modules dir name
-    rmdir(f"/mnt/eupnea-external/usr/src/linux-headers-{dir_kernel_version}", keep_dir=False)  # remove old headers
-    mkdir(f"/mnt/eupnea-external/usr/src/linux-headers-{dir_kernel_version}", create_parents=True)
-    bash(f"tar xpf /tmp/eupnea-external/headers.tar.xz -C /mnt/eupnea-external/usr/src/linux-headers-"
+    dir_kernel_version = bash(f"ls /mnt/depthboot-external/lib/modules/").strip()  # get modules dir name
+    rmdir(f"/mnt/depthboot-external/usr/src/linux-headers-{dir_kernel_version}", keep_dir=False)  # remove old headers
+    mkdir(f"/mnt/depthboot-external/usr/src/linux-headers-{dir_kernel_version}", create_parents=True)
+    bash(f"tar xpf /tmp/depthboot-external/headers.tar.xz -C /mnt/depthboot-external/usr/src/linux-headers-"
          f"{dir_kernel_version}/ --checkpoint=.10000")
     print("")  # break line after tar
     chroot(f"ln -s /usr/src/linux-headers-{dir_kernel_version}/ "
@@ -128,26 +128,26 @@ def flash_kernel() -> None:
     print_status("Signing kernel")
     bash("futility vbutil_kernel --arch x86_64 --version 1 --keyblock /usr/share/vboot/devkeys/kernel.keyblock"
          + " --signprivate /usr/share/vboot/devkeys/kernel_data_key.vbprivk --bootloader kernel.flags" +
-         " --config kernel.flags --vmlinuz /tmp/eupnea-external/bzImage --pack /tmp/eupnea-external/bzImage.signed")
+         " --config kernel.flags --vmlinuz /tmp/depthboot-external/bzImage --pack /tmp/depthboot-external/bzImage.signed")
 
     print_status("Flashing kernel")
-    bash(f"dd if=/tmp/eupnea-external/bzImage.signed of={device}1")
+    bash(f"dd if=/tmp/depthboot-external/bzImage.signed of={device}1")
 
-    # update kernel type in eupnea-settings
-    with open("/mnt/eupnea-external/etc/eupnea.json", "w") as settings_file:
+    # update kernel type in depthboot settings
+    with open("/mnt/depthboot-external/etc/eupnea.json", "w") as settings_file:
         settings = json.load(settings_file)
     settings["kernel_type"] = kernel_type
-    with open("/mnt/eupnea-external/etc/eupnea.json", "w") as settings_file:
+    with open("/mnt/depthboot-external/etc/eupnea.json", "w") as settings_file:
         json.dump(settings, settings_file)
 
 
 # chroot command
 def chroot(command: str) -> str:
-    return bash(f'chroot /mnt/eupnea-external /bin/sh -c "{command}"')
+    return bash(f'chroot /mnt/depthboot-external /bin/sh -c "{command}"')
 
 
 if __name__ == "__main__":
-    if os.geteuid() == 0 and not path_exists("/tmp/.eupnea_root_ok"):
+    if os.geteuid() == 0 and not path_exists("/tmp/.root_ok"):
         print_error("Please start the script as non-root/without sudo")
         exit(1)
 
@@ -159,13 +159,13 @@ if __name__ == "__main__":
     # Restart script as root
     if not os.geteuid() == 0:
         # create empty file to confirm script was started as non-root
-        with open("/tmp/.eupnea_root_ok", "w") as file:
+        with open("/tmp/.root_ok", "w") as file:
             file.write("")
         sudo_args = ['sudo', sys.executable] + sys.argv + [os.environ]
         os.execlpe('sudo', *sudo_args)
 
     # delete file to confirm script was started as root
-    rmfile("/tmp/.eupnea_root_ok")
+    rmfile("/tmp/.root_ok")
 
     if args.stable:
         print_warning("Using stable kernel")
@@ -244,10 +244,10 @@ if __name__ == "__main__":
             kernel_path = f"{args.local_path}/"
         else:
             kernel_path = args.local_path
-        print_status("Copying local files to /tmp/eupnea-external")
-        cpfile(f"{kernel_path}bzImage", "/tmp/eupnea-external/bzImage")
-        cpfile(f"{kernel_path}modules.tar.xz", "/tmp/eupnea-external/modules.tar.xz")
-        cpfile(f"{kernel_path}headers.tar.xz", "/tmp/eupnea-external/headers.tar.xz")
+        print_status("Copying local files to /tmp/depthboot-external")
+        cpfile(f"{kernel_path}bzImage", "/tmp/depthboot-external/bzImage")
+        cpfile(f"{kernel_path}modules.tar.xz", "/tmp/depthboot-external/modules.tar.xz")
+        cpfile(f"{kernel_path}headers.tar.xz", "/tmp/depthboot-external/headers.tar.xz")
 
     flash_kernel()
     print_header("Kernel update complete! ")

@@ -23,7 +23,7 @@ Verbose log:
 
 
 **Build system (please complete the following information):**
- - OS: [e.g. Ubuntu, Windows 11, Crostini(aka Linux on ChromeOS)]
+ - OS: [e.g. Ubuntu, Windows Subsystem for Linux, Crostini(aka Linux on ChromeOS)]
 
 **Additional context**
 Add any other context about the problem here.

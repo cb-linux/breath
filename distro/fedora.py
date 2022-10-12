@@ -59,26 +59,26 @@ def config(de_name: str, distro_version: str, username: str, root_partuuid: str,
 
     # Create /.autorelabel to force SELinux to relabel all files
     # If this is not done, the system won't let users login, even if set to permissive
-    with open("/mnt/eupnea/.autorelabel", "w") as f:
+    with open("/mnt/depthboot/.autorelabel", "w") as f:
         f.write("")
 
     # The default fstab file has the wrong PARTUUID -> system boots in emergency mode if not fixed
     with open("configs/fstab/fedora.fstab", "r") as f:
         fstab = f.read()
     fstab = fstab.replace("insert_partuuid", root_partuuid)
-    with open("/mnt/eupnea/etc/fstab", "w") as f:
+    with open("/mnt/depthboot/etc/fstab", "w") as f:
         f.write(fstab)
 
     # TODO: Fix zram
     chroot("dnf remove zram-generator-defaults -y")  # remove zram as it fails for some reason
     chroot("systemctl disable systemd-zram-setup@zram0.service")  # disable zram service
 
-    # Add eupnea to version(this is purely cosmetic)
-    with open("/mnt/eupnea/etc/os-release", "r") as f:
+    # Add depthboot to version(this is purely cosmetic)
+    with open("/mnt/depthboot/etc/os-release", "r") as f:
         os_release = f.read()
-    os_release = os_release.replace("Cloud Edition Prerelease", "Eupnea")
-    os_release = os_release.replace("Cloud Edition", "Eupnea")
-    with open("/mnt/eupnea/etc/os-release", "w") as f:
+    os_release = os_release.replace("Cloud Edition Prerelease", "Depthboot")
+    os_release = os_release.replace("Cloud Edition", "Depthboot")
+    with open("/mnt/depthboot/etc/os-release", "w") as f:
         f.write(os_release)
 
     print_status("Debian setup complete")
@@ -86,6 +86,6 @@ def config(de_name: str, distro_version: str, username: str, root_partuuid: str,
 
 def chroot(command: str) -> None:
     if verbose:
-        bash(f'chroot /mnt/eupnea /bin/sh -c "{command}"')
+        bash(f'chroot /mnt/depthboot /bin/sh -c "{command}"')
     else:
-        bash(f'chroot /mnt/eupnea /bin/sh -c "{command}" 2>/dev/null 1>/dev/null')  # supress all output
+        bash(f'chroot /mnt/depthboot /bin/sh -c "{command}" 2>/dev/null 1>/dev/null')  # supress all output

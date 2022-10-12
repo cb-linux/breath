@@ -60,7 +60,7 @@ def config(de_name: str, distro_version: str, username: str, root_partuuid: str,
     # GDM3 auto installs gnome-minimal. Gotta remove it if user didn't choose gnome
     if not de_name == "gnome":
         try:
-            rmfile("/mnt/eupnea/usr/share/xsessions/ubuntu.desktop")
+            rmfile("/mnt/depthboot/usr/share/xsessions/ubuntu.desktop")
         except FileNotFoundError:
             pass
         chroot("apt-get remove -y gnome-shell")
@@ -68,7 +68,7 @@ def config(de_name: str, distro_version: str, username: str, root_partuuid: str,
 
     # Fix gdm3, https://askubuntu.com/questions/1239503/ubuntu-20-04-and-20-10-etc-securetty-no-such-file-or-directory
     try:
-        cpfile("/mnt/eupnea/usr/share/doc/util-linux/examples/securetty", "/mnt/eupnea/etc/securetty")
+        cpfile("/mnt/depthboot/usr/share/doc/util-linux/examples/securetty", "/mnt/depthboot/etc/securetty")
     except FileNotFoundError:
         pass
     print_status("Desktop environment setup complete")
@@ -78,14 +78,14 @@ def config(de_name: str, distro_version: str, username: str, root_partuuid: str,
     chroot("apt-get remove -y xserver-xorg-input-synaptics")
     # chroot("apt-get install -y xserver-xorg-input-libinput")
 
-    # Pre-update python to 3.10 as some eupnea postinstall scripts require it
+    # Pre-update python to 3.10 as some postinstall scripts require it
     print_status("Upgrading python to 3.10")
     # switch to unstable channel
-    with open("/mnt/eupnea/etc/apt/sources.list", "r") as file:
+    with open("/mnt/depthboot/etc/apt/sources.list", "r") as file:
         original_sources = file.readlines()
     sources = original_sources
     sources[1] = sources[1].replace("stable", "unstable")
-    with open("/mnt/eupnea/etc/apt/sources.list", "w") as file:
+    with open("/mnt/depthboot/etc/apt/sources.list", "w") as file:
         file.writelines(sources)
     # update and install python
     print_status("Installing python 3.10")
@@ -93,17 +93,17 @@ def config(de_name: str, distro_version: str, username: str, root_partuuid: str,
     chroot("apt-get install -y python3")
     print_status("Python 3.10 installed")
     # revert to stable channel
-    with open("/mnt/eupnea/etc/apt/sources.list", "w") as file:
+    with open("/mnt/depthboot/etc/apt/sources.list", "w") as file:
         file.writelines(original_sources)
     chroot("apt-get update -y")
 
-    # Add eupnea to version(this is purely cosmetic)
-    with open("/mnt/eupnea/etc/os-release", "r") as f:
+    # Add depthboot to version(this is purely cosmetic)
+    with open("/mnt/depthboot/etc/os-release", "r") as f:
         os_release = f.readlines()
-    os_release[0] = os_release[0][:-2] + ' (Eupnea)"\n'
-    os_release[1] = os_release[1][:-2] + ' (Eupnea)"\n'
-    os_release[3] = os_release[3][:-2] + ' (Eupnea)"\n'
-    with open("/mnt/eupnea/etc/os-release", "w") as f:
+    os_release[0] = os_release[0][:-2] + ' (Depthboot)"\n'
+    os_release[1] = os_release[1][:-2] + ' (Depthboot)"\n'
+    os_release[3] = os_release[3][:-2] + ' (Depthboot)"\n'
+    with open("/mnt/depthboot/etc/os-release", "w") as f:
         f.writelines(os_release)
 
     print_status("Debian setup complete")
@@ -111,6 +111,6 @@ def config(de_name: str, distro_version: str, username: str, root_partuuid: str,
 
 def chroot(command: str) -> None:
     if verbose:
-        bash(f'chroot /mnt/eupnea /bin/sh -c "{command}"')
+        bash(f'chroot /mnt/depthboot /bin/sh -c "{command}"')
     else:
-        bash(f'chroot /mnt/eupnea /bin/sh -c "{command}" 2>/dev/null 1>/dev/null')  # supress all output
+        bash(f'chroot /mnt/depthboot /bin/sh -c "{command}" 2>/dev/null 1>/dev/null')  # supress all output

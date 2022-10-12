@@ -18,12 +18,12 @@ def config(de_name: str, distro_version: str, username:str,root_partuuid: str, v
     chroot("apt-get remove -y xserver-xorg-input-synaptics")
     chroot("apt-get install -y xserver-xorg-input-libinput")
 
-    # Add eupnea to version(this is purely cosmetic)
-    with open("/mnt/eupnea/etc/os-release", "r") as f:
+    # Add depthboot to version(this is purely cosmetic)
+    with open("/mnt/depthboot/etc/os-release", "r") as f:
         os_release = f.readlines()
-    os_release[1] = os_release[1][:-2] + ' (Eupnea)"\n'
-    os_release[4] = os_release[4][:-2] + ' (Eupnea)"\n'
-    with open("/mnt/eupnea/etc/os-release", "w") as f:
+    os_release[1] = os_release[1][:-2] + ' (Depthboot)"\n'
+    os_release[4] = os_release[4][:-2] + ' (Depthboot)"\n'
+    with open("/mnt/depthboot/etc/os-release", "w") as f:
         f.writelines(os_release)
 
     print_status("Pop!_OS setup complete")
@@ -31,6 +31,6 @@ def config(de_name: str, distro_version: str, username:str,root_partuuid: str, v
 
 def chroot(command: str) -> None:
     if verbose:
-        bash(f'chroot /mnt/eupnea /bin/bash -c "{command}"')
+        bash(f'chroot /mnt/depthboot /bin/bash -c "{command}"')
     else:
-        bash(f'chroot /mnt/eupnea /bin/bash -c "{command}" 2>/dev/null 1>/dev/null')  # supress all output
+        bash(f'chroot /mnt/depthboot /bin/bash -c "{command}" 2>/dev/null 1>/dev/null')  # supress all output

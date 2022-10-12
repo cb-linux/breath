@@ -1,5 +1,5 @@
 [Unit]
-Description=Postinstall service, should auto delete on first run
+Description=Postinstall service, autodeletes itself if run successfully on first boot
 
 [Service]
 Type=oneshot

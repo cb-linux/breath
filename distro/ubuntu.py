@@ -51,7 +51,7 @@ def config(de_name: str, distro_version: str, username: str, root_partuuid: str,
     # GDM3 auto installs gnome-minimal. Gotta remove it if user didn't choose gnome
     if not de_name == "gnome":
         try:
-            rmfile("/mnt/eupnea/usr/share/xsessions/ubuntu.desktop")
+            rmfile("/mnt/depthboot/usr/share/xsessions/ubuntu.desktop")
         except FileNotFoundError:
             pass
         chroot("apt-get remove -y gnome-shell")
@@ -59,7 +59,7 @@ def config(de_name: str, distro_version: str, username: str, root_partuuid: str,
 
     # Fix gdm3, https://askubuntu.com/questions/1239503/ubuntu-20-04-and-20-10-etc-securetty-no-such-file-or-directory
     try:
-        cpfile("/mnt/eupnea/usr/share/doc/util-linux/examples/securetty", "/mnt/eupnea/etc/securetty")
+        cpfile("/mnt/depthboot/usr/share/doc/util-linux/examples/securetty", "/mnt/depthboot/etc/securetty")
     except FileNotFoundError:
         pass
     print_status("Desktop environment setup complete")
@@ -71,7 +71,7 @@ def config(de_name: str, distro_version: str, username: str, root_partuuid: str,
     with open("configs/fstab/ubuntu.fstab", "r") as f:
         fstab = f.read()
     fstab = fstab.replace("insert_partuuid", root_partuuid)
-    with open("/mnt/eupnea/etc/fstab", "w") as f:
+    with open("/mnt/depthboot/etc/fstab", "w") as f:
         f.write(fstab)
 
     # Replace input-synaptics with newer input-libinput, for better touchpad support
@@ -79,12 +79,12 @@ def config(de_name: str, distro_version: str, username: str, root_partuuid: str,
     chroot("apt-get remove -y xserver-xorg-input-synaptics")
     # chroot("apt-get install -y xserver-xorg-input-libinput")
 
-    # Add eupnea to version(this is purely cosmetic)
-    with open("/mnt/eupnea/etc/os-release", "r") as f:
+    # Add depthboot to version(this is purely cosmetic)
+    with open("/mnt/depthboot/etc/os-release", "r") as f:
         os_release = f.readlines()
-    os_release[1] = os_release[1][:-2] + ' (Eupnea)"\n'
-    os_release[4] = os_release[4][:-2] + ' (Eupnea)"\n'
-    with open("/mnt/eupnea/etc/os-release", "w") as f:
+    os_release[1] = os_release[1][:-2] + ' (Depthboot)"\n'
+    os_release[4] = os_release[4][:-2] + ' (Depthboot)"\n'
+    with open("/mnt/depthboot/etc/os-release", "w") as f:
         f.writelines(os_release)
 
     print_status("Ubuntu setup complete")
@@ -92,6 +92,6 @@ def config(de_name: str, distro_version: str, username: str, root_partuuid: str,
 
 def chroot(command: str) -> None:
     if verbose:
-        bash(f'chroot /mnt/eupnea /bin/sh -c "{command}"')
+        bash(f'chroot /mnt/depthboot /bin/sh -c "{command}"')
     else:
-        bash(f'chroot /mnt/eupnea /bin/sh -c "{command}" 2>/dev/null 1>/dev/null')  # supress all output
+        bash(f'chroot /mnt/depthboot /bin/sh -c "{command}" 2>/dev/null 1>/dev/null')  # supress all output

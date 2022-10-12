@@ -1,8 +1,8 @@
 {
   "kernel_type": "",
   "kernel_version": "none",
-  "eupnea_version": "0.6.1-alpha",
-  "eupnea_install_type": "image",
+  "depthboot_version": "0.6.1-alpha",
+  "depthboot_install_type": "image",
   "distro_name": "",
   "de_name": ""
 }

@@ -14,7 +14,7 @@ def get_user_input() -> dict:
         "de_name": "cli",
         "username": "localuser",
         "password": "",
-        "hostname": "eupnea-chromebook",
+        "hostname": "depthboot-chromebook",
         "device": "image",
         "rebind_search": False
     }
@@ -22,16 +22,17 @@ def get_user_input() -> dict:
         distros = json.load(file)
 
     # Print welcome message
-    print_header("Welcome to Eupnea")
-    print_header("This script will create a bootable Eupnea USB-drive/SD-card/image for you.")
+    print_header("Welcome to Depthboot, formerly known as Breath")
+    print_header("This script will create a bootable Depthboot USB-drive/SD-card/image for you.")
     print_header("You will now be asked a few questions. If you dont know what to answer, just press 'enter' and the"
                  " recommended answer will be used.")
     input("(Press enter to continue)")
     print_question("Which Linux distro(flavor) would you like to use?")
 
     while True:
-        temp_distro_name = input("\033[94m" + "Available options: Ubuntu(default, recommended), Debian, Arch, Fedora, Pop!_OS\n"
-                                 + "\033[0m")
+        temp_distro_name = input(
+            "\033[94m" + "Available options: Ubuntu(default, recommended), Debian, Arch, Fedora, Pop!_OS\n"
+            + "\033[0m")
         match temp_distro_name:
             case "Ubuntu" | "ubuntu" | "":
                 output_dict["distro_name"] = "ubuntu"
@@ -93,22 +94,22 @@ def get_user_input() -> dict:
             case _:
                 print_warning("Check your spelling and try again")
                 continue
-    
-    if not output_dict["distro_name"] =="pop-os":
+
+    if not output_dict["distro_name"] == "pop-os":
         print_question("Which desktop environment(Desktop GUI) would you like to use?")
         match output_dict["distro_name"]:
             case "ubuntu":
                 available_de = "Gnome(default, recommended), KDE(recommended), MATE, Xfce(recommended for weak devices), " \
-                            "LXQt(recommended for weak devices), deepin, budgie, cli"
+                               "LXQt(recommended for weak devices), deepin, budgie, cli"
             case "debian":
                 available_de = "Gnome(default, recommended), KDE(recommended), MATE, Xfce(recommended for weak devices), " \
-                            "LXQt(recommended for weak devices), budgie, cli"
+                               "LXQt(recommended for weak devices), budgie, cli"
             case "arch":
                 available_de = "Gnome(default, recommended), KDE(recommended), MATE, Xfce(recommended for weak devices), " \
-                            "LXQt(recommended for weak devices), deepin, budgie, cli"
+                               "LXQt(recommended for weak devices), deepin, budgie, cli"
             case "fedora":
                 available_de = "Gnome(default, recommended), KDE(recommended), MATE, Xfce(recommended for weak devices), " \
-                            "LXQt(recommended for weak devices), deepin, cli"
+                               "LXQt(recommended for weak devices), deepin, cli"
 
         while True:
             temp_de_name = input("\033[94m" + "Available options: " + available_de + "\033[0m" + "\n")
@@ -150,7 +151,7 @@ def get_user_input() -> dict:
                 case "cli" | "none":
                     print_warning("Warning: No desktop environment will be installed!")
                     if input("\033[94mType 'yes' to continue or Press Enter to choose a desktop environment" +
-                            "\033[0m\n") == "yes":
+                             "\033[0m\n") == "yes":
                         print("No desktop will be installed")
                         output_dict["de_name"] = "cli"
                         break
@@ -161,7 +162,7 @@ def get_user_input() -> dict:
 
     # Gnome has a first time setup -> skip this part for gnome, as there will be a first time setup
     if not output_dict["de_name"] == "gnome":
-        print_question("Enter username to be used in Eupnea")
+        print_question("Enter a username for the new user")
         while True:
             output_dict["username"] = input("\033[94m" + "Username(default: 'localuser'): " + "\033[0m")
             if output_dict["username"] == "":
@@ -206,10 +207,10 @@ def get_user_input() -> dict:
     # TODO: Maybe skip this, as its not really needed for the average user to set themselves
     print_question("Enter hostname for the chromebook.(Hostname is something like a device name)")
     while True:
-        output_dict["hostname"] = input("\033[94m" + "Hostname(default: 'eupnea-chromebook'): " + "\033[0m")
+        output_dict["hostname"] = input("\033[94m" + "Hostname(default: 'depthboot-chromebook'): " + "\033[0m")
         if output_dict["hostname"] == "":
-            print("Using eupnea-chromebook as hostname")
-            output_dict["hostname"] = "eupnea-chromebook"
+            print("Using depthboot-chromebook as hostname")
+            # name is already preset in the dictionary
             break
         if output_dict["hostname"][0] == "-":
             print_warning("Hostname cannot start with a '-'")

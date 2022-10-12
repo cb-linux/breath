@@ -5,6 +5,8 @@
 from urllib.request import urlretrieve
 import json
 
+# Do not import functions.py, as script is run in a different directory
+
 if __name__ == '__main__':
     print("\033[96m" + "Starting update script" + "\033[0m")
     with open('distro-links.json', 'r') as file:
