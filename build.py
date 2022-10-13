@@ -342,8 +342,8 @@ def extract_rootfs(distro_name: str) -> None:
         case "arch":
             print_status("Extracting arch rootfs")
             mkdir("/tmp/depthboot-build/arch-rootfs")
-            bash(
-                "tar xfp /tmp/depthboot-build/arch-rootfs.tar.gz -C /tmp/depthboot-build/arch-rootfs --checkpoint=.10000")
+            bash("tar xfp /tmp/depthboot-build/arch-rootfs.tar.gz -C /tmp/depthboot-build/arch-rootfs "
+                 "--checkpoint=.10000")
             start_progress(force_show=True)  # start fake progress
             cpdir("/tmp/depthboot-build/arch-rootfs/root.x86_64/", "/mnt/depthboot/")
             stop_progress(force_show=True)  # stop fake progress
@@ -363,7 +363,7 @@ def extract_rootfs(distro_name: str) -> None:
             fedora_root_part = bash(
                 "losetup -P -f --show /tmp/depthboot-build/fedora-raw") + "p5"  # part 5 is the rootfs
             bash(
-                f"mount {fedora_root_part} /tmp/depthboot-build/fedora-tmp-mnt")  # mount 5th root partition as filesystem
+                f"mount {fedora_root_part} /tmp/depthboot-build/fedora-tmp-mnt")  # mount 5th root part as filesystem
             print_status("Copying fedora rootfs to /mnt/depthboot")
             cpdir("/tmp/depthboot-build/fedora-tmp-mnt/root/",
                   "/mnt/depthboot/")  # copy mounted rootfs to /mnt/depthboot
@@ -375,13 +375,15 @@ def extract_rootfs(distro_name: str) -> None:
                 pass
             bash(f"losetup -d {fedora_root_part[:-2]}")
         case "pop-os":
-            print_status("Extracting Pop!_OS squashfs from iso")
+            print_status("Extracting Pop!_OS squashfs from iso. This may take a VERY VERY long while")
             # Create a mount point for the iso to extract the squashfs
             mkdir("/tmp/depthboot-build/iso")
             mnt_iso = bash(f"losetup -f --show /tmp/depthboot-build/pop-os.iso")
             mkdir("/tmp/depthboot-build/cdrom")
             bash(f"mount {mnt_iso} /tmp/depthboot-build/cdrom")
+            start_progress()  # start fake progress
             bash("unsquashfs -f -d /mnt/depthboot /tmp/depthboot-build/cdrom/casper/filesystem.squashfs")
+            stop_progress()  # stop fake progress
             try:
                 bash("umount -fl /tmp/depthboot-build/cdrom")  # pop-os loop device
                 bash(f"losetup -d {mnt_iso} ")
