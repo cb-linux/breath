@@ -453,7 +453,7 @@ def post_extract(build_options, kernel_type: str) -> None:
     settings["distro_name"] = build_options["distro_name"]
     settings["de_name"] = build_options["de_name"]
     if not build_options["device"] == "image":
-        settings["depthboot_install_type"] = "direct"
+        settings["install_type"] = "direct"
     with open("/mnt/depthboot/etc/eupnea.json", "w") as settings_file:
         json.dump(settings, settings_file)
 
