@@ -334,7 +334,7 @@ def extract_rootfs(distro_name: str) -> None:
             start_progress()  # start fake progress
             # debootstrapping directly to /mnt/depthboot
             debian_result = bash(
-                "debootstrap testing /mnt/depthboot https://deb.debian.org/debian/")
+                "debootstrap stable /mnt/depthboot https://deb.debian.org/debian/")
             stop_progress()  # stop fake progress
             if debian_result.__contains__("Couldn't download packages:"):
                 print_error("Debootstrap failed, check your internet connection or try again later")
