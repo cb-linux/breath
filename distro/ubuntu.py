@@ -23,14 +23,14 @@ def config(de_name: str, distro_version: str, username: str, root_partuuid: str,
             # Pre-pin browser + software store and don't show mounted volumes in dock
             fav_apps = "['org.gnome.Epiphany.desktop', 'org.gnome.Software.desktop', 'org.gnome.Nautilus.desktop', " \
                        "'yelp.desktop']"
-            chroot(f"dconf write /org/gnome/shell/favorite-apps {fav_apps}")
+            chroot(f"dconf write /org/gnome/shell/favorite-apps '{fav_apps}'")
             chroot("dconf write /org/gnome/shell/extensions/dash-to-dock/show-mounts false")  # mounts clutter the dock
         case "kde":
             print_status("Installing KDE")
             chroot("apt-get install -y kde-standard")
         case "mate":
             print_status("Installing MATE")
-            chroot("apt-get install -y ubuntu-mate-desktop")
+            chroot("apt-get install -y ubuntu-mate-desktop gnome-software epiphany-browser")
         case "xfce":
             print_status("Installing Xfce")
             chroot("apt-get install -y --no-install-recommends xubuntu-desktop gnome-software")
