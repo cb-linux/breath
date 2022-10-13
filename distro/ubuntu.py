@@ -21,9 +21,8 @@ def config(de_name: str, distro_version: str, username: str, root_partuuid: str,
             chroot("apt-get install -y ubuntu-desktop gnome-software epiphany-browser")
 
             # Pre-pin browser + software store and don't show mounted volumes in dock
-            fav_apps = "['org.gnome.Epiphany.desktop', 'org.gnome.Software.desktop', 'org.gnome.Nautilus.desktop', " \
-                       "'yelp.desktop']"
-            chroot(f'dconf write /org/gnome/shell/favorite-apps "{fav_apps}"')
+            chroot('dconf write /org/gnome/shell/favorite-apps \"[\'org.gnome.Epiphany.desktop\', \'org.gnome.Software'
+                   '.desktop\', \'org.gnome.Nautilus.desktop\', \'yelp.desktop\']\"')
             chroot("dconf write /org/gnome/shell/extensions/dash-to-dock/show-mounts false")  # mounts clutter the dock
         case "kde":
             print_status("Installing KDE")
