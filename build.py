@@ -354,7 +354,10 @@ def extract_rootfs(distro_name: str) -> None:
             # using unxz instead of tar
             bash("unxz -d /tmp/depthboot-build/fedora-rootfs.raw.xz -c > /tmp/depthboot-build/fedora-raw")
 
-            bash("modprobe btrfs")  # some systems don't have btrfs module loaded by default.
+            try:
+                bash("modprobe btrfs")  # some systems don't have btrfs module loaded by default.
+            except subprocess.CalledProcessError:  # Crostini doesnt have modprobe
+                pass
 
             # mount fedora raw image as loop device
             fedora_root_part = bash(
