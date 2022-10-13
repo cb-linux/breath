@@ -97,7 +97,7 @@ def cpdir(src_as_str: str, dst_as_string: str) -> None:  # dst_dir must be a ful
         print("Source directory does not exist?")
 
 
-def cpfile(src: str, dst: str) -> None:  # "/etc/resolv.conf", "/mnt/eupnea/etc/resolv.conf"
+def cpfile(src: str, dst: str) -> None:  # "/etc/resolv.conf", "/var/some_config/resolv.conf"
     src_as_path = Path(src)
     dst_as_path = Path(dst)
     if src_as_path.exists():
@@ -139,21 +139,21 @@ def install_kernel_packages() -> None:
         bash("sudo apt-get install cgpt vboot-kernel-utils -y")
     elif path_exists("/usr/bin/pacman"):  # Arch
         # remove old files if present
-        rmdir("/tmp/eupnea-packages/")
-        mkdir("/tmp/eupnea-packages")
+        rmdir("/tmp/kernel-packages/")
+        mkdir("/tmp/kernel-packages")
 
         bash("sudo pacman -S --needed base-devel --noconfirm")  # install base-devel for makepkg
 
         # trousers is a dependency of vboot-utils
-        bash("git clone https://aur.archlinux.org/trousers.git /tmp/eupnea-packages/trousers")
-        bash("git clone https://aur.archlinux.org/vboot-utils.git /tmp/eupnea-packages/vboot-utils")
+        bash("git clone https://aur.archlinux.org/trousers.git /tmp/kernel-packages/trousers")
+        bash("git clone https://aur.archlinux.org/vboot-utils.git /tmp/kernel-packages/vboot-utils")
 
-        bash("cd /tmp/eupnea-packages/trousers && makepkg -sirc --noconfirm")
+        bash("cd /tmp/kernel-packages/trousers && makepkg -sirc --noconfirm")
         # using subprocess.run instead of bash because makepkg has some C errors
-        subprocess.run("cd /tmp/eupnea-packages/vboot-utils && makepkg -sirc --noconfirm", shell=True)
+        subprocess.run("cd /tmp/kernel-packages/vboot-utils && makepkg -sirc --noconfirm", shell=True)
 
         # remove local repo clones
-        rmdir("/tmp/eupnea-packages/")
+        rmdir("/tmp/kernel-packages/")
     elif path_exists("/usr/bin/dnf"):  # Fedora
         bash("sudo dnf install vboot-utils --assumeyes")  # cgpt is included in vboot-utils on fedora
     elif path_exists("/usr/bin/zypper"):  # openSUSE
