@@ -19,7 +19,7 @@ jobs:
       - name: Copy testing script to root
         run: cp ./.github/repo-scripts/build-tests/ubuntu-test.py ubuntu-test.py
 
-      - name: Testing Debian builds
+      - name: Testing Ubuntu builds
         run: python3 ./ubuntu-test.py
 
       - name: Uploading results as artifact
@@ -69,7 +69,7 @@ jobs:
       - name: Copy testing script to root
         run: cp ./.github/repo-scripts/build-tests/arch-test.py arch-test.py
 
-      - name: Testing Debian builds
+      - name: Testing Arch builds
         run: python3 ./arch-test.py
 
       - name: Uploading results as artifact
@@ -94,7 +94,7 @@ jobs:
       - name: Copy testing script to root
         run: cp ./.github/repo-scripts/build-tests/fedora-test.py fedora-test.py
 
-      - name: Testing Debian builds
+      - name: Testing Fedora builds
         run: python3 ./fedora-test.py
 
       - name: Uploading results as artifact
@@ -119,7 +119,7 @@ jobs:
       - name: Copy testing script to root
         run: cp ./.github/repo-scripts/build-tests/popos-test.py popos-test.py
 
-      - name: Testing Debian builds
+      - name: Testing PopOS build
         run: python3 ./popos-test.py
 
       - name: Uploading results as artifact
