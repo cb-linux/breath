@@ -556,7 +556,9 @@ def start_build(verbose: bool, local_path, kernel_type: str, dev_release: bool, 
             "bzImage":          [cpfile,"/tmp/depthboot-build/bzImage",download_kernel,kernel_type,dev_release,["bzImage"]],
             "modules.tar.xz":   [cpfile,"/tmp/depthboot-build/modules.tar.xz",download_kernel,kernel_type,dev_release,["modules"]],
             "headers.tar.xz":   [cpfile,"/tmp/depthboot-build/headers.tar.xz",download_kernel,kernel_type,dev_release,["headers"]],
-            "firmware":         [cpdir, "/mnt/depthboot/lib/firmware/google",download_firmware]
+            "firmware":         [cpdir, "/mnt/depthboot/lib/firmware/google",download_firmware],
+            "postinstall-scripts":[cpdir, "/mnt/depthboot-build/postinstall-scripts", download_postinstall_scripts],
+            "audio-scripts":	[cpdir, "/mnt/depthboot-build/audio-scripts",download_audio_scripts]
         }
         distro_rootfs={
             #keyfiletosearch:[cpmeth,pathtocopy,elsefunction,*args]
@@ -569,11 +571,12 @@ def start_build(verbose: bool, local_path, kernel_type: str, dev_release: bool, 
         # Assets
         for keyfile in files:
             try:
-                files[keyfile][0](local_path_posix+keyfile, files[keyfile][1])
+                files[keyfile][0](local_path_posix+keyfile, files[keyfile][1],True)
             except FileNotFoundError:
                 print_error(f"'{keyfile}' not found, downloading {keyfile}...")
                 fct=files[keyfile][2]
                 args=files[keyfile][3:]
+                fct(*args)
         # Rootfs
         try:
             distro_rootfs[build_options["distro_name"]][0](local_path_posix+distro_rootfs[build_options["distro_name"]][1],
