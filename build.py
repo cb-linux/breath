@@ -620,7 +620,7 @@ def start_build(verbose: bool, local_path, kernel_type: str, dev_release: bool, 
     if build_options["device"] == "image":
         # Shrink image to actual size
         print_status("Shrinking image")
-        bash(f"e2fsck -fpv {img_mnt}p2")  # Force check filesystem for errors
+        bash(f"e2fsck -fyv {img_mnt}p2")  # Force check filesystem for errors
         bash(f"resize2fs -f -M {img_mnt}p2")
         block_count = int(bash(f"dumpe2fs -h {img_mnt}p2 | grep 'Block count:'")[12:].split()[0])
         actual_fs_in_bytes = block_count * 4096
