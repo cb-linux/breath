@@ -1,0 +1,141 @@
+name: Testing builds
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+jobs:
+  test-ubuntu:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checking out repository code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 1
+
+      - name: Installing dependencies
+        runs: sudo apt-get install -y cgpt vboot-kernel-utils
+
+      - name: Testing Ubuntu builds
+        run: python3 ./.github/repo-scripts/build-tests/ubuntu-test.py
+
+      - name: Uploading results as artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: results-ubuntu
+          retention-days: 1
+          path: |
+            results.txt
+
+  test-debian:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checking out repository code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 1
+
+      - name: Installing dependencies
+        runs: sudo apt-get install -y cgpt vboot-kernel-utils
+
+      - name: Testing Debian builds
+        run: python3 ./.github/repo-scripts/build-tests/debian-test.py
+
+      - name: Uploading results as artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: results-debian
+          retention-days: 1
+          path: |
+            results.txt
+
+  test-arch:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checking out repository code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 1
+
+      - name: Installing dependencies
+        runs: sudo apt-get install -y cgpt vboot-kernel-utils
+
+      - name: Testing Arch builds
+        run: python3 ./.github/repo-scripts/build-tests/arch-test.py
+
+      - name: Uploading results as artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: results-arch
+          retention-days: 1
+          path: |
+            results.txt
+
+  test-fedora:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checking out repository code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 1
+
+      - name: Installing dependencies
+        runs: sudo apt-get install -y cgpt vboot-kernel-utils
+
+      - name: Testing Fedora builds
+        run: python3 ./.github/repo-scripts/build-tests/fedora-test.py
+
+      - name: Uploading results as artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: results-fedora
+          retention-days: 1
+          path: |
+            results.txt
+
+  test-popos:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checking out repository code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 1
+
+      - name: Installing dependencies
+        runs: sudo apt-get install -y cgpt vboot-kernel-utils
+
+      - name: Testing PopOS builds
+        run: python3 ./.github/repo-scripts/build-tests/popos-test.py
+
+      - name: Uploading results as artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: results-popos
+          retention-days: 1
+          path: |
+            results.txt
+
+  evaluate-results:
+    needs: [ test-ubuntu, test-debian, test-arch, test-fedora, test-popos ]
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checking out repository code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 1
+
+      - name: Downloading result artifacts
+        uses: actions/download-artifact@v3
+
+      - name: Evaluating results
+        # This checks if any of the results files are non-empty and fails if one is
+        run: |
+          for file in ./results-*/results.txt
+          do 
+            if [ -s $file ]
+              then
+                echo "Build test failed for $file"
+                cat $file
+                exit 1
+            fi
+          done
