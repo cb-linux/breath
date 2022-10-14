@@ -36,7 +36,7 @@ if __name__ == "__main__":
         testing_dict["de_name"] = de_name
         print_header(f"Testing Ubuntu + {de_name}")
         try:
-            build.start_build(verbose=True, local_path="", kernel_type="stable", dev_release=False,
+            build.start_build(verbose=True, local_path=None, kernel_type="stable", dev_release=False,
                               build_options=testing_dict)
         except Exception as e:
             print_error(str(e))
