@@ -45,9 +45,11 @@ jobs:
       - name: Maximizing build space
         uses: easimon/maximize-build-space@master
         with:
-          root-reserve-mb: 512
-          swap-size-mb: 1024
+          temp-reserve-mb: 11264
+          swap-size-mb: 1
           remove-dotnet: 'true'
+          remove-android: 'true'
+          remove-haskell: 'true'
 
       - name: Checking out repository code
         uses: actions/checkout@v3
@@ -77,9 +79,11 @@ jobs:
       - name: Maximizing build space
         uses: easimon/maximize-build-space@master
         with:
-          root-reserve-mb: 512
-          swap-size-mb: 1024
+          temp-reserve-mb: 11264
+          swap-size-mb: 1
           remove-dotnet: 'true'
+          remove-android: 'true'
+          remove-haskell: 'true'
 
       - name: Checking out repository code
         uses: actions/checkout@v3
@@ -109,9 +113,11 @@ jobs:
       - name: Maximizing build space
         uses: easimon/maximize-build-space@master
         with:
-          root-reserve-mb: 512
-          swap-size-mb: 1024
+          temp-reserve-mb: 11264
+          swap-size-mb: 1
           remove-dotnet: 'true'
+          remove-android: 'true'
+          remove-haskell: 'true'
 
       - name: Checking out repository code
         uses: actions/checkout@v3
@@ -141,9 +147,11 @@ jobs:
       - name: Maximizing build space
         uses: easimon/maximize-build-space@master
         with:
-          root-reserve-mb: 512
-          swap-size-mb: 1024
+          temp-reserve-mb: 11264
+          swap-size-mb: 1
           remove-dotnet: 'true'
+          remove-android: 'true'
+          remove-haskell: 'true'
 
       - name: Checking out repository code
         uses: actions/checkout@v3
