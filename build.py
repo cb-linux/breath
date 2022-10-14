@@ -531,8 +531,8 @@ def chroot(command: str) -> str:
 
 # The main build script
 def start_build(verbose: bool, local_path, kernel_type: str, dev_release: bool, build_options,
-                disable_download_progress: bool = False) -> None:
-    if disable_download_progress:
+                no_download_progress: bool = False) -> None:
+    if no_download_progress:
         disable_download_progress()  # disable download progress bar for non-interactive shells
     set_verbose(verbose)
     print_status("Starting build")
