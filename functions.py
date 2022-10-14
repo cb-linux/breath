@@ -21,7 +21,7 @@ def rmdir(rm_dir: str, keep_dir: bool = True) -> None:
                     unlink_files(path_to_rm)
         except FileNotFoundError:
             print(f"No such file or directory: {path_to_rm.absolute().as_posix()}, ignoring")
-            return
+            pass
 
     # convert string to Path object
     rm_dir_as_path = Path(rm_dir)
