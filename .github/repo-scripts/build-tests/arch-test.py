@@ -21,7 +21,7 @@ if __name__ == "__main__":
     testing_dict = {
         "distro_name": "arch",
         "distro_version": "",
-        "distro_link": "",
+        "distro_link": "https://geo.mirror.pkgbuild.com/iso/2022.09.03/archlinux-bootstrap-x86_64.tar.gz",
         "de_name": "",
         "username": "localuser",
         "password": "test",

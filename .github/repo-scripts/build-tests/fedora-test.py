@@ -21,7 +21,8 @@ if __name__ == "__main__":
     testing_dict = {
         "distro_name": "fedora",
         "distro_version": "36",
-        "distro_link": "",
+        "distro_link": "https://kojipkgs.fedoraproject.org/packages/Fedora-Cloud-Base/36/20221014.0/images/Fedora-Cloud"
+                       "-Base-36-20221014.0.x86_64.raw.xz",
         "de_name": "",
         "username": "localuser",
         "password": "test",
