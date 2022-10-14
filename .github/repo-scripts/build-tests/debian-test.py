@@ -1,5 +1,5 @@
-#!/usr/bin/env python3
-
+import os
+import sys
 import build
 
 
@@ -12,6 +12,10 @@ def print_error(message: str) -> None:
 
 
 if __name__ == "__main__":
+    # Restart script as root
+    if not os.geteuid() == 0:
+        sudo_args = ['sudo', sys.executable] + sys.argv + [os.environ]
+        os.execlpe('sudo', *sudo_args)
     print_header("Starting Debian tests")
 
     testing_dict = {
@@ -34,7 +38,8 @@ if __name__ == "__main__":
         try:
             build.start_build(verbose=True, local_path="", kernel_type="stable", dev_release=False,
                               build_options=testing_dict)
-        except:
+        except Exception as e:
+            print_error(str(e))
             print_error(f"Failed to build Debian + {de_name}")
             failed_distros.append(de_name)
 

@@ -1,5 +1,5 @@
-#!/usr/bin/env python3
-
+import os
+import sys
 import build
 
 
@@ -12,6 +12,10 @@ def print_error(message: str) -> None:
 
 
 if __name__ == "__main__":
+    # Restart script as root
+    if not os.geteuid() == 0:
+        sudo_args = ['sudo', sys.executable] + sys.argv + [os.environ]
+        os.execlpe('sudo', *sudo_args)
     print_header("Starting Ubuntu tests")
 
     testing_dict = {
