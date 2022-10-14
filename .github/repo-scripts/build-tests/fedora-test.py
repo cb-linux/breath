@@ -1,11 +1,18 @@
 #!/usr/bin/env python3
 
-from functions import *
 import build
+
+
+def print_header(message: str) -> None:
+    print("\033[95m" + message + "\033[0m", flush=True)
+
+
+def print_error(message: str) -> None:
+    print("\033[91m" + message + "\033[0m", flush=True)
+
 
 if __name__ == "__main__":
     print_header("Starting Fedora tests")
-    set_verbose(True)
 
     testing_dict = {
         "distro_name": "fedora",
