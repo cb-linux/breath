@@ -20,4 +20,4 @@ jobs:
         runs: sudo apt-get install -y cgpt vboot-kernel-utils
 
       - name: Building Ubuntu + Gnome
-        run: python3 -c "import build; build.build()"
+        run: python3 -c "import build; build.start_build(verbose=True, local_path=None, kernel_type="stable", dev_release=False, build_options={})"
