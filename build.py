@@ -530,7 +530,7 @@ def chroot(command: str) -> str:
 
 
 # The main build script
-def start_build(verbose: bool, local_path: str, kernel_type: str, dev_release: bool, build_options):
+def start_build(verbose: bool, local_path, kernel_type: str, dev_release: bool, build_options):
     set_verbose(verbose)
     print_status("Starting build")
 
