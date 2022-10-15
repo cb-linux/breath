@@ -59,10 +59,7 @@ def config(de_name: str, distro_version: str, username: str, root_partuuid: str,
 
     # GDM3 auto installs gnome-minimal. Gotta remove it if user didn't choose gnome
     if not de_name == "gnome":
-        try:
-            rmfile("/mnt/depthboot/usr/share/xsessions/ubuntu.desktop")
-        except FileNotFoundError:
-            pass
+        rmfile("/mnt/depthboot/usr/share/xsessions/ubuntu.desktop")
         chroot("apt-get remove -y gnome-shell")
         chroot("apt-get autoremove -y")
 
