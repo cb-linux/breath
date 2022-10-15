@@ -1,11 +1,11 @@
 from functions import *
 
 
-def config(de_name: str, distro_version: str, username:str,root_partuuid: str, verbose: bool) -> None:
+def config(de_name: str, distro_version: str, username: str, root_partuuid: str, verbose: bool) -> None:
     set_verbose(verbose)
     print_status("Configuring Pop!_OS")
 
-    print_status("Removing casper debs") # src : https://github.com/pop-os/distinst
+    print_status("Removing casper debs")  # Source : https://github.com/pop-os/distinst
     chroot("apt-get purge btrfs-progs casper cifs-utils distinst distinst-v2 dmraid expect f2fs-tools fatresize gettext"
            " gparted gparted-common grub-common grub2-common kpartx kpartx-boot libdistinst libdmraid1.0.0.rc16 "
            "libinih1 libnss-mymachines localechooser-data os-prober pop-installer pop-installer-casper pop-shop-casper "

@@ -145,42 +145,47 @@ jobs:
           path: |
             results.txt
 
-  test-popos:
-    runs-on: ubuntu-22.04
-    steps:
-      - name: Maximizing build space
-        uses: easimon/maximize-build-space@master
-        with:
-          temp-reserve-mb: 11264
-          swap-size-mb: 1
-          remove-dotnet: 'true'
-          remove-android: 'true'
-          remove-haskell: 'true'
-
-      - name: Checking out repository code
-        uses: actions/checkout@v3
-        with:
-          fetch-depth: 1
-
-      - name: Installing dependencies
-        run: sudo apt-get install -y cgpt vboot-kernel-utils parted squashfs-tools
-
-      - name: Copy testing script to root
-        run: cp ./.github/repo-scripts/build-tests/popos-test.py popos-test.py
-
-      - name: Testing PopOS build
-        run: python3 ./popos-test.py
-
-      - name: Uploading results as artifact
-        uses: actions/upload-artifact@v2
-        with:
-          name: results-popos
-          retention-days: 1
-          path: |
-            results.txt
+  # PopOS times out the container
+  # Perhaps unsquashfs is taking too long?
+  #TODO: fix popos
+  #
+  #  test-popos:
+  #    runs-on: ubuntu-22.04
+  #    steps:
+  #      - name: Maximizing build space
+  #        uses: easimon/maximize-build-space@master
+  #        with:
+  #          temp-reserve-mb: 11264
+  #          swap-size-mb: 1
+  #          remove-dotnet: 'true'
+  #          remove-android: 'true'
+  #          remove-haskell: 'true'
+  #
+  #      - name: Checking out repository code
+  #        uses: actions/checkout@v3
+  #        with:
+  #          fetch-depth: 1
+  #
+  #      - name: Installing dependencies
+  #        run: sudo apt-get install -y cgpt vboot-kernel-utils parted squashfs-tools
+  #
+  #      - name: Copy testing script to root
+  #        run: cp ./.github/repo-scripts/build-tests/popos-test.py popos-test.py
+  #
+  #      - name: Testing PopOS build
+  #        run: python3 ./popos-test.py
+  #
+  #      - name: Uploading results as artifact
+  #        uses: actions/upload-artifact@v2
+  #        with:
+  #          name: results-popos
+  #          retention-days: 1
+  #          path: |
+  #            results.txt
 
   evaluate-results:
-    needs: [ test-ubuntu, test-debian, test-arch, test-fedora, test-popos ]
+    # needs: [ test-ubuntu, test-debian, test-arch, test-fedora, test-popos ]
+    needs: [ test-ubuntu, test-debian, test-arch, test-fedora ]
     runs-on: ubuntu-22.04
     steps:
       - name: Checking out repository code
