@@ -111,7 +111,7 @@ def prepare_host(de_name: str) -> None:
         # download kernel files from GitHub
 
 
-def download_kernel(kernel_type: str, dev_release: bool,files:list=["bzImage","modules","headers"]) -> None:
+def download_kernel(kernel_type: str, dev_release: bool, files: list = ["bzImage", "modules", "headers"]) -> None:
     # select correct link
     if dev_release:
         url = "https://github.com/eupnea-linux/kernel/releases/download/dev-build/"
@@ -125,24 +125,36 @@ def download_kernel(kernel_type: str, dev_release: bool,files:list=["bzImage","m
             case "mainline":
                 print_status("Downloading mainline kernel")
                 url = "https://github.com/eupnea-linux/mainline-kernel/releases/latest/download/"
-                if "bzImage" in files: urlretrieve(f"{url}bzImage-stable", filename="/tmp/depthboot-build/bzImage")
-                if "modules" in files: urlretrieve(f"{url}modules-stable.tar.xz", filename="/tmp/depthboot-build/modules.tar.xz")
-                if "headers" in files: urlretrieve(f"{url}headers-stable.tar.xz", filename="/tmp/depthboot-build/headers.tar.xz")
+                if "bzImage" in files:
+                    urlretrieve(f"{url}bzImage-stable", filename="/tmp/depthboot-build/bzImage")
+                if "modules" in files:
+                    urlretrieve(f"{url}modules-stable.tar.xz", filename="/tmp/depthboot-build/modules.tar.xz")
+                if "headers" in files:
+                    urlretrieve(f"{url}headers-stable.tar.xz", filename="/tmp/depthboot-build/headers.tar.xz")
             case "alt":
                 print_status("Downloading alt kernel")
-                if "bzImage" in files: urlretrieve(f"{url}bzImage-alt", filename="/tmp/depthboot-build/bzImage")
-                if "modules" in files: urlretrieve(f"{url}modules-alt.tar.xz", filename="/tmp/depthboot-build/modules.tar.xz")
-                if "headers" in files: urlretrieve(f"{url}headers-alt.tar.xz", filename="/tmp/depthboot-build/headers.tar.xz")
+                if "bzImage" in files:
+                    urlretrieve(f"{url}bzImage-alt", filename="/tmp/depthboot-build/bzImage")
+                if "modules" in files:
+                    urlretrieve(f"{url}modules-alt.tar.xz", filename="/tmp/depthboot-build/modules.tar.xz")
+                if "headers" in files:
+                    urlretrieve(f"{url}headers-alt.tar.xz", filename="/tmp/depthboot-build/headers.tar.xz")
             case "exp":
                 print_status("Downloading experimental 5.15 kernel")
-                if "bzImage" in files: urlretrieve(f"{url}bzImage-exp", filename="/tmp/depthboot-build/bzImage")
-                if "modules" in files: urlretrieve(f"{url}modules-exp.tar.xz", filename="/tmp/depthboot-build/modules.tar.xz")
-                if "headers" in files: urlretrieve(f"{url}headers-exp.tar.xz", filename="/tmp/depthboot-build/headers.tar.xz")
+                if "bzImage" in files:
+                    urlretrieve(f"{url}bzImage-exp", filename="/tmp/depthboot-build/bzImage")
+                if "modules" in files:
+                    urlretrieve(f"{url}modules-exp.tar.xz", filename="/tmp/depthboot-build/modules.tar.xz")
+                if "headers" in files:
+                    urlretrieve(f"{url}headers-exp.tar.xz", filename="/tmp/depthboot-build/headers.tar.xz")
             case "stable":
                 print_status("Downloading stable 5.10 kernel")
-                if "bzImage" in files: urlretrieve(f"{url}bzImage", filename="/tmp/depthboot-build/bzImage")
-                if "modules" in files: urlretrieve(f"{url}modules.tar.xz", filename="/tmp/depthboot-build/modules.tar.xz")
-                if "headers" in files: urlretrieve(f"{url}headers.tar.xz", filename="/tmp/depthboot-build/headers.tar.xz")
+                if "bzImage" in files:
+                    urlretrieve(f"{url}bzImage", filename="/tmp/depthboot-build/bzImage")
+                if "modules" in files:
+                    urlretrieve(f"{url}modules.tar.xz", filename="/tmp/depthboot-build/modules.tar.xz")
+                if "headers" in files:
+                    urlretrieve(f"{url}headers.tar.xz", filename="/tmp/depthboot-build/headers.tar.xz")
     except URLError:
         print_error("Failed to reach github. Check your internet connection and try again or use local files with -l")
         exit(1)
@@ -230,8 +242,6 @@ def download_audio_scripts() -> None:
 # Create, mount, partition the img and flash the eupnea kernel
 def prepare_img(distro_name: str) -> Tuple[str, str]:
     print_status("Preparing image")
-
-    # TODO: dynamic img size
     img_size = 10
     try:
         bash(f"fallocate -l {img_size}G depthboot.img")
@@ -555,42 +565,44 @@ def start_build(verbose: bool, local_path, kernel_type: str, dev_release: bool, 
             local_path_posix = local_path
 
         print_status("Copying local files to /tmp/depthboot-build")
-        files={
-            #keyfiletosearch:[cpmeth,pathtocopy,elsefunction,*args]
-            "bzImage":          [cpfile,"/tmp/depthboot-build/bzImage",download_kernel,kernel_type,dev_release,["bzImage"]],
-            "modules.tar.xz":   [cpfile,"/tmp/depthboot-build/modules.tar.xz",download_kernel,kernel_type,dev_release,["modules"]],
-            "headers.tar.xz":   [cpfile,"/tmp/depthboot-build/headers.tar.xz",download_kernel,kernel_type,dev_release,["headers"]],
-            "firmware":         [cpdir, "/tmp/depthboot-build/firmware",download_firmware],
-            "postinstall-scripts":[cpdir, "/tmp/depthboot-build/postinstall-scripts", download_postinstall_scripts],
-            "audio-scripts":	[cpdir, "/tmp/depthboot-build/audio-scripts",download_audio_scripts]
+        files = {
+            # keyfiletosearch:[cpmeth,pathtocopy,elsefunction,*args]
+            "bzImage": [cpfile, "/tmp/depthboot-build/bzImage", download_kernel, kernel_type, dev_release, ["bzImage"]],
+            "modules.tar.xz": [cpfile, "/tmp/depthboot-build/modules.tar.xz", download_kernel, kernel_type, dev_release,
+                               ["modules"]],
+            "headers.tar.xz": [cpfile, "/tmp/depthboot-build/headers.tar.xz", download_kernel, kernel_type, dev_release,
+                               ["headers"]],
+            "firmware": [cpdir, "/tmp/depthboot-build/firmware", download_firmware],
+            "postinstall-scripts": [cpdir, "/tmp/depthboot-build/postinstall-scripts", download_postinstall_scripts],
+            "audio-scripts": [cpdir, "/tmp/depthboot-build/audio-scripts", download_audio_scripts]
         }
-        distro_rootfs={
-            #distro_name:[cpmeth,filename]
-            "ubuntu":   [cpfile,"ubuntu-rootfs.tar.xz"],
-            "debian":   [cpdir,"debian"],
-            "arch":     [cpfile,"arch-rootfs.tar.gz"],
-            "pop-os":   [cpfile, "pop-os.iso"]
+        distro_rootfs = {
+            # distro_name:[cpmeth,filename]
+            "ubuntu": [cpfile, "ubuntu-rootfs.tar.xz"],
+            "debian": [cpdir, "debian"],
+            "arch": [cpfile, "arch-rootfs.tar.gz"],
+            "pop-os": [cpfile, "pop-os.iso"]
         }
-        
+
         # Assets
         for keyfile in files:
             try:
-                cpfct=files[keyfile][0]
-                origin=local_path_posix+keyfile
-                dest=files[keyfile][1]
+                cpfct = files[keyfile][0]
+                origin = local_path_posix + keyfile
+                dest = files[keyfile][1]
                 cpfct(origin, dest)
             except FileNotFoundError:
                 print_error(f"'{keyfile}' not found, downloading {keyfile}...")
-                fct=files[keyfile][2]
-                args=files[keyfile][3:]
+                fct = files[keyfile][2]
+                args = files[keyfile][3:]
                 fct(*args)
         # Rootfs
         try:
-            cpfct=distro_rootfs[build_options["distro_name"]][0]
-            filename=distro_rootfs[build_options["distro_name"]][1]
-            cpfct(local_path_posix+filename,"/tmp/depthboot-build/"+filename)
+            cpfct = distro_rootfs[build_options["distro_name"]][0]
+            filename = distro_rootfs[build_options["distro_name"]][1]
+            cpfct(local_path_posix + filename, "/tmp/depthboot-build/" + filename)
         except FileNotFoundError:
-            print_error(f"'{filename}' not found, downloading "+build_options["distro_name"]+" rootfs...")
+            print_error(f"'{filename}' not found, downloading " + build_options["distro_name"] + " rootfs...")
             download_rootfs(build_options["distro_name"], build_options["distro_version"], build_options["distro_link"])
 
     # Setup device
@@ -635,6 +647,7 @@ def start_build(verbose: bool, local_path, kernel_type: str, dev_release: bool, 
     if build_options["device"] == "image":
         # Shrink image to actual size
         print_status("Shrinking image")
+        sleep(5)  # wait for umount to finish
         bash(f"e2fsck -fyv {img_mnt}p2")  # Force check filesystem for errors
         bash(f"resize2fs -f -M {img_mnt}p2")
         block_count = int(bash(f"dumpe2fs -h {img_mnt}p2 | grep 'Block count:'")[12:].split()[0])
