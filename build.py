@@ -561,7 +561,7 @@ def start_build(verbose: bool, local_path, kernel_type: str, dev_release: bool, 
             "audio-scripts":	[cpdir, "/mnt/depthboot-build/audio-scripts",download_audio_scripts]
         }
         distro_rootfs={
-            #keyfiletosearch:[cpmeth,pathtocopy,elsefunction,*args]
+            #keyfiletosearch:[cpmeth,filename]
             "ubuntu":   [cpfile,"ubuntu-rootfs.tar.xz"],
             "debian":   [cpdir,"debian"],
             "arch":     [cpfile,"arch-rootfs.tar.gz"],
