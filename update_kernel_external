@@ -16,8 +16,8 @@ def process_args():
     parser.add_argument('-p', '--local-path', dest="local_path",
                         help="Local path for kernel files to use instead of downloading from github.")
     parser.add_argument("--stable", action="store_true", dest="stable", default=False,
-                        help="Use kernels from latest dev build. May be unstable.")
-    parser.add_argument("--dev", action="store_true", dest="dev_build", default=False,
+                        help="Use latest stable kernel.")
+    parser.add_argument("--dev", action="store_true", dest="dev_release", default=False,
                         help="Use kernels from latest dev build. May be unstable.")
     parser.add_argument("--alt", action="store_true", dest="alt", default=False,
                         help="Use alt kernel. Recommended for older devices.")
@@ -57,7 +57,7 @@ def prepare_host() -> None:
 # download kernel files from GitHub
 def download_kernel() -> None:
     # select correct link
-    if args.dev_build:
+    if args.dev_release:
         url = "https://github.com/eupnea-linux/kernel/releases/download/dev-build/"
     else:
         url = "https://github.com/eupnea-linux/kernel/releases/latest/download/"
@@ -170,7 +170,7 @@ if __name__ == "__main__":
     if args.stable:
         print_warning("Using stable kernel")
         kernel_type = "stable"
-    if args.dev_build:
+    if args.dev_release:
         print_warning("Using dev release")
     if args.alt:
         print_warning("Using alt kernel")
