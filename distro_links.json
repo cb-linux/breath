@@ -15,6 +15,6 @@
         "35": "https://kojipkgs.fedoraproject.org/packages/Fedora-Cloud-Base/35/20221014.0/images/Fedora-Cloud-Base-35-20221014.0.x86_64.raw.xz",
         "36": "https://kojipkgs.fedoraproject.org/packages/Fedora-Cloud-Base/36/20221014.0/images/Fedora-Cloud-Base-36-20221014.0.x86_64.raw.xz",
         "37": "https://kojipkgs.fedoraproject.org/packages/Fedora-Cloud-Base/37/20221014.n.0/images/Fedora-Cloud-Base-37-20221014.n.0.x86_64.raw.xz",
-        "Rawhide": "https://kojipkgs.fedoraproject.org/packages/Fedora-Cloud-Base/Rawhide/20221014.n.0/images/Fedora-Cloud-Base-Rawhide-20221014.n.0.x86_64.raw.xz"
+        "Rawhide": "https://kojipkgs.fedoraproject.org/packages/Fedora-Cloud-Base/Rawhide/20221014.n.1/images/Fedora-Cloud-Base-Rawhide-20221014.n.1.x86_64.raw.xz"
     }
 }
