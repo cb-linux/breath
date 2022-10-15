@@ -501,15 +501,16 @@ def post_extract(build_options, kernel_type: str) -> None:
 
 
 # post extract and distro config
-def post_config(rebind_search: bool) -> None:
-    # Add chromebook layout. Needs to be done after install Xorg
-    print_status("Backing up default keymap and setting Chromebook layout")
-    cpfile("/mnt/depthboot/usr/share/X11/xkb/symbols/pc", "/mnt/depthboot/usr/share/X11/xkb/symbols/pc.default")
-    cpfile("configs/xkb/xkb.chromebook", "/mnt/depthboot/usr/share/X11/xkb/symbols/pc")
-    if rebind_search:  # rebind search key to caps lock
-        print("Rebinding search key to Caps Lock")
-        cpfile("/mnt/depthboot/usr/share/X11/xkb/keycodes/evdev",
-               "/mnt/depthboot/usr/share/X11/xkb/keycodes/evdev.default")
+def post_config(rebind_search: bool, de_name: str) -> None:
+    if not de_name == "cli":
+        # Add chromebook layout. Needs to be done after install Xorg
+        print_status("Backing up default keymap and setting Chromebook layout")
+        cpfile("/mnt/depthboot/usr/share/X11/xkb/symbols/pc", "/mnt/depthboot/usr/share/X11/xkb/symbols/pc.default")
+        cpfile("configs/xkb/xkb.chromebook", "/mnt/depthboot/usr/share/X11/xkb/symbols/pc")
+        if rebind_search:  # rebind search key to caps lock
+            print("Rebinding search key to Caps Lock")
+            cpfile("/mnt/depthboot/usr/share/X11/xkb/keycodes/evdev",
+                   "/mnt/depthboot/usr/share/X11/xkb/keycodes/evdev.default")
 
     # Add postinstall service
     print_status("Adding postinstall service")
@@ -530,7 +531,10 @@ def chroot(command: str) -> str:
 
 
 # The main build script
-def start_build(verbose: bool, local_path, kernel_type: str, dev_release: bool, build_options):
+def start_build(verbose: bool, local_path, kernel_type: str, dev_release: bool, build_options,
+                no_download_progress: bool = False) -> None:
+    if no_download_progress:
+        disable_download_progress()  # disable download progress bar for non-interactive shells
     set_verbose(verbose)
     print_status("Starting build")
 
@@ -624,7 +628,7 @@ def start_build(verbose: bool, local_path, kernel_type: str, dev_release: bool, 
     distro.config(build_options["de_name"], build_options["distro_version"], build_options["username"], root_partuuid,
                   verbose)
 
-    post_config(build_options["rebind_search"])
+    post_config(build_options["rebind_search"], build_options["de_name"])
 
     # Post-install cleanup
     print_status("Cleaning up host system after build")
@@ -635,7 +639,7 @@ def start_build(verbose: bool, local_path, kernel_type: str, dev_release: bool, 
     if build_options["device"] == "image":
         # Shrink image to actual size
         print_status("Shrinking image")
-        bash(f"e2fsck -fpv {img_mnt}p2")  # Force check filesystem for errors
+        bash(f"e2fsck -fyv {img_mnt}p2")  # Force check filesystem for errors
         bash(f"resize2fs -f -M {img_mnt}p2")
         block_count = int(bash(f"dumpe2fs -h {img_mnt}p2 | grep 'Block count:'")[12:].split()[0])
         actual_fs_in_bytes = block_count * 4096

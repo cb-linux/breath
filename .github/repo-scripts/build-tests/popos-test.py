@@ -36,8 +36,8 @@ if __name__ == "__main__":
         testing_dict["de_name"] = de_name
         print_header(f"Testing PopOS + {de_name}")
         try:
-            build.start_build(verbose=True, local_path="", kernel_type="stable", dev_release=False,
-                              build_options=testing_dict)
+            build.start_build(verbose=True, local_path=None, kernel_type="stable", dev_release=False,
+                              build_options=testing_dict, no_download_progress=True)
         except Exception as e:
             print_error(str(e))
             print_error(f"Failed to build PopOS + {de_name}")

@@ -21,7 +21,8 @@ if __name__ == "__main__":
     testing_dict = {
         "distro_name": "fedora",
         "distro_version": "36",
-        "distro_link": "",
+        "distro_link": "https://kojipkgs.fedoraproject.org/packages/Fedora-Cloud-Base/36/20221014.0/images/Fedora-Cloud"
+                       "-Base-36-20221014.0.x86_64.raw.xz",
         "de_name": "",
         "username": "localuser",
         "password": "test",
@@ -36,8 +37,8 @@ if __name__ == "__main__":
         testing_dict["de_name"] = de_name
         print_header(f"Testing Fedora + {de_name}")
         try:
-            build.start_build(verbose=True, local_path="", kernel_type="stable", dev_release=False,
-                              build_options=testing_dict)
+            build.start_build(verbose=True, local_path=None, kernel_type="stable", dev_release=False,
+                              build_options=testing_dict, no_download_progress=True)
         except Exception as e:
             print_error(str(e))
             print_error(f"Failed to build Fedora + {de_name}")

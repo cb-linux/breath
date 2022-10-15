@@ -21,7 +21,7 @@ if __name__ == "__main__":
     testing_dict = {
         "distro_name": "arch",
         "distro_version": "",
-        "distro_link": "",
+        "distro_link": "https://geo.mirror.pkgbuild.com/iso/2022.09.03/archlinux-bootstrap-x86_64.tar.gz",
         "de_name": "",
         "username": "localuser",
         "password": "test",
@@ -36,8 +36,8 @@ if __name__ == "__main__":
         testing_dict["de_name"] = de_name
         print_header(f"Testing Arch + {de_name}")
         try:
-            build.start_build(verbose=True, local_path="", kernel_type="stable", dev_release=False,
-                              build_options=testing_dict)
+            build.start_build(verbose=True, local_path=None, kernel_type="stable", dev_release=False,
+                              build_options=testing_dict, no_download_progress=True)
         except Exception as e:
             print_error(str(e))
             print_error(f"Failed to build Arch + {de_name}")

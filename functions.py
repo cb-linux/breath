@@ -5,6 +5,7 @@ from threading import Thread
 import subprocess
 
 verbose = False
+disable_download = False
 
 
 #######################################################################################
@@ -129,6 +130,12 @@ def set_verbose(new_state: bool) -> None:
     verbose = new_state
 
 
+# This is for non-interactive shells
+def disable_download_progress() -> None:
+    global disable_download
+    disable_download = True
+
+
 def install_kernel_packages() -> None:
     print_status("Installing: vboot, cgpt")
 
@@ -191,8 +198,9 @@ def stop_progress(force_show: bool = False) -> None:
 
 
 def start_download_progress(file_path_str: str) -> None:
-    rmfile(".stop_download_progress")
-    Thread(target=__print_download_progress, args=(Path(file_path_str),), daemon=True).start()
+    if not disable_download:  # for non-interactive shells only
+        rmfile(".stop_download_progress")
+        Thread(target=__print_download_progress, args=(Path(file_path_str),), daemon=True).start()
 
 
 def stop_download_progress() -> None:
