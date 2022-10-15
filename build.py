@@ -590,7 +590,7 @@ def start_build(verbose: bool, local_path, kernel_type: str, dev_release: bool, 
                 print(f"Copying using {cpfct}, {filename} as /tmp/depthboot-build/{filename}")
             cpfct(local_path_posix+filename,"/tmp/depthboot-build/"+filename,True)
         except FileNotFoundError:
-            print_error(f"'{filename}' not found, downloading "+{build_options["distro_name"]+" rootfs...")
+            print_error(f"'{filename}' not found, downloading "+build_options["distro_name"]+" rootfs...")
             download_rootfs(build_options["distro_name"], build_options["distro_version"], build_options["distro_link"])
 
     # Setup device
