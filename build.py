@@ -571,7 +571,12 @@ def start_build(verbose: bool, local_path, kernel_type: str, dev_release: bool, 
         # Assets
         for keyfile in files:
             try:
-                files[keyfile][0](local_path_posix+keyfile, files[keyfile][1],True)
+                cpfct=files[keyfile][0]
+                origin=local_path_posix+keyfile
+                dest=files[keyfile][1]
+                if verbose:
+                    print(f"Copying using {cpfct}, {origin} as {dest}")
+                cpfct(origin, dest,True)
             except FileNotFoundError:
                 print_error(f"'{keyfile}' not found, downloading {keyfile}...")
                 fct=files[keyfile][2]
@@ -579,8 +584,11 @@ def start_build(verbose: bool, local_path, kernel_type: str, dev_release: bool, 
                 fct(*args)
         # Rootfs
         try:
-            distro_rootfs[build_options["distro_name"]][0](local_path_posix+distro_rootfs[build_options["distro_name"]][1],
-             "/tmp/depthboot-build/"+distro_rootfs[build_options["distro_name"]][1])
+            cpfct=distro_rootfs[build_options["distro_name"]][0]
+            filename=distro_rootfs[build_options["distro_name"]][1]
+            if verbose:
+                print(f"Copying using {cpfct}, {filename} as /tmp/depthboot-build/{filename}")
+            cpfct(local_path_posix+filename,"/tmp/depthboot-build/"+filename,True)
         except FileNotFoundError:
             print_error(f"'{keyfile}' not found, downloading {keyfile}...")
             download_rootfs(build_options["distro_name"], build_options["distro_version"], build_options["distro_link"])
