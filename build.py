@@ -560,12 +560,12 @@ def start_build(verbose: bool, local_path, kernel_type: str, dev_release: bool, 
             "bzImage":          [cpfile,"/tmp/depthboot-build/bzImage",download_kernel,kernel_type,dev_release,["bzImage"]],
             "modules.tar.xz":   [cpfile,"/tmp/depthboot-build/modules.tar.xz",download_kernel,kernel_type,dev_release,["modules"]],
             "headers.tar.xz":   [cpfile,"/tmp/depthboot-build/headers.tar.xz",download_kernel,kernel_type,dev_release,["headers"]],
-            "firmware":         [cpdir, "/mnt/depthboot/lib/firmware/google",download_firmware],
-            "postinstall-scripts":[cpdir, "/mnt/depthboot-build/postinstall-scripts", download_postinstall_scripts],
-            "audio-scripts":	[cpdir, "/mnt/depthboot-build/audio-scripts",download_audio_scripts]
+            "firmware":         [cpdir, "/tmp/depthboot-build/firmware",download_firmware],
+            "postinstall-scripts":[cpdir, "/tmp/depthboot-build/postinstall-scripts", download_postinstall_scripts],
+            "audio-scripts":	[cpdir, "/tmp/depthboot-build/audio-scripts",download_audio_scripts]
         }
         distro_rootfs={
-            #keyfiletosearch:[cpmeth,filename]
+            #distro_name:[cpmeth,filename]
             "ubuntu":   [cpfile,"ubuntu-rootfs.tar.xz"],
             "debian":   [cpdir,"debian"],
             "arch":     [cpfile,"arch-rootfs.tar.gz"],
@@ -578,9 +578,7 @@ def start_build(verbose: bool, local_path, kernel_type: str, dev_release: bool, 
                 cpfct=files[keyfile][0]
                 origin=local_path_posix+keyfile
                 dest=files[keyfile][1]
-                if verbose:
-                    print(f"Copying using {cpfct}, {origin} as {dest}")
-                cpfct(origin, dest,True)
+                cpfct(origin, dest)
             except FileNotFoundError:
                 print_error(f"'{keyfile}' not found, downloading {keyfile}...")
                 fct=files[keyfile][2]
@@ -590,9 +588,7 @@ def start_build(verbose: bool, local_path, kernel_type: str, dev_release: bool, 
         try:
             cpfct=distro_rootfs[build_options["distro_name"]][0]
             filename=distro_rootfs[build_options["distro_name"]][1]
-            if verbose:
-                print(f"Copying using {cpfct}, {filename} as /tmp/depthboot-build/{filename}")
-            cpfct(local_path_posix+filename,"/tmp/depthboot-build/"+filename,True)
+            cpfct(local_path_posix+filename,"/tmp/depthboot-build/"+filename)
         except FileNotFoundError:
             print_error(f"'{filename}' not found, downloading "+build_options["distro_name"]+" rootfs...")
             download_rootfs(build_options["distro_name"], build_options["distro_version"], build_options["distro_link"])
