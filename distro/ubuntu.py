@@ -34,7 +34,7 @@ def config(de_name: str, distro_version: str, username: str, root_partuuid: str,
             chroot("apt-get install -y lubuntu-desktop")
         case "deepin":
             print_status("Installing deepin")
-            chroot("add-apt-repository ppa:ubuntudde-dev/stable")
+            chroot("add-apt-repository -y ppa:ubuntudde-dev/stable")
             chroot("apt-get update -y")
             chroot("apt-get install -y ubuntudde-dde")
         case "budgie":
