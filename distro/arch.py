@@ -55,12 +55,12 @@ def config(de_name: str, distro_version: str, username: str, root_partuuid: str,
             print_status("Installing Xfce")
             # no wayland support in xfce
             chroot("pacman -S --noconfirm xfce4 xfce4-goodies xorg xorg-server lightdm lightdm-gtk-greeter firefox "
-                   "network-manager-applet nm-connection-editor")
+                   "network-manager-applet nm-connection-editor gnome-software")
             chroot("systemctl enable lightdm.service")
         case "lxqt":
             print_status("Installing LXQt")
             chroot("pacman -S --noconfirm lxqt breeze-icons xorg xorg-server sddm firefox networkmanager-qt "
-                   "network-manager-applet nm-connection-editor")
+                   "network-manager-applet nm-connection-editor discover")
             chroot("systemctl enable sddm.service")
         case "deepin":
             print_status("Installing deepin")
@@ -80,10 +80,6 @@ def config(de_name: str, distro_version: str, username: str, root_partuuid: str,
         case _:
             print_error("Invalid desktop environment! Please create an issue")
             exit(1)
-
-    if de_name == "xfce" or de_name == "lxqt":  # xfce and lxqt don't have a built-in gui software manager
-        chroot(f'su - {username} -c "cd /tmp; git clone https://aur.archlinux.org/pamac-nosnap.git"')
-        chroot(f'su - {username} -s /usr/bin/bash -c "cd /tmp/pamac-nosnap; /usr/bin/makepkg -si --noconfirm"')
 
     stop_progress()  # stop fake progress
     print_status("Desktop environment setup complete")
