@@ -34,9 +34,17 @@ def config(de_name: str, distro_version: str, username: str, root_partuuid: str,
             chroot("apt-get install -y lubuntu-desktop")
         case "deepin":
             print_status("Installing deepin")
-            chroot("add-apt-repository -y ppa:ubuntudde-dev/stable")
-            chroot("apt-get update -y")
-            chroot("apt-get install -y ubuntudde-dde")
+            print_error("Deepin is currently broken on Ubuntu, please select another DE")
+            exit(1)
+
+            # Probably to some misconfiguration in deepin's installer, our kernel version is not supported.
+            # Install fails with: Errors were encountered while processing: deepin-anything-dkms, dde-file-manager,
+            # ubuntudde-dde, deepin-anything-server
+
+            # TODO: Fix deepin
+            # chroot("add-apt-repository -y ppa:ubuntudde-dev/stable")
+            # chroot("apt-get update -y")
+            # chroot("apt-get install -y ubuntudde-dde")
         case "budgie":
             print_status("Installing Budgie")
             chroot("apt-get install -y ubuntu-budgie-desktop")

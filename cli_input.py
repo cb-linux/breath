@@ -99,17 +99,17 @@ def get_user_input() -> dict:
         print_question("Which desktop environment(Desktop GUI) would you like to use?")
         match output_dict["distro_name"]:
             case "ubuntu":
-                available_de = "Gnome(default, recommended), KDE(recommended), MATE, Xfce(recommended for weak devices), " \
-                               "LXQt(recommended for weak devices), deepin, budgie, cli"
+                available_de = "Gnome(default, recommended), KDE(recommended), MATE, Xfce(recommended for weak device" \
+                               "s), LXQt(recommended for weak devices), budgie, cli"
             case "debian":
-                available_de = "Gnome(default, recommended), KDE(recommended), MATE, Xfce(recommended for weak devices), " \
-                               "LXQt(recommended for weak devices), budgie, cli"
+                available_de = "Gnome(default, recommended), KDE(recommended), MATE, Xfce(recommended for weak device" \
+                               "s), LXQt(recommended for weak devices), budgie, cli"
             case "arch":
-                available_de = "Gnome(default, recommended), KDE(recommended), MATE, Xfce(recommended for weak devices), " \
-                               "LXQt(recommended for weak devices), deepin, budgie, cli"
+                available_de = "Gnome(default, recommended), KDE(recommended), MATE, Xfce(recommended for weak device" \
+                               "s), LXQt(recommended for weak devices), deepin, budgie, cli"
             case "fedora":
-                available_de = "Gnome(default, recommended), KDE(recommended), MATE, Xfce(recommended for weak devices), " \
-                               "LXQt(recommended for weak devices), deepin, cli"
+                available_de = "Gnome(default, recommended), KDE(recommended), MATE, Xfce(recommended for weak device" \
+                               "s), LXQt(recommended for weak devices), deepin, cli"
 
         while True:
             temp_de_name = input("\033[94m" + "Available options: " + available_de + "\033[0m" + "\n")
@@ -135,8 +135,8 @@ def get_user_input() -> dict:
                     output_dict["de_name"] = "lxqt"
                     break
                 case "deepin":
-                    if output_dict["distro_name"] == "debian":
-                        print_warning("Deepin is not available for Debian, please choose another DE")
+                    if output_dict["distro_name"] == "debian" or output_dict["distro_name"] == "ubuntu":
+                        print_warning("Deepin is not available for Debian/Ubuntu, please choose another DE")
                     else:
                         print("Deepin selected")
                         output_dict["de_name"] = "deepin"
