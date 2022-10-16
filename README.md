@@ -15,8 +15,7 @@ Depthboot allows Linux to run on Chromebooks **WITHOUT** modifying the stock fir
 * Hardware works the same as in ChromeOS
 * More audio support available
 
-## Supported Devices
-[Supported devices](https://eupnea-linux.github.io/docs.html#/pages/devices)
+## [Supported devices](https://eupnea-linux.github.io/docs.html#/pages/devices)
 
 ## [How does Depthboot work?](https://eupnea-linux.github.io/docs.html#/dev-pages/build-script)
 
