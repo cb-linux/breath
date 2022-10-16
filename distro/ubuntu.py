@@ -31,7 +31,7 @@ def config(de_name: str, distro_version: str, username: str, root_partuuid: str,
             chroot("apt-get install -y xfce4-goodies")
         case "lxqt":
             print_status("Installing LXQt")
-            chroot("apt-get install -y lubuntu-desktop")
+            chroot("apt-get install -y lubuntu-desktop discover konqueror")
         case "deepin":
             print_status("Installing deepin")
             print_error("Deepin is currently broken on Ubuntu, please select another DE")
@@ -47,7 +47,7 @@ def config(de_name: str, distro_version: str, username: str, root_partuuid: str,
             # chroot("apt-get install -y ubuntudde-dde")
         case "budgie":
             print_status("Installing Budgie")
-            chroot("apt-get install -y ubuntu-budgie-desktop")
+            chroot("DEBIAN_FRONTEND=noninteractive apt-get install -y ubuntu-budgie-desktop")
             chroot("dpkg-reconfigure lightdm")
         case "cli":
             print_status("Skipping desktop environment install")
