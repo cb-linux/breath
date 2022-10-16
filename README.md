@@ -1,6 +1,6 @@
 # Depthboot
 Depthboot allows Linux to run on Chromebooks **WITHOUT** modifying the stock firmware in any way.  
-<h1><a href="https://eupnea-linux.github.io/docs.html#/">‼️➡️ INSTALL INSTRUCTIONS ⬅️‼️</a></h1>
+<h1><a href="https://eupnea-linux.github.io/docs.html#/">‼️➡️ TRY NOW ⬅️‼️</a></h1>
 
 ## Depthboot vs mainline
 (Mainline = stock, unmodified Linux distribution)
