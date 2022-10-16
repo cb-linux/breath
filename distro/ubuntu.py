@@ -47,7 +47,8 @@ def config(de_name: str, distro_version: str, username: str, root_partuuid: str,
             # chroot("apt-get install -y ubuntudde-dde")
         case "budgie":
             print_status("Installing Budgie")
-            chroot("DEBIAN_FRONTEND=noninteractive apt-get install -y ubuntu-budgie-desktop")
+            # do not install tex-common, it breaks the installation
+            chroot("DEBIAN_FRONTEND=noninteractive apt-get install -y ubuntu-budgie-desktop tex-common-")
             chroot("dpkg-reconfigure lightdm")
         case "cli":
             print_status("Skipping desktop environment install")
