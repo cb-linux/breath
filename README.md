@@ -20,5 +20,9 @@ Depthboot allows Linux to run on Chromebooks **WITHOUT** modifying the stock fir
 
 ## [How does Depthboot work?](https://eupnea-linux.github.io/docs.html#/dev-pages/build-script)
 
+## Credit
+* Depthboot is based on [Breath](https://github.com/cb-linux/breath) by MilkyDeveloper. Breath was active from Apr 2021 until its archival in late Aug 2022.  
+* All Eupnea Project icons were made by [Inderix](https://github.com/CorruptedPlazma)
+
 ## Join our discord server
 [<img src="https://discordapp.com/api/guilds/994245999822381076/widget.png?style=banner2" alt="Discord banner"></img>](https://discord.gg/jxXb2PwzYz)
