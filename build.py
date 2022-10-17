@@ -537,7 +537,7 @@ def post_config(rebind_search: bool, de_name: str) -> None:
 
 # chroot command
 def chroot(command: str) -> str:
-    return bash(f'chroot /mnt/depthboot /bin/sh -c "{command}"')
+    return bash(f'chroot /mnt/depthboot /bin/bash -c "{command}"')
 
 
 # The main build script
