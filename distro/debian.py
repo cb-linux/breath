@@ -31,8 +31,8 @@ def config(de_name: str, distro_version: str, username: str, root_partuuid: str,
         case "mate":
             print_status("Installing MATE")
             chroot("DEBIAN_FRONTEND=noninteractive apt-get install -y mate-desktop-environment "
-                   "mate-desktop-environment-extras gdm3")
-            chroot("systemctl set-default graphical.target")
+                   "mate-desktop-environment-extras gnome-software epiphany-browser")
+            chroot("DEBIAN_FRONTEND=noninteractive apt-get install -y gdm3")
         case "xfce":
             print_status("Installing Xfce")
             chroot("DEBIAN_FRONTEND=noninteractive apt-get install -y task-xfce-desktop gnome-boxes")
