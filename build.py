@@ -498,9 +498,6 @@ def post_extract(build_options, kernel_type: str) -> None:
                 chroot(f"usermod -aG sudo {username}")
             case "arch" | "fedora":
                 chroot(f"usermod -aG wheel {username}")
-            case "pop-os":
-                sleep(5)  # need to sleep for some reasons
-                chroot(f"usermod -aG adm,sudo,lpadmin {username}")
 
         # set timezone build system timezone on device
         host_time_zone = bash("file /etc/localtime")  # read host timezone link
@@ -565,7 +562,7 @@ def start_build(verbose: bool, local_path, kernel_type: str, dev_release: bool, 
             local_path_posix = local_path
 
         # copy kernel files
-        kernel_files = ["bzImage", "modules.tar.xz", "headers.tar.xz", ]
+        kernel_files = ["bzImage", "modules", "headers", ]
         for file in kernel_files:
             try:
                 cpfile(f"{local_path_posix}{file}", f"/tmp/depthboot-build/{file}")
@@ -597,7 +594,7 @@ def start_build(verbose: bool, local_path, kernel_type: str, dev_release: bool, 
         }
         if build_options["distro_name"] == "pop-os":
             # symlink instead of copying whole iso
-            bash("ln -s {local_path_posix}pop-os.iso /tmp/depthboot-build/pop-os.iso")
+            bash(f"ln -s {local_path_posix}pop-os.iso /tmp/depthboot-build/pop-os.iso")
         try:
             distro_rootfs[build_options["distro_name"]][0](
                 f"{local_path_posix}{distro_rootfs[build_options['distro_name']][1]}",

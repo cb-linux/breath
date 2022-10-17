@@ -11,7 +11,7 @@ def config(de_name: str, distro_version: str, username: str, root_partuuid: str,
            "libinih1 libnss-mymachines localechooser-data os-prober pop-installer pop-installer-casper pop-shop-casper "
            "squashfs-tools systemd-container tcl-expect user-setup xfsprogs -y")
     chroot("apt-get update")
-    chroot("apt-get install cloud-utils -y")
+    chroot("apt-get install cloud-utils pop-gnome-inital-setup-y")
 
     # Replace input-synaptics with newer input-libinput, for better touchpad support
     print_status("Upgrading touchpad drivers")
