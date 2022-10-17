@@ -32,9 +32,10 @@ def config(de_name: str, distro_version: str, username: str, root_partuuid: str,
             print_status("Installing MATE")
             chroot("DEBIAN_FRONTEND=noninteractive apt-get install -y mate-desktop-environment "
                    "mate-desktop-environment-extras gdm3")
+            chroot("systemctl set-default graphical.target")
         case "xfce":
             print_status("Installing Xfce")
-            chroot("DEBIAN_FRONTEND=noninteractive apt-get install -y task-xfce-desktop")
+            chroot("DEBIAN_FRONTEND=noninteractive apt-get install -y task-xfce-desktop gnome-boxes")
         case "lxqt":
             print_status("Installing LXQt")
             chroot("DEBIAN_FRONTEND=noninteractive apt-get install -y task-lxqt-desktop")
