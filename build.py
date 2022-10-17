@@ -550,59 +550,61 @@ def start_build(verbose: bool, local_path, kernel_type: str, dev_release: bool, 
 
     prepare_host(build_options["distro_name"])
 
-    # Download files first
-    if local_path is None:
+    if local_path is None:  # default
         download_kernel(kernel_type, dev_release)
         download_rootfs(build_options["distro_name"], build_options["distro_version"], build_options["distro_link"])
         download_firmware()
         download_postinstall_scripts()
         download_audio_scripts()
     else:  # if local path is specified, copy files from it, instead of downloading from the internet
+        print_status("Copying local files to /tmp/depthboot-build")
         # clean local path string
         if not local_path.endswith("/"):
             local_path_posix = f"{local_path}/"
         else:
             local_path_posix = local_path
 
-        print_status("Copying local files to /tmp/depthboot-build")
-        files = {
-            # keyfiletosearch:[cpmeth,pathtocopy,elsefunction,*args]
-            "bzImage": [cpfile, "/tmp/depthboot-build/bzImage", download_kernel, kernel_type, dev_release, ["bzImage"]],
-            "modules.tar.xz": [cpfile, "/tmp/depthboot-build/modules.tar.xz", download_kernel, kernel_type, dev_release,
-                               ["modules"]],
-            "headers.tar.xz": [cpfile, "/tmp/depthboot-build/headers.tar.xz", download_kernel, kernel_type, dev_release,
-                               ["headers"]],
-            "firmware": [cpdir, "/tmp/depthboot-build/firmware", download_firmware],
-            "postinstall-scripts": [cpdir, "/tmp/depthboot-build/postinstall-scripts", download_postinstall_scripts],
-            "audio-scripts": [cpdir, "/tmp/depthboot-build/audio-scripts", download_audio_scripts]
+        # copy kernel files
+        kernel_files = ["bzImage", "modules.tar.xz", "headers.tar.xz", ]
+        for file in kernel_files:
+            try:
+                cpfile(f"{local_path_posix}{file}", f"/tmp/depthboot-build/{file}")
+            except FileNotFoundError:
+                print_error(f"File {file} not found in {local_path}, attempting to download")
+                download_kernel(kernel_type, dev_release, [file])
+
+        # copy distro agnostic files
+        dirs = {
+            "firmware": download_firmware,
+            "postinstall-scripts": download_postinstall_scripts,
+            "audio-scripts": download_audio_scripts
         }
+        for directory in dirs:
+            try:
+                cpdir(f"{local_path_posix}{directory}", f"/tmp/depthboot-build/{directory}")
+            except FileNotFoundError:
+                print_error(f"Directory {directory} not found in {local_path}, attempting to download")
+                dirs[directory]()
+
+        # copy distro rootfs
         distro_rootfs = {
-            # distro_name:[cpmeth,filename]
+            # distro_name:[cp function type,filename]
             "ubuntu": [cpfile, "ubuntu-rootfs.tar.xz"],
             "debian": [cpdir, "debian"],
             "arch": [cpfile, "arch-rootfs.tar.gz"],
+            "fedora": [cpfile, "fedora-rootfs.raw.xz"],
             "pop-os": [cpfile, "pop-os.iso"]
         }
-
-        # Assets
-        for keyfile in files:
-            try:
-                cpfct = files[keyfile][0]
-                origin = local_path_posix + keyfile
-                dest = files[keyfile][1]
-                cpfct(origin, dest)
-            except FileNotFoundError:
-                print_error(f"'{keyfile}' not found, downloading {keyfile}...")
-                fct = files[keyfile][2]
-                args = files[keyfile][3:]
-                fct(*args)
-        # Rootfs
+        if build_options["distro_name"] == "pop-os":
+            # symlink instead of copying whole iso
+            bash("ln -s {local_path_posix}pop-os.iso /tmp/depthboot-build/pop-os.iso")
         try:
-            cpfct = distro_rootfs[build_options["distro_name"]][0]
-            filename = distro_rootfs[build_options["distro_name"]][1]
-            cpfct(local_path_posix + filename, "/tmp/depthboot-build/" + filename)
+            distro_rootfs[build_options["distro_name"]][0](
+                f"{local_path_posix}{distro_rootfs[build_options['distro_name']][1]}",
+                f"/tmp/depthboot-build/{distro_rootfs[build_options['distro_name']][1]}")
         except FileNotFoundError:
-            print_error(f"'{filename}' not found, downloading " + build_options["distro_name"] + " rootfs...")
+            print_error(f"File {distro_rootfs[build_options['distro_name']][1]} not found in {local_path}, "
+                        f"attempting to download")
             download_rootfs(build_options["distro_name"], build_options["distro_version"], build_options["distro_link"])
 
     # Setup device

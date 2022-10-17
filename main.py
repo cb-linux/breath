@@ -12,10 +12,7 @@ from functions import *
 def process_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('-l', '--local-path', dest="local_path",
-                        help="Use local files, instead of downloading from the internet (not recommended). Required "
-                             "files: bzImage, modules.tar.xz, folder with firmware(named 'firmware'), Rootfs: "
-                             "ubuntu-rootfs.tar.xz or arch-rootfs.tar.gz or fedora-rootfs.raw.xz or pre-debootstrapped "
-                             "folder(named 'debian')")
+                        help="Prefer local files instead of downloading from the internet(not recommended).")
     parser.add_argument("-v", "--verbose", action="store_true", dest="verbose", default=False,
                         help="Print more output")
     parser.add_argument("--dev", action="store_true", dest="dev_build", default=False,
@@ -106,5 +103,5 @@ if __name__ == "__main__":
         print_warning("Using local files")
     if args.verbose:
         print_warning("Verbosity increased")
-    build = build.start_build(args.verbose, local_path=args.local_path, kernel_type=kernel_type,
-                              dev_release=dev_release, build_options=cli_input.get_user_input())
+    build.start_build(args.verbose, local_path=args.local_path, kernel_type=kernel_type, dev_release=dev_release,
+                      build_options=cli_input.get_user_input())
