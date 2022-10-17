@@ -158,7 +158,7 @@ def get_user_input() -> dict:
                 case _:
                     print_warning("No such Desktop environment. Check your spelling and try again")
     else:
-        output_dict["de_name"] = None
+        output_dict["de_name"] = "gnome"
 
     # Gnome has a first time setup -> skip this part for gnome, as there will be a first time setup
     if not output_dict["de_name"] == "gnome":
