@@ -38,7 +38,7 @@ def config(de_name: str, distro_version: str, username: str, root_partuuid: str,
             chroot("DEBIAN_FRONTEND=noninteractive apt-get install -y task-xfce-desktop gnome-software epiphany-browser")
         case "lxqt":
             print_status("Installing LXQt")
-            chroot("DEBIAN_FRONTEND=noninteractive apt-get install -y task-lxqt-desktop discover konqueror")
+            chroot("DEBIAN_FRONTEND=noninteractive apt-get install -y task-lxqt-desktop plasma-discover")
         case "deepin":
             print_error("Deepin is not available for Debian")
             exit(1)
