@@ -35,17 +35,17 @@ def config(de_name: str, distro_version: str, username: str, root_partuuid: str,
             chroot("DEBIAN_FRONTEND=noninteractive apt-get install -y gdm3")
         case "xfce":
             print_status("Installing Xfce")
-            chroot("DEBIAN_FRONTEND=noninteractive apt-get install -y task-xfce-desktop gnome-boxes")
+            chroot("DEBIAN_FRONTEND=noninteractive apt-get install -y task-xfce-desktop gnome-software epiphany-browser")
         case "lxqt":
             print_status("Installing LXQt")
-            chroot("DEBIAN_FRONTEND=noninteractive apt-get install -y task-lxqt-desktop")
+            chroot("DEBIAN_FRONTEND=noninteractive apt-get install -y task-lxqt-desktop discover konqueror")
         case "deepin":
             print_error("Deepin is not available for Debian")
             exit(1)
         case "budgie":
             print_status("Installing Budgie")
             chroot("DEBIAN_FRONTEND=noninteractive apt-get install -y budgie-desktop budgie-indicator-applet "
-                   "budgie-core lightdm lightdm-gtk-greeter gnome-terminal firefox")
+                   "budgie-core lightdm lightdm-gtk-greeter gnome-terminal epiphany-browser gnome-software")
             chroot("systemctl enable lightdm.service")
         case "cli":
             print_status("Skipping desktop environment install")
