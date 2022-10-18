@@ -15,6 +15,8 @@ def process_args():
                         help="Prefer local files instead of downloading from the internet(not recommended).")
     parser.add_argument("-v", "--verbose", action="store_true", dest="verbose", default=False,
                         help="Print more output")
+    parser.add_argument("--no-compress-image", action="store_true", dest="no_compress", default=False,
+                        help="Print more output")
     parser.add_argument("--dev", action="store_true", dest="dev_build", default=False,
                         help="Use latest dev build. May be unstable.")
     parser.add_argument("--alt", action="store_true", dest="alt", default=False,
@@ -103,5 +105,7 @@ if __name__ == "__main__":
         print_warning("Using local files")
     if args.verbose:
         print_warning("Verbosity increased")
+    if args.no_compress:
+        print_warning("Image compression disabled")
     build.start_build(args.verbose, local_path=args.local_path, kernel_type=kernel_type, dev_release=dev_release,
                       build_options=cli_input.get_user_input())

@@ -539,7 +539,7 @@ def chroot(command: str) -> str:
 
 # The main build script
 def start_build(verbose: bool, local_path, kernel_type: str, dev_release: bool, build_options,
-                no_download_progress: bool = False) -> None:
+                no_download_progress: bool = False, no_compress: bool = False) -> None:
     if no_download_progress:
         disable_download_progress()  # disable download progress bar for non-interactive shells
     set_verbose(verbose)
@@ -652,17 +652,18 @@ def start_build(verbose: bool, local_path, kernel_type: str, dev_release: bool, 
         if verbose:
             print(error)
     if build_options["device"] == "image":
-        # Shrink image to actual size
-        print_status("Shrinking image")
-        sleep(5)  # wait for umount to finish
-        bash(f"e2fsck -fpv {img_mnt}p2")  # Force check filesystem for errors
-        bash(f"resize2fs -f -M {img_mnt}p2")
-        block_count = int(bash(f"dumpe2fs -h {img_mnt}p2 | grep 'Block count:'")[12:].split()[0])
-        actual_fs_in_bytes = block_count * 4096
-        # the kernel part is always the same size -> sector amount: 131072 * 512 => 67108864 bytes
-        actual_fs_in_bytes += 67108864
-        actual_fs_in_bytes += 102400  # add 100kb for linux to be able to boot
-        bash(f"truncate --size={actual_fs_in_bytes} ./depthboot.img")
+        if not no_compress:
+            # Shrink image to actual size
+            print_status("Shrinking image")
+            sleep(5)  # wait for umount to finish
+            bash(f"e2fsck -fpv {img_mnt}p2")  # Force check filesystem for errors
+            bash(f"resize2fs -f -M {img_mnt}p2")
+            block_count = int(bash(f"dumpe2fs -h {img_mnt}p2 | grep 'Block count:'")[12:].split()[0])
+            actual_fs_in_bytes = block_count * 4096
+            # the kernel part is always the same size -> sector amount: 131072 * 512 => 67108864 bytes
+            actual_fs_in_bytes += 67108864
+            actual_fs_in_bytes += 102400  # add 100kb for linux to be able to boot
+            bash(f"truncate --size={actual_fs_in_bytes} ./depthboot.img")
 
         bash(f"losetup -d {img_mnt}")
         print_header(f"The ready-to-boot Depthboot image is located at {get_full_path('.')}/depthboot.img")
