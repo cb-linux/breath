@@ -29,7 +29,7 @@ if __name__ == "__main__":
         "device": "image",
         "rebind_search": False
     }
-    available_des = ["gnome", "kde", "mate", "xfce", "lxqt", "budgie", "cli"]  # deepin is not available for debian
+    available_des = ["gnome", "kde", "xfce", "lxqt", "budgie", "cli"]  # deepin is not available for debian
     failed_distros = []
     # Start testing
     for de_name in available_des:

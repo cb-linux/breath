@@ -29,7 +29,7 @@ if __name__ == "__main__":
         "device": "image",
         "rebind_search": False
     }
-    available_des = ["gnome", "kde", "mate", "xfce", "lxqt", "deepin", "budgie", "cli"]
+    available_des = ["gnome", "kde", "xfce", "lxqt", "deepin", "budgie", "cli"]
     failed_distros = []
     # Start testing
     for de_name in available_des:

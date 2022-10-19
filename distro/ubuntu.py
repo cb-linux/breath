@@ -22,9 +22,6 @@ def config(de_name: str, distro_version: str, username: str, root_partuuid: str,
         case "kde":
             print_status("Installing KDE")
             chroot("apt-get install -y kde-standard")
-        case "mate":
-            print_status("Installing MATE")
-            chroot("apt-get install -y ubuntu-mate-desktop gnome-software epiphany-browser")
         case "xfce":
             print_status("Installing Xfce")
             chroot("apt-get install -y --no-install-recommends xubuntu-desktop gnome-software epiphany-browser")

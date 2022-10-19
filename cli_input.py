@@ -99,16 +99,16 @@ def get_user_input() -> dict:
         print_question("Which desktop environment(Desktop GUI) would you like to use?")
         match output_dict["distro_name"]:
             case "ubuntu":
-                available_de = "Gnome(default, recommended), KDE(recommended), MATE, Xfce(recommended for weak device" \
+                available_de = "Gnome(default, recommended), KDE(recommended), Xfce(recommended for weak device" \
                                "s), LXQt(recommended for weak devices), budgie, cli"
             case "debian":
-                available_de = "Gnome(default, recommended), KDE(recommended), MATE, Xfce(recommended for weak device" \
+                available_de = "Gnome(default, recommended), KDE(recommended), Xfce(recommended for weak device" \
                                "s), LXQt(recommended for weak devices), budgie, cli"
             case "arch":
-                available_de = "Gnome(default, recommended), KDE(recommended), MATE, Xfce(recommended for weak device" \
+                available_de = "Gnome(default, recommended), KDE(recommended), Xfce(recommended for weak device" \
                                "s), LXQt(recommended for weak devices), deepin, budgie, cli"
             case "fedora":
-                available_de = "Gnome(default, recommended), KDE(recommended), MATE, Xfce(recommended for weak device" \
+                available_de = "Gnome(default, recommended), KDE(recommended), Xfce(recommended for weak device" \
                                "s), LXQt(recommended for weak devices), deepin, cli"
 
         while True:
@@ -121,10 +121,6 @@ def get_user_input() -> dict:
                 case "KDE" | "kde":
                     print("KDE selected")
                     output_dict["de_name"] = "kde"
-                    break
-                case "MATE" | "mate":
-                    print("MATE selected")
-                    output_dict["de_name"] = "mate"
                     break
                 case "xfce" | "Xfce":
                     print("Xfce selected")

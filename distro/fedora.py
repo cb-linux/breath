@@ -30,9 +30,6 @@ def config(de_name: str, distro_version: str, username: str, root_partuuid: str,
         case "kde":
             print_status("Installing KDE")
             chroot("dnf group install -y 'KDE Plasma Workspaces'")
-        case "mate":
-            print_status("Installing MATE")
-            chroot("dnf group install -y 'MATE Desktop'")
         case "xfce":
             print_status("Installing Xfce")
             chroot("dnf group install -y 'Xfce Desktop'")

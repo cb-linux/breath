@@ -45,12 +45,6 @@ def config(de_name: str, distro_version: str, username: str, root_partuuid: str,
             print_status("Installing KDE")
             chroot("pacman -S --noconfirm plasma-meta plasma-wayland-session kde-applications packagekit-qt5")
             chroot("systemctl enable sddm.service")
-        case "mate":
-            print_status("Installing MATE")
-            # no wayland support in mate
-            chroot("pacman -S --noconfirm mate mate-extra xorg xorg-server lightdm lightdm-gtk-greeter firefox "
-                   "network-manager-applet nm-connection-editor")
-            chroot("systemctl enable lightdm.service")
         case "xfce":
             print_status("Installing Xfce")
             # no wayland support in xfce
