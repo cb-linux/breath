@@ -15,7 +15,7 @@ def process_args():
                         help="Prefer local files instead of downloading from the internet(not recommended).")
     parser.add_argument("-v", "--verbose", action="store_true", dest="verbose", default=False,
                         help="Print more output")
-    parser.add_argument("--no-shrink-image", action="store_true", dest="no_shrink", default=False,
+    parser.add_argument("--no-shrink", action="store_true", dest="no_shrink", default=False,
                         help="Do not shrink image")
     parser.add_argument("--dev", action="store_true", dest="dev_build", default=False,
                         help="Use latest dev build. May be unstable.")
