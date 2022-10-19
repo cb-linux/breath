@@ -539,7 +539,7 @@ def chroot(command: str) -> str:
 
 # The main build script
 def start_build(verbose: bool, local_path, kernel_type: str, dev_release: bool, build_options,
-                no_download_progress: bool = False, no_compress: bool = False) -> None:
+                no_download_progress: bool = False, no_shrink: bool = False) -> None:
     if no_download_progress:
         disable_download_progress()  # disable download progress bar for non-interactive shells
     set_verbose(verbose)
@@ -652,7 +652,7 @@ def start_build(verbose: bool, local_path, kernel_type: str, dev_release: bool, 
         if verbose:
             print(error)
     if build_options["device"] == "image":
-        if not no_compress:
+        if not no_shrink:
             # Shrink image to actual size
             print_status("Shrinking image")
             sleep(5)  # wait for umount to finish
