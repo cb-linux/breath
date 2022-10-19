@@ -477,13 +477,6 @@ def post_extract(build_options, kernel_type: str) -> None:
     # Enable loading modules needed for depthboot
     cpfile("configs/eupnea-modules.conf", "/mnt/depthboot/etc/modules-load.d/eupnea-modules.conf")
 
-    # TODO: Fix failing services
-    # The services below fail to start, so they are disabled
-
-    # ssh
-    rmfile("/mnt/depthboot/etc/systemd/system/multi-user.target.wants/ssh.service")
-    rmfile("/mnt/depthboot/etc/systemd/system/sshd.service")
-
     username = build_options["username"]  # quotes interfere with functions below
     password = build_options["password"]  # quotes interfere with functions below
 

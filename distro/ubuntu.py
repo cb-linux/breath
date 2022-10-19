@@ -13,6 +13,9 @@ def config(de_name: str, distro_version: str, username: str, root_partuuid: str,
     print("Reinstalling dbus")
     chroot("apt-get reinstall -y dbus")
 
+    # Remove cloud packages: not needed for normal use
+    chroot("apt-get purge -y openssh-server")
+
     print_status("Downloading and installing de, might take a while")
     start_progress()  # start fake progress
     match de_name:
