@@ -105,7 +105,7 @@ if __name__ == "__main__":
         print_warning("Using local files")
     if args.verbose:
         print_warning("Verbosity increased")
-    if args.no_compress:
+    if args.no_shrink:
         print_warning("Image compression disabled")
     build.start_build(args.verbose, local_path=args.local_path, kernel_type=kernel_type, dev_release=dev_release,
                       build_options=cli_input.get_user_input(), no_shrink=args.no_shrink)
