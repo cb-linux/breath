@@ -21,6 +21,9 @@ def config(de_name: str, distro_version: str, username: str, root_partuuid: str,
            f"{distro_version}.noarch.rpm")
     stop_progress()  # stop fake progress
 
+    # Remove cloud packages: not needed for normal use
+    chroot("dnf remove -y openssh-server*")
+
     print_status("Downloading and installing DE, might take a while")
     start_progress()  # start fake progress
     match de_name:
@@ -69,6 +72,10 @@ def config(de_name: str, distro_version: str, username: str, root_partuuid: str,
     # TODO: Fix zram
     chroot("dnf remove zram-generator-defaults -y")  # remove zram as it fails for some reason
     chroot("systemctl disable systemd-zram-setup@zram0.service")  # disable zram service
+
+    # add sunrpc module, as otherwise var-lib-nfs fails to mount
+    with open("/mnt/depthboot/etc/modules-load.d/eupnea-modules.conf", "a") as f:
+        f.write("# NFS module\nsunrpc\n")
 
     # Add depthboot to version(this is purely cosmetic)
     with open("/mnt/depthboot/etc/os-release", "r") as f:
