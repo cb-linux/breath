@@ -43,7 +43,7 @@ def config(de_name: str, distro_version: str, username: str, root_partuuid: str,
             chroot("systemctl enable gdm.service")
         case "kde":
             print_status("Installing KDE")
-            chroot("pacman -S --noconfirm plasma-meta plasma-wayland-session kde-applications")
+            chroot("pacman -S --noconfirm plasma-meta plasma-wayland-session kde-applications packagekit-qt5")
             chroot("systemctl enable sddm.service")
         case "mate":
             print_status("Installing MATE")
@@ -60,7 +60,7 @@ def config(de_name: str, distro_version: str, username: str, root_partuuid: str,
         case "lxqt":
             print_status("Installing LXQt")
             chroot("pacman -S --noconfirm lxqt breeze-icons xorg xorg-server sddm firefox networkmanager-qt "
-                   "network-manager-applet nm-connection-editor discover")
+                   "network-manager-applet nm-connection-editor discover packagekit-qt5")
             chroot("systemctl enable sddm.service")
         case "deepin":
             print_status("Installing deepin")
