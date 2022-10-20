@@ -17,6 +17,8 @@ def process_args():
                         help="Print more output")
     parser.add_argument("--no-shrink", action="store_true", dest="no_shrink", default=False,
                         help="Do not shrink image")
+    parser.add_argument("--image-size", "-i", dest="image_size", type=int, nargs=1, default=10,
+                        help="Override image size(default: 10GB)")
     parser.add_argument("--dev", action="store_true", dest="dev_build", default=False,
                         help="Use latest dev build. May be unstable.")
     parser.add_argument("--alt", action="store_true", dest="alt", default=False,
@@ -107,5 +109,8 @@ if __name__ == "__main__":
         print_warning("Verbosity increased")
     if args.no_shrink:
         print_warning("Image will not be shrunk")
-    build.start_build(args.verbose, local_path=args.local_path, kernel_type=kernel_type, dev_release=dev_release,
-                      build_options=cli_input.get_user_input(), no_shrink=args.no_shrink)
+    if not args.image_size == 10:
+        print_warning(f"Image size overridden to {args.image_size}GB")
+    build.start_build(verbose=args.verbose, local_path=args.local_path, kernel_type=kernel_type,
+                      dev_release=dev_release, build_options=cli_input.get_user_input(), no_shrink=args.no_shrink,
+                      img_size=args.image_size)

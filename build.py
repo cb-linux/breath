@@ -240,9 +240,8 @@ def download_audio_scripts() -> None:
 
 
 # Create, mount, partition the img and flash the eupnea kernel
-def prepare_img(distro_name: str) -> Tuple[str, str]:
+def prepare_img(distro_name: str, img_size: int = 10) -> Tuple[str, str]:
     print_status("Preparing image")
-    img_size = 10
     try:
         bash(f"fallocate -l {img_size}G depthboot.img")
     except subprocess.CalledProcessError:  # try fallocate, if it fails use dd
@@ -531,7 +530,7 @@ def chroot(command: str) -> str:
 
 
 # The main build script
-def start_build(verbose: bool, local_path, kernel_type: str, dev_release: bool, build_options,
+def start_build(verbose: bool, local_path, kernel_type: str, dev_release: bool, build_options, img_size: int,
                 no_download_progress: bool = False, no_shrink: bool = False) -> None:
     if no_download_progress:
         disable_download_progress()  # disable download progress bar for non-interactive shells
@@ -599,7 +598,7 @@ def start_build(verbose: bool, local_path, kernel_type: str, dev_release: bool, 
 
     # Setup device
     if build_options["device"] == "image":
-        output_temp = prepare_img(build_options["distro_name"])
+        output_temp = prepare_img(build_options["distro_name"], img_size)
         img_mnt = output_temp[0]
         root_partuuid = output_temp[1]
     else:
