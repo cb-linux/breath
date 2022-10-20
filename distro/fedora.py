@@ -34,6 +34,7 @@ def config(de_name: str, distro_version: str, username: str, root_partuuid: str,
         case "kde":
             print_status("Installing KDE")
             chroot("dnf group install -y 'KDE Plasma Workspaces'")
+            chroot("dnf install -y firefox")
         case "xfce":
             print_status("Installing Xfce")
             chroot("dnf group install -y 'Xfce Desktop'")
