@@ -1,1 +1,1 @@
-console=tty1 root=PARTUUID=${USB_ROOTFS} i915.modeset=1 rootwait rw fbcon=logo-pos:center,logo-count:1 security=selinux quiet loglevel=3 vt.global_cursor_default=0 splash
+console=tty1 root=PARTUUID=${USB_ROOTFS} i915.modeset=1 rootwait rw fbcon=logo-pos:center,logo-count:1 security=selinux quiet loglevel=3 splash
