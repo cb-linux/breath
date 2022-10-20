@@ -7,7 +7,8 @@ def config(de_name: str, distro_version: str, username: str, root_partuuid: str,
 
     print_status("Installing dependencies")
     chroot("apt-get update -y")
-    chroot("apt-get install -y linux-firmware network-manager software-properties-common cloud-utils")
+    chroot("apt-get install -y linux-firmware network-manager software-properties-common")
+    chroot("apt-get install -y git cgpt vboot-kernel-utils cloud-utils")  # postinstall dependencies
 
     # TODO: Find out why we need to reinstall dbus
     print("Reinstalling dbus")

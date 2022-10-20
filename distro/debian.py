@@ -15,7 +15,8 @@ def config(de_name: str, distro_version: str, username: str, root_partuuid: str,
     chroot("apt-get update -y")
     # Install dependencies
     chroot("apt-get install -y network-manager sudo firmware-linux-free cloud-utils firmware-linux-nonfree "
-           "firmware-iwlwifi iw git")
+           "firmware-iwlwifi iw")
+    chroot("apt-get install -y git cgpt vboot-kernel-utils")  # postinstall dependencies
     stop_progress()  # stop fake progress
 
     print_status("Downloading and installing de, might take a while")
