@@ -151,13 +151,12 @@ if __name__ == "__main__":
         print_error("Please start the script as non-root/without sudo")
         exit(1)
 
-    args = process_args()  # process args before elevating to root for better ux
-
-    # install kernel packages before elevating to root, as makepkg needs to be run as non-root
-    install_kernel_packages()
+    args = process_args()
 
     # Restart script as root
     if not os.geteuid() == 0:
+        # install kernel packages before elevating to root, as makepkg needs to be run as non-root
+        install_kernel_packages()
         # create empty file to confirm script was started as non-root
         with open("/tmp/.root_ok", "w") as file:
             file.write("")
