@@ -75,7 +75,7 @@ if __name__ == "__main__":
                 with open("/etc/apt/sources.list", "w") as file:
                     file.writelines(original_sources)
 
-                print_header("\033[92m" + 'Please restart the script with: "./main.py"' + "\033[0m")
+                print_header('Please restart the script with: "./main.py"')
                 exit(1)
             else:
                 print_error("Please run the script with python 3.10 or higher")
@@ -83,6 +83,9 @@ if __name__ == "__main__":
         else:
             print_error("Please run the script with python 3.10 or higher")
             exit(1)
+
+    # TODO: add Crostini check
+    # cat /sys/devices/virtual/dmi/id/product_name
 
     # import files after python version check is successful
     import build
