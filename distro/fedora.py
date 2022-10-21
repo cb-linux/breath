@@ -59,8 +59,13 @@ def config(de_name: str, distro_version: str, username: str, root_partuuid: str,
 
     # Relabel all files for SELinux
     # If this is not done, the system won't let users login, even if set to permissive
+    # copy /proc files needed for fixfiles
     mkdir("/mnt/depthboot/proc/self")
-    cpdir("configs/selinux", "/mnt/depthboot/proc/self")  # copy /proc files needed for fixfiles
+    cpfile("configs/selinux/mounts", "/mnt/depthboot/proc/self/mounts")
+    cpfile("configs/selinux/mountinfo", "/mnt/depthboot/proc/self/mountinfo")
+    # copy /sys files needed for fixfiles
+    mkdir("/mnt/depthboot/sys/fs/selinux/initial_contexts/")
+    cpfile("configs/selinux/unlabeled", "/mnt/depthboot/sys/fs/selinux/initial_contexts/unlabeled")
     chroot("/sbin/fixfiles -T 0 restore")
 
     # The default fstab file has the wrong PARTUUID -> system boots in emergency mode if not fixed
