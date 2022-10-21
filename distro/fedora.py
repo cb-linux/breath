@@ -7,7 +7,7 @@ def config(de_name: str, distro_version: str, username: str, root_partuuid: str,
 
     print("Installing dependencies")
     start_progress()  # start fake progress
-    chroot("dnf update -y")  # update repos list
+    chroot(f"dnf install -y --releasever={distro_version} fedora-release")  # update repos list
     # Install core packages
     chroot("dnf group install -y 'Core'")
     # Install firmware packages
