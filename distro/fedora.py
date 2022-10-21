@@ -64,7 +64,7 @@ def config(de_name: str, distro_version: str, username: str, root_partuuid: str,
     cpfile("configs/selinux/mounts", "/mnt/depthboot/proc/self/mounts")
     cpfile("configs/selinux/mountinfo", "/mnt/depthboot/proc/self/mountinfo")
     # copy /sys files needed for fixfiles
-    mkdir("/mnt/depthboot/sys/fs/selinux/initial_contexts/")
+    mkdir("/mnt/depthboot/sys/fs/selinux/initial_contexts/", create_parents=True)
     cpfile("configs/selinux/unlabeled", "/mnt/depthboot/sys/fs/selinux/initial_contexts/unlabeled")
     chroot("/sbin/fixfiles -T 0 restore")
 
