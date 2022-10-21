@@ -17,7 +17,7 @@ def process_args():
                         help="Print more output")
     parser.add_argument("--no-shrink", action="store_true", dest="no_shrink", default=False,
                         help="Do not shrink image")
-    parser.add_argument("--image-size", "-i", dest="image_size", type=int, nargs=1, default=10,
+    parser.add_argument("--image-size", "-i", dest="image_size", type=int, nargs=1, default=[10],
                         help="Override image size(default: 10GB)")
     parser.add_argument("--dev", action="store_true", dest="dev_build", default=False,
                         help="Use latest dev build. May be unstable.")
