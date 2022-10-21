@@ -86,7 +86,7 @@ if __name__ == "__main__":
 
     # Check if running under crostini
     with open("/sys/devices/virtual/dmi/id/product_name", "r") as file:
-        if file.read().strip() == "crosvm":
+        if file.read().strip() == "crosvm" and not path_exists("/tmp/.crosini-fixed"):
             print_warning("Crostini detected. Preparing Crostini")
             bash("mount -t devtmpfs /dev /dev")
             bash("ln -s /proc/self/fd /dev/fd")
@@ -94,6 +94,8 @@ if __name__ == "__main__":
                 mkdir("/sys/fs/cgroup/devices", create_parents=True)
                 bash("mount -t cgroup cgroup /sys/fs/cgroup/devices/ -o rw,nosuid,nodev,noexec,relatime,devices")
             cpfile("configs/crostini/devices.allow", "/sys/fs/cgroup/devices/devices.allow")
+            with open("/tmp/.crosini-fixed", "w") as file:
+                file.write("")
 
     # import files after python version check is successful
     import build
