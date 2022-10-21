@@ -240,7 +240,7 @@ def download_audio_scripts() -> None:
 
 
 # Create, mount, partition the img and flash the eupnea kernel
-def prepare_img(distro_name: str, img_size: int = 10) -> Tuple[str, str]:
+def prepare_img(distro_name: str, img_size) -> Tuple[str, str]:
     print_status("Preparing image")
     try:
         bash(f"fallocate -l {img_size}G depthboot.img")
