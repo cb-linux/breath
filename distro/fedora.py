@@ -66,7 +66,10 @@ def config(de_name: str, distro_version: str, username: str, root_partuuid: str,
     # copy /sys files needed for fixfiles
     mkdir("/mnt/depthboot/sys/fs/selinux/initial_contexts/", create_parents=True)
     cpfile("configs/selinux/unlabeled", "/mnt/depthboot/sys/fs/selinux/initial_contexts/unlabeled")
-    chroot("/sbin/fixfiles -T 0 restore")
+    try:
+        chroot("/sbin/fixfiles -T 0 restore")
+    except subprocess.CalledProcessError:
+        pass  # due to working in a chroot, fixfiles fails at the end, but the files are still relabeled
 
     # The default fstab file has the wrong PARTUUID -> system boots in emergency mode if not fixed
     # with open("configs/fstab/fedora.fstab", "r") as f:
