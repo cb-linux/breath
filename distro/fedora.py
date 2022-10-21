@@ -71,21 +71,6 @@ def config(de_name: str, distro_version: str, username: str, root_partuuid: str,
     except subprocess.CalledProcessError:
         pass  # due to working in a chroot, fixfiles fails at the end, but the files are still relabeled
 
-    # The default fstab file has the wrong PARTUUID -> system boots in emergency mode if not fixed
-    # with open("configs/fstab/fedora.fstab", "r") as f:
-    #     fstab = f.read()
-    # fstab = fstab.replace("insert_partuuid", root_partuuid)
-    # with open("/mnt/depthboot/etc/fstab", "w") as f:
-    #     f.write(fstab)
-
-    # TODO: Fix zram
-    # chroot("dnf remove zram-generator-defaults -y")  # remove zram as it fails for some reason
-    # chroot("systemctl disable systemd-zram-setup@zram0.service")  # disable zram service
-
-    # add sunrpc module, as otherwise var-lib-nfs fails to mount
-    # with open("/mnt/depthboot/etc/modules-load.d/eupnea-modules.conf", "a") as f:
-    #     f.write("# NFS module\nsunrpc\n")
-
     # Add depthboot to version(this is purely cosmetic)
     with open("/mnt/depthboot/etc/os-release", "r") as f:
         os_release = f.read()

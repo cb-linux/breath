@@ -84,8 +84,16 @@ if __name__ == "__main__":
             print_error("Please run the script with python 3.10 or higher")
             exit(1)
 
-    # TODO: add Crostini check
-    # cat /sys/devices/virtual/dmi/id/product_name
+    # Check if running under crostini
+    with open("/sys/devices/virtual/dmi/id/product_name", "r") as file:
+        if file.read().strip() == "crosvm":
+            print_warning("Crostini detected. Preparing Crostini")
+            bash("mount -t devtmpfs /dev /dev")
+            bash("ln -s /proc/self/fd /dev/fd")
+            if not path_exists("/sys/fs/cgroup/devices"):
+                mkdir("/sys/fs/cgroup/devices", create_parents=True)
+                bash("mount -t cgroup cgroup /sys/fs/cgroup/devices/ -o rw,nosuid,nodev,noexec,relatime,devices")
+            cpfile("configs/crostini/devices.allow", "/sys/fs/cgroup/devices/devices.allow")
 
     # import files after python version check is successful
     import build
