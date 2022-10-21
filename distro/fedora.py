@@ -10,7 +10,7 @@ def config(de_name: str, distro_version: str, username: str, root_partuuid: str,
     chroot("dnf update -y")  # update repos list
     # Install core packages
     chroot("dnf group install -y 'Core'")
-    # Install hardware support packages
+    # Install firmware packages
     chroot("dnf group install -y 'Hardware Support'")
     chroot("dnf group install -y 'Common NetworkManager Submodules'")
     chroot("dnf install -y linux-firmware")
@@ -21,9 +21,6 @@ def config(de_name: str, distro_version: str, username: str, root_partuuid: str,
     chroot(f"dnf install -y https://download1.rpmfusion.org/free/fedora/rpmfusion-free-release-"
            f"{distro_version}.noarch.rpm")
     stop_progress()  # stop fake progress
-
-    # Remove cloud packages: not needed for normal use
-    chroot("dnf remove -y openssh-server*")
 
     print_status("Downloading and installing DE, might take a while")
     start_progress()  # start fake progress
@@ -60,25 +57,26 @@ def config(de_name: str, distro_version: str, username: str, root_partuuid: str,
         chroot("systemctl set-default graphical.target")
     print_status("Desktop environment setup complete")
 
-    # Create /.autorelabel to force SELinux to relabel all files
+    # Relabel all files for SELinux
     # If this is not done, the system won't let users login, even if set to permissive
-    with open("/mnt/depthboot/.autorelabel", "w") as f:
-        f.write("")
+    mkdir("mnt/depthboot/proc/self")
+    cpdir("configs/selinux", "/mnt/depthboot/proc/self")  # copy /proc files needed for fixfiles
+    chroot("/sbin/fixfiles -T 0 restore")
 
     # The default fstab file has the wrong PARTUUID -> system boots in emergency mode if not fixed
-    with open("configs/fstab/fedora.fstab", "r") as f:
-        fstab = f.read()
-    fstab = fstab.replace("insert_partuuid", root_partuuid)
-    with open("/mnt/depthboot/etc/fstab", "w") as f:
-        f.write(fstab)
+    # with open("configs/fstab/fedora.fstab", "r") as f:
+    #     fstab = f.read()
+    # fstab = fstab.replace("insert_partuuid", root_partuuid)
+    # with open("/mnt/depthboot/etc/fstab", "w") as f:
+    #     f.write(fstab)
 
     # TODO: Fix zram
-    chroot("dnf remove zram-generator-defaults -y")  # remove zram as it fails for some reason
-    chroot("systemctl disable systemd-zram-setup@zram0.service")  # disable zram service
+    # chroot("dnf remove zram-generator-defaults -y")  # remove zram as it fails for some reason
+    # chroot("systemctl disable systemd-zram-setup@zram0.service")  # disable zram service
 
     # add sunrpc module, as otherwise var-lib-nfs fails to mount
-    with open("/mnt/depthboot/etc/modules-load.d/eupnea-modules.conf", "a") as f:
-        f.write("# NFS module\nsunrpc\n")
+    # with open("/mnt/depthboot/etc/modules-load.d/eupnea-modules.conf", "a") as f:
+    #     f.write("# NFS module\nsunrpc\n")
 
     # Add depthboot to version(this is purely cosmetic)
     with open("/mnt/depthboot/etc/os-release", "r") as f:
@@ -88,7 +86,7 @@ def config(de_name: str, distro_version: str, username: str, root_partuuid: str,
     with open("/mnt/depthboot/etc/os-release", "w") as f:
         f.write(os_release)
 
-    print_status("Debian setup complete")
+    print_status("Fedora setup complete")
 
 
 def chroot(command: str) -> None:

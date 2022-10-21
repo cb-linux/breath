@@ -12,16 +12,9 @@ from functions import *
 def prepare_host(de_name: str) -> None:
     print_status("Preparing host system")
 
-    # unmount fedora remains before attempting to remove /tmp/depthboot-build
+    # unmount popos remains before attempting to remove /tmp/depthboot-build
     try:
-        bash("umount -lf /tmp/depthboot-build/fedora-tmp-mnt 2>/dev/null")  # umount fedora temp if exists
-    except subprocess.CalledProcessError:
-        print("Failed to unmount /tmp/depthboot-build/fedora-tmp-mnt, ignore")
-        pass
-
-    # unmount cdrom remains before attempting to remove /tmp/depthboot-build
-    try:
-        bash("umount -lf /tmp/depthboot-build/cdrom 2>/dev/null")  # umount fedora temp if exists
+        bash("umount -lf /tmp/depthboot-build/cdrom 2>/dev/null")  # umount popos iso if exists
     except subprocess.CalledProcessError:
         print("Failed to unmount /tmp/depthboot-build/cdrom, ignore")
         pass
@@ -183,9 +176,10 @@ def download_rootfs(distro_name: str, distro_version: str, distro_link: str) -> 
                 urlretrieve(distro_link, filename="/tmp/depthboot-build/arch-rootfs.tar.gz")
                 stop_download_progress()
             case "fedora":
-                print_status(f"Downloading fedora rootfs version: {distro_version}")
-                start_download_progress("/tmp/depthboot-build/fedora-rootfs.raw.xz")
-                urlretrieve(distro_link, filename="/tmp/depthboot-build/fedora-rootfs.raw.xz")
+                print_status(f"Downloading fedora rootfs version: {distro_version} from github")
+                start_download_progress("/tmp/depthboot-build/fedora-rootfs.tar.xz")
+                urlretrieve(f"https://github.com/eupnea-linux/fedora-bootstrap/releases/latest/download/fedora-rootfs-"
+                            f"{distro_version}.tar.xz", filename="/tmp/depthboot-build/fedora-rootfs.tar.xz")
                 stop_download_progress()
             case "pop-os":
                 print_status(f"Downloading Pop!_OS iso {distro_version}")
@@ -357,32 +351,9 @@ def extract_rootfs(distro_name: str) -> None:
             cpdir("/tmp/depthboot-build/arch-rootfs/root.x86_64/", "/mnt/depthboot/")
             stop_progress(force_show=True)  # stop fake progress
         case "fedora":
-            print_status("Extracting fedora rootfs")
-            # extract raw image to temp location
-            mkdir("/tmp/depthboot-build/fedora-tmp-mnt")
-            # using unxz instead of tar
-            bash("unxz -d /tmp/depthboot-build/fedora-rootfs.raw.xz -c > /tmp/depthboot-build/fedora-raw")
-
-            try:
-                bash("modprobe btrfs")  # some systems don't have btrfs module loaded by default.
-            except subprocess.CalledProcessError:  # Crostini doesnt have modprobe
-                pass
-
-            # mount fedora raw image as loop device
-            fedora_root_part = bash(
-                "losetup -P -f --show /tmp/depthboot-build/fedora-raw") + "p5"  # part 5 is the rootfs
-            bash(
-                f"mount {fedora_root_part} /tmp/depthboot-build/fedora-tmp-mnt")  # mount 5th root part as filesystem
-            print_status("Copying fedora rootfs to /mnt/depthboot")
-            cpdir("/tmp/depthboot-build/fedora-tmp-mnt/root/",
-                  "/mnt/depthboot/")  # copy mounted rootfs to /mnt/depthboot
-
-            # unmount fedora image to prevent errors and unused loop devices
-            try:
-                bash(f"umount -fl /tmp/depthboot-build/fedora-tmp-mnt")
-            except subprocess.CalledProcessError:  # fails on Crostini
-                pass
-            bash(f"losetup -d {fedora_root_part[:-2]}")
+            print_status("Extracting ubuntu rootfs")
+            # --checkpoint is for printing real tar progress
+            bash("tar xfp /tmp/depthboot-build/fedora-rootfs.tar.xz -C /mnt/depthboot --checkpoint=.10000")
         case "pop-os":
             print_status("Extracting Pop!_OS squashfs from iso. This may take a VERY VERY long while")
             # Create a mount point for the iso to extract the squashfs
@@ -581,7 +552,7 @@ def start_build(verbose: bool, local_path, kernel_type: str, dev_release: bool, 
             "ubuntu": [cpfile, "ubuntu-rootfs.tar.xz"],
             "debian": [cpdir, "debian"],
             "arch": [cpfile, "arch-rootfs.tar.gz"],
-            "fedora": [cpfile, "fedora-rootfs.raw.xz"],
+            "fedora": [cpfile, "fedora-rootfs.tar.xz"],
             "pop-os": [cpfile, "pop-os.iso"]
         }
         if build_options["distro_name"] == "pop-os":
