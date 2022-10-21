@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
 
-from typing import Tuple
-import json
 from getpass import getpass
 from functions import *
 
 
 def get_user_input() -> dict:
+    fedora_versions = ["35", "36", "37", "rawhide"]
+    ubuntu_versions = ['19.10', '20.04', '20.10', '21.04', '21.10', '22.04']
     output_dict = {
         "distro_name": "ubuntu",
         "distro_version": "",
@@ -18,9 +18,6 @@ def get_user_input() -> dict:
         "device": "image",
         "rebind_search": False
     }
-    with open("distro_links.json", "r") as file:
-        distros = json.load(file)
-
     # Print welcome message
     print_header("Welcome to Depthboot, formerly known as Breath")
     print_header("This script will create a bootable Depthboot USB-drive/SD-card/image for you.")
@@ -36,17 +33,23 @@ def get_user_input() -> dict:
         match temp_distro_name:
             case "Ubuntu" | "ubuntu" | "":
                 output_dict["distro_name"] = "ubuntu"
+                # convert array into string
+                array_as_string = ""
+                for line in ubuntu_versions:
+                    array_as_string += line + ", "
+                array_as_string = array_as_string[:-2]
                 while True:
                     print_question("Use latest Ubuntu version?")
-                    output_dict["distro_version"] = input("\033[94m" + "Press enter for yes, or type in the version "
-                                                                       "number(example: '21.10'): " + "\033[0m")
-                    if output_dict["distro_version"] == "":
+                    temp_input = input("\033[94m" + "Press enter for yes, or type in the version number. Supported "
+                                                    "versions: " + array_as_string + "\033[0m")
+                    if temp_input == "":
                         # get highest version number
-                        output_dict["distro_version"] = max(distros["ubuntu"])
+                        output_dict["distro_version"] = ubuntu_versions[-1]  # latest version
                         print("Ubuntu: " + output_dict["distro_version"] + " selected")
                         break
                     else:
-                        if output_dict["distro_version"] in distros["ubuntu"]:
+                        if temp_input in ubuntu_versions:
+                            output_dict["distro_version"] = temp_input
                             print("Ubuntu: " + output_dict["distro_version"] + " selected")
                             break
                         else:
@@ -61,25 +64,25 @@ def get_user_input() -> dict:
             case "Arch" | "arch" | "arch btw":
                 print("Arch selected")
                 output_dict["distro_name"] = "arch"
-                output_dict["distro_link"] = distros["arch"]
                 break
             case "Fedora" | "fedora":
                 output_dict["distro_name"] = "fedora"
+                # convert array into string
+                array_as_string = ""
+                for line in fedora_versions:
+                    array_as_string += line + ", "
+                array_as_string = array_as_string[:-2]
                 while True:
-                    print_question("Use latest Fedora version?")
-                    output_dict["distro_version"] = input("\033[94m" + "Press enter for yes, or type in the version "
-                                                                       "number(example: '36'): " + "\033[0m")
-                    if output_dict["distro_version"] == "":
-                        # remove rawhide, then get the highest version number
-                        temp_fedora_dict = distros["fedora"]
-                        temp_fedora_dict.pop("Rawhide")
-                        output_dict["distro_version"] = max(temp_fedora_dict)
-                        output_dict["distro_link"] = distros["fedora"][output_dict["distro_version"]]
+                    print_question("Use latest stable Fedora version?")
+                    temp_input = input("\033[94m" + "Press enter for yes, or type in the version number. Supported "
+                                                    "versions: " + array_as_string + "\033[0m")
+                    if temp_input == "":
+                        output_dict["distro_version"] = fedora_versions[-3]  # latest stable version
                         print("Using Fedora version: " + output_dict["distro_version"])
                         break
                     else:
-                        if output_dict["distro_version"] in distros["fedora"]:
-                            output_dict["distro_link"] = distros["fedora"][output_dict["distro_version"]]
+                        if temp_input in fedora_versions:
+                            output_dict["distro_version"] = temp_input
                             print("Fedora: " + output_dict["distro_version"] + " selected")
                             break
                         else:

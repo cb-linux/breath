@@ -157,7 +157,7 @@ def download_kernel(kernel_type: str, dev_release: bool, files: list = ["bzImage
 
 
 # download the distro rootfs
-def download_rootfs(distro_name: str, distro_version: str, distro_link: str) -> None:
+def download_rootfs(distro_name: str, distro_version: str) -> None:
     try:
         match distro_name:
             case "ubuntu":
@@ -173,7 +173,8 @@ def download_rootfs(distro_name: str, distro_version: str, distro_link: str) -> 
             case "arch":
                 print_status("Downloading latest arch rootfs")
                 start_download_progress("/tmp/depthboot-build/arch-rootfs.tar.gz")
-                urlretrieve(distro_link, filename="/tmp/depthboot-build/arch-rootfs.tar.gz")
+                urlretrieve("https://geo.mirror.pkgbuild.com/iso/latest/archlinux-bootstrap-x86_64.tar.gz",
+                            filename="/tmp/depthboot-build/arch-rootfs.tar.gz")
                 stop_download_progress()
             case "fedora":
                 print_status(f"Downloading fedora rootfs version: {distro_version} from github")
@@ -512,7 +513,7 @@ def start_build(verbose: bool, local_path, kernel_type: str, dev_release: bool, 
 
     if local_path is None:  # default
         download_kernel(kernel_type, dev_release)
-        download_rootfs(build_options["distro_name"], build_options["distro_version"], build_options["distro_link"])
+        download_rootfs(build_options["distro_name"], build_options["distro_version"])
         download_firmware()
         download_postinstall_scripts()
         download_audio_scripts()
@@ -565,7 +566,7 @@ def start_build(verbose: bool, local_path, kernel_type: str, dev_release: bool, 
         except FileNotFoundError:
             print_error(f"File {distro_rootfs[build_options['distro_name']][1]} not found in {local_path}, "
                         f"attempting to download")
-            download_rootfs(build_options["distro_name"], build_options["distro_version"], build_options["distro_link"])
+            download_rootfs(build_options["distro_name"], build_options["distro_version"])
 
     # Setup device
     if build_options["device"] == "image":
