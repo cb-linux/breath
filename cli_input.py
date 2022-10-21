@@ -41,7 +41,7 @@ def get_user_input() -> dict:
                 while True:
                     print_question("Use latest Ubuntu version?")
                     temp_input = input("\033[94m" + "Press enter for yes, or type in the version number. Supported "
-                                                    "versions: " + array_as_string + "\033[0m")
+                                                    "versions: " + array_as_string + ": \033[0m")
                     if temp_input == "":
                         # get highest version number
                         output_dict["distro_version"] = ubuntu_versions[-1]  # latest version
@@ -75,7 +75,7 @@ def get_user_input() -> dict:
                 while True:
                     print_question("Use latest stable Fedora version?")
                     temp_input = input("\033[94m" + "Press enter for yes, or type in the version number. Supported "
-                                                    "versions: " + array_as_string + "\033[0m")
+                                                    "versions: " + array_as_string + ": \033[0m")
                     if temp_input == "":
                         output_dict["distro_version"] = fedora_versions[-3]  # latest stable version
                         print("Using Fedora version: " + output_dict["distro_version"])
