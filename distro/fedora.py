@@ -59,7 +59,7 @@ def config(de_name: str, distro_version: str, username: str, root_partuuid: str,
 
     # Relabel all files for SELinux
     # If this is not done, the system won't let users login, even if set to permissive
-    mkdir("mnt/depthboot/proc/self")
+    mkdir("/mnt/depthboot/proc/self")
     cpdir("configs/selinux", "/mnt/depthboot/proc/self")  # copy /proc files needed for fixfiles
     chroot("/sbin/fixfiles -T 0 restore")
 
