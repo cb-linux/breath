@@ -111,7 +111,7 @@ if __name__ == "__main__":
         print_warning("Verbosity increased")
     if args.no_shrink:
         print_warning("Image will not be shrunk")
-    if not args.image_size == 10:
+    if not args.image_size[0] == 10:
         print_warning(f"Image size overridden to {args.image_size[0]}GB")
     build.start_build(verbose=args.verbose, local_path=args.local_path, kernel_type=kernel_type,
                       dev_release=dev_release, build_options=cli_input.get_user_input(), no_shrink=args.no_shrink,
