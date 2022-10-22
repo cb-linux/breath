@@ -101,9 +101,8 @@ def prepare_host(de_name: str) -> None:
                           "another distro instead of Pop!_OS")
             exit(1)
 
-        # download kernel files from GitHub
 
-
+# download kernel files from GitHub
 def download_kernel(kernel_type: str, dev_release: bool, files: list = ["bzImage", "modules", "headers"]) -> None:
     # select correct link
     if dev_release:
@@ -250,7 +249,7 @@ def prepare_img(distro_name: str, img_size) -> Tuple[str, str]:
     return partition_and_flash_kernel(mnt_point, False, distro_name)
 
 
-# Prepare USB, usb is not yet fully implemented
+# Prepare USB/SD-card
 def prepare_usb(device: str, distro_name: str) -> Tuple[str, str]:
     print_status("Preparing USB")
 
