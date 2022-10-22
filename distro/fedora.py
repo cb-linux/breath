@@ -43,6 +43,7 @@ def config(de_name: str, distro_version: str, username: str, root_partuuid: str,
         case "deepin":
             print_status("Installing deepin")
             chroot("dnf group install -y 'Deepin Desktop'")
+            chroot("dnf install -y plasma-discover")
         case "budgie":
             print_error("Budgie is not available for Fedora")
             exit(1)
