@@ -49,6 +49,8 @@ def config(de_name: str, distro_version: str, username: str, root_partuuid: str,
             exit(1)
         case "cli":
             print_status("Skipping desktop environment install")
+            # install network tui
+            chroot("dnf install -y NetworkManager-tui")
         case _:
             print_error("Invalid desktop environment! Please create an issue")
             exit(1)
