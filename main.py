@@ -89,13 +89,8 @@ if __name__ == "__main__":
         product_name = file.read().strip()
     if product_name == "crosvm" and not path_exists("/tmp/.crostini-fixed"):
         print_warning("Crostini detected. Preparing Crostini")
-        bash("mount -t devtmpfs /dev /dev")
-        bash("ln -s /proc/self/fd /dev/fd")
-        if not path_exists("/sys/fs/cgroup/devices"):
-            mkdir("/sys/fs/cgroup/devices", create_parents=True)
-            bash("mount -t cgroup cgroup /sys/fs/cgroup/devices/ -o rw,nosuid,nodev,noexec,relatime,devices")
-        # cpfile("configs/crostini/devices.allow", "/sys/fs/cgroup/devices/devices.allow")
-        bash("printf '%s\n' 'c *:* rwm' 'b *:* rwm' > /sys/fs/cgroup/devices/devices.allow")
+        # TODO: Translate to python
+        bash("bash configs/setup-crostini.sh")
         with open("/tmp/.crostini-fixed", "w") as file:
             file.write("")
 
