@@ -517,6 +517,7 @@ def post_config(rebind_search: bool, de_name: str, distro_name) -> None:
 
         # Restore original fixfiles
         cpfile("/mnt/depthboot/usr/sbin/fixfiles.bak", "/mnt/depthboot/usr/sbin/fixfiles")
+        rmfile("/mnt/depthboot/usr/sbin/fixfiles.bak")
 
 
 # chroot command
