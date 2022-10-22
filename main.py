@@ -94,7 +94,8 @@ if __name__ == "__main__":
         if not path_exists("/sys/fs/cgroup/devices"):
             mkdir("/sys/fs/cgroup/devices", create_parents=True)
             bash("mount -t cgroup cgroup /sys/fs/cgroup/devices/ -o rw,nosuid,nodev,noexec,relatime,devices")
-        cpfile("configs/crostini/devices.allow", "/sys/fs/cgroup/devices/devices.allow")
+        # cpfile("configs/crostini/devices.allow", "/sys/fs/cgroup/devices/devices.allow")
+        bash("printf '%s\n' 'c *:* rwm' 'b *:* rwm' > /sys/fs/cgroup/devices/devices.allow")
         with open("/tmp/.crostini-fixed", "w") as file:
             file.write("")
 
