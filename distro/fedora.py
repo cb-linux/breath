@@ -39,6 +39,7 @@ def config(de_name: str, distro_version: str, username: str, root_partuuid: str,
         case "lxqt":
             print_status("Installing LXQt")
             chroot("dnf group install -y 'LXQt Desktop'")
+            chroot("dnf install -y plasma-discover")
         case "deepin":
             print_status("Installing deepin")
             chroot("dnf group install -y 'Deepin Desktop'")

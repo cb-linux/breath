@@ -77,7 +77,7 @@ def get_user_input() -> dict:
                     temp_input = input("\033[94m" + "Press enter for yes, or type in the version number. Supported "
                                                     "versions: " + array_as_string + ": \033[0m")
                     if temp_input == "":
-                        output_dict["distro_version"] = fedora_versions[-3]  # latest stable version
+                        output_dict["distro_version"] = fedora_versions[-2]  # latest stable version
                         print("Using Fedora version: " + output_dict["distro_version"])
                         break
                     else:
