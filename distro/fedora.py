@@ -58,20 +58,6 @@ def config(de_name: str, distro_version: str, username: str, root_partuuid: str,
         chroot("systemctl set-default graphical.target")
     print_status("Desktop environment setup complete")
 
-    # Relabel all files for SELinux
-    # If this is not done, the system won't let users login, even if set to permissive
-    # copy /proc files needed for fixfiles
-    mkdir("/mnt/depthboot/proc/self")
-    cpfile("configs/selinux/mounts", "/mnt/depthboot/proc/self/mounts")
-    cpfile("configs/selinux/mountinfo", "/mnt/depthboot/proc/self/mountinfo")
-    # copy /sys files needed for fixfiles
-    mkdir("/mnt/depthboot/sys/fs/selinux/initial_contexts/", create_parents=True)
-    cpfile("configs/selinux/unlabeled", "/mnt/depthboot/sys/fs/selinux/initial_contexts/unlabeled")
-    try:
-        chroot("/sbin/fixfiles -T 0 restore")
-    except subprocess.CalledProcessError:
-        pass  # due to working in a chroot, fixfiles fails at the end, but the files are still relabeled
-
     # Add depthboot to version(this is purely cosmetic)
     with open("/mnt/depthboot/etc/os-release", "r") as f:
         os_release = f.read()

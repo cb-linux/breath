@@ -471,7 +471,7 @@ def post_extract(build_options, kernel_type: str) -> None:
 
 
 # post extract and distro config
-def post_config(rebind_search: bool, de_name: str) -> None:
+def post_config(rebind_search: bool, de_name: str, distro_name) -> None:
     if not de_name == "cli":
         # Add chromebook layout. Needs to be done after install Xorg
         print_status("Backing up default keymap and setting Chromebook layout")
@@ -493,6 +493,29 @@ def post_config(rebind_search: bool, de_name: str) -> None:
     start_progress(force_show=True)  # start fake progress
     cpdir("/tmp/depthboot-build/firmware", "/mnt/depthboot/lib/firmware")
     stop_progress(force_show=True)  # stop fake progress
+
+    if distro_name == "fedora":
+        # Fedora requires all files to be relabled for SELinux to work
+        # If this is not done, SELinux will prevent users from logging in
+
+        # copy /proc files needed for fixfiles
+        mkdir("/mnt/depthboot/proc/self")
+        cpfile("configs/selinux/mounts", "/mnt/depthboot/proc/self/mounts")
+        cpfile("configs/selinux/mountinfo", "/mnt/depthboot/proc/self/mountinfo")
+
+        # copy /sys files needed for fixfiles
+        mkdir("/mnt/depthboot/sys/fs/selinux/initial_contexts/", create_parents=True)
+        cpfile("configs/selinux/unlabeled", "/mnt/depthboot/sys/fs/selinux/initial_contexts/unlabeled")
+
+        # Backup original selinux
+        cpfile("/mnt/depthboot/usr/sbin/fixfiles", "/mnt/depthboot/usr/sbin/fixfiles.bak")
+        # Copy patched fixfiles
+        cpfile("configs/selinux/fixfiles", "/mnt/depthboot/usr/sbin/fixfiles")
+
+        chroot("/sbin/fixfiles -T 0 restore")
+
+        # Restore original fixfiles
+        cpfile("/mnt/depthboot/usr/sbin/fixfiles.bak", "/mnt/depthboot/usr/sbin/fixfiles")
 
 
 # chroot command
@@ -598,7 +621,7 @@ def start_build(verbose: bool, local_path, kernel_type: str, dev_release: bool, 
     distro.config(build_options["de_name"], build_options["distro_version"], build_options["username"], root_partuuid,
                   verbose)
 
-    post_config(build_options["rebind_search"], build_options["de_name"])
+    post_config(build_options["rebind_search"], build_options["de_name"], build_options["distro_name"])
 
     # Post-install cleanup
     print_status("Cleaning up host system after build")
