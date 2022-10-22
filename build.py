@@ -352,6 +352,7 @@ def extract_rootfs(distro_name: str) -> None:
             stop_progress(force_show=True)  # stop fake progress
         case "fedora":
             print_status("Extracting ubuntu rootfs")
+            bash("sudo modprobe isofs")  # load isofs kernel module
             # --checkpoint is for printing real tar progress
             bash("tar xfp /tmp/depthboot-build/fedora-rootfs.tar.xz -C /mnt/depthboot --checkpoint=.10000")
         case "pop-os":
