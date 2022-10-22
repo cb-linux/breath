@@ -609,6 +609,7 @@ def start_build(verbose: bool, local_path, kernel_type: str, dev_release: bool, 
     except subprocess.CalledProcessError as error:  # on crostini umount fails for some reason
         if verbose:
             print(error)
+    sleep(5)  # wait for umount to finish
     try:
         bash("umount -f /mnt/depthboot")  # umount mountpoint again
     except subprocess.CalledProcessError as error:  # on crostini umount fails for some reason
@@ -618,7 +619,6 @@ def start_build(verbose: bool, local_path, kernel_type: str, dev_release: bool, 
         if not no_shrink:
             # Shrink image to actual size
             print_status("Shrinking image")
-            sleep(5)  # wait for umount to finish
             bash(f"e2fsck -fpv {img_mnt}p2")  # Force check filesystem for errors
             bash(f"resize2fs -f -M {img_mnt}p2")
             block_count = int(bash(f"dumpe2fs -h {img_mnt}p2 | grep 'Block count:'")[12:].split()[0])
