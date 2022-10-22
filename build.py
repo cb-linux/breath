@@ -497,6 +497,7 @@ def post_config(rebind_search: bool, de_name: str, distro_name) -> None:
     if distro_name == "fedora":
         # Fedora requires all files to be relabled for SELinux to work
         # If this is not done, SELinux will prevent users from logging in
+        print_status("Relabeling files for SELinux")
 
         # copy /proc files needed for fixfiles
         mkdir("/mnt/depthboot/proc/self")
@@ -509,7 +510,7 @@ def post_config(rebind_search: bool, de_name: str, distro_name) -> None:
 
         # Backup original selinux
         cpfile("/mnt/depthboot/usr/sbin/fixfiles", "/mnt/depthboot/usr/sbin/fixfiles.bak")
-        # Copy patched fixfiles
+        # Copy patched fixfiles script
         cpfile("configs/selinux/fixfiles", "/mnt/depthboot/usr/sbin/fixfiles")
 
         chroot("/sbin/fixfiles -T 0 restore")
