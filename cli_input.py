@@ -20,18 +20,16 @@ def get_user_input() -> dict:
     }
     # Print welcome message
     print_header("Welcome to Depthboot, formerly known as Breath")
-    print_header("This script will create a bootable Depthboot USB-drive/SD-card/image for you.")
+    print_header("This script will create a bootable Linux USB-drive/SD-card/image for you.")
     print_header("You will now be asked a few questions. If you dont know what to answer, just press 'enter' and the"
-                 " recommended answer will be used.")
+                 " recommended answer will be selected.")
     input("(Press enter to continue)")
     print_question("Which Linux distro(flavor) would you like to use?")
-
     while True:
         temp_distro_name = input(
-            "\033[94m" + "Available options: Ubuntu(default, recommended), Debian, Arch, Fedora, Pop!_OS\n"
-            + "\033[0m")
+            "\033[94m" + "Available options: Pop!_OS(default, recommended), Ubuntu, Debian, Arch, Fedora\n" + "\033[0m")
         match temp_distro_name:
-            case "Ubuntu" | "ubuntu" | "":
+            case "Ubuntu" | "ubuntu":
                 output_dict["distro_name"] = "ubuntu"
                 # convert array into string
                 array_as_string = ""
@@ -89,11 +87,10 @@ def get_user_input() -> dict:
                             print_warning("Version not available, please choose another")
                             continue
                 break
-            case "Pop!_OS" | "PopOS" | "POP!_OS" | "Pop_OS" | "Pop!OS" | "pop!_os" | "popos" | "pop-os":
+            case "Pop!_OS" | "PopOS" | "POP!_OS" | "Pop_OS" | "Pop!OS" | "pop!_os" | "popos" | "pop-os" | "":  # default
                 print("Pop!_OS selected")
                 output_dict["distro_name"] = "pop-os"
                 break
-
             case _:
                 print_warning("Check your spelling and try again")
                 continue
@@ -103,13 +100,13 @@ def get_user_input() -> dict:
         match output_dict["distro_name"]:
             case "ubuntu":
                 available_de = "Gnome(default, recommended), KDE(recommended), Xfce(recommended for weak device" \
-                               "s), LXQt(recommended for weak devices), budgie, cli"
+                               "s), LXQt(recommended for weak devices), cli"
             case "debian":
                 available_de = "Gnome(default, recommended), KDE(recommended), Xfce(recommended for weak device" \
                                "s), LXQt(recommended for weak devices), budgie, cli"
             case "arch":
                 available_de = "Gnome(default, recommended), KDE(recommended), Xfce(recommended for weak device" \
-                               "s), LXQt(recommended for weak devices), deepin, budgie, cli"
+                               "s), LXQt(recommended for weak devices), deepin, cli"
             case "fedora":
                 available_de = "Gnome(default, recommended), KDE(recommended), Xfce(recommended for weak device" \
                                "s), LXQt(recommended for weak devices), deepin, cli"
@@ -134,8 +131,10 @@ def get_user_input() -> dict:
                     output_dict["de_name"] = "lxqt"
                     break
                 case "deepin":
-                    if output_dict["distro_name"] == "debian" or output_dict["distro_name"] == "ubuntu":
-                        print_warning("Deepin is not available for Debian/Ubuntu, please choose another DE")
+                    if output_dict["distro_name"] == "debian":
+                        print_warning("Deepin is not available for Debian, please choose another DE")
+                    elif output_dict["distro_name"] == "ubuntu":
+                        print_warning("Deepin is currently broken upstream in Ubuntu, please choose another DE")
                     else:
                         print("Deepin selected")
                         output_dict["de_name"] = "deepin"
@@ -143,6 +142,10 @@ def get_user_input() -> dict:
                 case "budgie":
                     if output_dict["distro_name"] == "fedora":
                         print_warning("Budgie is not available for Fedora, please choose another DE")
+                    elif output_dict["distro_name"] == "ubuntu":
+                        print_warning("Budgie is currently broken in Ubuntu, please choose another DE")
+                    elif output_dict["distro_name"] == "arch":
+                        print_warning("Budgie is currently broken in Arch, please choose another DE")
                     else:
                         print("Budgie selected")
                         output_dict["de_name"] = "budgie"
@@ -224,7 +227,7 @@ def get_user_input() -> dict:
             print(f"Using {output_dict['hostname']} as hostname")
             break
 
-    print_question("Would you like to rebind the Search/Super/Win key to Caps Lock?(NOT RECOMMENDED)")
+    print_question("Rebind the Search/Super/Win key to Caps Lock?(NOT RECOMMENDED)")
     if input("\033[94m" + "Type yes to rebind. Press enter to keep old binding: " "\033[0m") == "yes":
         print("Search key will be a CAPS LOCK key")
         rebind_search = True
