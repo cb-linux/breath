@@ -60,7 +60,7 @@ def config(de_name: str, distro_version: str, username: str, root_partuuid: str,
         case "deepin":
             print_status("Installing deepin")
             chroot("pacman -S --noconfirm deepin deepin-kwin deepin-extra xorg xorg-server lightdm kde-applications "
-                   "firefox discover")
+                   "firefox discover packagekit-qt5")
             # enable deepin specific login style
             with open("/mnt/depthboot/etc/lightdm/lightdm.conf", "a") as conf:
                 conf.write("greeter-session=lightdm-deepin-greeter")
