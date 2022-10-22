@@ -616,7 +616,10 @@ def start_build(verbose: bool, local_path, kernel_type: str, dev_release: bool, 
         if verbose:
             print(error)
     if build_options["device"] == "image":
-        if not no_shrink:
+        with open("/sys/devices/virtual/dmi/id/product_name", "r") as file:
+            product_name = file.read().strip()
+        # TODO: Fix shrinking on Crostini
+        if not product_name == "crosvm" and not no_shrink:
             # Shrink image to actual size
             print_status("Shrinking image")
             bash(f"e2fsck -fpv {img_mnt}p2")  # Force check filesystem for errors
