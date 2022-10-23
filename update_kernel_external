@@ -84,9 +84,9 @@ def download_kernel() -> None:
                 urlretrieve(f"{url}headers-exp.tar.xz", filename="/tmp/depthboot-external/headers.tar.xz")
             case "stable":
                 print_status("Downloading stable 5.10 kernel")
-                urlretrieve(f"{url}bzImage", filename="/tmp/depthboot-external/bzImage")
-                urlretrieve(f"{url}modules.tar.xz", filename="/tmp/depthboot-external/modules.tar.xz")
-                urlretrieve(f"{url}headers.tar.xz", filename="/tmp/depthboot-external/headers.tar.xz")
+                urlretrieve(f"{url}bzImage-stable", filename="/tmp/depthboot-external/bzImage")
+                urlretrieve(f"{url}modules-stable.tar.xz", filename="/tmp/depthboot-external/modules.tar.xz")
+                urlretrieve(f"{url}headers-stable.tar.xz", filename="/tmp/depthboot-external/headers.tar.xz")
     except URLError:
         print_error("Failed to reach github. Check your internet connection and try again or use local files with -l")
         exit(1)
@@ -126,9 +126,9 @@ def flash_kernel() -> None:
         file.write(new_cmdline)
 
     print_status("Signing kernel")
-    bash("futility vbutil_kernel --arch x86_64 --version 1 --keyblock /usr/share/vboot/devkeys/kernel.keyblock"
-         + " --signprivate /usr/share/vboot/devkeys/kernel_data_key.vbprivk --bootloader kernel.flags" +
-         " --config kernel.flags --vmlinuz /tmp/depthboot-external/bzImage --pack /tmp/depthboot-external/bzImage.signed")
+    bash("futility vbutil_kernel --arch x86_64 --version 1 --keyblock /usr/share/vboot/devkeys/kernel.keyblock --signp"
+         "rivate /usr/share/vboot/devkeys/kernel_data_key.vbprivk --bootloader kernel.flags --config kernel.flags --vm"
+         "linuz /tmp/depthboot-external/bzImage --pack /tmp/depthboot-external/bzImage.signed")
 
     print_status("Flashing kernel")
     bash(f"dd if=/tmp/depthboot-external/bzImage.signed of={device}1")

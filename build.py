@@ -142,11 +142,11 @@ def download_kernel(kernel_type: str, dev_release: bool, files: list = ["bzImage
             case "stable":
                 print_status("Downloading stable 5.10 kernel")
                 if "bzImage" in files:
-                    urlretrieve(f"{url}bzImage", filename="/tmp/depthboot-build/bzImage")
+                    urlretrieve(f"{url}bzImage-stable", filename="/tmp/depthboot-build/bzImage")
                 if "modules" in files:
-                    urlretrieve(f"{url}modules.tar.xz", filename="/tmp/depthboot-build/modules.tar.xz")
+                    urlretrieve(f"{url}modules-stable.tar.xz", filename="/tmp/depthboot-build/modules.tar.xz")
                 if "headers" in files:
-                    urlretrieve(f"{url}headers.tar.xz", filename="/tmp/depthboot-build/headers.tar.xz")
+                    urlretrieve(f"{url}headers-stable.tar.xz", filename="/tmp/depthboot-build/headers.tar.xz")
     except URLError:
         print_error("Failed to reach github. Check your internet connection and try again or use local files with -l")
         exit(1)
