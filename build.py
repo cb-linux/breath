@@ -326,7 +326,8 @@ def extract_rootfs(distro_name: str, distro_version: str) -> None:
             print_status("Debootstraping Ubuntu into /mnt/depthboot")
             start_progress()  # start fake progress
             # debootstrapping directly to /mnt/depthboot
-            ubuntu_result = bash(f"debootstrap --components=main,restricted,universe,multiverse {distro_version} /mnt/depthboot http://archive.ubuntu.com/ubuntu")
+            ubuntu_result = bash(f"debootstrap --components=main,restricted,universe,multiverse {distro_version} "
+                                 f"/mnt/depthboot http://archive.ubuntu.com/ubuntu")
             stop_progress()  # stop fake progress
             if ubuntu_result.__contains__("Couldn't download packages:"):
                 print_error("Ubuntu Debootstrap failed, check your internet connection or try again later")
@@ -350,13 +351,13 @@ def extract_rootfs(distro_name: str, distro_version: str) -> None:
             stop_progress(force_show=True)  # stop fake progress
         case "fedora":
             print_status("Extracting ubuntu rootfs")
-            bash("sudo modprobe isofs")  # load isofs kernel module
             # --checkpoint is for printing real tar progress
             bash("tar xfp /tmp/depthboot-build/fedora-rootfs.tar.xz -C /mnt/depthboot --checkpoint=.10000")
         case "pop-os":
             print_status("Extracting Pop!_OS squashfs from iso. This may take a VERY VERY long while")
             # Create a mount point for the iso to extract the squashfs
             mkdir("/tmp/depthboot-build/iso")
+            bash("sudo modprobe isofs")  # load isofs kernel module
             mnt_iso = bash(f"losetup -f --show /tmp/depthboot-build/pop-os.iso")
             mkdir("/tmp/depthboot-build/cdrom")
             bash(f"mount {mnt_iso} /tmp/depthboot-build/cdrom")
