@@ -11,7 +11,7 @@ def get_user_input() -> dict:
         "20.04": "focal",
         "21.04": "hirsute",
         "22.04": "jammy",
-        "22.10": "kinetic"
+        #     "22.10": "kinetic"
     }
     output_dict = {
         "distro_name": "popos",
