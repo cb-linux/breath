@@ -602,7 +602,7 @@ def start_build(verbose: bool, local_path, kernel_type: str, dev_release: bool, 
         root_partuuid = output_temp[1]
 
     # Extract rootfs and configure distro agnostic settings
-    extract_rootfs(build_options["distro_name"])
+    extract_rootfs(build_options["distro_name"], build_options["distro_version"])
     post_extract(build_options, kernel_type)
 
     match build_options["distro_name"]:
