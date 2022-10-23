@@ -14,7 +14,7 @@ def config(de_name: str, distro_version: str, username: str, root_partuuid: str,
     chroot("dnf group install -y 'Hardware Support'")
     chroot("dnf group install -y 'Common NetworkManager Submodules'")
     chroot("dnf install -y linux-firmware")
-    chroot("dnf install -y git vboot-utils")  # postinstall dependencies
+    chroot("dnf install -y git vboot-utils rsync")  # postinstall dependencies
     # Add RPMFusion repos
     chroot(f"dnf install -y https://download1.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-"
            f"{distro_version}.noarch.rpm")
