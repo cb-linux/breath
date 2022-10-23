@@ -10,13 +10,6 @@ def config(de_name: str, distro_version: str, username: str, root_partuuid: str,
     chroot("apt-get install -y linux-firmware network-manager software-properties-common")
     chroot("apt-get install -y git cgpt vboot-kernel-utils cloud-utils")  # postinstall dependencies
 
-    # TODO: Find out why we need to reinstall dbus
-    print("Reinstalling dbus")
-    chroot("apt-get reinstall -y dbus")
-
-    # Remove cloud packages: not needed for normal use
-    chroot("apt-get purge -y openssh-server")
-
     print_status("Downloading and installing de, might take a while")
     start_progress()  # start fake progress
     match de_name:
@@ -38,14 +31,14 @@ def config(de_name: str, distro_version: str, username: str, root_partuuid: str,
             print_error("Deepin is currently broken on Ubuntu, please select another DE")
             exit(1)
 
-            # Probably to some misconfiguration in deepin's installer, our kernel version is not supported.
+            # Probably due to some misconfiguration in deepin's installer, our kernel version is not supported.
             # Install fails with: Errors were encountered while processing: deepin-anything-dkms, dde-file-manager,
             # ubuntudde-dde, deepin-anything-server
 
             # TODO: Fix deepin
-            # chroot("add-apt-repository -y ppa:ubuntudde-dev/stable")
-            # chroot("apt-get update -y")
-            # chroot("apt-get install -y ubuntudde-dde")
+            chroot("add-apt-repository -y ppa:ubuntudde-dev/stable")
+            chroot("apt-get update -y")
+            chroot("apt-get install -y ubuntudde-dde")
         case "budgie":
             print_status("Installing Budgie")
             # do not install tex-common, it breaks the installation
@@ -70,16 +63,6 @@ def config(de_name: str, distro_version: str, username: str, root_partuuid: str,
     except FileNotFoundError:
         pass
     print_status("Desktop environment setup complete")
-
-    # TODO: Figure out if removing needrestart is necessary
-    chroot("apt-get remove -y needrestart")
-
-    # The default fstab file causes systemd-remount-fs to fail
-    with open("configs/fstab/ubuntu.fstab", "r") as f:
-        fstab = f.read()
-    fstab = fstab.replace("insert_partuuid", root_partuuid)
-    with open("/mnt/depthboot/etc/fstab", "w") as f:
-        f.write(fstab)
 
     # Replace input-synaptics with newer input-libinput, for better touchpad support
     print_status("Upgrading touchpad drivers")

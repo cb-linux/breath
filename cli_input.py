@@ -6,9 +6,15 @@ from functions import *
 
 def get_user_input() -> dict:
     fedora_versions = ["35", "36", "37"]
-    ubuntu_versions = ['19.10', '20.04', '20.10', '21.04', '21.10', '22.04']
+    ubuntu_versions = {
+        "18.04": "eoan",
+        "20.04": "focal",
+        "21.04": "hirsute",
+        "22.04": "jammy",
+        "22.10": "kinetic"
+    }
     output_dict = {
-        "distro_name": "ubuntu",
+        "distro_name": "popos",
         "distro_version": "",
         "distro_link": "",
         "de_name": "cli",
@@ -33,7 +39,7 @@ def get_user_input() -> dict:
                 output_dict["distro_name"] = "ubuntu"
                 # convert array into string
                 array_as_string = ""
-                for line in ubuntu_versions:
+                for line in ubuntu_versions.keys():
                     array_as_string += line + ", "
                 array_as_string = array_as_string[:-2]
                 while True:
@@ -42,17 +48,19 @@ def get_user_input() -> dict:
                                                     "versions: " + array_as_string + ": \033[0m")
                     if temp_input == "":
                         # get highest version number
-                        output_dict["distro_version"] = ubuntu_versions[-1]  # latest version
+                        output_dict["distro_version"] = next(reversed(ubuntu_versions.keys()))  # latest version
                         print("Ubuntu: " + output_dict["distro_version"] + " selected")
-                        break
                     else:
                         if temp_input in ubuntu_versions:
                             output_dict["distro_version"] = temp_input
                             print("Ubuntu: " + output_dict["distro_version"] + " selected")
-                            break
                         else:
                             print_warning("Version not available, please choose another")
                             continue
+                    # translate version number to codename
+                    output_dict["distro_version"] = ubuntu_versions[output_dict["distro_version"]]
+                    print("Ubuntu: " + output_dict["distro_version"] + " selected")
+                    break
                 break
             case "Debian" | "debian":
                 print("Debian stable selected")

@@ -54,7 +54,7 @@ def prepare_host(de_name: str) -> None:
             exit(1)
 
     # install debootstrap for debian
-    if de_name == "debian" and not path_exists("/usr/sbin/debootstrap"):
+    if (de_name == "debian" or de_name == "ubuntu") or not path_exists("/usr/sbin/debootstrap"):
         print_status("Installing debootstrap")
         if path_exists("/usr/bin/apt"):
             bash("apt-get install debootstrap -y")
@@ -160,13 +160,7 @@ def download_rootfs(distro_name: str, distro_version: str) -> None:
     try:
         match distro_name:
             case "ubuntu":
-                print_status(f"Downloading ubuntu rootfs {distro_version}")
-                start_download_progress("/tmp/depthboot-build/ubuntu-rootfs.tar.xz")
-                urlretrieve(
-                    f"https://cloud-images.ubuntu.com/releases/{distro_version}/release/ubuntu-{distro_version}"
-                    f"-server-cloudimg-amd64-root.tar.xz",
-                    filename="/tmp/depthboot-build/ubuntu-rootfs.tar.xz")
-                stop_download_progress()
+                print_status("Ubuntu is downloaded later, skipping download")
             case "debian":
                 print_status("Debian is downloaded later, skipping download")
             case "arch":
@@ -325,22 +319,26 @@ def partition_and_flash_kernel(mnt_point: str, write_usb: bool, distro_name: str
 
 
 # extract the rootfs to /mnt/depthboot
-def extract_rootfs(distro_name: str) -> None:
+def extract_rootfs(distro_name: str, distro_version: str) -> None:
     print_status("Extracting rootfs")
     match distro_name:
         case "ubuntu":
-            print_status("Extracting ubuntu rootfs")
-            # --checkpoint is for printing real tar progress
-            bash("tar xfp /tmp/depthboot-build/ubuntu-rootfs.tar.xz -C /mnt/depthboot --checkpoint=.10000")
-        case "debian":
-            print_status("Debootstraping into /mnt/depthboot")
+            print_status("Debootstraping Ubuntu into /mnt/depthboot")
             start_progress()  # start fake progress
             # debootstrapping directly to /mnt/depthboot
-            debian_result = bash(
-                "debootstrap stable /mnt/depthboot https://deb.debian.org/debian/")
+            ubuntu_result = bash(f"debootstrap {distro_version} /mnt/depthboot http://archive.ubuntu.com/ubuntu")
+            stop_progress()  # stop fake progress
+            if ubuntu_result.__contains__("Couldn't download packages:"):
+                print_error("Ubuntu Debootstrap failed, check your internet connection or try again later")
+                exit(1)
+        case "debian":
+            print_status("Debootstraping Debian into /mnt/depthboot")
+            start_progress()  # start fake progress
+            # debootstrapping directly to /mnt/depthboot
+            debian_result = bash("debootstrap stable /mnt/depthboot https://deb.debian.org/debian/")
             stop_progress()  # stop fake progress
             if debian_result.__contains__("Couldn't download packages:"):
-                print_error("Debootstrap failed, check your internet connection or try again later")
+                print_error("Debian Debootstrap failed, check your internet connection or try again later")
                 exit(1)
         case "arch":
             print_status("Extracting arch rootfs")
