@@ -176,11 +176,11 @@ def download_rootfs(distro_name: str, distro_version: str) -> None:
                             f"{distro_version}.tar.xz", filename="/tmp/depthboot-build/fedora-rootfs.tar.xz")
                 stop_download_progress()
             case "pop-os":
-                print_status(f"Downloading Pop!_OS iso {distro_version}")
-                start_download_progress("/tmp/depthboot-build/pop-os.iso")
+                print_status(f"Downloading pop-os rootfs from github")
+                start_download_progress("/tmp/depthboot-build/popos-rootfs.tar.xz")
                 urlretrieve(
-                    "https://iso.pop-os.org/22.04/amd64/intel/14/pop-os_22.04_amd64_intel_14.iso",
-                    filename="/tmp/depthboot-build/pop-os.iso")
+                    f"https://github.com/eupnea-linux/popos-rootfs/releases/latest/download/popos-rootfs.tar.xz",
+                    filename="/tmp/depthboot-build/popos-rootfs.tar.xz")
                 stop_download_progress()
     except URLError:
         print_error("Couldn't download rootfs. Check your internet connection and try again. If the error persists, "
@@ -350,25 +350,13 @@ def extract_rootfs(distro_name: str, distro_version: str) -> None:
             cpdir("/tmp/depthboot-build/arch-rootfs/root.x86_64/", "/mnt/depthboot/")
             stop_progress(force_show=True)  # stop fake progress
         case "fedora":
-            print_status("Extracting ubuntu rootfs")
+            print_status("Extracting fedora rootfs")
             # --checkpoint is for printing real tar progress
             bash("tar xfp /tmp/depthboot-build/fedora-rootfs.tar.xz -C /mnt/depthboot --checkpoint=.10000")
         case "pop-os":
-            print_status("Extracting Pop!_OS squashfs from iso. This may take a VERY VERY long while")
-            # Create a mount point for the iso to extract the squashfs
-            mkdir("/tmp/depthboot-build/iso")
-            bash("sudo modprobe isofs")  # load isofs kernel module
-            mnt_iso = bash(f"losetup -f --show /tmp/depthboot-build/pop-os.iso")
-            mkdir("/tmp/depthboot-build/cdrom")
-            bash(f"mount {mnt_iso} /tmp/depthboot-build/cdrom")
-            start_progress()  # start fake progress
-            bash("unsquashfs -f -d /mnt/depthboot /tmp/depthboot-build/cdrom/casper/filesystem.squashfs")
-            stop_progress()  # stop fake progress
-            try:
-                bash("umount -fl /tmp/depthboot-build/cdrom")  # pop-os loop device
-                bash(f"losetup -d {mnt_iso} ")
-            except subprocess.CalledProcessError:
-                pass  # on crostini umount fails for some reason
+            print_status("Extracting popos rootfs")
+            # --checkpoint is for printing real tar progress
+            bash("tar xfp /tmp/depthboot-build/popos-rootfs.tar.xz -C /mnt/depthboot --checkpoint=.10000")
 
     print_status("\n" + "Rootfs extraction complete")
 

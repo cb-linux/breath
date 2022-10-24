@@ -37,8 +37,6 @@ def config(de_name: str, distro_version: str, username: str, root_partuuid: str,
             chroot("apt-get install -y lubuntu-desktop discover konqueror")
         case "deepin":
             print_status("Installing deepin")
-            print_error("Deepin is currently broken on Ubuntu, please select another DE")
-            exit(1)
 
             # Probably due to some misconfiguration in deepin's installer, our kernel version is not supported.
             # Install fails with: Errors were encountered while processing: deepin-anything-dkms, dde-file-manager,
