@@ -425,6 +425,9 @@ def post_extract(build_options, kernel_type: str) -> None:
     with open("/mnt/depthboot/etc/eupnea.json", "w") as settings_file:
         json.dump(settings, settings_file)
 
+    # Preinstall alsa-info, needed for collect-logs postinstall script
+    cpfile("configs/audio/alsa-info", "/mnt/depthboot/usr/sbin/alsa-info")
+
     print_status("Fixing sleep")
     # disable hibernation aka S4 sleep, READ: https://eupnea-linux.github.io/docs.html#/pages/bootlock
     # TODO: Fix sleep, maybe
