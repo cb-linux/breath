@@ -632,8 +632,11 @@ def start_build(verbose: bool, local_path, kernel_type: str, dev_release: bool, 
         if verbose:
             print(error)
     if build_options["device"] == "image":
-        with open("/sys/devices/virtual/dmi/id/product_name", "r") as file:
-            product_name = file.read().strip()
+        try:
+            with open("/sys/devices/virtual/dmi/id/product_name", "r") as file:
+                product_name = file.read().strip()
+        except FileNotFoundError:  # WSL doesnt have dmi data
+            pass
         # TODO: Fix shrinking on Crostini
         if not product_name == "crosvm" and not no_shrink:
             # Shrink image to actual size
