@@ -85,8 +85,11 @@ if __name__ == "__main__":
             exit(1)
 
     # Check if running under crostini
-    with open("/sys/devices/virtual/dmi/id/product_name", "r") as file:
-        product_name = file.read().strip()
+    try:
+        with open("/sys/devices/virtual/dmi/id/product_name", "r") as file:
+            product_name = file.read().strip()
+    except FileNotFoundError:
+        product_name = ""  # WSL has no dmi data
     if product_name == "crosvm" and not path_exists("/tmp/.crostini-fixed"):
         print_warning("Crostini detected. Preparing Crostini")
         # TODO: Translate to python
