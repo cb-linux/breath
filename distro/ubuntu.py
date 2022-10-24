@@ -6,7 +6,7 @@ def config(de_name: str, distro_version: str, username: str, root_partuuid: str,
     print_status("Configuring Ubuntu")
 
     # add missing apt sources
-    with open("/etc/apt/sources.list", "a") as file:
+    with open("/mnt/depthboot/etc/apt/sources.list", "a") as file:
         file.write(
             f"\ndeb http://archive.ubuntu.com/ubuntu {distro_version}-backports main restricted universe multiverse\n")
         file.write(
