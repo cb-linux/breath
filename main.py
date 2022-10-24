@@ -112,6 +112,10 @@ if __name__ == "__main__":
     if args.mainline:
         print_warning("Using mainline kernel")
         kernel_type = "mainline"
+
+        # temporary
+        print_error("Mainline kernel is currently broken")
+        exit(1)
     if args.local_path:
         print_warning("Using local files")
     if args.verbose:
