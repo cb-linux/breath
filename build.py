@@ -172,7 +172,7 @@ def download_rootfs(distro_name: str, distro_version: str) -> None:
             case "fedora":
                 print_status(f"Downloading fedora rootfs version: {distro_version} from github")
                 start_download_progress("/tmp/depthboot-build/fedora-rootfs.tar.xz")
-                urlretrieve(f"https://github.com/eupnea-linux/fedora-bootstrap/releases/latest/download/fedora-rootfs-"
+                urlretrieve(f"https://github.com/eupnea-linux/fedora-rootfs/releases/latest/download/fedora-rootfs-"
                             f"{distro_version}.tar.xz", filename="/tmp/depthboot-build/fedora-rootfs.tar.xz")
                 stop_download_progress()
             case "pop-os":
