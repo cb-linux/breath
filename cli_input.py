@@ -5,7 +5,7 @@ from functions import *
 
 
 def get_user_input() -> dict:
-    fedora_versions = ["35", "36", "37"]
+    fedora_versions = ["35", "36", "37", "38"]
     ubuntu_versions = {
         "18.04": "eoan",
         "20.04": "focal",
@@ -117,7 +117,7 @@ def get_user_input() -> dict:
                                "s), LXQt(recommended for weak devices), deepin, cli"
             case "fedora":
                 available_de = "Gnome(default, recommended), KDE(recommended), Xfce(recommended for weak device" \
-                               "s), LXQt(recommended for weak devices), deepin, cli"
+                               "s), LXQt(recommended for weak devices), budgie, deepin, cli"
 
         while True:
             temp_de_name = input("\033[94m" + "Available options: " + available_de + "\033[0m" + "\n")
@@ -148,9 +148,7 @@ def get_user_input() -> dict:
                         output_dict["de_name"] = "deepin"
                         break
                 case "budgie":
-                    if output_dict["distro_name"] == "fedora":
-                        print_warning("Budgie is not available for Fedora, please choose another DE")
-                    elif output_dict["distro_name"] == "ubuntu":
+                    if output_dict["distro_name"] == "ubuntu":
                         print_warning("Budgie is currently broken in Ubuntu, please choose another DE")
                     elif output_dict["distro_name"] == "arch":
                         print_warning("Budgie is currently broken in Arch, please choose another DE")
