@@ -111,30 +111,15 @@ def cpfile(src_as_str: str, dst_as_str: str) -> None:  # "/etc/resolv.conf", "/v
 
 
 #######################################################################################
-#                               SUBPROCESS FUNCTIONS                                  #
+#                               BASH FUNCTIONS                                        #
 #######################################################################################
 
 # return the output of a command
 def bash(command: str) -> str:
     output = subprocess.check_output(command, shell=True, text=True).strip()
     if verbose:
-        print(output)
+        print(output, flush=True)
     return output
-
-
-#######################################################################################
-#                                    MISC STUFF                                       #
-#######################################################################################
-
-def set_verbose(new_state: bool) -> None:
-    global verbose
-    verbose = new_state
-
-
-# This is for non-interactive shells
-def disable_download_progress() -> None:
-    global disable_download
-    disable_download = True
 
 
 def install_kernel_packages() -> None:
@@ -170,6 +155,21 @@ def install_kernel_packages() -> None:
         bash("sudo zypper --non-interactive install vboot")
 
 
+#######################################################################################
+#                                    MISC STUFF                                       #
+#######################################################################################
+
+def set_verbose(new_state: bool) -> None:
+    global verbose
+    verbose = new_state
+
+
+# This is for non-interactive shells
+def disable_download_progress() -> None:
+    global disable_download
+    disable_download = True
+
+
 def prevent_idle() -> None:
     Thread(target=__prevent_idle, daemon=True).start()
 
@@ -180,7 +180,7 @@ def __prevent_idle():
 
 
 #######################################################################################
-#                                    PROCESS MONITOR FUNCTIONS                        #
+#                              PROGRESS MONITOR FUNCTIONS                             #
 #######################################################################################
 def start_progress(force_show: bool = False) -> None:
     if not force_show and verbose:
