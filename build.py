@@ -323,7 +323,7 @@ def extract_rootfs(distro_name: str, distro_version: str) -> None:
     print_status("Extracting rootfs")
     match distro_name:
         case "ubuntu":
-            print_status("Debootstraping Ubuntu into /mnt/depthboot")
+            print_status(f"Debootstraping Ubuntu {distro_version} into /mnt/depthboot")
             start_progress()  # start fake progress
             # debootstrapping directly to /mnt/depthboot
             ubuntu_result = bash(f"debootstrap --components=main,restricted,universe,multiverse {distro_version} "
