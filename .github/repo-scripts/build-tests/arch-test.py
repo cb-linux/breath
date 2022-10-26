@@ -37,7 +37,7 @@ if __name__ == "__main__":
         print_header(f"Testing Arch + {de_name}")
         try:
             build.start_build(verbose=True, local_path=None, kernel_type="stable", dev_release=False,
-                              build_options=testing_dict, no_download_progress=True)
+                              build_options=testing_dict, no_download_progress=True, no_shrink=True)
         except Exception as e:
             print_error(str(e))
             print_error(f"Failed to build Arch + {de_name}")
