@@ -326,8 +326,11 @@ def extract_rootfs(distro_name: str, distro_version: str) -> None:
             print_status(f"Debootstraping Ubuntu {distro_version} into /mnt/depthboot")
             start_progress()  # start fake progress
             # debootstrapping directly to /mnt/depthboot
-            ubuntu_result = bash(f"debootstrap --components=main,restricted,universe,multiverse {distro_version} "
-                                 f"/mnt/depthboot http://archive.ubuntu.com/ubuntu")
+            try:
+                ubuntu_result = bash(f"debootstrap --components=main,restricted,universe,multiverse {distro_version} "
+                                     f"/mnt/depthboot http://archive.ubuntu.com/ubuntu")
+            except subprocess.CalledProcessError:  # crostini throws error, but still works
+                pass
             stop_progress()  # stop fake progress
             if ubuntu_result.__contains__("Couldn't download packages:"):
                 print_error("Ubuntu Debootstrap failed, check your internet connection or try again later")
