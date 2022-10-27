@@ -94,16 +94,6 @@ def config(de_name: str, distro_version: str, username: str, root_partuuid: str,
         file.writelines(original_sources)
     chroot("apt-get update -y")
     '''
-
-    # Add depthboot to version(this is purely cosmetic)
-    with open("/mnt/depthboot/etc/os-release", "r") as f:
-        os_release = f.readlines()
-    os_release[0] = os_release[0][:-2] + ' (Depthboot)"\n'
-    os_release[1] = os_release[1][:-2] + ' (Depthboot)"\n'
-    os_release[3] = os_release[3][:-2] + ' (Depthboot)"\n'
-    with open("/mnt/depthboot/etc/os-release", "w") as f:
-        f.writelines(os_release)
-
     print_status("Debian setup complete")
 
 

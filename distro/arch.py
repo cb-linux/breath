@@ -98,17 +98,6 @@ def config(de_name: str, distro_version: str, username: str, root_partuuid: str,
     with open("/mnt/depthboot/etc/pacman.conf", "w") as conf:
         conf.writelines(temp_pacman)
 
-    # TODO: add depthboot to arch name
-    # Add depthboot to version(this is purely cosmetic)
-    with open("/mnt/depthboot/etc/os-release", "r") as f:
-        os_release = f.readlines()
-    os_release[0] = os_release[0][:-2] + ' (Depthboot)"\n'
-    os_release[1] = os_release[1][:-2] + ' (Depthboot)"\n'
-    with open("/mnt/depthboot/etc/os-release", "w") as f:
-        f.writelines(os_release)
-
-    print_status("Arch configuration complete")
-
 
 # using arch-chroot for arch
 def chroot(command: str):

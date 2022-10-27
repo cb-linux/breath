@@ -60,14 +60,6 @@ def config(de_name: str, distro_version: str, username: str, root_partuuid: str,
         # Set system to boot to gui
         chroot("systemctl set-default graphical.target")
     print_status("Desktop environment setup complete")
-
-    # Add depthboot to version(this is purely cosmetic)
-    with open("/mnt/depthboot/etc/os-release", "r") as f:
-        os_release = f.read()
-    os_release = os_release.replace("(Generic)", "Depthboot")
-    with open("/mnt/depthboot/etc/os-release", "w") as f:
-        f.write(os_release)
-
     print_status("Fedora setup complete")
 
 
