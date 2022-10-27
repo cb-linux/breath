@@ -6,7 +6,7 @@ from functions import *
 
 def get_user_input() -> dict:
     fedora_versions = ["35", "36", "37", "38"]
-    ubuntu_versions = ["18.04", "20.04", "21.04", "22.04", "22.10"]
+    ubuntu_versions = ["18.04", "20.04", "21.04", "22.04"]
     output_dict = {
         "distro_name": "",
         "distro_version": "",
