@@ -14,10 +14,9 @@ def get_user_input() -> dict:
         #     "22.10": "kinetic"
     }
     output_dict = {
-        "distro_name": "popos",
+        "distro_name": "",
         "distro_version": "",
-        "distro_link": "",
-        "de_name": "cli",
+        "de_name": "",
         "username": "localuser",
         "password": "",
         "hostname": "depthboot-chromebook",
@@ -65,11 +64,13 @@ def get_user_input() -> dict:
             case "Debian" | "debian":
                 print("Debian stable selected")
                 output_dict["distro_name"] = "debian"
+                output_dict["distro_version"] = "stable"
                 # TODO: Add non stable debian versions
                 break
             case "Arch" | "arch" | "arch btw":
                 print("Arch selected")
                 output_dict["distro_name"] = "arch"
+                output_dict["distro_version"] = "latest"
                 break
             case "Fedora" | "fedora":
                 output_dict["distro_name"] = "fedora"
@@ -98,6 +99,7 @@ def get_user_input() -> dict:
             case "Pop!_OS" | "PopOS" | "POP!_OS" | "Pop_OS" | "Pop!OS" | "pop!_os" | "popos" | "pop-os" | "":  # default
                 print("Pop!_OS selected")
                 output_dict["distro_name"] = "pop-os"
+                output_dict["distro_version"] = "22.04"
                 break
             case _:
                 print_warning("Check your spelling and try again")

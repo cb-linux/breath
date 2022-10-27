@@ -422,6 +422,7 @@ def post_extract(build_options, kernel_type: str) -> None:
     settings["kernel_type"] = kernel_type
     # TODO: set kernel_version
     settings["distro_name"] = build_options["distro_name"]
+    settings["distro_version"] = build_options["distro_version"]
     settings["de_name"] = build_options["de_name"]
     if not build_options["device"] == "image":
         settings["install_type"] = "direct"

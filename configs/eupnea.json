@@ -4,5 +4,6 @@
   "depthboot_version": "0.6.1-alpha",
   "install_type": "image",
   "distro_name": "",
+  "distro_version": "",
   "de_name": ""
 }
