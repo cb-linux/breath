@@ -102,7 +102,6 @@ if __name__ == "__main__":
     import cli_input
 
     # parse arguments
-    dev_release = args.dev_build
     kernel_type = "stable"
     if args.dev_build:
         print_warning("Using dev release")
@@ -124,5 +123,5 @@ if __name__ == "__main__":
     if not args.image_size[0] == 10:
         print_warning(f"Image size overridden to {args.image_size[0]}GB")
     build.start_build(verbose=args.verbose, local_path=args.local_path, kernel_type=kernel_type,
-                      dev_release=dev_release, build_options=cli_input.get_user_input(), no_shrink=args.no_shrink,
+                      dev_release=args.dev_build, build_options=cli_input.get_user_input(), no_shrink=args.no_shrink,
                       img_size=args.image_size[0])

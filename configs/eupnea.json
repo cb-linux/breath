@@ -1,11 +1,12 @@
 {
   "kernel_type": "",
-  "kernel_version": "none",
-  "depthboot_version": "0.6.1-alpha",
+  "kernel_version": "",
+  "kernel_dev": false,
+  "depthboot_version": "",
   "install_type": "image",
   "distro_name": "",
   "distro_version": "",
   "de_name": "",
-  "scripts_type": "stable",
-  "scripts_version": "v1.0"
+  "scripts_dev": false,
+  "scripts_version": ""
 }

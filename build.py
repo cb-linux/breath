@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 from typing import Tuple
-from urllib.request import urlretrieve
+from urllib.request import urlretrieve, urlopen
 from urllib.error import URLError
 import json
 
@@ -103,7 +103,7 @@ def prepare_host(de_name: str) -> None:
 
 
 # download kernel files from GitHub
-def download_kernel(kernel_type: str, dev_release: bool, files: list = ["bzImage", "modules", "headers"]) -> None:
+def download_kernel(kernel_type: str, dev_release: bool, files: list = ["bzImage", "modules", "headers"]) -> str:
     # select correct link
     if dev_release:
         url = "https://github.com/eupnea-linux/kernel/releases/download/dev-build/"
@@ -147,8 +147,16 @@ def download_kernel(kernel_type: str, dev_release: bool, files: list = ["bzImage
                     urlretrieve(f"{url}modules-stable.tar.xz", filename="/tmp/depthboot-build/modules.tar.xz")
                 if "headers" in files:
                     urlretrieve(f"{url}headers-stable.tar.xz", filename="/tmp/depthboot-build/headers.tar.xz")
+
+        print_status("Getting kernel version")
+        if kernel_type == "mainline":
+            url = "https://api.github.com/repos/eupnea-linux/mainline-kernel/releases/latest"
+        else:
+            url = "https://api.github.com/repos/eupnea-linux/kernel/releases/latest"
+        return json.loads(urlopen(url).read())["tag_name"]
     except URLError:
         print_error("Failed to reach github. Check your internet connection and try again or use local files with -l")
+        print_warning("Dev releases may not always be available")
         exit(1)
 
     stop_progress()  # stop fake progress
@@ -360,7 +368,7 @@ def extract_rootfs(distro_name: str, distro_version: str) -> None:
 
 
 # Configure distro agnostic options
-def post_extract(build_options, kernel_type: str) -> None:
+def post_extract(build_options, kernel_type: str, kernel_version: str, dev_release: bool) -> None:
     print_status("Applying distro agnostic configuration")
 
     # Extract modules
@@ -415,7 +423,8 @@ def post_extract(build_options, kernel_type: str) -> None:
     with open("configs/eupnea.json", "r") as settings_file:
         settings = json.load(settings_file)
     settings["kernel_type"] = kernel_type
-    # TODO: set kernel_version
+    settings["kernel_version"] = kernel_version
+    settings["kernel_dev"] = dev_release
     settings["distro_name"] = build_options["distro_name"]
     settings["distro_version"] = build_options["distro_version"]
     settings["de_name"] = build_options["de_name"]
@@ -523,7 +532,7 @@ def start_build(verbose: bool, local_path, kernel_type: str, dev_release: bool, 
     prepare_host(build_options["distro_name"])
 
     if local_path is None:  # default
-        download_kernel(kernel_type, dev_release)
+        kernel_version = download_kernel(kernel_type, dev_release)
         download_rootfs(build_options["distro_name"], build_options["distro_version"])
         download_firmware()
         download_postinstall_scripts()
@@ -543,7 +552,7 @@ def start_build(verbose: bool, local_path, kernel_type: str, dev_release: bool, 
                 cpfile(f"{local_path_posix}{file}", f"/tmp/depthboot-build/{file}")
             except FileNotFoundError:
                 print_error(f"File {file} not found in {local_path}, attempting to download")
-                download_kernel(kernel_type, dev_release, [file])
+                kernel_version = download_kernel(kernel_type, dev_release, [file])
 
         # copy distro agnostic files
         dirs = {
@@ -591,7 +600,7 @@ def start_build(verbose: bool, local_path, kernel_type: str, dev_release: bool, 
 
     # Extract rootfs and configure distro agnostic settings
     extract_rootfs(build_options["distro_name"], build_options["distro_version"])
-    post_extract(build_options, kernel_type)
+    post_extract(build_options, kernel_type, kernel_version, dev_release)
 
     match build_options["distro_name"]:
         case "ubuntu":
