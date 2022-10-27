@@ -5,14 +5,21 @@ def config(de_name: str, distro_version: str, username: str, root_partuuid: str,
     set_verbose(verbose)
     print_status("Configuring Ubuntu")
 
+    ubuntu_versions_codenames = {
+        "18.04": "bionic",
+        "20.04": "focal",
+        "21.04": "hirsute",
+        "22.04": "jammy",
+        "22.10": "kinetic"
+    }
     # add missing apt sources
     with open("/mnt/depthboot/etc/apt/sources.list", "a") as file:
-        file.write(
-            f"\ndeb http://archive.ubuntu.com/ubuntu {distro_version}-backports main restricted universe multiverse\n")
-        file.write(
-            f"\ndeb http://security.ubuntu.com/ubuntu {distro_version}-security main restricted universe multiverse\n")
-        file.write(
-            f"\ndeb http://archive.ubuntu.com/ubuntu {distro_version}-updates main restricted universe multiverse\n")
+        file.write(f"\ndeb http://archive.ubuntu.com/ubuntu {ubuntu_versions_codenames[distro_version]}-backports main "
+                   "restricted universe multiverse\n")
+        file.write(f"\ndeb http://security.ubuntu.com/ubuntu {ubuntu_versions_codenames[distro_version]}-security main"
+                   f" restricted universe multiverse\n")
+        file.write(f"\ndeb http://archive.ubuntu.com/ubuntu {ubuntu_versions_codenames[distro_version]}-updates main "
+                   f"restricted universe multiverse\n")
 
     print_status("Installing dependencies")
     chroot("apt-get update -y")

@@ -6,13 +6,7 @@ from functions import *
 
 def get_user_input() -> dict:
     fedora_versions = ["35", "36", "37", "38"]
-    ubuntu_versions = {
-        "18.04": "eoan",
-        "20.04": "focal",
-        "21.04": "hirsute",
-        "22.04": "jammy",
-        #     "22.10": "kinetic"
-    }
+    ubuntu_versions = ["18.04", "20.04", "21.04", "22.04", "22.10"]
     output_dict = {
         "distro_name": "",
         "distro_version": "",
@@ -38,28 +32,25 @@ def get_user_input() -> dict:
                 output_dict["distro_name"] = "ubuntu"
                 # convert array into string
                 array_as_string = ""
-                for line in ubuntu_versions.keys():
+                for line in ubuntu_versions:
                     array_as_string += line + ", "
                 array_as_string = array_as_string[:-2]
                 while True:
-                    print_question("Use latest Ubuntu version?")
+                    print_question("Use latest stable Ubuntu version?")
                     temp_input = input("\033[94m" + "Press enter for yes, or type in the version number. Supported "
                                                     "versions: " + array_as_string + ": \033[0m")
                     if temp_input == "":
-                        # get highest version number
-                        output_dict["distro_version"] = next(reversed(ubuntu_versions.keys()))  # latest version
-                        print("Ubuntu: " + output_dict["distro_version"] + " selected")
+                        output_dict["distro_version"] = ubuntu_versions[-2]  # latest stable version
+                        print("Using Ubuntu version: " + output_dict["distro_version"])
+                        break
                     else:
                         if temp_input in ubuntu_versions:
                             output_dict["distro_version"] = temp_input
                             print("Ubuntu: " + output_dict["distro_version"] + " selected")
+                            break
                         else:
                             print_warning("Version not available, please choose another")
                             continue
-                    # translate version number to codename
-                    output_dict["distro_version"] = ubuntu_versions[output_dict["distro_version"]]
-                    print("Ubuntu: " + output_dict["distro_version"] + " selected")
-                    break
                 break
             case "Debian" | "debian":
                 print("Debian stable selected")
