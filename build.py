@@ -160,7 +160,11 @@ def download_rootfs(distro_name: str, distro_version: str) -> None:
     try:
         match distro_name:
             case "ubuntu":
-                print_status("Ubuntu is downloaded later, skipping download")
+                print_status(f"Downloading ubuntu rootfs version: {distro_version} from github")
+                start_download_progress("/tmp/depthboot-build/ubuntu-rootfs.tar.xz")
+                urlretrieve(f"https://github.com/eupnea-linux/ubuntu-rootfs/releases/latest/download/ubuntu-rootfs-"
+                            f"{distro_version}.tar.xz", filename="/tmp/depthboot-build/ubuntu-rootfs.tar.xz")
+                stop_download_progress()
             case "debian":
                 print_status("Debian is downloaded later, skipping download")
             case "arch":
@@ -323,18 +327,9 @@ def extract_rootfs(distro_name: str, distro_version: str) -> None:
     print_status("Extracting rootfs")
     match distro_name:
         case "ubuntu":
-            print_status(f"Debootstraping Ubuntu {distro_version} into /mnt/depthboot")
-            start_progress()  # start fake progress
-            # debootstrapping directly to /mnt/depthboot
-            try:
-                ubuntu_result = bash(f"debootstrap --components=main,restricted,universe,multiverse {distro_version} "
-                                     f"/mnt/depthboot http://archive.ubuntu.com/ubuntu")
-            except subprocess.CalledProcessError:  # crostini throws error, but still works
-                pass
-            stop_progress()  # stop fake progress
-            if ubuntu_result.__contains__("Couldn't download packages:"):
-                print_error("Ubuntu Debootstrap failed, check your internet connection or try again later")
-                exit(1)
+            print_status("Extracting ubuntu rootfs")
+            # --checkpoint is for printing real tar progress
+            bash("tar xfp /tmp/depthboot-build/ubuntu-rootfs.tar.xz -C /mnt/depthboot --checkpoint=.10000")
         case "debian":
             print_status("Debootstraping Debian into /mnt/depthboot")
             start_progress()  # start fake progress
