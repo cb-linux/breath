@@ -60,6 +60,11 @@ def config(de_name: str, distro_version: str, username: str, root_partuuid: str,
         # Set system to boot to gui
         chroot("systemctl set-default graphical.target")
     print_status("Desktop environment setup complete")
+
+    print_status("Adding fedora modules")
+    with open("/mnt/depthboot/etc/modules-load.d/eupnea-modules.conf", "a") as f:
+        f.write("# Fedora modules\nsunrpc\n")
+
     print_status("Fedora setup complete")
 
 
