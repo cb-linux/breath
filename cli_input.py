@@ -245,7 +245,7 @@ def get_user_input() -> dict:
         lsblk_out = bash("lsblk -nd -o NAME,MODEL,SIZE,TRAN").splitlines()
         for line in lsblk_out:
             # MassStorageClass is not a real device, so ignore it
-            if not line.find("usb") == -1 and line.find("MassStorageClass") == -1:  # Print USB devices only
+            if not line.find("usb") == -1 and line.find("0B") == -1:  # Print USB devices only with storage
                 usb_array.append(line[:3])
                 print(line[:-3])  # this is for the user to see the list
         if len(usb_array) == 0:
