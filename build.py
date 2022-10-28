@@ -10,15 +10,6 @@ from functions import *
 
 # Clean old depthboot files from /tmp
 def prepare_host(de_name: str) -> None:
-    print_status("Preparing host system")
-
-    # unmount popos remains before attempting to remove /tmp/depthboot-build
-    try:
-        bash("umount -lf /tmp/depthboot-build/cdrom 2>/dev/null")  # umount popos iso if exists
-    except subprocess.CalledProcessError:
-        print("Failed to unmount /tmp/depthboot-build/cdrom, ignore")
-        pass
-
     print_status("Cleaning + preparing host system")
     rmdir("/tmp/depthboot-build")
     mkdir("/tmp/depthboot-build", create_parents=True)
