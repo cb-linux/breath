@@ -29,6 +29,8 @@ def prepare_host(de_name: str) -> None:
 
     # Install dependencies
     install_kernel_packages()
+
+    # TODO: only install if building image
     # Install parted
     if not path_exists("/usr/sbin/parted"):
         print_status("Installing parted")
