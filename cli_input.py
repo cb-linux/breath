@@ -116,11 +116,11 @@ def get_user_input() -> dict:
             temp_de_name = input("\033[94m" + "Available options: " + available_de + "\033[0m" + "\n")
             match temp_de_name:
                 case "Gnome" | "gnome" | "":
-                    if output_dict["distro_name"] == "fedora":
-                        print_warning("Gnome is currently broken on fedora, please choose another DE")
+                    if output_dict["distro_name"] == "fedora" and output_dict["distro_version"] == "37":
+                        print_warning("Gnome is currently broken on fedora 37, please choose another DE")
                         continue
-                    if output_dict["distro_name"] == "ubuntu":
-                        print_warning("Gnome is currently broken on ubuntu, please choose another DE")
+                    if output_dict["distro_name"] == "ubuntu" and output_dict["distro_version"] == "22.10":
+                        print_warning("Gnome is currently broken on ubuntu 22-10, please choose another DE")
                         continue
                     print("Gnome selected")
                     output_dict["de_name"] = "gnome"
