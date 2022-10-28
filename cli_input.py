@@ -6,7 +6,7 @@ from functions import *
 
 def get_user_input() -> dict:
     fedora_versions = ["35", "36", "37", "38"]
-    ubuntu_versions = ["18.04", "20.04", "21.04", "22.04"]
+    ubuntu_versions = ["18.04", "20.04", "21.04", "22.04", "22.10"]
     output_dict = {
         "distro_name": "",
         "distro_version": "",
@@ -100,7 +100,7 @@ def get_user_input() -> dict:
         print_question("Which desktop environment(Desktop GUI) would you like to use?")
         match output_dict["distro_name"]:
             case "ubuntu":
-                available_de = "Gnome(default, recommended), KDE(recommended), Xfce(recommended for weak device" \
+                available_de = "KDE(recommended), Xfce(recommended for weak device" \
                                "s), LXQt(recommended for weak devices), cli"
             case "debian":
                 available_de = "Gnome(default, recommended), KDE(recommended), Xfce(recommended for weak device" \
@@ -109,7 +109,7 @@ def get_user_input() -> dict:
                 available_de = "Gnome(default, recommended), KDE(recommended), Xfce(recommended for weak device" \
                                "s), LXQt(recommended for weak devices), deepin, cli"
             case "fedora":
-                available_de = "Gnome(default, recommended), KDE(recommended), Xfce(recommended for weak device" \
+                available_de = "KDE(recommended), Xfce(recommended for weak device" \
                                "s), LXQt(recommended for weak devices), budgie, deepin, cli"
 
         while True:
