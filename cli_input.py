@@ -100,8 +100,8 @@ def get_user_input() -> dict:
         print_question("Which desktop environment(Desktop GUI) would you like to use?")
         match output_dict["distro_name"]:
             case "ubuntu":
-                available_de = "KDE(recommended), Xfce(recommended for weak device" \
-                               "s), LXQt(recommended for weak devices), cli"
+                available_de = "Gnome(default, recommended), KDE(recommended), Xfce(recommended for weak devices), " \
+                               "LXQt(recommended for weak devices), cli"
             case "debian":
                 available_de = "Gnome(default, recommended), KDE(recommended), Xfce(recommended for weak device" \
                                "s), LXQt(recommended for weak devices), budgie, cli"
@@ -109,8 +109,8 @@ def get_user_input() -> dict:
                 available_de = "Gnome(default, recommended), KDE(recommended), Xfce(recommended for weak device" \
                                "s), LXQt(recommended for weak devices), deepin, cli"
             case "fedora":
-                available_de = "KDE(recommended), Xfce(recommended for weak device" \
-                               "s), LXQt(recommended for weak devices), budgie, deepin, cli"
+                available_de = "Gnome(default, recommended), KDE(recommended), Xfce(recommended for weak device" \
+                               "s), LXQt(recommended for weak devices), deepin, budgie, cli"
 
         while True:
             temp_de_name = input("\033[94m" + "Available options: " + available_de + "\033[0m" + "\n")
