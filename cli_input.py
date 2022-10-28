@@ -5,8 +5,6 @@ from functions import *
 
 
 def get_user_input() -> dict:
-    fedora_versions = ["35", "36", "37", "38"]
-    ubuntu_versions = ["18.04", "20.04", "21.04", "22.04", "22.10"]
     output_dict = {
         "distro_name": "",
         "distro_version": "",
@@ -30,27 +28,21 @@ def get_user_input() -> dict:
         match temp_distro_name:
             case "Ubuntu" | "ubuntu":
                 output_dict["distro_name"] = "ubuntu"
-                # convert array into string
-                array_as_string = ""
-                for line in ubuntu_versions:
-                    array_as_string += line + ", "
-                array_as_string = array_as_string[:-2]
                 while True:
-                    print_question("Use latest stable Ubuntu version?")
-                    temp_input = input("\033[94m" + "Press enter for yes, or type in the version number. Supported "
-                                                    "versions: " + array_as_string + ": \033[0m")
+                    print_question("Use latest Ubuntu version?")
+                    temp_input = input("\033[94m" + "Press enter for yes(22.10), or type 'LTS' to use the latest "
+                                                    "lts version(22.04): " + "\033[0m")
                     if temp_input == "":
-                        output_dict["distro_version"] = ubuntu_versions[-1]  # latest stable version
+                        output_dict["distro_version"] = "22.10"
                         print("Using Ubuntu version: " + output_dict["distro_version"])
                         break
+                    elif temp_input == "LTS" or temp_input == "lts":
+                        output_dict["distro_version"] = "22.04"
+                        print("Ubuntu: " + output_dict["distro_version"] + " selected")
+                        break
                     else:
-                        if temp_input in ubuntu_versions:
-                            output_dict["distro_version"] = temp_input
-                            print("Ubuntu: " + output_dict["distro_version"] + " selected")
-                            break
-                        else:
-                            print_warning("Version not available, please choose another")
-                            continue
+                        print_warning("Version not available, please choose another")
+                        continue
                 break
             case "Debian" | "debian":
                 print("Debian stable selected")
@@ -65,27 +57,21 @@ def get_user_input() -> dict:
                 break
             case "Fedora" | "fedora":
                 output_dict["distro_name"] = "fedora"
-                # convert array into string
-                array_as_string = ""
-                for line in fedora_versions:
-                    array_as_string += line + ", "
-                array_as_string = array_as_string[:-2]
                 while True:
                     print_question("Use latest stable Fedora version?")
-                    temp_input = input("\033[94m" + "Press enter for yes, or type in the version number. Supported "
-                                                    "versions: " + array_as_string + ": \033[0m")
+                    temp_input = input("\033[94m" + "Press enter for yes(37), or type 'beta' to use the latest "
+                                                    "beta(38):" + "\033[0m")
                     if temp_input == "":
-                        output_dict["distro_version"] = fedora_versions[-2]  # latest stable version
+                        output_dict["distro_version"] = "37"
                         print("Using Fedora version: " + output_dict["distro_version"])
                         break
+                    elif temp_input == "Beta" or temp_input == "beta":
+                        output_dict["distro_version"] = "38"
+                        print("Fedora: " + output_dict["distro_version"] + " selected")
+                        break
                     else:
-                        if temp_input in fedora_versions:
-                            output_dict["distro_version"] = temp_input
-                            print("Fedora: " + output_dict["distro_version"] + " selected")
-                            break
-                        else:
-                            print_warning("Version not available, please choose another")
-                            continue
+                        print_warning("Version not available, please choose another")
+                        continue
                 break
             case "Pop!_OS" | "PopOS" | "POP!_OS" | "Pop_OS" | "Pop!OS" | "pop!_os" | "popos" | "pop-os" | "":  # default
                 print("Pop!_OS selected")
