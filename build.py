@@ -47,7 +47,7 @@ def prepare_host(de_name: str) -> None:
             exit(1)
 
     # install debootstrap for debian
-    if de_name == "debian" or not path_exists("/usr/sbin/debootstrap"):
+    if de_name == "debian" and not path_exists("/usr/sbin/debootstrap"):
         print_status("Installing debootstrap")
         if path_exists("/usr/bin/apt"):
             bash("apt-get install debootstrap -y")
