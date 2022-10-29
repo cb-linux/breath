@@ -42,8 +42,7 @@ if __name__ == "__main__":
         # install kernel packages before elevating to root, as makepkg needs to be run as non-root
         install_kernel_packages()
         # create empty file to confirm script was started as non-root
-        with open("/tmp/.root_ok", "w") as file:
-            file.write("")
+        open("/tmp/.root_ok", "a").close()
         sudo_args = ['sudo', sys.executable] + sys.argv + [os.environ]
         os.execlpe('sudo', *sudo_args)
 
@@ -100,8 +99,7 @@ if __name__ == "__main__":
             print_error("Have you ran the Crostini specific instructions in the README?")
             print("https://eupnea-linux.github.io/docs.html#/pages/crostini?id=crostini-specific-instructions")
             exit(1)
-        with open("/tmp/.crostini-fixed", "w") as file:
-            file.write("")
+        open("/tmp/.crostini-fixed", "a").close()
 
     # import files after python version check is successful
     import build
