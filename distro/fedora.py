@@ -46,7 +46,8 @@ def config(de_name: str, distro_version: str, username: str, root_partuuid: str,
             chroot("dnf install -y plasma-discover")
         case "budgie":
             print_status("Installing Budgie")
-            chroot("dnf install -y budgie-desktop lightdm xorg-x11-server-Xorg gnome-terminal firefox gnome-software")
+            chroot("dnf install -y budgie-desktop lightdm lightdm-gtk xorg-x11-server-Xorg gnome-terminal firefox "
+                   "gnome-software")
         case "cli":
             print_status("Skipping desktop environment install")
             # install network tui
