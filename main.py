@@ -53,9 +53,9 @@ if __name__ == "__main__":
     # Check python version
     if sys.version_info < (3, 10):  # python 3.10 or higher is required
         if path_exists("/usr/bin/apt"):
-            if input(
-                    "\033[92m" + "Python 3.10 or higher is required. Attempt to install? (Y/n)\n" +
-                    "\033[0m").lower() == "y" or "":
+            user_answer = input("\033[92m" + "Python 3.10 or higher is required. Attempt to install? (Y/n)\n" +
+                                "\033[0m").lower()
+            if user_answer == "y" or user_answer == "":
                 print_status("Switching to unstable channel")
                 # switch to unstable channel
                 with open("/etc/apt/sources.list", "r") as file:
