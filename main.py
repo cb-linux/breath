@@ -93,7 +93,13 @@ if __name__ == "__main__":
     if product_name == "crosvm" and not path_exists("/tmp/.crostini-fixed"):
         print_warning("Crostini detected. Preparing Crostini")
         # TODO: Translate to python
-        bash("bash configs/crostini/setup-crostini.sh")
+        try:
+            bash("bash configs/crostini/setup-crostini.sh")
+        except subprocess.CalledProcessError:
+            print_error("Failed to prepare Crostini")
+            print_error("Have you ran the Crostini specific instructions in the README?")
+            print("https://eupnea-linux.github.io/docs.html#/pages/crostini?id=crostini-specific-instructions")
+            exit(1)
         with open("/tmp/.crostini-fixed", "w") as file:
             file.write("")
 
