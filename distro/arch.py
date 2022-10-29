@@ -25,14 +25,12 @@ def config(de_name: str, distro_version: str, username: str, root_partuuid: str,
     print_status("Preparing pacman")
     chroot("pacman-key --init")
     chroot("pacman-key --populate archlinux")
-    chroot("pacman -Syy --noconfirm")
-    chroot("pacman -Syu --noconfirm")
+    chroot("pacman -Syyu --noconfirm")  # update the whole system
 
     print_status("Installing packages")
     start_progress()  # start fake progress
-    chroot("pacman -S --noconfirm base base-devel nano networkmanager xkeyboard-config linux-firmware "
-           "sudo")  # system packages
-    chroot("pacman -S --noconfirm git dmidecode cloud-utils rsync")  # postinstall dependencies
+    chroot("pacman -S --noconfirm base base-devel nano networkmanager xkeyboard-config linux-firmware sudo")
+    chroot("pacman -S --noconfirm git cloud-utils rsync")  # postinstall script dependencies
     stop_progress()  # stop fake progress
 
     print_status("Downloading and installing de, might take a while")
