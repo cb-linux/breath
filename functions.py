@@ -192,8 +192,7 @@ def start_progress(force_show: bool = False) -> None:
 def stop_progress(force_show: bool = False) -> None:
     if not force_show and verbose:
         return
-    with open(".stop_progress", "w") as file:
-        file.write("")
+    open(".stop_progress", "a").close()
     sleep(3)
     print("\n", end="")
 
@@ -205,8 +204,7 @@ def start_download_progress(file_path_str: str) -> None:
 
 
 def stop_download_progress() -> None:
-    with open(".stop_download_progress", "w") as file:
-        file.write("")
+    open(".stop_download_progress", "a").close()
     sleep(1)
     print("\n", end="")
 
