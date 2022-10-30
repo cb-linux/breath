@@ -34,7 +34,7 @@ def config(de_name: str, distro_version: str, username: str, root_partuuid: str,
             chroot("apt-get install -y ubuntu-desktop gnome-software epiphany-browser")
         case "kde":
             print_status("Installing KDE")
-            chroot("apt-get install -y kde-standard")
+            chroot("DEBIAN_FRONTEND=noninteractive apt-get install -y kde-standard")
         case "xfce":
             print_status("Installing Xfce")
             chroot("apt-get install -y --no-install-recommends xubuntu-desktop gnome-software epiphany-browser")
