@@ -96,8 +96,8 @@ if __name__ == "__main__":
             bash("bash configs/crostini/setup-crostini.sh")
         except subprocess.CalledProcessError:
             print_error("Failed to prepare Crostini")
-            print_error("Have you ran the Crostini specific instructions in the README?")
-            print("https://eupnea-linux.github.io/docs.html#/pages/crostini?id=crostini-specific-instructions")
+            print_error("Please run the Crostini specific instructions")
+            print("https://eupnea-linux.github.io/docs.html#/extra-pages/crostini")
             exit(1)
         open("/tmp/.crostini-fixed", "a").close()
 
