@@ -647,6 +647,9 @@ def start_build(verbose: bool, local_path, kernel_type: str, dev_release: bool, 
             actual_fs_in_bytes += 67108864
             actual_fs_in_bytes += 102400  # add 100kb for linux to be able to boot
             bash(f"truncate --size={actual_fs_in_bytes} ./depthboot.img")
+        if product_name == "crosvm":
+            # rename the image to .bin for the chromeos recovery utility to be able to flash it
+            bash(f"mv ./depthboot.img ./depthboot.bin")
 
         bash(f"losetup -d {img_mnt}")
         print_header(f"The ready-to-boot Depthboot image is located at {get_full_path('.')}/depthboot.img")
