@@ -21,7 +21,7 @@ def rmdir(rm_dir: str, keep_dir: bool = True) -> None:
                 else:
                     unlink_files(path_to_rm)
         except FileNotFoundError:
-            print(f"No such file or directory: {path_to_rm}, ignoring")
+            print(f"Couldn't remove non existent directory: {path_to_rm}, ignoring")
             pass
 
     # convert string to Path object
@@ -41,7 +41,7 @@ def rmdir(rm_dir: str, keep_dir: bool = True) -> None:
 
 # remove a single file
 def rmfile(file: str, force: bool = False) -> None:
-    if force:
+    if force:  # for symbolic links
         Path(file).unlink(missing_ok=True)
     file_as_path = Path(file)
     if file_as_path.exists():
@@ -232,6 +232,35 @@ def __print_download_progress(file_path: Path) -> None:
 #######################################################################################
 #                                    PRINT FUNCTIONS                                  #
 #######################################################################################
+
+# tree implementation in python
+# Credit: https://stackoverflow.com/a/59109706
+def create_tree(dir_str: str) -> str:
+    # TODO: sort alphabetically
+    def tree(dir_path: Path, prefix: str = ''):
+        # prefix components:
+        space = '    '
+        branch = '│   '
+        # pointers:
+        tee = '├── '
+        last = '└── '
+
+        dir_path.iterdir()
+        contents = list(dir_path.iterdir())
+        # contents each get pointers that are ├── with a final └── :
+        pointers = [tee] * (len(contents) - 1) + [last]
+        for pointer, path in zip(pointers, contents):
+            yield prefix + pointer + path.name
+            if path.is_dir():  # extend the prefix and recurse:
+                extension = branch if pointer == tee else space
+                # i.e. space because last, └── , above so no more |
+                yield from tree(path, prefix=prefix + extension)
+
+    final_tree = dir_str + "\n"
+    for line in tree(Path(dir_str)):
+        final_tree += line + "\n"
+    return final_tree
+
 
 def print_warning(message: str) -> None:
     print("\033[93m" + message + "\033[0m", flush=True)
