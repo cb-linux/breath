@@ -440,21 +440,21 @@ def post_extract(build_options, kernel_type: str, kernel_version: str, dev_relea
     password = build_options["password"]  # quotes interfere with functions below
 
     # Do not pre-setup gnome, as there is a nice gui first time setup on first boot
-    if not build_options["de_name"] == "gnome":
-        print_status("Configuring user")
-        chroot(f"useradd --create-home --shell /bin/bash {username}")
-        # TODO: Fix ) and ( crashing chpasswd
-        chroot(f'echo "{username}:{password}" | chpasswd')
-        match build_options["distro_name"]:
-            case "ubuntu" | "debian":
-                chroot(f"usermod -aG sudo {username}")
-            case "arch" | "fedora":
-                chroot(f"usermod -aG wheel {username}")
+    # if not build_options["de_name"] == "gnome":
+    print_status("Configuring user")
+    chroot(f"useradd --create-home --shell /bin/bash {username}")
+    # TODO: Fix ) and ( crashing chpasswd
+    chroot(f'echo "{username}:{password}" | chpasswd')
+    match build_options["distro_name"]:
+        case "ubuntu" | "debian":
+            chroot(f"usermod -aG sudo {username}")
+        case "arch" | "fedora":
+            chroot(f"usermod -aG wheel {username}")
 
-        # set timezone build system timezone on device
-        host_time_zone = bash("file /etc/localtime")  # read host timezone link
-        host_time_zone = host_time_zone[host_time_zone.find("/usr/share/zoneinfo/"):].strip()  # get actual timezone
-        chroot(f"ln -sf {host_time_zone} /etc/localtime")
+    # set timezone build system timezone on device
+    host_time_zone = bash("file /etc/localtime")  # read host timezone link
+    host_time_zone = host_time_zone[host_time_zone.find("/usr/share/zoneinfo/"):].strip()  # get actual timezone
+    chroot(f"ln -sf {host_time_zone} /etc/localtime")
 
     print_status("Distro agnostic configuration complete")
 
