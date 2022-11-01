@@ -57,8 +57,9 @@ def config(de_name: str, distro_version: str, username: str, root_partuuid: str,
         case "budgie":
             print_status("Installing Budgie")
             # do not install tex-common, it breaks the installation
-            chroot("DEBIAN_FRONTEND=noninteractive apt-get install -y ubuntu-budgie-desktop tex-common-")
-            chroot("dpkg-reconfigure lightdm")
+            chroot("DEBIAN_FRONTEND=noninteractive apt-get install -y ubuntu-budgie-desktop tex-common- lightdm "
+                   "lightdm-gtk-greeter")
+            chroot("systemctl enable lightdm.service")
         case "cli":
             print_status("Skipping desktop environment install")
         case _:
