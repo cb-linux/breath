@@ -238,7 +238,7 @@ def prepare_img(distro_name: str, img_size) -> Tuple[str, str]:
     try:
         bash(f"fallocate -l {img_size}G depthboot.img")
     except subprocess.CalledProcessError:  # try fallocate, if it fails use dd
-        bash("dd if=/dev/zero of=depthboot.img status=progress bs=12884 count=1000070")
+        bash(f"dd if=/dev/zero of=depthboot.img status=progress bs=1024 count={img_size * 1000000}")
 
     print_status("Mounting empty image")
     mnt_point = bash("losetup -f --show depthboot.img")
