@@ -45,11 +45,15 @@ def get_user_input() -> dict:
                         continue
                 break
             case "Debian" | "debian":
-                print("Debian stable selected")
-                output_dict["distro_name"] = "debian"
-                output_dict["distro_version"] = "stable"
-                # TODO: Add non stable debian versions
-                break
+                print_warning("Warning: The audio and some postinstall scripts are not supported on debian by default.")
+                if input("\033[94mType 'yes' to continue anyways or Press Enter to choose another distro" +
+                         "\033[0m\n") == "yes":
+                    print("Debian stable selected")
+                    output_dict["distro_name"] = "debian"
+                    output_dict["distro_version"] = "stable"
+                    # TODO: Add non stable debian versions
+                    break
+                continue
             case "Arch" | "arch" | "arch btw":
                 print("Arch selected")
                 output_dict["distro_name"] = "arch"
