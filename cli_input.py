@@ -11,7 +11,6 @@ def get_user_input() -> dict:
         "de_name": "",
         "username": "localuser",
         "password": "",
-        "hostname": "depthboot-chromebook",
         "device": "image",
         "rebind_search": False
     }
@@ -165,7 +164,7 @@ def get_user_input() -> dict:
             found_invalid_char = False
             for char in output_dict["username"]:
                 if char not in "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789._-":
-                    print_warning(f"Hostname contains invalid character: {char}")
+                    print_warning(f"Username contains invalid character: {char}")
                     found_invalid_char = True
                     break
             if not found_invalid_char:
@@ -197,26 +196,25 @@ def get_user_input() -> dict:
                     print_warning("Passwords do not match, please try again")
                     continue
 
-    # TODO: Maybe skip this, as its not really needed for the average user to set themselves
-    print_question("Enter hostname for the chromebook.(Hostname is something like a device name)")
-    while True:
-        output_dict["hostname"] = input("\033[94m" + "Hostname(default: 'depthboot-chromebook'): " + "\033[0m")
-        if output_dict["hostname"] == "":
-            print("Using depthboot-chromebook as hostname")
-            # name is already preset in the dictionary
-            break
-        if output_dict["hostname"][0] == "-":
-            print_warning("Hostname cannot start with a '-'")
-            continue
-        found_invalid_char = False
-        for char in output_dict["hostname"]:
-            if char not in "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-":
-                print_warning(f"Hostname contains invalid character: {char}")
-                found_invalid_char = True
-                break
-        if not found_invalid_char:
-            print(f"Using {output_dict['hostname']} as hostname")
-            break
+    # print_question("Enter hostname for the chromebook.(Hostname is something like a device name)")
+    # while True:
+    #     output_dict["hostname"] = input("\033[94m" + "Hostname(default: 'depthboot-chromebook'): " + "\033[0m")
+    #     if output_dict["hostname"] == "":
+    #         print("Using depthboot-chromebook as hostname")
+    #         # name is already preset in the dictionary
+    #         break
+    #     if output_dict["hostname"][0] == "-":
+    #         print_warning("Hostname cannot start with a '-'")
+    #         continue
+    #     found_invalid_char = False
+    #     for char in output_dict["hostname"]:
+    #         if char not in "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-":
+    #             print_warning(f"Hostname contains invalid character: {char}")
+    #             found_invalid_char = True
+    #             break
+    #     if not found_invalid_char:
+    #         print(f"Using {output_dict['hostname']} as hostname")
+    #         break
 
     print_question("Rebind the Search/Super/Win key to Caps Lock?(NOT RECOMMENDED)")
     if input("\033[94m" + "Type yes to rebind. Press enter to keep old binding: " "\033[0m") == "yes":

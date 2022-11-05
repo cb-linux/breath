@@ -387,9 +387,9 @@ def post_extract(build_options, kernel_type: str, kernel_version: str, dev_relea
     cpfile("/etc/resolv.conf",
            "/mnt/depthboot/run/systemd/resolve/stub-resolv.conf")  # copy hosts resolv.conf to chroot
 
-    # Set device hostname
-    with open("/mnt/depthboot/etc/hostname", "w") as hostname_file:
-        hostname_file.write(build_options["hostname"] + "\n")
+    # # Set device hostname
+    # with open("/mnt/depthboot/etc/hostname", "w") as hostname_file:
+    #     hostname_file.write(build_options["hostname"] + "\n")
 
     # Copy eupnea scripts and config
     print_status("Copying eupnea scripts and configs")
