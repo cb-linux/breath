@@ -31,11 +31,11 @@ def get_user_input() -> dict:
                     print_question("Use latest Ubuntu version?")
                     temp_input = input("\033[94m" + "Press enter for yes(22.10), or type 'LTS' to use the latest "
                                                     "lts version(22.04): " + "\033[0m")
-                    if temp_input == "":
+                    if temp_input == "" or temp_input == "22.10":
                         output_dict["distro_version"] = "22.10"
                         print("Using Ubuntu version: " + output_dict["distro_version"])
                         break
-                    elif temp_input == "LTS" or temp_input == "lts":
+                    elif temp_input == "LTS" or temp_input == "lts" or temp_input == "22.04":
                         output_dict["distro_version"] = "22.04"
                         print("Ubuntu: " + output_dict["distro_version"] + " selected")
                         break
