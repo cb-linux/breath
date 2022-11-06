@@ -460,7 +460,7 @@ def post_config(rebind_search: bool, de_name: str, distro_name) -> None:
 
     # copy previously downloaded firmware
     print_status("Copying google firmware")
-    rmdir("/mnt/depthboot/lib/firmware")
+    # rmdir("/mnt/depthboot/lib/firmware")
     start_progress(force_show=True)  # start fake progress
     cpdir("/tmp/depthboot-build/firmware", "/mnt/depthboot/lib/firmware")
     stop_progress(force_show=True)  # stop fake progress
