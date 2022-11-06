@@ -27,10 +27,6 @@ def prepare_host(de_name: str) -> None:
     rmfile("depthboot.img")
     rmfile("kernel.flags")
 
-    # Install dependencies
-    install_kernel_packages()
-
-    # TODO: only install if building image
     # Install parted
     if not path_exists("/usr/sbin/parted"):
         print_status("Installing parted")
@@ -76,22 +72,6 @@ def prepare_host(de_name: str) -> None:
         else:
             print_warning("Arch-install-scripts not found, please install it using your distros package manager or "
                           "select another distro instead of arch")
-            exit(1)
-
-    # install unsquashfs for pop-os
-    if de_name == "pop-os" and not path_exists("/usr/bin/unsquashfs"):
-        print_status("Installing unsquashfs")
-        if path_exists("/usr/bin/apt"):
-            bash("apt-get install squashfs-tools -y")
-        elif path_exists("/usr/bin/pacman"):
-            bash("pacman -S squashfs-tools --noconfirm")
-        elif path_exists("/usr/bin/dnf"):
-            bash("dnf install squashfs-tools --assumeyes")
-        elif path_exists("/usr/bin/zypper"):  # openSUSE
-            bash("zypper --non-interactive install squashfs-tools")
-        else:
-            print_warning("'squashfs-tools' not found, please install it using your distros package manager or select "
-                          "another distro instead of Pop!_OS")
             exit(1)
 
 
