@@ -173,6 +173,7 @@ def download_rootfs(distro_name: str, distro_version: str) -> None:
         exit(1)
 
 
+# TODO: Figure out if this is actually necessary or if linux-firmware is enough
 # Download firmware for later
 def download_firmware() -> None:
     print_status("Downloading firmware")
