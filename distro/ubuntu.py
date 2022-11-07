@@ -37,9 +37,7 @@ def config(de_name: str, distro_version: str, username: str, root_partuuid: str,
             chroot("DEBIAN_FRONTEND=noninteractive apt-get install -y kde-standard")
         case "xfce":
             print_status("Installing Xfce")
-            chroot("apt-get install -y --no-install-recommends xubuntu-desktop network-manager-gnome gnome-software "
-                   "epiphany-browser")
-            chroot("apt-get install -y xfce4-goodies")
+            chroot("apt-get install -y xubuntu-desktop epiphany-browser")
         case "lxqt":
             print_status("Installing LXQt")
             chroot("apt-get install -y lubuntu-desktop discover konqueror")
