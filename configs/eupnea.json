@@ -8,6 +8,6 @@
   "distro_version": "",
   "de_name": "",
   "scripts_dev": false,
-  "scripts_version": ""
+  "scripts_version": "",
   "firmware_payload": "depthcharge"
 }
