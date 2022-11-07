@@ -38,8 +38,8 @@ def config(de_name: str, distro_version: str, username: str, root_partuuid: str,
         case "xfce":
             print_status("Installing Xfce")
             chroot("apt-get install -y --no-install-recommends xubuntu-desktop")
-            chroot("apt-get install -y xfce4-goodies xfce4-pulseaudio-plugin network-manager-gnome gnome-software "
-                   "epiphany-browser")
+            chroot("apt-get install -y xfce4-goodies xfce4-pulseaudio-plugin pulseaudio-module-bluetooth "
+                   "network-manager-gnome gnome-software epiphany-browser")
         case "lxqt":
             print_status("Installing LXQt")
             chroot("apt-get install -y lubuntu-desktop discover konqueror")
