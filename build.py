@@ -79,9 +79,9 @@ def prepare_host(de_name: str) -> None:
 def download_kernel(kernel_type: str, dev_release: bool, files: list = ["bzImage", "modules", "headers"]) -> str:
     # select correct link
     if dev_release:
-        url = "https://github.com/eupnea-linux/kernel/releases/download/dev-build/"
+        url = "https://github.com/eupnea-linux/chromeos-kernel/releases/download/dev-build/"
     else:
-        url = "https://github.com/eupnea-linux/kernel/releases/latest/download/"
+        url = "https://github.com/eupnea-linux/chromeos-kernel/releases/latest/download/"
 
     # download kernel files
     start_progress()  # show fake progress
@@ -125,7 +125,7 @@ def download_kernel(kernel_type: str, dev_release: bool, files: list = ["bzImage
         if kernel_type == "mainline":
             url = "https://api.github.com/repos/eupnea-linux/mainline-kernel/releases/latest"
         else:
-            url = "https://api.github.com/repos/eupnea-linux/kernel/releases/latest"
+            url = "https://api.github.com/repos/eupnea-linux/chromeos-kernel/releases/latest"
         return json.loads(urlopen(url).read())["tag_name"]
     except URLError:
         print_error("Failed to reach github. Check your internet connection and try again or use local files with -l")
