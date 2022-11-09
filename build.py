@@ -120,13 +120,19 @@ def download_kernel(kernel_type: str, dev_release: bool, files: list = ["bzImage
                     urlretrieve(f"{url}modules-stable.tar.xz", filename="/tmp/depthboot-build/modules.tar.xz")
                 if "headers" in files:
                     urlretrieve(f"{url}headers-stable.tar.xz", filename="/tmp/depthboot-build/headers.tar.xz")
-
-        # Download stable Eupnea-ChromeOS kernel to use as reserve kernel
-        print_status("Downloading stable Eupnea-ChromeOS kernel")
-        urlretrieve("https://github.com/eupnea-linux/chromeos-kernel/releases/latest/download/bzImage-stable",
-                    filename="/tmp/depthboot-build/bzImage-reserve")
-        urlretrieve("https://github.com/eupnea-linux/chromeos-kernel/releases/latest/download/modules-stable.tar.xz",
-                    filename="/tmp/depthboot-build/modules-reserve.tar.xz")
+        if kernel_type == "stable":
+            print_status("Duplicating stable kernel files")
+            # duplicate stable kernel files instead of downloading them again
+            cpfile("/tmp/depthboot-build/bzImage", "/tmp/depthboot-build/bzImage-reserve")
+            cpfile("/tmp/depthboot-build/modules.tar.xz", "/tmp/depthboot-build/modules-reserve.tar.xz")
+        else:
+            # Download stable Eupnea-ChromeOS kernel to use as reserve kernel
+            print_status("Downloading stable Eupnea-ChromeOS kernel")
+            urlretrieve("https://github.com/eupnea-linux/chromeos-kernel/releases/latest/download/bzImage-stable",
+                        filename="/tmp/depthboot-build/bzImage-reserve")
+            urlretrieve(
+                "https://github.com/eupnea-linux/chromeos-kernel/releases/latest/download/modules-stable.tar.xz",
+                filename="/tmp/depthboot-build/modules-reserve.tar.xz")
 
         print_status("Getting kernel version")
         if kernel_type == "mainline":
@@ -277,7 +283,7 @@ def partition_and_flash_kernel(mnt_point: str, write_usb: bool, distro_name: str
     bash(f"parted -s -a optimal {mnt_point} unit mib mkpart Kernel 65 130")  # reserve kernel partition
     bash(f"parted -s -a optimal {mnt_point} unit mib mkpart Root 130 100%")  # rootfs partition
     bash(f"cgpt add -i 1 -t kernel -S 1 -T 5 -P 15 {mnt_point}")  # set kernel flags
-    bash(f"cgpt add -i 1 -t kernel -S 2 -T 5 -P 1 {mnt_point}")  # set reserve kernel flags
+    bash(f"cgpt add -i 2 -t kernel -S 1 -T 5 -P 1 {mnt_point}")  # set reserve kernel flags
 
     # get uuid of rootfs partition
     rootfs_partuuid = bash(f"blkid -o value -s PARTUUID {rootfs_mnt}")
