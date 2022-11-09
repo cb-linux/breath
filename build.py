@@ -121,6 +121,13 @@ def download_kernel(kernel_type: str, dev_release: bool, files: list = ["bzImage
                 if "headers" in files:
                     urlretrieve(f"{url}headers-stable.tar.xz", filename="/tmp/depthboot-build/headers.tar.xz")
 
+        # Download stable Eupnea-ChromeOS kernel to use as reserve kernel
+        print_status("Downloading stable Eupnea-ChromeOS kernel")
+        urlretrieve("https://github.com/eupnea-linux/chromeos-kernel/releases/latest/download/bzImage-stable",
+                    filename="/tmp/depthboot-build/bzImage-reserve")
+        urlretrieve("https://github.com/eupnea-linux/chromeos-kernel/releases/latest/download/modules-stable.tar.xz",
+                    filename="/tmp/depthboot-build/modules-reserve.tar.xz")
+
         print_status("Getting kernel version")
         if kernel_type == "mainline":
             url = "https://api.github.com/repos/eupnea-linux/mainline-kernel/releases/latest"
@@ -254,10 +261,10 @@ def partition_and_flash_kernel(mnt_point: str, write_usb: bool, distro_name: str
     # Determine rootfs part name
     if write_usb:
         # if writing to usb, then no p in partition name
-        rootfs_mnt = mnt_point + "2"
+        rootfs_mnt = mnt_point + "3"
     else:
         # image is a loop device -> needs p in part name
-        rootfs_mnt = mnt_point + "p2"
+        rootfs_mnt = mnt_point + "p3"
 
     # remove pre-existing partition table from usb
     if write_usb:
@@ -267,8 +274,10 @@ def partition_and_flash_kernel(mnt_point: str, write_usb: bool, distro_name: str
     # READ: https://wiki.gentoo.org/wiki/Creating_bootable_media_for_depthcharge_based_devices
     bash(f"parted -s {mnt_point} mklabel gpt")
     bash(f"parted -s -a optimal {mnt_point} unit mib mkpart Kernel 1 65")  # kernel partition
-    bash(f"parted -s -a optimal {mnt_point} unit mib mkpart Root 65 100%")  # rootfs partition
-    bash(f"cgpt add -i 1 -t kernel -S 1 -T 5 -P 15 {mnt_point}")  # depthcharge flags
+    bash(f"parted -s -a optimal {mnt_point} unit mib mkpart Kernel 65 130")  # reserve kernel partition
+    bash(f"parted -s -a optimal {mnt_point} unit mib mkpart Root 130 100%")  # rootfs partition
+    bash(f"cgpt add -i 1 -t kernel -S 1 -T 5 -P 15 {mnt_point}")  # set kernel flags
+    bash(f"cgpt add -i 1 -t kernel -S 2 -T 5 -P 1 {mnt_point}")  # set reserve kernel flags
 
     # get uuid of rootfs partition
     rootfs_partuuid = bash(f"blkid -o value -s PARTUUID {rootfs_mnt}")
@@ -285,6 +294,14 @@ def partition_and_flash_kernel(mnt_point: str, write_usb: bool, distro_name: str
          + " --signprivate /usr/share/vboot/devkeys/kernel_data_key.vbprivk --bootloader kernel.flags" +
          " --config kernel.flags --vmlinuz /tmp/depthboot-build/bzImage --pack /tmp/depthboot-build/bzImage.signed")
 
+    # Set different kernel flags for the reserve kernel
+    with open("kernel.flags", "w") as config:
+        config.write(f"console=tty1 root=PARTUUID={rootfs_partuuid} i915.modeset=1 rootwait rw reserve_kernel")
+    # Sign reserve kernel
+    bash("futility vbutil_kernel --arch x86_64 --version 1 --keyblock /usr/share/vboot/devkeys/kernel.keyblock --signp"
+         "rivate /usr/share/vboot/devkeys/kernel_data_key.vbprivk --bootloader kernel.flags --config kernel.flags --vm"
+         "linuz /tmp/depthboot-build/bzImage-reserve --pack /tmp/depthboot-build/bzImage-reserve.signed")
+
     # Flash kernel
     if write_usb:
         # if writing to usb, then no p in partition name
@@ -292,6 +309,14 @@ def partition_and_flash_kernel(mnt_point: str, write_usb: bool, distro_name: str
     else:
         # image is a loop device -> needs p in part name
         bash(f"dd if=/tmp/depthboot-build/bzImage.signed of={mnt_point}p1")
+
+    # Flash reserve kernel
+    if write_usb:
+        # if writing to usb, then no p in partition name
+        bash(f"dd if=/tmp/depthboot-build/bzImage-reserve.signed of={mnt_point}2")
+    else:
+        # image is a loop device -> needs p in part name
+        bash(f"dd if=/tmp/depthboot-build/bzImage-reserve.signed of={mnt_point}p2")
 
     print_status("Formatting rootfs part")
     # Create rootfs ext4 partition
@@ -347,9 +372,11 @@ def post_extract(build_options, kernel_type: str, kernel_version: str, dev_relea
 
     # Extract modules
     print_status("Extracting kernel modules")
-    rmdir("/mnt/depthboot/lib/modules")  # remove all old modules
+    rmdir("/mnt/depthboot/lib/modules")  # remove any preinstalled modules
     mkdir("/mnt/depthboot/lib/modules")
     bash(f"tar xpf /tmp/depthboot-build/modules.tar.xz -C /mnt/depthboot/lib/modules/ --checkpoint=.10000")
+    # Extract reserve kernel modules
+    bash(f"tar xpf /tmp/depthboot-build/modules-reserve.tar.xz -C /mnt/depthboot/lib/modules/ --checkpoint=.10000")
     print("")  # break line after tar
 
     # Extract kernel headers
@@ -621,9 +648,9 @@ def start_build(verbose: bool, local_path, kernel_type: str, dev_release: bool, 
         if not product_name == "crosvm" and not no_shrink:
             # Shrink image to actual size
             print_status("Shrinking image")
-            bash(f"e2fsck -fpv {img_mnt}p2")  # Force check filesystem for errors
-            bash(f"resize2fs -f -M {img_mnt}p2")
-            block_count = int(bash(f"dumpe2fs -h {img_mnt}p2 | grep 'Block count:'")[12:].split()[0])
+            bash(f"e2fsck -fpv {img_mnt}p3")  # Force check filesystem for errors
+            bash(f"resize2fs -f -M {img_mnt}p3")
+            block_count = int(bash(f"dumpe2fs -h {img_mnt}p3 | grep 'Block count:'")[12:].split()[0])
             actual_fs_in_bytes = block_count * 4096
             # the kernel part is always the same size -> sector amount: 131072 * 512 => 67108864 bytes
             actual_fs_in_bytes += 67108864
