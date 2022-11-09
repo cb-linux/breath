@@ -120,19 +120,6 @@ def download_kernel(kernel_type: str, dev_release: bool, files: list = ["bzImage
                     urlretrieve(f"{url}modules-stable.tar.xz", filename="/tmp/depthboot-build/modules.tar.xz")
                 if "headers" in files:
                     urlretrieve(f"{url}headers-stable.tar.xz", filename="/tmp/depthboot-build/headers.tar.xz")
-        if kernel_type == "stable":
-            print_status("Duplicating stable kernel files")
-            # duplicate stable kernel files instead of downloading them again
-            cpfile("/tmp/depthboot-build/bzImage", "/tmp/depthboot-build/bzImage-reserve")
-            cpfile("/tmp/depthboot-build/modules.tar.xz", "/tmp/depthboot-build/modules-reserve.tar.xz")
-        else:
-            # Download stable Eupnea-ChromeOS kernel to use as reserve kernel
-            print_status("Downloading stable Eupnea-ChromeOS kernel")
-            urlretrieve("https://github.com/eupnea-linux/chromeos-kernel/releases/latest/download/bzImage-stable",
-                        filename="/tmp/depthboot-build/bzImage-reserve")
-            urlretrieve(
-                "https://github.com/eupnea-linux/chromeos-kernel/releases/latest/download/modules-stable.tar.xz",
-                filename="/tmp/depthboot-build/modules-reserve.tar.xz")
 
         print_status("Getting kernel version")
         if kernel_type == "mainline":
@@ -300,14 +287,6 @@ def partition_and_flash_kernel(mnt_point: str, write_usb: bool, distro_name: str
          + " --signprivate /usr/share/vboot/devkeys/kernel_data_key.vbprivk --bootloader kernel.flags" +
          " --config kernel.flags --vmlinuz /tmp/depthboot-build/bzImage --pack /tmp/depthboot-build/bzImage.signed")
 
-    # Set different kernel flags for the reserve kernel
-    with open("kernel.flags", "w") as config:
-        config.write(f"console=tty1 root=PARTUUID={rootfs_partuuid} i915.modeset=1 rootwait rw reserve_kernel")
-    # Sign reserve kernel
-    bash("futility vbutil_kernel --arch x86_64 --version 1 --keyblock /usr/share/vboot/devkeys/kernel.keyblock --signp"
-         "rivate /usr/share/vboot/devkeys/kernel_data_key.vbprivk --bootloader kernel.flags --config kernel.flags --vm"
-         "linuz /tmp/depthboot-build/bzImage-reserve --pack /tmp/depthboot-build/bzImage-reserve.signed")
-
     # Flash kernel
     if write_usb:
         # if writing to usb, then no p in partition name
@@ -315,14 +294,6 @@ def partition_and_flash_kernel(mnt_point: str, write_usb: bool, distro_name: str
     else:
         # image is a loop device -> needs p in part name
         bash(f"dd if=/tmp/depthboot-build/bzImage.signed of={mnt_point}p1")
-
-    # Flash reserve kernel
-    if write_usb:
-        # if writing to usb, then no p in partition name
-        bash(f"dd if=/tmp/depthboot-build/bzImage-reserve.signed of={mnt_point}2")
-    else:
-        # image is a loop device -> needs p in part name
-        bash(f"dd if=/tmp/depthboot-build/bzImage-reserve.signed of={mnt_point}p2")
 
     print_status("Formatting rootfs part")
     # Create rootfs ext4 partition
@@ -381,8 +352,6 @@ def post_extract(build_options, kernel_type: str, kernel_version: str, dev_relea
     rmdir("/mnt/depthboot/lib/modules")  # remove any preinstalled modules
     mkdir("/mnt/depthboot/lib/modules")
     bash(f"tar xpf /tmp/depthboot-build/modules.tar.xz -C /mnt/depthboot/lib/modules/ --checkpoint=.10000")
-    # Extract reserve kernel modules
-    bash(f"tar xpf /tmp/depthboot-build/modules-reserve.tar.xz -C /mnt/depthboot/lib/modules/ --checkpoint=.10000")
     print("")  # break line after tar
 
     # Extract kernel headers
