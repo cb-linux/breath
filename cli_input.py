@@ -15,6 +15,7 @@ def get_user_input() -> dict:
         "rebind_search": False
     }
     # Print welcome message
+    print_warning("DEPTHBOOT IS IN BETA. USE AT YOUR OWN RISK.")
     print_header("Welcome to Depthboot, formerly known as Breath")
     print_header("This script will create a bootable Linux USB-drive/SD-card/image for you.")
     print_header("You will now be asked a few questions. If you dont know what to answer, just press 'enter' and the"
