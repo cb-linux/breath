@@ -43,6 +43,9 @@ def config(de_name: str, distro_version: str, username: str, root_partuuid: str,
         case "lxqt":
             print_status("Installing LXQt")
             chroot("apt-get install -y lubuntu-desktop discover konqueror")
+            # hide snd_hda error on boot
+            with open("/mnt/depthboot/etc/modprobe.d/alsa-base.conf", "a") as file:
+                file.write("\noptions snd-hda-intel probe_mask=1\n")
         case "deepin":
             print_status("Installing deepin")
 
