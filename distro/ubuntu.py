@@ -1,4 +1,5 @@
 from functions import *
+import os
 
 
 def config(de_name: str, distro_version: str, username: str, root_partuuid: str, verbose: bool) -> None:
@@ -51,7 +52,12 @@ def config(de_name: str, distro_version: str, username: str, root_partuuid: str,
                 chroot("apt-get install -y ubuntudde-dde")
             except subprocess.CalledProcessError:  # ignore modules error, missing modules are installed on first boot
                 pass
-            chroot("apt-get install -y  discover konqueror")
+            # remove dpkg deepin-anything files to avoid dpkg errors
+            # These are later reinstated by the postinstall script
+            for file in os.listdir("/mnt/depthboot/var/lib/dpkg/info/"):
+                if file.startswith("deepin-anything-"):
+                    rmfile(f"/mnt/depthboot/var/lib/dpkg/info/{file}")
+            chroot("apt-get install -y discover konqueror")
         case "budgie":
             print_status("Installing Budgie")
             # do not install tex-common, it breaks the installation
