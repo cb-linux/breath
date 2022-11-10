@@ -45,15 +45,9 @@ def config(de_name: str, distro_version: str, username: str, root_partuuid: str,
             chroot("apt-get install -y lubuntu-desktop discover konqueror")
         case "deepin":
             print_status("Installing deepin")
-
-            # Probably due to some misconfiguration in deepin's installer, our kernel version is not supported.
-            # Install fails with: Errors were encountered while processing: deepin-anything-dkms, dde-file-manager,
-            # ubuntudde-dde, deepin-anything-server
-
-            # TODO: Fix deepin
             chroot("add-apt-repository -y ppa:ubuntudde-dev/stable")
             chroot("apt-get update -y")
-            chroot("apt-get install -y ubuntudde-dde")
+            chroot("apt-get install -y ubuntudde-dde discover konqueror")
         case "budgie":
             print_status("Installing Budgie")
             # do not install tex-common, it breaks the installation

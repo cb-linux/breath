@@ -124,8 +124,6 @@ def get_user_input() -> dict:
                 case "deepin":
                     if output_dict["distro_name"] == "debian":
                         print_warning("Deepin is not available for Debian, please choose another DE")
-                    elif output_dict["distro_name"] == "ubuntu":
-                        print_warning("Deepin is currently broken upstream in Ubuntu, please choose another DE")
                     else:
                         print("Deepin selected")
                         output_dict["de_name"] = "deepin"
