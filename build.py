@@ -4,6 +4,7 @@ from typing import Tuple
 from urllib.request import urlretrieve, urlopen
 from urllib.error import URLError
 import json
+import dbus
 
 from functions import *
 
@@ -613,6 +614,7 @@ def start_build(verbose: bool, local_path, kernel_type: str, dev_release: bool, 
     except subprocess.CalledProcessError as error:  # on crostini umount fails for some reason
         if verbose:
             print(error)
+
     if build_options["device"] == "image":
         try:
             with open("/sys/devices/virtual/dmi/id/product_name", "r") as file:
@@ -636,8 +638,17 @@ def start_build(verbose: bool, local_path, kernel_type: str, dev_release: bool, 
             bash(f"mv ./depthboot.img ./depthboot.bin")
 
         bash(f"losetup -d {img_mnt}")
+
+        # send a dbus notification
+        dbus.Interface(dbus.SessionBus().get_object(
+            "org.freedesktop.Notifications", "/org/freedesktop/Notifications"), "org.freedesktop.Notifications"
+        ).Notify("", 0, "", "The Eupnea Project", "Depthboot image creation finished", [], {"urgency": 1}, 5000)
+
         print_header(f"The ready-to-boot Depthboot image is located at {get_full_path('.')}/depthboot.img")
     else:
+        dbus.Interface(dbus.SessionBus().get_object(
+            "org.freedesktop.Notifications", "/org/freedesktop/Notifications"), "org.freedesktop.Notifications"
+        ).Notify("", 0, "", "The Eupnea Project", "Depthboot USB/SD-card creation finished", [], {"urgency": 1}, 5000)
         print_header(f"USB/SD-card is ready to boot {build_options['distro_name'].capitalize()}")
         print_header("It is safe to remove the USB-drive/SD-card now.")
     print_header("Please report any bugs/issues on GitHub or on the Discord server.")
