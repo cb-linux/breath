@@ -1,5 +1,7 @@
 [Unit]
-Description=Postinstall service, autodeletes itself if run successfully on first boot
+Description=Eupnea oneshot post-installation script
+# Further description:
+# This script is only run on the first boot of Deptboot/EupneaOS. It calls the postinstall script in /usr/local/bin.
 
 [Service]
 Type=oneshot
