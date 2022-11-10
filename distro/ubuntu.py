@@ -47,7 +47,11 @@ def config(de_name: str, distro_version: str, username: str, root_partuuid: str,
             print_status("Installing deepin")
             chroot("add-apt-repository -y ppa:ubuntudde-dev/stable")
             chroot("apt-get update -y")
-            chroot("apt-get install -y ubuntudde-dde discover konqueror")
+            try:
+                chroot("apt-get install -y ubuntudde-dde")
+            except subprocess.CalledProcessError:  # ignore modules error, missing modules are installed on first boot
+                pass
+            chroot("apt-get install -y  discover konqueror")
         case "budgie":
             print_status("Installing Budgie")
             # do not install tex-common, it breaks the installation
