@@ -43,9 +43,6 @@ def config(de_name: str, distro_version: str, username: str, root_partuuid: str,
         case "lxqt":
             print_status("Installing LXQt")
             chroot("apt-get install -y lubuntu-desktop discover konqueror")
-            # hide snd_hda error on boot
-            with open("/mnt/depthboot/etc/modprobe.d/alsa-base.conf", "a") as file:
-                file.write("\noptions snd-hda-intel probe_mask=1\n")
         case "deepin":
             print_status("Installing deepin")
 
@@ -60,9 +57,8 @@ def config(de_name: str, distro_version: str, username: str, root_partuuid: str,
         case "budgie":
             print_status("Installing Budgie")
             # do not install tex-common, it breaks the installation
-            chroot("DEBIAN_FRONTEND=noninteractive apt-get install -y ubuntu-budgie-desktop tex-common- lightdm "
-                   "lightdm-gtk-greeter")
-            chroot("systemctl enable lightdm.service")
+            chroot("DEBIAN_FRONTEND=noninteractive apt-get install -y lightdm lightdm-gtk-greeter ubuntu-budgie-desktop"
+                   " tex-common-")
         case "cli":
             print_status("Skipping desktop environment install")
         case _:

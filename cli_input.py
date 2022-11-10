@@ -131,14 +131,9 @@ def get_user_input() -> dict:
                         output_dict["de_name"] = "deepin"
                         break
                 case "budgie":
-                    if output_dict["distro_name"] == "ubuntu":
-                        print_warning("Budgie is currently broken in Ubuntu, please choose another DE")
-                    elif output_dict["distro_name"] == "arch":
-                        print_warning("Budgie is currently broken in Arch, please choose another DE")
-                    else:
-                        print("Budgie selected")
-                        output_dict["de_name"] = "budgie"
-                        break
+                    print("Budgie selected")
+                    output_dict["de_name"] = "budgie"
+                    break
                 case "cli" | "none":
                     print_warning("Warning: No desktop environment will be installed!")
                     if input("\033[94mType 'yes' to continue or Press Enter to choose a desktop environment" +
