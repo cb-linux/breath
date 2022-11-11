@@ -1,0 +1,9 @@
+[Unit]
+Description=Eupnea auto-update timer
+
+[Timer]
+OnUnitActiveSec=1d
+OnBootSec=120s
+
+[Install]
+WantedBy=timers.target

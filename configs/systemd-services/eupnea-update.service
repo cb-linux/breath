@@ -1,0 +1,6 @@
+[Unit]
+Description=Eupnea auto-update
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/update-scripts

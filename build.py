@@ -457,10 +457,11 @@ def post_config(rebind_search: bool, de_name: str, distro_name) -> None:
             cpfile("/mnt/depthboot/usr/share/X11/xkb/keycodes/evdev",
                    "/mnt/depthboot/usr/share/X11/xkb/keycodes/evdev.default")
 
-    # Add postinstall service
-    print_status("Adding postinstall service")
-    cpfile("configs/postinstall.service", "/mnt/depthboot/etc/systemd/system/postinstall.service")
+    # Install systemd services
+    print_status("Adding systemd services")
+    cpfile("configs/systemd-services", "/mnt/depthboot/etc/systemd/system")
     chroot("systemctl enable postinstall.service")
+    chroot("systemctl enable eupnea-update.timer")
 
     # copy previously downloaded firmware
     print_status("Copying google firmware")
