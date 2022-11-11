@@ -291,9 +291,11 @@ def partition_and_flash_kernel(mnt_point: str, write_usb: bool, distro_name: str
     if write_usb:
         # if writing to usb, then no p in partition name
         bash(f"dd if=/tmp/depthboot-build/bzImage.signed of={mnt_point}1")
+        bash(f"dd if=/tmp/depthboot-build/bzImage.signed of={mnt_point}2")  # Backup kernel
     else:
         # image is a loop device -> needs p in part name
         bash(f"dd if=/tmp/depthboot-build/bzImage.signed of={mnt_point}p1")
+        bash(f"dd if=/tmp/depthboot-build/bzImage.signed of={mnt_point}p2")  # Backup kernel
 
     print_status("Formatting rootfs part")
     # Create rootfs ext4 partition
