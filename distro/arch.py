@@ -69,6 +69,9 @@ def config(de_name: str, distro_version: str, username: str, root_partuuid: str,
                    "budgie-screensaver budgie-control-center xorg xorg-server network-manager-applet gnome-terminal"
                    " firefox gnome-software")
             chroot("systemctl enable lightdm.service")
+            # remove broken gnome login xsessions
+            chroot("rm /usr/share/xsessions/gnome.desktop")
+            chroot("rm /usr/share/xsessions/gnome-xorg.desktop")
         case "cli":
             print_status("Skipping desktop environment install")
         case _:
