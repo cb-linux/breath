@@ -67,7 +67,7 @@ def config(de_name: str, distro_version: str, username: str, root_partuuid: str,
             print_status("Installing Budgie")
             chroot("pacman -S --noconfirm lightdm lightdm-gtk-greeter budgie-desktop budgie-desktop-view "
                    "budgie-screensaver budgie-control-center xorg xorg-server network-manager-applet gnome-terminal"
-                   " firefox gnome-software nautilus")
+                   " firefox gnome-software nemo")
             chroot("systemctl enable lightdm.service")
             # remove broken gnome xsessions
             chroot("rm /usr/share/xsessions/gnome.desktop")
