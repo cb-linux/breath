@@ -68,6 +68,7 @@ def config(de_name: str, distro_version: str, username: str, root_partuuid: str,
             chroot("pacman -S --noconfirm lightdm lightdm-gtk-greeter budgie-desktop budgie-desktop-view "
                    "budgie-screensaver budgie-control-center xorg xorg-server network-manager-applet gnome-terminal"
                    " firefox gnome-software")
+            chroot("systemctl enable lightdm.service")
         case "cli":
             print_status("Skipping desktop environment install")
         case _:
