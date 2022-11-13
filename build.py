@@ -267,8 +267,8 @@ def partition_and_flash_kernel(mnt_point: str, write_usb: bool, distro_name: str
     # READ: https://wiki.gentoo.org/wiki/Creating_bootable_media_for_depthcharge_based_devices
     bash(f"parted -s {mnt_point} mklabel gpt")
     bash(f"parted -s -a optimal {mnt_point} unit mib mkpart Kernel 1 65")  # kernel partition
-    bash(f"parted -s -a optimal {mnt_point} unit mib mkpart Kernel 65 131")  # reserve kernel partition
-    bash(f"parted -s -a optimal {mnt_point} unit mib mkpart Root 131 100%")  # rootfs partition
+    bash(f"parted -s -a optimal {mnt_point} unit mib mkpart Kernel 65 129")  # reserve kernel partition
+    bash(f"parted -s -a optimal {mnt_point} unit mib mkpart Root 129 100%")  # rootfs partition
     bash(f"cgpt add -i 1 -t kernel -S 1 -T 5 -P 15 {mnt_point}")  # set kernel flags
     bash(f"cgpt add -i 2 -t kernel -S 1 -T 5 -P 1 {mnt_point}")  # set reserve kernel flags
 
