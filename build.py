@@ -460,7 +460,7 @@ def post_config(rebind_search: bool, de_name: str, distro_name) -> None:
     # Install systemd services
     print_status("Adding systemd services")
     cpdir("configs/systemd-services", "/mnt/depthboot/etc/systemd/system")
-    chroot("systemctl enable postinstall.service")
+    chroot("systemctl enable eupnea-postinstall.service")
     chroot("systemctl enable eupnea-update.timer")
 
     # copy previously downloaded firmware
