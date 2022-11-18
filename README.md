@@ -1,6 +1,9 @@
-# Depthboot
-Depthboot allows Linux to run on Chromebooks **WITHOUT** modifying the stock firmware in any way.  
-<h1><a href="https://eupnea-linux.github.io/docs.html#/">‼️➡️ TRY NOW ⬅️‼️</a></h1>
+# Depthboot: your **Chromebook**, your way
+Choose between a variety of common Linux distributions and desktop environments to create a bootable image for any 64-bit Chromebook.
+<h1><a href="https://eupnea-linux.github.io/main.html#/depthboot-pages/requirements">‼️➡️ Build now ⬅️‼️</a></h1>
+Due to licensing restraints, Depthboot cannot be distributed as an iso. Instead, it has to be build locally.
+
+You can alternatively use [EupneaOS](https://github.com/eupnea-linux/eupnea-os) which does offer prebuilt isos.
 
 ## Depthboot vs mainline
 (Mainline = stock, unmodified Linux distribution)
@@ -12,12 +15,12 @@ Depthboot allows Linux to run on Chromebooks **WITHOUT** modifying the stock fir
 
 **Depthboot:**
 * Requires no modifications to firmware
-* Hardware works the same as in ChromeOS
+* Hardware support matches ChromeOS
 * More audio support available
 
-## [Supported devices](https://eupnea-linux.github.io/docs.html#/pages/devices)
+## [Supported devices](https://eupnea-linux.github.io/main.html#/depthboot-pages/requirements?id=supported-devices)
 
-## [How does Depthboot work?](https://eupnea-linux.github.io/docs.html#/dev-pages/build-script)
+## [Developer docs](https://eupnea-linux.github.io/main.html#/dev-pages/build-script)
 
 ## Credit
 * Depthboot is based on [Breath](https://github.com/cb-linux/breath) by MilkyDeveloper. Breath was active from Apr 2021 until its archival in late Aug 2022.  
