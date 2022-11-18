@@ -3,6 +3,7 @@ from pathlib import Path
 from time import sleep
 from threading import Thread
 import subprocess
+from urllib.request import urlretrieve
 
 verbose = False
 disable_download = False
@@ -131,28 +132,18 @@ def install_kernel_packages() -> None:
         return
 
     if path_exists("/usr/bin/apt"):  # Ubuntu + debian
-        bash("sudo apt-get install cgpt vboot-kernel-utils -y")
+        bash("apt-get install cgpt vboot-kernel-utils -y")
     elif path_exists("/usr/bin/pacman"):  # Arch
-        # remove old files if present
-        rmdir("/tmp/kernel-packages/")
-        mkdir("/tmp/kernel-packages")
-
-        bash("sudo pacman -S --needed base-devel --noconfirm")  # install base-devel for makepkg
-
-        # trousers is a dependency of vboot-utils
-        bash("git clone https://aur.archlinux.org/trousers.git /tmp/kernel-packages/trousers")
-        bash("git clone https://aur.archlinux.org/vboot-utils.git /tmp/kernel-packages/vboot-utils")
-
-        bash("cd /tmp/kernel-packages/trousers && makepkg -sirc --noconfirm")
-        # using subprocess.run instead of bash because makepkg has some C errors
-        subprocess.run("cd /tmp/kernel-packages/vboot-utils && makepkg -sirc --noconfirm", shell=True)
-
-        # remove local repo clones
-        rmdir("/tmp/kernel-packages/")
+        # Download prepackaged cgpt + vboot from GitHub
+        urlretrieve(
+            "https://github.com/eupnea-linux/arch-packages/releases/latest/download/vboot-cgpt-utils.pkg.tar.zst",
+            filename="/tmp/vboot-cgpt-utils.pkg.tar.zst")
+        # Install packages
+        bash("pacman --noconfirm -U /tmp/vboot-cgpt-utils.pkg.tar.zst")
     elif path_exists("/usr/bin/dnf"):  # Fedora
-        bash("sudo dnf install vboot-utils --assumeyes")  # cgpt is included in vboot-utils on fedora
+        bash("dnf install vboot-utils --assumeyes")  # cgpt is included in vboot-utils on fedora
     elif path_exists("/usr/bin/zypper"):  # openSUSE
-        bash("sudo zypper --non-interactive install vboot")
+        bash("zypper --non-interactive install vboot")
 
 
 #######################################################################################
