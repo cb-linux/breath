@@ -31,27 +31,26 @@ def process_args():
 
 
 if __name__ == "__main__":
-    if os.geteuid() == 0 and not path_exists("/tmp/.root_ok"):
-        print_error("Please start the script as non-root/without sudo")
-        exit(1)
-
     args = process_args()
 
     # Restart script as root
     if not os.geteuid() == 0:
-        # install kernel packages before elevating to root, as makepkg needs to be run as non-root
-        install_kernel_packages()
-        # create empty file to confirm script was started as non-root
-        open("/tmp/.root_ok", "a").close()
         sudo_args = ['sudo', sys.executable] + sys.argv + [os.environ]
         os.execlpe('sudo', *sudo_args)
 
-    # delete file to confirm script was started as root
-    rmfile("/tmp/.root_ok")
+    # install dependencies
+    install_kernel_packages()
 
     # Check python version
     if sys.version_info < (3, 10):  # python 3.10 or higher is required
-        if path_exists("/usr/bin/apt"):
+        # Check if running under crostini and ask user to update python
+        # Do not give this option on regular systems, as it may break the system
+        try:
+            with open("/sys/devices/virtual/dmi/id/product_name", "r") as file:
+                product_name = file.read().strip()
+        except FileNotFoundError:
+            product_name = ""
+        if product_name == "crosvm" and path_exists("/usr/bin/apt"):
             user_answer = input("\033[92m" + "Python 3.10 or higher is required. Attempt to install? (Y/n)\n" +
                                 "\033[0m").lower()
             if user_answer == "y" or user_answer == "":
@@ -74,6 +73,8 @@ if __name__ == "__main__":
                 with open("/etc/apt/sources.list", "w") as file:
                     file.writelines(original_sources)
 
+                bash("apt-get update -y")  # update cache back to stable channel
+
                 print_header('Please restart the script with: "./main.py"')
                 exit(1)
             else:
@@ -82,6 +83,10 @@ if __name__ == "__main__":
         else:
             print_error("Please run the script with python 3.10 or higher")
             exit(1)
+
+    # import other scripts after python version check is successful
+    import build
+    import cli_input
 
     # Check if running under crostini
     try:
@@ -96,14 +101,10 @@ if __name__ == "__main__":
             bash("bash configs/crostini/setup-crostini.sh")
         except subprocess.CalledProcessError:
             print_error("Failed to prepare Crostini")
-            print_error("Please run the Crostini specific instructions")
+            print_error("Please run the Crostini specific instructions before running this script")
             print("https://eupnea-linux.github.io/main.html#/extra-pages/crostini")
             exit(1)
         open("/tmp/.crostini-fixed", "a").close()
-
-    # import files after python version check is successful
-    import build
-    import cli_input
 
     # parse arguments
     kernel_type = "stable"
