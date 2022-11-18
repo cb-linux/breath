@@ -3,6 +3,8 @@ Choose between a variety of common Linux distributions and desktop environments 
 <h1><a href="https://eupnea-linux.github.io/main.html#/depthboot-pages/requirements">‼️➡️ Build now ⬅️‼️</a></h1>
 Due to licensing restraints, Depthboot cannot be distributed as an iso. Instead, it has to be build locally.
 
+You can alternatively use [EupneaOS](https://github.com/eupnea-linux/eupnea-os) which does offer prebuilt isos.
+
 ## Depthboot vs mainline
 (Mainline = stock, unmodified Linux distribution)
 
