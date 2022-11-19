@@ -30,7 +30,7 @@ def config(de_name: str, distro_version: str, username: str, root_partuuid: str,
     print_status("Installing packages")
     start_progress()  # start fake progress
     chroot("pacman -S --noconfirm base base-devel nano networkmanager xkeyboard-config linux-firmware sudo")
-    chroot("pacman -S --noconfirm git cloud-utils rsync")  # postinstall script dependencies
+    chroot("pacman -S --noconfirm git cloud-utils rsync flashrom")  # postinstall script dependencies
     stop_progress()  # stop fake progress
 
     print_status("Downloading and installing de, might take a while")
