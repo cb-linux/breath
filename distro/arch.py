@@ -47,8 +47,8 @@ def config(de_name: str, distro_version: str, username: str, root_partuuid: str,
         case "xfce":
             print_status("Installing Xfce")
             # no wayland support in xfce
-            chroot("pacman -S --noconfirm xfce4 xfce4-goodies xorg xorg-server lightdm lightdm-gtk-greeter firefox "
-                   "network-manager-applet nm-connection-editor gnome-software")
+            chroot("pacman -S --noconfirm xfce4 xfce4-goodies xorg xorg-server lightdm lightdm-gtk-greeter network-"
+                   "manager-applet nm-connection-editor xfce4-pulseaudio-plugin gnome-software firefox")
             chroot("systemctl enable lightdm.service")
         case "lxqt":
             print_status("Installing LXQt")

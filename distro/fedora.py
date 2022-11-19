@@ -36,7 +36,7 @@ def config(de_name: str, distro_version: str, username: str, root_partuuid: str,
         case "xfce":
             print_status("Installing Xfce")
             chroot("dnf group install -y 'Xfce Desktop'")
-            chroot("dnf install -y firefox gnome-software")
+            chroot("dnf install -y firefox gnome-software xfce4-pulseaudio-plugin")
         case "lxqt":
             print_status("Installing LXQt")
             chroot("dnf group install -y 'LXQt Desktop'")

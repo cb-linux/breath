@@ -31,8 +31,8 @@ def config(de_name: str, distro_version: str, username: str, root_partuuid: str,
             chroot("DEBIAN_FRONTEND=noninteractive apt-get install -y task-kde-desktop")
         case "xfce":
             print_status("Installing Xfce")
-            chroot("DEBIAN_FRONTEND=noninteractive apt-get install -y task-xfce-desktop gnome-software "
-                   "epiphany-browser")
+            chroot("DEBIAN_FRONTEND=noninteractive apt-get install -y task-xfce-desktop xfce4-pulseaudio-plugin "
+                   "gnome-software epiphany-browser")
         case "lxqt":
             print_status("Installing LXQt")
             chroot("DEBIAN_FRONTEND=noninteractive apt-get install -y task-lxqt-desktop plasma-discover")
