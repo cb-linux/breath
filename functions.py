@@ -138,8 +138,9 @@ def install_kernel_packages() -> None:
         urlretrieve(
             "https://github.com/eupnea-linux/arch-packages/releases/latest/download/vboot-cgpt-utils.pkg.tar.zst",
             filename="/tmp/vboot-cgpt-utils.pkg.tar.zst")
-        # Install packages
+        # Install package
         bash("pacman --noconfirm -U /tmp/vboot-cgpt-utils.pkg.tar.zst")
+        bash("pacman --noconfirm -S flashrom")  # futility needs flashrom
     elif path_exists("/usr/bin/dnf"):  # Fedora
         bash("dnf install vboot-utils --assumeyes")  # cgpt is included in vboot-utils on fedora
     elif path_exists("/usr/bin/zypper"):  # openSUSE
