@@ -12,7 +12,7 @@ def config(de_name: str, distro_version: str, username: str, root_partuuid: str,
            " squashfs-tools systemd-container tcl-expect user-setup xfsprogs kernelstub")
     chroot("apt-get update")
     chroot("apt-get install -y git cloud-utils pop-gnome-initial-setup cgpt vboot-kernel-utils "
-           "rsync")  # postinstall dependencies
+           "rsync parted")  # postinstall dependencies
 
     # Replace input-synaptics with newer input-libinput, for better touchpad support
     print_status("Upgrading touchpad drivers")
