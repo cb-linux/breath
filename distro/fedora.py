@@ -28,7 +28,8 @@ def config(de_name: str, distro_version: str, username: str, root_partuuid: str,
     match de_name:
         case "gnome":
             print_status("Installing GNOME")
-            chroot("dnf group install -y 'Fedora Workstation'")  # Fedora has gnome by default in a workstation install
+            chroot("dnf group install -y 'GNOME Desktop Environment'")
+            chroot("dnf install -y firefox")
         case "kde":
             print_status("Installing KDE")
             chroot("dnf group install -y 'KDE Plasma Workspaces'")
