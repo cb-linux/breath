@@ -8,6 +8,7 @@ def config(de_name: str, distro_version: str, username: str, root_partuuid: str,
     print("Installing dependencies")
     start_progress()  # start fake progress
     chroot(f"dnf install -y --releasever={distro_version} fedora-release")  # update repos list
+    chroot("dnf upgrade -y")  # update the whole system
     # Install core packages
     chroot("dnf group install -y 'Core'")
     # Install firmware packages
@@ -47,7 +48,7 @@ def config(de_name: str, distro_version: str, username: str, root_partuuid: str,
         case "budgie":
             print_status("Installing Budgie")
             chroot("dnf install -y budgie-desktop lightdm lightdm-gtk xorg-x11-server-Xorg gnome-terminal firefox "
-                   "gnome-software")
+                   "gnome-software nemo")
         case "cli":
             print_status("Skipping desktop environment install")
             # install network tui
