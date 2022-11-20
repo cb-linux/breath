@@ -46,9 +46,8 @@ def config(de_name: str, distro_version: str, username: str, root_partuuid: str,
             chroot("systemctl enable sddm.service")
             # KDE theme for sddm
             mkdir("/mnt/depthboot/etc/sddm.conf.d")
-            with open("/mnt/depthboot/etc/sddm.conf.d/breeze-theme.conf") as conf:
-                conf.write("[Theme]
-                           Current=breeze")
+            with open("/mnt/depthboot/etc/sddm.conf.d/breeze-theme.conf", "a") as conf:
+                conf.write("[Theme]\nCurrent=breeze")
         case "xfce":
             print_status("Installing Xfce")
             # no wayland support in xfce
