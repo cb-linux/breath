@@ -44,7 +44,7 @@ def config(de_name: str, distro_version: str, username: str, root_partuuid: str,
             print_status("Installing KDE")
             chroot("pacman -S --noconfirm plasma-meta plasma-wayland-session kde-system-meta kde-utilities-meta firefox packagekit-qt5")
             chroot("systemctl enable sddm.service")
-            # KDE theme for sddm
+            # Set default kde sddm theme
             mkdir("/mnt/depthboot/etc/sddm.conf.d")
             with open("/mnt/depthboot/etc/sddm.conf.d/breeze-theme.conf", "a") as conf:
                 conf.write("[Theme]\nCurrent=breeze")
