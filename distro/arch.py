@@ -31,6 +31,13 @@ def config(de_name: str, distro_version: str, username: str, root_partuuid: str,
     start_progress()  # start fake progress
     chroot("pacman -S --noconfirm base base-devel nano networkmanager xkeyboard-config linux-firmware sudo")
     chroot("pacman -S --noconfirm git cloud-utils rsync flashrom parted")  # postinstall script dependencies
+
+    # Preinstall cgpt and vboot-utils
+    urlretrieve("https://github.com/eupnea-linux/arch-packages/releases/latest/download/vboot-cgpt-utils.pkg.tar.zst",
+                filename="/mnt/depthboot/tmp/vboot-cgpt-utils.pkg.tar.zst")
+    # Install package
+    chroot("pacman --noconfirm -U /tmp/vboot-cgpt-utils.pkg.tar.zst")
+
     stop_progress()  # stop fake progress
 
     print_status("Downloading and installing de, might take a while")
