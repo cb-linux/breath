@@ -199,31 +199,6 @@ def get_user_input() -> dict:
         print("Search key will be Super/Win key")
         rebind_search = False
 
-    while True:
-        usb_array = []
-        lsblk_out = bash("lsblk -nd -o NAME,MODEL,SIZE,TRAN").splitlines()
-        for line in lsblk_out:
-            # MassStorageClass is not a real device, so ignore it
-            if not line.find("usb") == -1 and line.find("0B") == -1:  # Print USB devices only with storage
-                usb_array.append(line[:3])
-                print(line[:-3])  # this is for the user to see the list
-        if len(usb_array) == 0:
-            print_status("No available USBs/SD-cards found. Building image file.")
-            break
-        else:
-            device = input("\033[92m" + 'Enter USB-drive/SD-card name(example: sdb) or "image" to build an image'
-                           + "\033[0m" + "\n").strip()
-            if device == "image":
-                print("Building image instead of writing directly")
-                break
-            elif device in usb_array:
-                print(f"Writing directly to {device}")
-                output_dict["device"] = device
-                break
-            else:
-                print_warning("No such device. Check your spelling and try again")
-                continue
-
     print_question("Which kernel type would you like to use? Usually there is no need to change this")
     while True:
         temp_kernel_type = input("\033[94m" + "Available options: Stable(default, recommended), experimental, "
@@ -254,6 +229,31 @@ def get_user_input() -> dict:
                 # break
             case _:
                 print_warning("Check your spelling and try again")
+                continue
+
+    while True:
+        usb_array = []
+        lsblk_out = bash("lsblk -nd -o NAME,MODEL,SIZE,TRAN").splitlines()
+        for line in lsblk_out:
+            # MassStorageClass is not a real device, so ignore it
+            if not line.find("usb") == -1 and line.find("0B") == -1:  # Print USB devices only with storage
+                usb_array.append(line[:3])
+                print(line[:-3])  # this is for the user to see the list
+        if len(usb_array) == 0:
+            print_status("No available USBs/SD-cards found. Building image file.")
+            break
+        else:
+            device = input("\033[92m" + 'Enter USB-drive/SD-card name(example: sdb) or "image" to build an image'
+                           + "\033[0m" + "\n").strip()
+            if device == "image":
+                print("Building image instead of writing directly")
+                break
+            elif device in usb_array:
+                print(f"Writing directly to {device}")
+                output_dict["device"] = device
+                break
+            else:
+                print_warning("No such device. Check your spelling and try again")
                 continue
 
     print_status("User input complete")
