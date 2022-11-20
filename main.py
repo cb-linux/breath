@@ -21,12 +21,6 @@ def process_args():
                         help="Override image size(default: 10GB)")
     parser.add_argument("--dev", action="store_true", dest="dev_build", default=False,
                         help="Use latest dev build. May be unstable.")
-    parser.add_argument("--alt", action="store_true", dest="alt", default=False,
-                        help="Use alt kernel. Only for older devices.")
-    parser.add_argument("--exp", action="store_true", dest="exp", default=False,
-                        help="Use experimental 5.15 kernel.")
-    parser.add_argument("--mainline", action="store_true", dest="mainline", default=False,
-                        help="Use mainline linux kernel instead of modified chromeos kernel.")
     return parser.parse_args()
 
 

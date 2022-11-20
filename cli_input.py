@@ -224,7 +224,7 @@ def get_user_input() -> dict:
                 print_warning("No such device. Check your spelling and try again")
                 continue
 
-    print_question("Which kernel type would you like to use? Usually there is no need to change this.")
+    print_question("Which kernel type would you like to use? Usually there is no need to change this")
     while True:
         temp_kernel_type = input("\033[94m" + "Available options: Stable(default, recommended), experimental, "
                                               "alternative, mainline, mainline-testing \n" + "\033[0m")
