@@ -232,6 +232,7 @@ def get_user_input() -> dict:
                 continue
 
     while True:
+        print_status("Available devices: ")
         usb_array = []
         lsblk_out = bash("lsblk -nd -o NAME,MODEL,SIZE,TRAN").splitlines()
         for line in lsblk_out:
