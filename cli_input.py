@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-
 from getpass import getpass
 from functions import *
 
@@ -12,21 +10,22 @@ def get_user_input() -> dict:
         "username": "localuser",
         "password": "",
         "device": "image",
-        "rebind_search": False
+        "rebind_search": False,
+        "kernel_type": ""
     }
     # Print welcome message
     print_error("DEPTHBOOT IS IN BETA. USE AT YOUR OWN RISK.")
     print_header("Welcome to Depthboot, formerly known as Breath")
-    print_header("This script will create a bootable Linux USB-drive/SD-card/image for you.")
-    print_header("You will now be asked a few questions. If you dont know what to answer, just press 'enter' and the"
+    print_header("This script will create a bootable Linux USB-drive/SD-card/image.")
+    print_header("The script will now ask a few questions. If you dont know what to answer, just press 'enter' and the"
                  " recommended answer will be selected.")
     input("(Press enter to continue)")
     print_question("Which Linux distro(flavor) would you like to use?")
     while True:
         temp_distro_name = input(
             "\033[94m" + "Available options: Pop!_OS(default, recommended), Ubuntu, Fedora, Debian, Arch\n" + "\033[0m")
-        match temp_distro_name:
-            case "Ubuntu" | "ubuntu":
+        match temp_distro_name.lower():
+            case "ubuntu":
                 output_dict["distro_name"] = "ubuntu"
                 while True:
                     print_question("Use latest Ubuntu version?")
@@ -44,7 +43,7 @@ def get_user_input() -> dict:
                         print_warning("Version not available, please choose another")
                         continue
                 break
-            case "Debian" | "debian":
+            case "debian":
                 print_warning("Warning: The audio and some postinstall scripts are not supported on debian by default.")
                 if input("\033[94mType 'yes' to continue anyways or Press Enter to choose another distro" +
                          "\033[0m\n") == "yes":
@@ -54,12 +53,12 @@ def get_user_input() -> dict:
                     # TODO: Add non stable debian versions
                     break
                 continue
-            case "Arch" | "arch" | "arch btw":
+            case "arch" | "arch btw":
                 print("Arch selected")
                 output_dict["distro_name"] = "arch"
                 output_dict["distro_version"] = "latest"
                 break
-            case "Fedora" | "fedora":
+            case "fedora":
                 output_dict["distro_name"] = "fedora"
                 while True:
                     print_question("Use latest stable Fedora version?")
@@ -77,7 +76,7 @@ def get_user_input() -> dict:
                         print_warning("Version not available, please choose another")
                         continue
                 break
-            case "Pop!_OS" | "PopOS" | "POP!_OS" | "Pop_OS" | "Pop!OS" | "pop!_os" | "popos" | "pop-os" | "":  # default
+            case "pop!_os" | "popos" | "pop_os" | "":  # default
                 print("Pop!_OS selected")
                 output_dict["distro_name"] = "pop-os"
                 output_dict["distro_version"] = "22.04"
@@ -104,20 +103,20 @@ def get_user_input() -> dict:
 
         while True:
             temp_de_name = input("\033[94m" + "Available options: " + available_de + "\033[0m" + "\n")
-            match temp_de_name:
-                case "Gnome" | "gnome" | "":
+            match temp_de_name.lower():
+                case "gnome" | "":
                     print("Gnome selected")
                     output_dict["de_name"] = "gnome"
                     break
-                case "KDE" | "kde":
+                case "kde":
                     print("KDE selected")
                     output_dict["de_name"] = "kde"
                     break
-                case "xfce" | "Xfce":
+                case "xfce":
                     print("Xfce selected")
                     output_dict["de_name"] = "xfce"
                     break
-                case "lxqt" | "Lxqt":
+                case "lxqt":
                     print("Lxqt selected")
                     output_dict["de_name"] = "lxqt"
                     break
@@ -192,26 +191,6 @@ def get_user_input() -> dict:
                     print_warning("Passwords do not match, please try again")
                     continue
 
-    # print_question("Enter hostname for the chromebook.(Hostname is something like a device name)")
-    # while True:
-    #     output_dict["hostname"] = input("\033[94m" + "Hostname(default: 'depthboot-chromebook'): " + "\033[0m")
-    #     if output_dict["hostname"] == "":
-    #         print("Using depthboot-chromebook as hostname")
-    #         # name is already preset in the dictionary
-    #         break
-    #     if output_dict["hostname"][0] == "-":
-    #         print_warning("Hostname cannot start with a '-'")
-    #         continue
-    #     found_invalid_char = False
-    #     for char in output_dict["hostname"]:
-    #         if char not in "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-":
-    #             print_warning(f"Hostname contains invalid character: {char}")
-    #             found_invalid_char = True
-    #             break
-    #     if not found_invalid_char:
-    #         print(f"Using {output_dict['hostname']} as hostname")
-    #         break
-
     print_question("Rebind the Search/Super/Win key to Caps Lock?(NOT RECOMMENDED)")
     if input("\033[94m" + "Type yes to rebind. Press enter to keep old binding: " "\033[0m") == "yes":
         print("Search key will be a CAPS LOCK key")
@@ -245,9 +224,37 @@ def get_user_input() -> dict:
                 print_warning("No such device. Check your spelling and try again")
                 continue
 
+    print_question("Which kernel type would you like to use? Usually there is no need to change this.")
+    while True:
+        temp_kernel_type = input("\033[94m" + "Available options: Stable(default, recommended), experimental, "
+                                              "alternative, mainline, mainline-testing \n" + "\033[0m")
+        match temp_kernel_type.lower():
+            case "" | "stable":
+                print("Stable kernel selected")
+                output_dict["kernel_type"] = "stable"
+                break
+            case "exp" | "experimental":
+                print("Experimental kernel selected")
+                output_dict["kernel_type"] = "exp"
+                break
+            case "alt" | "alternative":
+                print("Alternative kernel selected")
+                output_dict["kernel_type"] = "alt"
+                break
+            case "main" | "mainline":
+                print("Mainline kernel selected")
+                output_dict["kernel_type"] = "mainline"
+                break
+            case "testing" | "mainline-testing":
+                print("Mainline testing kernel selected")
+                print_warning("Not yet implemented")
+                continue
+                # TODO: implement mainline testing kernel
+                # output_dict["kernel_type"] = "mainline-testing"
+                # break
+            case _:
+                print_warning("Check your spelling and try again")
+                continue
+
     print_status("User input complete")
     return output_dict
-
-
-if __name__ == "__main__":
-    print_error("Do not run this file. Run main.py")

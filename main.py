@@ -107,18 +107,8 @@ if __name__ == "__main__":
         open("/tmp/.crostini-fixed", "a").close()
 
     # parse arguments
-    kernel_type = "stable"
     if args.dev_build:
         print_warning("Using dev release")
-    if args.alt:
-        print_warning("Using alt kernel")
-        kernel_type = "alt"
-    if args.exp:
-        print_warning("Using experimental kernel")
-        kernel_type = "exp"
-    if args.mainline:
-        print_warning("Using mainline kernel")
-        kernel_type = "mainline"
     if args.local_path:
         print_warning("Using local files")
     if args.verbose:
@@ -127,6 +117,10 @@ if __name__ == "__main__":
         print_warning("Image will not be shrunk")
     if not args.image_size[0] == 10:
         print_warning(f"Image size overridden to {args.image_size[0]}GB")
-    build.start_build(verbose=args.verbose, local_path=args.local_path, kernel_type=kernel_type,
-                      dev_release=args.dev_build, build_options=cli_input.get_user_input(), no_shrink=args.no_shrink,
+
+    # get user input
+    user_input = cli_input.get_user_input()
+
+    build.start_build(verbose=args.verbose, local_path=args.local_path, kernel_type=user_input["kernel_type"],
+                      dev_release=args.dev_build, build_options=user_input, no_shrink=args.no_shrink,
                       img_size=args.image_size[0])
