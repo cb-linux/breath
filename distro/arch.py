@@ -60,7 +60,7 @@ def config(de_name: str, distro_version: str, username: str, root_partuuid: str,
             with open("/mnt/depthboot/etc/sddm.conf.d/breeze-theme.conf", "a") as conf:
                 conf.write("[Theme]\nCurrent=breeze")
             # Touch sddm fix file
-            open("/mnt/depthboot/etc/sddm.fix").close()
+            open("/mnt/depthboot/etc/sddm.fix", "w").close()
         case "xfce":
             print_status("Installing Xfce")
             # no wayland support in xfce
@@ -73,7 +73,7 @@ def config(de_name: str, distro_version: str, username: str, root_partuuid: str,
                    "network-manager-applet nm-connection-editor discover packagekit-qt5")
             chroot("systemctl enable sddm.service")
             # Touch sddm fix file
-            open("/mnt/depthboot/etc/sddm.fix").close()
+            open("/mnt/depthboot/etc/sddm.fix", "w").close()
         case "deepin":
             print_status("Installing deepin")
             chroot("pacman -S --noconfirm deepin deepin-kwin deepin-extra xorg xorg-server lightdm kde-applications "
