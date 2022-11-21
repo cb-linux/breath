@@ -19,6 +19,14 @@ def config(de_name: str, distro_version: str, username: str, root_partuuid: str,
     chroot("apt-get remove -y xserver-xorg-input-synaptics")
     chroot("apt-get install -y xserver-xorg-input-libinput")
 
+    # Enable wayland
+    print_status("Enabling Wayland")
+    with open("/mnt/depthboot/etc/gdm3/custom.conf", "r") as file:
+        gdm_config = file.read()
+    with open("/mnt/depthboot/etc/gdm3/custom.conf", "w") as file:
+        file.write(gdm_config.replace("WaylandEnable=false", "#WaylandEnable=false"))
+    # TODO: Set wayland as default
+
     print_status("Pop!_OS setup complete")
 
 
