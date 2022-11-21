@@ -52,12 +52,15 @@ def config(de_name: str, distro_version: str, username: str, root_partuuid: str,
             chroot("systemctl enable gdm.service")
         case "kde":
             print_status("Installing KDE")
-            chroot("pacman -S --noconfirm plasma-meta plasma-wayland-session kde-system-meta kde-utilities-meta firefox packagekit-qt5")
+            chroot("pacman -S --noconfirm plasma-meta plasma-wayland-session kde-system-meta kde-utilities-meta "
+                   "packagekit-qt5 firefox")
             chroot("systemctl enable sddm.service")
             # Set default kde sddm theme
             mkdir("/mnt/depthboot/etc/sddm.conf.d")
             with open("/mnt/depthboot/etc/sddm.conf.d/breeze-theme.conf", "a") as conf:
                 conf.write("[Theme]\nCurrent=breeze")
+            # Touch sddm fix file
+            open("/mnt/depthboot/etc/sddm.fix").close()
         case "xfce":
             print_status("Installing Xfce")
             # no wayland support in xfce
@@ -69,6 +72,8 @@ def config(de_name: str, distro_version: str, username: str, root_partuuid: str,
             chroot("pacman -S --noconfirm lxqt breeze-icons xorg xorg-server sddm firefox networkmanager-qt "
                    "network-manager-applet nm-connection-editor discover packagekit-qt5")
             chroot("systemctl enable sddm.service")
+            # Touch sddm fix file
+            open("/mnt/depthboot/etc/sddm.fix").close()
         case "deepin":
             print_status("Installing deepin")
             chroot("pacman -S --noconfirm deepin deepin-kwin deepin-extra xorg xorg-server lightdm kde-applications "

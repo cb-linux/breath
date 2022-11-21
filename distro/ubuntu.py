@@ -36,6 +36,8 @@ def config(de_name: str, distro_version: str, username: str, root_partuuid: str,
         case "kde":
             print_status("Installing KDE")
             chroot("DEBIAN_FRONTEND=noninteractive apt-get install -y kde-standard")
+            # Touch sddm fix file
+            open("/mnt/depthboot/etc/sddm.fix").close()
         case "xfce":
             print_status("Installing Xfce")
             chroot("apt-get install -y --no-install-recommends xubuntu-desktop")
@@ -44,6 +46,8 @@ def config(de_name: str, distro_version: str, username: str, root_partuuid: str,
         case "lxqt":
             print_status("Installing LXQt")
             chroot("apt-get install -y lubuntu-desktop discover konqueror")
+            # Touch sddm fix file
+            open("/mnt/depthboot/etc/sddm.fix").close()
         case "deepin":
             print_status("Installing deepin")
             chroot("add-apt-repository -y ppa:ubuntudde-dev/stable")
