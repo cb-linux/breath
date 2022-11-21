@@ -34,9 +34,12 @@ def config(de_name: str, distro_version: str, username: str, root_partuuid: str,
 
     # Preinstall cgpt and vboot-utils
     urlretrieve("https://github.com/eupnea-linux/arch-packages/releases/latest/download/vboot-cgpt-utils.pkg.tar.zst",
-                filename="/mnt/depthboot/tmp/vboot-cgpt-utils.pkg.tar.zst")
+                filename="/mnt/depthboot/opt/vboot-cgpt-utils.pkg.tar.zst")
     # Install package
-    chroot("pacman --noconfirm -U /tmp/vboot-cgpt-utils.pkg.tar.zst")
+    chroot("pacman --noconfirm -U /opt/vboot-cgpt-utils.pkg.tar.zst")
+
+    # Delete package tar
+    rmfile("/mnt/depthboot/opt/vboot-cgpt-utils.pkg.tar.zst")
 
     stop_progress()  # stop fake progress
 
