@@ -35,7 +35,8 @@ def config(de_name: str, distro_version: str, username: str, root_partuuid: str,
             chroot("apt-get install -y ubuntu-desktop gnome-software epiphany-browser")
         case "kde":
             print_status("Installing KDE")
-            chroot("DEBIAN_FRONTEND=noninteractive apt-get install -y kde-standard plasma-workspace-wayland")
+            chroot("DEBIAN_FRONTEND=noninteractive apt-get install -y kde-standard plasma-workspace-wayland "
+                   "sddm-theme-breeze")
             # Set default kde sddm theme
             mkdir("/mnt/depthboot/etc/sddm.conf.d")
             with open("/mnt/depthboot/etc/sddm.conf.d/breeze-theme.conf", "a") as conf:
