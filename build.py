@@ -631,7 +631,8 @@ def start_build(verbose: bool, local_path, kernel_type: str, dev_release: bool, 
             block_count = int(bash(f"dumpe2fs -h {img_mnt}p3 | grep 'Block count:'")[12:].split()[0])
             actual_fs_in_bytes = block_count * 4096
             # the kernel part is always the same size -> sector amount: 131072 * 512 => 67108864 bytes
-            actual_fs_in_bytes += 67108864
+            # There are 2 kernel partitions -> 67108864 bytes * 2 = 134217728 bytes
+            actual_fs_in_bytes += 134217728
             actual_fs_in_bytes += 20971520  # add 20mb for linux to be able to boot properly
             bash(f"truncate --size={actual_fs_in_bytes} ./depthboot.img")
         if product_name == "crosvm":
