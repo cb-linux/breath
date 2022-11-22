@@ -632,7 +632,7 @@ def start_build(verbose: bool, local_path, kernel_type: str, dev_release: bool, 
             actual_fs_in_bytes = block_count * 4096
             # the kernel part is always the same size -> sector amount: 131072 * 512 => 67108864 bytes
             actual_fs_in_bytes += 67108864
-            actual_fs_in_bytes += 102400  # add 100kb for linux to be able to boot
+            actual_fs_in_bytes += 20971520  # add 20mb for linux to be able to boot properly
             bash(f"truncate --size={actual_fs_in_bytes} ./depthboot.img")
         if product_name == "crosvm":
             # rename the image to .bin for the chromeos recovery utility to be able to flash it
