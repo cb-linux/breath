@@ -29,7 +29,8 @@ def config(de_name: str, distro_version: str, username: str, root_partuuid: str,
 
     print_status("Installing packages")
     start_progress()  # start fake progress
-    chroot("pacman -S --noconfirm base base-devel nano networkmanager xkeyboard-config linux-firmware sudo")
+    chroot("pacman -S --noconfirm base base-devel nano networkmanager xkeyboard-config linux-firmware sudo bluez "
+           "bluez-utils")
     chroot("pacman -S --noconfirm git cloud-utils rsync flashrom parted")  # postinstall script dependencies
 
     # Preinstall cgpt and vboot-utils
@@ -98,6 +99,8 @@ def config(de_name: str, distro_version: str, username: str, root_partuuid: str,
 
     # enable networkmanager systemd service
     chroot("systemctl enable NetworkManager.service")
+    # Enable bluetooth systemd service
+    chroot("systemctl enable bluetooth")
 
     # Configure sudo
     with open("/mnt/depthboot/etc/sudoers", "r") as conf:
