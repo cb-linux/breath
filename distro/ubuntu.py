@@ -39,9 +39,10 @@ def config(de_name: str, distro_version: str, username: str, root_partuuid: str,
                    "sddm-theme-breeze")
         case "xfce":
             print_status("Installing Xfce")
-            chroot("apt-get install -y --no-install-recommends xubuntu-desktop")
-            chroot("apt-get install -y xfce4-goodies xfce4-pulseaudio-plugin pulseaudio-module-bluetooth "
-                   "network-manager-gnome gnome-software epiphany-browser")
+            chroot("apt-get install -y xubuntu-desktop gimp- gnome-font-viewer- gnome-mines- gnome-sudoku- gucharmap-"
+                   " hexchat- libreoffice-style-elementary- libreoffice-writer- mate-calc- pastebinit- synaptic- "
+                   "thunderbird- transmission-gtk-")  # install xfce without heavy unnecessary packages
+            chroot("apt-get install -y gnome-software epiphany-browser")
         case "lxqt":
             print_status("Installing LXQt")
             chroot("apt-get install -y lubuntu-desktop discover konqueror")
