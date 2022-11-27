@@ -14,7 +14,6 @@ def get_user_input() -> dict:
         "kernel_type": ""
     }
     # Print welcome message
-    print_error("DEPTHBOOT IS IN BETA. USE AT YOUR OWN RISK.")
     print_header("Welcome to Depthboot, formerly known as Breath")
     print_header("This script will create a bootable Linux USB-drive/SD-card/image.")
     print_header("The script will now ask a few questions. If you dont know what to answer, just press 'enter' and the"
