@@ -200,6 +200,19 @@ def download_postinstall_scripts() -> None:
     stop_progress()  # stop fake progress
 
 
+# Download systemd services
+def download_systemd_services() -> None:
+    print_status("Downloading systemds services")
+    start_progress()  # start fake progress
+    try:
+        bash("git clone --depth=1 https://github.com/eupnea-linux/systemd-services "
+             "/tmp/depthboot-build/systemd-services")
+    except URLError:
+        print_error("Couldn't download systemd services. Check your internet connection and try again.")
+        exit(1)
+    stop_progress()  # stop fake progress
+
+
 # Download postinstall scripts
 def download_audio_scripts() -> None:
     print_status("Downloading audio scripts")
@@ -270,7 +283,7 @@ def partition_and_flash_kernel(mnt_point: str, write_usb: bool, distro_name: str
     bash(f"parted -s -a optimal {mnt_point} unit mib mkpart Kernel 65 129")  # reserve kernel partition
     bash(f"parted -s -a optimal {mnt_point} unit mib mkpart Root 129 100%")  # rootfs partition
     bash(f"cgpt add -i 1 -t kernel -S 1 -T 5 -P 15 {mnt_point}")  # set kernel flags
-    bash(f"cgpt add -i 2 -t kernel -S 1 -T 5 -P 1 {mnt_point}")  # set reserve kernel flags
+    bash(f"cgpt add -i 2 -t kernel -S 1 -T 5 -P 1 {mnt_point}")  # set backup kernel flags
 
     # get uuid of rootfs partition
     rootfs_partuuid = bash(f"blkid -o value -s PARTUUID {rootfs_mnt}")
@@ -372,10 +385,6 @@ def post_extract(build_options, kernel_type: str, kernel_version: str, dev_relea
     cpfile("/etc/resolv.conf",
            "/mnt/depthboot/run/systemd/resolve/stub-resolv.conf")  # copy hosts resolv.conf to chroot
 
-    # # Set device hostname
-    # with open("/mnt/depthboot/etc/hostname", "w") as hostname_file:
-    #     hostname_file.write(build_options["hostname"] + "\n")
-
     # Copy eupnea scripts and config
     print_status("Copying eupnea scripts and configs")
     # Copy postinstall scripts
@@ -385,6 +394,7 @@ def post_extract(build_options, kernel_type: str, kernel_version: str, dev_relea
                 continue  # dont copy license, readme and gitignore
             else:
                 cpfile(file.absolute().as_posix(), f"/mnt/depthboot/usr/local/bin/{file.name}")
+
     # copy audio setup script
     cpfile("/tmp/depthboot-build/audio-scripts/setup-audio", "/mnt/depthboot/usr/local/bin/setup-audio")
     # copy functions file
@@ -458,14 +468,19 @@ def post_config(rebind_search: bool, de_name: str, distro_name) -> None:
                    "/mnt/depthboot/usr/share/X11/xkb/keycodes/evdev.default")
 
     # Install systemd services
-    print_status("Adding systemd services")
-    cpdir("configs/systemd-services", "/mnt/depthboot/etc/systemd/system")
+    print_status("Installing systemd services")
+    # Copy postinstall scripts
+    for file in Path("/tmp/depthboot-build/systemd-services").iterdir():
+        if file.is_file():
+            if file.name == "LICENSE" or file.name == "README.md" or file.name == ".gitignore":
+                continue  # dont copy license, readme and gitignore
+            else:
+                cpfile(file.absolute().as_posix(), f"/mnt/depthboot/etc/systemd/system/{file.name}")
     chroot("systemctl enable eupnea-postinstall.service")
     chroot("systemctl enable eupnea-update.timer")
 
     # copy previously downloaded firmware
     print_status("Copying google firmware")
-    # rmdir("/mnt/depthboot/lib/firmware")
     start_progress(force_show=True)  # start fake progress
     cpdir("/tmp/depthboot-build/firmware", "/mnt/depthboot/lib/firmware")
     stop_progress(force_show=True)  # stop fake progress
@@ -516,6 +531,7 @@ def start_build(verbose: bool, local_path, kernel_type: str, dev_release: bool, 
         download_rootfs(build_options["distro_name"], build_options["distro_version"])
         download_firmware()
         download_postinstall_scripts()
+        download_systemd_services()
         download_audio_scripts()
     else:  # if local path is specified, copy files from it, instead of downloading from the internet
         print_status("Copying local files to /tmp/depthboot-build")
@@ -538,6 +554,7 @@ def start_build(verbose: bool, local_path, kernel_type: str, dev_release: bool, 
         dirs = {
             "firmware": download_firmware,
             "postinstall-scripts": download_postinstall_scripts,
+            "systemd-services": download_systemd_services,
             "audio-scripts": download_audio_scripts
         }
         for directory in dirs:
