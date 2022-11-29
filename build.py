@@ -258,7 +258,7 @@ def prepare_usb_sd(device: str, distro_name: str) -> Tuple[str, str]:
         bash(f"umount -lf {device}*")
     except subprocess.CalledProcessError:
         pass
-    if device.endswith("p"): # sd card
+    if device.__contains__("mmcblk"):  # sd card
         return partition_and_flash_kernel(device, False, distro_name)
     else:
         return partition_and_flash_kernel(device, True, distro_name)
