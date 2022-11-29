@@ -243,8 +243,8 @@ def prepare_img(distro_name: str, img_size) -> Tuple[str, str]:
 
 
 # Prepare USB/SD-card
-def prepare_usb(device: str, distro_name: str) -> Tuple[str, str]:
-    print_status("Preparing USB")
+def prepare_usb_sd(device: str, distro_name: str) -> Tuple[str, str]:
+    print_status("Preparing USB/SD-card")
 
     # fix device name if needed
     if device.endswith("/") or device.endswith("1") or device.endswith("2"):
@@ -258,7 +258,10 @@ def prepare_usb(device: str, distro_name: str) -> Tuple[str, str]:
         bash(f"umount -lf {device}*")
     except subprocess.CalledProcessError:
         pass
-    return partition_and_flash_kernel(device, True, distro_name)
+    if device.endswith("p"): # sd card
+        return partition_and_flash_kernel(device, False, distro_name)
+    else:
+        return partition_and_flash_kernel(device, True, distro_name)
 
 
 def partition_and_flash_kernel(mnt_point: str, write_usb: bool, distro_name: str) -> Tuple[str, str]:
@@ -272,9 +275,8 @@ def partition_and_flash_kernel(mnt_point: str, write_usb: bool, distro_name: str
         # image is a loop device -> needs p in part name
         rootfs_mnt = mnt_point + "p3"
 
-    # remove pre-existing partition table from usb
-    if write_usb:
-        bash(f"wipefs -af {mnt_point}")
+    # remove pre-existing partition table from storage device
+    bash(f"wipefs -af {mnt_point}")
 
     # format as per depthcharge requirements,
     # READ: https://wiki.gentoo.org/wiki/Creating_bootable_media_for_depthcharge_based_devices
@@ -591,7 +593,7 @@ def start_build(verbose: bool, local_path, kernel_type: str, dev_release: bool, 
         img_mnt = output_temp[0]
         root_partuuid = output_temp[1]
     else:
-        output_temp = prepare_usb(build_options["device"], build_options["distro_name"])
+        output_temp = prepare_usb_sd(build_options["device"], build_options["distro_name"])
         img_mnt = output_temp[0]
         root_partuuid = output_temp[1]
 
