@@ -11,8 +11,10 @@ from functions import *
 # parse arguments from the cli. Only for testing/advanced use. All other parameters are handled by cli_input.py
 def process_args():
     parser = argparse.ArgumentParser()
-    parser.add_argument('-l', '--local-path', dest="local_path",
+    parser.add_argument('-p', '--local-path', dest="local_path",
                         help="Prefer local files instead of downloading from the internet(not recommended).")
+    parser.add_argument('-d', '--device', dest="device_override",
+                        help="Specify device to direct write. Skips the device selection question.")
     parser.add_argument("-v", "--verbose", action="store_true", dest="verbose", default=False,
                         help="Print more output")
     parser.add_argument("--no-shrink", action="store_true", dest="no_shrink", default=False,
@@ -112,8 +114,12 @@ if __name__ == "__main__":
     if not args.image_size[0] == 10:
         print_warning(f"Image size overridden to {args.image_size[0]}GB")
 
-    # get user input
-    user_input = cli_input.get_user_input()
+    # override device if specified
+    if args.device_override is not None:
+        user_input = cli_input.get_user_input(skip_device=True)  # get user input
+        user_input["device"] = args.device_override  # override device
+    else:
+        user_input = cli_input.get_user_input()  # get normal user input
 
     build.start_build(verbose=args.verbose, local_path=args.local_path, kernel_type=user_input["kernel_type"],
                       dev_release=args.dev_build, build_options=user_input, no_shrink=args.no_shrink,
