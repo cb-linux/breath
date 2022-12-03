@@ -487,8 +487,14 @@ def post_config(rebind_search: bool, de_name: str, distro_name) -> None:
     cpdir("/tmp/depthboot-build/firmware", "/mnt/depthboot/lib/firmware")
     stop_progress(force_show=True)  # stop fake progress
 
-    # delete resolv.conf to prevent issues with dns before relabeling
-    rmfile("/mnt/eupneaos/run/systemd/resolve/stub-resolv.conf")
+    # Clean image of temporary files
+    rmdir("/mnt/eupneaos/tmp")
+    rmdir("/mnt/eupneaos/var/tmp")
+    rmdir("/mnt/eupneaos/proc")
+    rmdir("/mnt/eupneaos/run")
+    rmdir("/mnt/eupneaos/sys")
+    rmdir("/mnt/eupneaos/lost+found")
+    rmdir("/mnt/eupneaos/dev")
 
     if distro_name == "fedora":
         # Fedora requires all files to be relabled for SELinux to work
