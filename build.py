@@ -384,8 +384,7 @@ def post_extract(build_options, kernel_type: str, kernel_version: str, dev_relea
 
     # Create a temporary resolv.conf for internet inside the chroot
     mkdir("/mnt/depthboot/run/systemd/resolve", create_parents=True)  # dir doesnt exist coz systemd didnt run
-    cpfile("/etc/resolv.conf",
-           "/mnt/depthboot/run/systemd/resolve/stub-resolv.conf")  # copy hosts resolv.conf to chroot
+    cpfile("/etc/resolv.conf", "/mnt/depthboot/run/systemd/resolve/stub-resolv.conf")  # copy host resolv.conf to chroot
 
     # Copy eupnea scripts and config
     print_status("Copying eupnea scripts and configs")
@@ -429,6 +428,9 @@ def post_extract(build_options, kernel_type: str, kernel_version: str, dev_relea
     mkdir("/mnt/depthboot/etc/systemd/")  # just in case systemd path doesn't exist
     with open("/mnt/depthboot/etc/systemd/sleep.conf", "a") as conf:
         conf.write("SuspendState=freeze\nHibernateState=freeze\n")
+
+    # systemd-resolved.service needed to create /etc/resolv.conf link. Not enabled by default for some reason
+    chroot("systemctl enable systemd-resolved")
 
     # Enable loading modules needed for depthboot
     cpfile("configs/eupnea-modules.conf", "/mnt/depthboot/etc/modules-load.d/eupnea-modules.conf")
@@ -486,15 +488,6 @@ def post_config(rebind_search: bool, de_name: str, distro_name) -> None:
     start_progress(force_show=True)  # start fake progress
     cpdir("/tmp/depthboot-build/firmware", "/mnt/depthboot/lib/firmware")
     stop_progress(force_show=True)  # stop fake progress
-
-    # Clean image of temporary files
-    rmdir("/mnt/eupneaos/tmp")
-    rmdir("/mnt/eupneaos/var/tmp")
-    rmdir("/mnt/eupneaos/proc")
-    rmdir("/mnt/eupneaos/run")
-    rmdir("/mnt/eupneaos/sys")
-    rmdir("/mnt/eupneaos/lost+found")
-    rmdir("/mnt/eupneaos/dev")
 
     if distro_name == "fedora":
         # Fedora requires all files to be relabled for SELinux to work
@@ -644,6 +637,16 @@ def start_build(verbose: bool, local_path, kernel_type: str, dev_release: bool, 
     except subprocess.CalledProcessError as error:  # on crostini umount fails for some reason
         if verbose:
             print(error)
+
+    # Clean image/sd-card of temporary files
+    rmdir("/mnt/eupneaos/tmp")
+    rmdir("/mnt/eupneaos/var/tmp")
+    rmdir("/mnt/eupneaos/proc")
+    rmdir("/mnt/eupneaos/run")
+    rmdir("/mnt/eupneaos/sys")
+    rmdir("/mnt/eupneaos/lost+found")
+    rmdir("/mnt/eupneaos/dev")
+
     if build_options["device"] == "image":
         try:
             with open("/sys/devices/virtual/dmi/id/product_name", "r") as file:
