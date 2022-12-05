@@ -194,7 +194,7 @@ def download_postinstall_scripts() -> None:
     try:
         bash("git clone --depth=1 https://github.com/eupnea-linux/postinstall-scripts "
              "/tmp/depthboot-build/postinstall-scripts")
-    except URLError:
+    except subprocess.CalledProcessError:
         print_error("Couldn't download postinstall scripts. Check your internet connection and try again.")
         exit(1)
     stop_progress()  # stop fake progress
@@ -207,7 +207,7 @@ def download_systemd_services() -> None:
     try:
         bash("git clone --depth=1 https://github.com/eupnea-linux/systemd-services "
              "/tmp/depthboot-build/systemd-services")
-    except URLError:
+    except subprocess.CalledProcessError:
         print_error("Couldn't download systemd services. Check your internet connection and try again.")
         exit(1)
     stop_progress()  # stop fake progress
@@ -220,7 +220,7 @@ def download_audio_scripts() -> None:
     try:
         bash("git clone --depth=1 https://github.com/eupnea-linux/audio-scripts "
              "/tmp/depthboot-build/audio-scripts")
-    except URLError:
+    except subprocess.CalledProcessError:
         print_error("Couldn't download audio scripts. Check your internet connection and try again.")
         exit(1)
     stop_progress()  # stop fake progress
