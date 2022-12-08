@@ -641,6 +641,7 @@ def start_build(verbose: bool, local_path, kernel_type: str, dev_release: bool, 
     # Clean image/sd-card of temporary files
     rmdir("/mnt/eupneaos/tmp")
     rmdir("/mnt/eupneaos/var/tmp")
+    rmdir("/mnt/eupneaos/var/cache")
     rmdir("/mnt/eupneaos/proc")
     rmdir("/mnt/eupneaos/run")
     rmdir("/mnt/eupneaos/sys")
