@@ -423,13 +423,13 @@ def post_extract(build_options, kernel_type: str, kernel_version: str, dev_relea
         json.dump(settings, settings_file)
 
     print_status("Fixing sleep")
-    # disable hibernation aka S4 sleep, READ: https://eupnea-linux.github.io/docs.html#/pages/bootlock
+    # disable hibernation aka S3 sleep, READ: https://eupnea-linux.github.io/main.html#/pages/bootlock
     # TODO: Fix sleep, maybe
     mkdir("/mnt/depthboot/etc/systemd/")  # just in case systemd path doesn't exist
     with open("/mnt/depthboot/etc/systemd/sleep.conf", "a") as conf:
         conf.write("SuspendState=freeze\nHibernateState=freeze\n")
 
-    # systemd-resolved.service needed to create /etc/resolv.conf link. Not enabled by default for some reason
+    # systemd-resolved.service needed to create /etc/resolv.conf link. Not enabled by default on some distros
     chroot("systemctl enable systemd-resolved")
 
     # Enable loading modules needed for depthboot
