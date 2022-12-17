@@ -22,6 +22,9 @@ def config(de_name: str, distro_version: str, username: str, root_partuuid: str,
     with open("/mnt/depthboot/etc/pacman.conf", "w") as conf:
         conf.writelines(temp_pacman)
 
+    print_status("Preparing pacman")
+    chroot("pacman-key --init")
+    chroot("pacman-key --populate archlinux")
     # Add eupnea repo to pacman.conf
     urlretrieve(f"https://eupnea-linux.github.io/arch-repo/public_key.gpg", filename="/tmp/eupnea.key")
     bash("pacman-key --add /tmp/eupnea.key")
@@ -29,10 +32,6 @@ def config(de_name: str, distro_version: str, username: str, root_partuuid: str,
     # add repo to pacman.conf
     with open("/etc/pacman.conf", "a") as file:
         file.write("[eupnea]\nServer = https://eupnea-linux.github.io/arch-repo/repodata/$arch\n")
-
-    print_status("Preparing pacman")
-    chroot("pacman-key --init")
-    chroot("pacman-key --populate archlinux")
     chroot("pacman -Syyu --noconfirm")  # update the whole system
 
     print_status("Installing packages")
