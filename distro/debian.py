@@ -12,11 +12,20 @@ def config(de_name: str, distro_version: str, username: str, root_partuuid: str,
     chroot("apt-get install -y software-properties-common")
     # add non-free repos
     chroot("add-apt-repository -y non-free")
+    # Add eupnea repo
+    mkdir("/usr/local/share/keyrings", create_parents=True)
+    # download public key
+    urlretrieve(f"https://eupnea-linux.github.io/apt-repo/public.key",
+                filename="/usr/local/share/keyrings/eupnea.key")
+    with open("/etc/apt/sources.list.d/eupnea.list", "w") as file:
+        file.write("deb [signed-by=/usr/local/share/keyrings/eupnea.key] https://eupnea-linux.github.io/"
+                   "apt-repo/debian_ubuntu kinetic main")
+    # update apt
     chroot("apt-get update -y")
-    # Install dependencies
+    # Install general dependencies + eupnea packages
     chroot("apt-get install -y network-manager sudo firmware-linux-free cloud-utils firmware-linux-nonfree "
-           "firmware-iwlwifi iw")
-    chroot("apt-get install -y git cgpt vboot-kernel-utils rsync parted")  # postinstall dependencies
+           "firmware-iwlwifi iw git")
+    chroot("apt-get install -y eupnea-utils eupnea-system")
     stop_progress()  # stop fake progress
 
     print_status("Downloading and installing de, might take a while")
@@ -55,7 +64,7 @@ def config(de_name: str, distro_version: str, username: str, root_partuuid: str,
         # Set system to boot to gui
         chroot("systemctl set-default graphical.target")
 
-    # GDM3 auto installs gnome-minimal. Gotta remove it if user didn't choose gnome
+    # GDM3 auto installs gnome-minimal. Remove it if user didn't choose gnome
     if not de_name == "gnome":
         rmfile("/mnt/depthboot/usr/share/xsessions/ubuntu.desktop")
         chroot("apt-get remove -y gnome-shell")
@@ -71,8 +80,9 @@ def config(de_name: str, distro_version: str, username: str, root_partuuid: str,
     # Replace input-synaptics with newer input-libinput, for better touchpad support
     print_status("Upgrading touchpad drivers")
     chroot("apt-get remove -y xserver-xorg-input-synaptics")
-    # chroot("apt-get install -y xserver-xorg-input-libinput")
+    chroot("apt-get install -y xserver-xorg-input-libinput")
 
+    # TODO: Pre-update python3 to 3.10
     # Pre-updating to python3.10 breaks the gnome first time installer...
     '''
     # Pre-update python to 3.10 as some postinstall scripts require it

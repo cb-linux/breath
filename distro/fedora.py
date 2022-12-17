@@ -8,19 +8,21 @@ def config(de_name: str, distro_version: str, username: str, root_partuuid: str,
     print("Installing dependencies")
     start_progress()  # start fake progress
     chroot(f"dnf install -y --releasever={distro_version} fedora-release")  # update repos list
-    chroot("dnf upgrade -y")  # update the whole system
+    # Add eupnea repo
+    chroot("dnf config-manager --add-repo https://eupnea-linux.github.io/rpm-repo/eupnea.repo")
+    # Add RPMFusion repos
+    chroot(f"dnf install -y https://download1.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-"
+           f"{distro_version}.noarch.rpm")
+    chroot(f"dnf install -y https://download1.rpmfusion.org/free/fedora/rpmfusion-free-release-"
+           f"{distro_version}.noarch.rpm")
+    chroot("dnf update --refresh -y")  # update repos
+    chroot("dnf upgrade -y")  # upgrade the whole system
     # Install core packages
     chroot("dnf group install -y 'Core'")
     # Install firmware packages
     chroot("dnf group install -y 'Hardware Support'")
     chroot("dnf group install -y 'Common NetworkManager Submodules'")
     chroot("dnf install -y linux-firmware")
-    chroot("dnf install -y git vboot-utils rsync cloud-utils parted")  # postinstall dependencies
-    # Add RPMFusion repos
-    chroot(f"dnf install -y https://download1.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-"
-           f"{distro_version}.noarch.rpm")
-    chroot(f"dnf install -y https://download1.rpmfusion.org/free/fedora/rpmfusion-free-release-"
-           f"{distro_version}.noarch.rpm")
     stop_progress()  # stop fake progress
 
     print_status("Downloading and installing DE, might take a while")

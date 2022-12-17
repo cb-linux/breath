@@ -10,9 +10,18 @@ def config(de_name: str, distro_version: str, username: str, root_partuuid: str,
            "gettext gparted gparted-common grub-common grub2-common kpartx kpartx-boot libdistinst libdmraid1.0.0.rc16"
            " libinih1 libnss-mymachines localechooser-data os-prober pop-installer pop-installer-casper pop-shop-casper"
            " squashfs-tools systemd-container tcl-expect user-setup xfsprogs kernelstub")
+    # Add eupnea repo
+    mkdir("/usr/local/share/keyrings", create_parents=True)
+    # download public key
+    urlretrieve(f"https://eupnea-linux.github.io/apt-repo/public.key",
+                filename="/usr/local/share/keyrings/eupnea.key")
+    with open("/etc/apt/sources.list.d/eupnea.list", "w") as file:
+        file.write("deb [signed-by=/usr/local/share/keyrings/eupnea.key] https://eupnea-linux.github.io/"
+                   "apt-repo/debian_ubuntu kinetic main")
+    # update apt
     chroot("apt-get update")
-    chroot("apt-get install -y git cloud-utils pop-gnome-initial-setup cgpt vboot-kernel-utils "
-           "rsync parted")  # postinstall dependencies
+    # Install general dependencies + eupnea packages
+    chroot("apt-get install -y git pop-gnome-initial-setup eupnea-utils eupnea-system")
 
     # Replace input-synaptics with newer input-libinput, for better touchpad support
     print_status("Upgrading touchpad drivers")

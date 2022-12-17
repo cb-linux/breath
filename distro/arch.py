@@ -22,6 +22,14 @@ def config(de_name: str, distro_version: str, username: str, root_partuuid: str,
     with open("/mnt/depthboot/etc/pacman.conf", "w") as conf:
         conf.writelines(temp_pacman)
 
+    # Add eupnea repo to pacman.conf
+    urlretrieve(f"https://eupnea-linux.github.io/arch-repo/public_key.gpg", filename="/tmp/eupnea.key")
+    bash("pacman-key --add /tmp/eupnea.key")
+    bash("pacman-key --lsign-key 94EB01F3608D3940CE0F2A6D69E3E84DF85C8A12")
+    # add repo to pacman.conf
+    with open("/etc/pacman.conf", "a") as file:
+        file.write("[eupnea]\nServer = https://eupnea-linux.github.io/arch-repo/repodata/$arch\n")
+
     print_status("Preparing pacman")
     chroot("pacman-key --init")
     chroot("pacman-key --populate archlinux")
@@ -29,18 +37,9 @@ def config(de_name: str, distro_version: str, username: str, root_partuuid: str,
 
     print_status("Installing packages")
     start_progress()  # start fake progress
+    # Install basic utils + eupnea packages
     chroot("pacman -S --noconfirm base base-devel nano networkmanager xkeyboard-config linux-firmware sudo bluez "
-           "bluez-utils")
-    chroot("pacman -S --noconfirm git cloud-utils rsync flashrom parted")  # postinstall script dependencies
-
-    # Preinstall cgpt and vboot-utils
-    urlretrieve("https://github.com/eupnea-linux/arch-packages/releases/latest/download/vboot-cgpt-utils.pkg.tar.zst",
-                filename="/mnt/depthboot/opt/vboot-cgpt-utils.pkg.tar.zst")
-    # Install package
-    chroot("pacman --noconfirm -U /opt/vboot-cgpt-utils.pkg.tar.zst")
-
-    # Delete package tar
-    rmfile("/mnt/depthboot/opt/vboot-cgpt-utils.pkg.tar.zst")
+           "bluez-utils git eupnea-utils eupnea-system cgpt-vboot-utils")
 
     stop_progress()  # stop fake progress
 

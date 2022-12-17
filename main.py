@@ -34,8 +34,24 @@ if __name__ == "__main__":
         sudo_args = ['sudo', sys.executable] + sys.argv + [os.environ]
         os.execlpe('sudo', *sudo_args)
 
-    # install dependencies
-    install_kernel_packages()
+    # check if cgpt and vboot are already installed
+    if path_exists("/usr/bin/vbutil_kernel") and path_exists("/usr/bin/cgpt"):
+        print_status("Cgpt and vboot already installed, skipping")
+    else:
+        print_status("Installing: vboot, cgpt")
+        if path_exists("/usr/bin/apt"):  # Ubuntu + debian
+            bash("apt-get install cgpt vboot-kernel-utils -y")
+        elif path_exists("/usr/bin/pacman"):  # Arch
+            # Download prepackaged cgpt + vboot from arch-repo releases
+            urlretrieve(
+                "https://github.com/eupnea-linux/arch-repo/releases/latest/download/cgpt-vboot-utils.pkg.tar.gz",
+                filename="/tmp/cgpt-vboot-utils.pkg.tar.gz")
+            # Install package
+            bash("pacman --noconfirm -U /tmp/cgpt-vboot-utils.pkg.tar.gz")
+        elif path_exists("/usr/bin/dnf"):  # Fedora
+            bash("dnf install vboot-utils --assumeyes")  # cgpt is included in vboot-utils on fedora
+        elif path_exists("/usr/bin/zypper"):  # openSUSE
+            bash("zypper --non-interactive install vboot")
 
     # Check python version
     if sys.version_info < (3, 10):  # python 3.10 or higher is required

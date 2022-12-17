@@ -2,7 +2,7 @@
   "kernel_type": "",
   "kernel_version": "",
   "kernel_dev": false,
-  "depthboot_version": "v1.0.0",
+  "depthboot_version": "v1.1.0",
   "install_type": "image",
   "distro_name": "",
   "distro_version": "",
