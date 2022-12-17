@@ -30,7 +30,7 @@ def rmdir(rm_dir: str, keep_dir: bool = True) -> None:
     try:
         unlink_files(rm_dir_as_path)
     except RecursionError:  # python doesn't work for folders with a lot of subfolders
-        print("\033[93m" + f"Failed to remove {rm_dir} with python, using bash" + "\033[0m")
+        print(f"Failed to remove {rm_dir} with python, using bash")
         bash(f"rm -rf {rm_dir_as_path.absolute().as_posix()}")
     # Remove emtpy directory
     if not keep_dir:
