@@ -187,45 +187,6 @@ def download_firmware() -> None:
     stop_progress()  # stop fake progress
 
 
-# Download postinstall scripts
-def download_postinstall_scripts() -> None:
-    print_status("Downloading postinstall scripts")
-    start_progress()  # start fake progress
-    try:
-        bash("git clone --depth=1 https://github.com/eupnea-linux/postinstall-scripts "
-             "/tmp/depthboot-build/postinstall-scripts")
-    except subprocess.CalledProcessError:
-        print_error("Couldn't download postinstall scripts. Check your internet connection and try again.")
-        exit(1)
-    stop_progress()  # stop fake progress
-
-
-# Download systemd services
-def download_systemd_services() -> None:
-    print_status("Downloading systemds services")
-    start_progress()  # start fake progress
-    try:
-        bash("git clone --depth=1 https://github.com/eupnea-linux/systemd-services "
-             "/tmp/depthboot-build/systemd-services")
-    except subprocess.CalledProcessError:
-        print_error("Couldn't download systemd services. Check your internet connection and try again.")
-        exit(1)
-    stop_progress()  # stop fake progress
-
-
-# Download postinstall scripts
-def download_audio_scripts() -> None:
-    print_status("Downloading audio scripts")
-    start_progress()  # start fake progress
-    try:
-        bash("git clone --depth=1 https://github.com/eupnea-linux/audio-scripts "
-             "/tmp/depthboot-build/audio-scripts")
-    except subprocess.CalledProcessError:
-        print_error("Couldn't download audio scripts. Check your internet connection and try again.")
-        exit(1)
-    stop_progress()  # stop fake progress
-
-
 # Create, mount, partition the img and flash the eupnea kernel
 def prepare_img(distro_name: str, img_size) -> Tuple[str, str]:
     print_status("Preparing image")
@@ -386,28 +347,6 @@ def post_extract(build_options, kernel_type: str, kernel_version: str, dev_relea
     mkdir("/mnt/depthboot/run/systemd/resolve", create_parents=True)  # dir doesnt exist coz systemd didnt run
     cpfile("/etc/resolv.conf", "/mnt/depthboot/run/systemd/resolve/stub-resolv.conf")  # copy host resolv.conf to chroot
 
-    # Copy eupnea scripts and config
-    print_status("Copying eupnea scripts and configs")
-    # Copy postinstall scripts
-    for file in Path("/tmp/depthboot-build/postinstall-scripts").iterdir():
-        if file.is_file():
-            if file.name == "LICENSE" or file.name == "README.md" or file.name == ".gitignore":
-                continue  # dont copy license, readme and gitignore
-            else:
-                cpfile(file.absolute().as_posix(), f"/mnt/depthboot/usr/local/bin/{file.name}")
-
-    # copy audio setup script
-    cpfile("/tmp/depthboot-build/audio-scripts/setup-audio", "/mnt/depthboot/usr/local/bin/setup-audio")
-    # copy functions file
-    cpfile("functions.py", "/mnt/depthboot/usr/local/bin/functions.py")
-    chroot("chmod 755 /usr/local/bin/*")  # make scripts executable in system
-
-    # copy configs
-    mkdir("/mnt/depthboot/etc/eupnea")
-    cpdir("configs", "/mnt/depthboot/etc/eupnea")  # eupnea-builder configs
-    cpdir("/tmp/depthboot-build/postinstall-scripts/configs", "/mnt/depthboot/etc/eupnea")  # postinstall configs
-    cpdir("/tmp/depthboot-build/audio-scripts/configs", "/mnt/depthboot/etc/eupnea")  # audio configs
-
     # create depthboot settings file for postinstall scripts to read
     with open("configs/eupnea.json", "r") as settings_file:
         settings = json.load(settings_file)
@@ -423,8 +362,8 @@ def post_extract(build_options, kernel_type: str, kernel_version: str, dev_relea
         json.dump(settings, settings_file)
 
     print_status("Fixing sleep")
-    # disable hibernation aka S3 sleep, READ: https://eupnea-linux.github.io/main.html#/pages/bootlock
-    # TODO: Fix sleep, maybe
+    # disable hibernation aka S3 sleep, READ more: https://eupnea-linux.github.io/main.html#/pages/bootlock
+    # This fix is removed if the user installs to internal
     mkdir("/mnt/depthboot/etc/systemd/")  # just in case systemd path doesn't exist
     with open("/mnt/depthboot/etc/systemd/sleep.conf", "a") as conf:
         conf.write("SuspendState=freeze\nHibernateState=freeze\n")
@@ -462,7 +401,7 @@ def post_extract(build_options, kernel_type: str, kernel_version: str, dev_relea
 # post extract and distro config
 def post_config(rebind_search: bool, de_name: str, distro_name) -> None:
     if not de_name == "cli":
-        # Add chromebook layout. Needs to be done after install Xorg
+        # Add chromebook layout. Needs to be done after installing Xorg
         print_status("Backing up default keymap and setting Chromebook layout")
         cpfile("/mnt/depthboot/usr/share/X11/xkb/symbols/pc", "/mnt/depthboot/usr/share/X11/xkb/symbols/pc.default")
         cpfile("configs/xkb/xkb.chromebook", "/mnt/depthboot/usr/share/X11/xkb/symbols/pc")
@@ -471,27 +410,15 @@ def post_config(rebind_search: bool, de_name: str, distro_name) -> None:
             cpfile("/mnt/depthboot/usr/share/X11/xkb/keycodes/evdev",
                    "/mnt/depthboot/usr/share/X11/xkb/keycodes/evdev.default")
 
-    # Install systemd services
-    print_status("Installing systemd services")
-    # Copy postinstall scripts
-    for file in Path("/tmp/depthboot-build/systemd-services").iterdir():
-        if file.is_file():
-            if file.name == "LICENSE" or file.name == "README.md" or file.name == ".gitignore":
-                continue  # dont copy license, readme and gitignore
-            else:
-                cpfile(file.absolute().as_posix(), f"/mnt/depthboot/etc/systemd/system/{file.name}")
-    chroot("systemctl enable eupnea-postinstall.service")
-    chroot("systemctl enable eupnea-update.timer")
-
     # copy previously downloaded firmware
     print_status("Copying google firmware")
     start_progress(force_show=True)  # start fake progress
     cpdir("/tmp/depthboot-build/firmware", "/mnt/depthboot/lib/firmware")
     stop_progress(force_show=True)  # stop fake progress
 
+    # Fedora requires all files to be relabled for SELinux to work
+    # If this is not done, SELinux will prevent users from logging in
     if distro_name == "fedora":
-        # Fedora requires all files to be relabled for SELinux to work
-        # If this is not done, SELinux will prevent users from logging in
         print_status("Relabeling files for SELinux")
 
         # copy /proc files needed for fixfiles
@@ -534,9 +461,6 @@ def start_build(verbose: bool, local_path, kernel_type: str, dev_release: bool, 
         kernel_version = download_kernel(kernel_type, dev_release)
         download_rootfs(build_options["distro_name"], build_options["distro_version"])
         download_firmware()
-        download_postinstall_scripts()
-        download_systemd_services()
-        download_audio_scripts()
     else:  # if local path is specified, copy files from it, instead of downloading from the internet
         print_status("Copying local files to /tmp/depthboot-build")
         # clean local path string
@@ -557,9 +481,6 @@ def start_build(verbose: bool, local_path, kernel_type: str, dev_release: bool, 
         # copy distro agnostic files
         dirs = {
             "firmware": download_firmware,
-            "postinstall-scripts": download_postinstall_scripts,
-            "systemd-services": download_systemd_services,
-            "audio-scripts": download_audio_scripts
         }
         for directory in dirs:
             try:
@@ -638,7 +559,7 @@ def start_build(verbose: bool, local_path, kernel_type: str, dev_release: bool, 
         if verbose:
             print(error)
 
-    # Clean image/sd-card of temporary files
+    # Clean image/sd-card of temporary files to reduce its size
     rmdir("/mnt/eupneaos/tmp")
     rmdir("/mnt/eupneaos/var/tmp")
     rmdir("/mnt/eupneaos/var/cache")

@@ -23,9 +23,18 @@ def config(de_name: str, distro_version: str, username: str, root_partuuid: str,
                    f"restricted universe multiverse\n")
 
     print_status("Installing dependencies")
+    # Add eupnea repo
+    mkdir("/usr/local/share/keyrings", create_parents=True)
+    # download public key
+    urlretrieve(f"https://eupnea-linux.github.io/apt-repo/public.key",
+                filename="/usr/local/share/keyrings/eupnea.key")
+    with open("/etc/apt/sources.list.d/eupnea.list", "w") as file:
+        file.write("deb [signed-by=/usr/local/share/keyrings/eupnea.key] https://eupnea-linux.github.io/"
+                   "apt-repo/debian_ubuntu kinetic main")
+    # update apt
     chroot("apt-get update -y")
-    chroot("apt-get install -y linux-firmware network-manager software-properties-common")
-    chroot("apt-get install -y git cgpt vboot-kernel-utils cloud-utils parted rsync")  # postinstall dependencies
+    # Install general dependencies + eupnea packages
+    chroot("apt-get install -y linux-firmware network-manager software-properties-common eupnea-utils eupnea-system")
 
     print_status("Downloading and installing de, might take a while")
     start_progress()  # start fake progress
@@ -88,7 +97,7 @@ def config(de_name: str, distro_version: str, username: str, root_partuuid: str,
     # Replace input-synaptics with newer input-libinput, for better touchpad support
     print_status("Upgrading touchpad drivers")
     chroot("apt-get remove -y xserver-xorg-input-synaptics")
-    # chroot("apt-get install -y xserver-xorg-input-libinput")
+    chroot("apt-get install -y xserver-xorg-input-libinput")
 
     print_status("Ubuntu setup complete")
 
