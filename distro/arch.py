@@ -31,7 +31,7 @@ def config(de_name: str, distro_version: str, username: str, root_partuuid: str,
     bash("chroot /mnt/depthboot bash -c 'pacman-key --add /tmp/eupnea.key'")
     chroot("pacman-key --lsign-key 94EB01F3608D3940CE0F2A6D69E3E84DF85C8A12")
     # add repo to pacman.conf
-    with open("/etc/pacman.conf", "a") as file:
+    with open("/mnt/depthboot/etc/pacman.conf", "a") as file:
         file.write("[eupnea]\nServer = https://eupnea-linux.github.io/arch-repo/repodata/$arch\n")
     chroot("pacman -Syyu --noconfirm")  # update the whole system
 
