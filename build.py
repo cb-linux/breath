@@ -561,14 +561,14 @@ def start_build(verbose: bool, local_path, kernel_type: str, dev_release: bool, 
             print(error)
 
     # Clean image/sd-card of temporary files to reduce its size
-    rmdir("/mnt/eupneaos/tmp")
-    rmdir("/mnt/eupneaos/var/tmp")
-    rmdir("/mnt/eupneaos/var/cache")
-    rmdir("/mnt/eupneaos/proc")
-    rmdir("/mnt/eupneaos/run")
-    rmdir("/mnt/eupneaos/sys")
-    rmdir("/mnt/eupneaos/lost+found")
-    rmdir("/mnt/eupneaos/dev")
+    rmdir("/mnt/depthboot/tmp")
+    rmdir("/mnt/depthboot/var/tmp")
+    rmdir("/mnt/depthboot/var/cache")
+    rmdir("/mnt/depthboot/proc")
+    rmdir("/mnt/depthboot/run")
+    rmdir("/mnt/depthboot/sys")
+    rmdir("/mnt/depthboot/lost+found")
+    rmdir("/mnt/depthboot/dev")
 
     if build_options["device"] == "image":
         try:
