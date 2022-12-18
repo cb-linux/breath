@@ -27,8 +27,8 @@ def config(de_name: str, distro_version: str, username: str, root_partuuid: str,
     chroot("pacman-key --populate archlinux")
     # Add eupnea repo to pacman.conf
     urlretrieve(f"https://eupnea-linux.github.io/arch-repo/public_key.gpg", filename="/tmp/eupnea.key")
-    bash("pacman-key --add /tmp/eupnea.key")
-    bash("pacman-key --lsign-key 94EB01F3608D3940CE0F2A6D69E3E84DF85C8A12")
+    chroot("pacman-key --add /tmp/eupnea.key")
+    chroot("pacman-key --lsign-key 94EB01F3608D3940CE0F2A6D69E3E84DF85C8A12")
     # add repo to pacman.conf
     with open("/etc/pacman.conf", "a") as file:
         file.write("[eupnea]\nServer = https://eupnea-linux.github.io/arch-repo/repodata/$arch\n")
