@@ -24,11 +24,11 @@ def config(de_name: str, distro_version: str, username: str, root_partuuid: str,
 
     print_status("Installing dependencies")
     # Add eupnea repo
-    mkdir("/usr/local/share/keyrings", create_parents=True)
+    mkdir("/mnt/depthboot/usr/local/share/keyrings", create_parents=True)
     # download public key
     urlretrieve(f"https://eupnea-linux.github.io/apt-repo/public.key",
-                filename="/usr/local/share/keyrings/eupnea.key")
-    with open("/etc/apt/sources.list.d/eupnea.list", "w") as file:
+                filename="/mnt/depthboot/usr/local/share/keyrings/eupnea.key")
+    with open("/mnt/depthboot/etc/apt/sources.list.d/eupnea.list", "w") as file:
         file.write("deb [signed-by=/usr/local/share/keyrings/eupnea.key] https://eupnea-linux.github.io/"
                    "apt-repo/debian_ubuntu kinetic main")
     # update apt
