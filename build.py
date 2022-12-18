@@ -475,6 +475,7 @@ def start_build(verbose: bool, local_path, kernel_type: str, dev_release: bool, 
         for file in kernel_files:
             try:
                 cpfile(f"{local_path_posix}{file}", f"/tmp/depthboot-build/{file}")
+                kernel_version = "unknown"
             except FileNotFoundError:
                 print_error(f"File {file} not found in {local_path}, attempting to download")
                 kernel_version = download_kernel(kernel_type, dev_release, [file])
