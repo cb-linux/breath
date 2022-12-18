@@ -547,19 +547,6 @@ def start_build(verbose: bool, local_path, kernel_type: str, dev_release: bool, 
     # Post-install cleanup
     print_status("Cleaning up host system after build")
 
-    # /mnt/depthboot doesn't unmount on first try and e2fsck throws an error, therefore its unmounted twice
-    try:
-        bash("umount -f /mnt/depthboot")  # umount mountpoint
-    except subprocess.CalledProcessError as error:  # on crostini umount fails for some reason
-        if verbose:
-            print(error)
-    sleep(5)  # wait for umount to finish
-    try:
-        bash("umount -f /mnt/depthboot")  # umount mountpoint again
-    except subprocess.CalledProcessError as error:  # on crostini umount fails for some reason
-        if verbose:
-            print(error)
-
     # Clean image/sd-card of temporary files to reduce its size
     rmdir("/mnt/eupneaos/tmp")
     rmdir("/mnt/eupneaos/var/tmp")
@@ -569,6 +556,21 @@ def start_build(verbose: bool, local_path, kernel_type: str, dev_release: bool, 
     rmdir("/mnt/eupneaos/sys")
     rmdir("/mnt/eupneaos/lost+found")
     rmdir("/mnt/eupneaos/dev")
+
+    bash("sync")  # write all pending changes to usb
+
+    # /mnt/depthboot doesn't unmount on first try and e2fsck throws an error, therefore its unmounted twice
+    try:
+        bash("umount -lf /mnt/depthboot")  # umount mountpoint
+    except subprocess.CalledProcessError as error:  # on crostini umount fails for some reason
+        if verbose:
+            print(error)
+    sleep(5)  # wait for umount to finish
+    try:
+        bash("umount -lf /mnt/depthboot")  # umount mountpoint again
+    except subprocess.CalledProcessError as error:  # on crostini umount fails for some reason
+        if verbose:
+            print(error)
 
     if build_options["device"] == "image":
         try:
