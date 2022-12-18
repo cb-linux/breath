@@ -471,7 +471,7 @@ def start_build(verbose: bool, local_path, kernel_type: str, dev_release: bool, 
             local_path_posix = local_path
 
         # copy kernel files
-        kernel_files = ["bzImage", "modules", "headers", ]
+        kernel_files = ["bzImage", "modules.tar.xz", "headers.tar.xz", ]
         for file in kernel_files:
             try:
                 cpfile(f"{local_path_posix}{file}", f"/tmp/depthboot-build/{file}")
