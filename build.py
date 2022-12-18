@@ -323,7 +323,8 @@ def extract_rootfs(distro_name: str, distro_version: str) -> None:
 
 
 # Configure distro agnostic options
-def post_extract(build_options, kernel_type: str, kernel_version: str, dev_release: bool) -> None:
+def post_extract(build_options: dict, kernel_type: str, kernel_version: str = "unknown",
+                 dev_release: bool = False) -> None:
     print_status("Applying distro agnostic configuration")
 
     # Extract modules
