@@ -18,6 +18,7 @@ def prepare_host(de_name: str) -> None:
     try:
         bash("umount -lf /mnt/depthboot")  # just in case
         sleep(5)  # wait for umount to finish
+        bash("umount -lf /mnt/depthboot")  # umount a second time, coz first time might not work
     except subprocess.CalledProcessError:
         print("Failed to unmount /mnt/depthboot, ignore")
         pass
