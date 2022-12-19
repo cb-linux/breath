@@ -122,31 +122,6 @@ def bash(command: str) -> str:
         print(output, flush=True)
     return output
 
-
-def install_kernel_packages() -> None:
-    print_status("Installing: vboot, cgpt")
-
-    # check if packages are already installed
-    if path_exists("/usr/bin/vbutil_kernel") and path_exists("/usr/bin/cgpt"):
-        print_status("Packages already installed, skipping")
-        return
-
-    if path_exists("/usr/bin/apt"):  # Ubuntu + debian
-        bash("apt-get install cgpt vboot-kernel-utils -y")
-    elif path_exists("/usr/bin/pacman"):  # Arch
-        # Download prepackaged cgpt + vboot from GitHub
-        urlretrieve(
-            "https://github.com/eupnea-linux/arch-packages/releases/latest/download/vboot-cgpt-utils.pkg.tar.zst",
-            filename="/tmp/vboot-cgpt-utils.pkg.tar.zst")
-        # Install package
-        bash("pacman --noconfirm -U /tmp/vboot-cgpt-utils.pkg.tar.zst")
-        bash("pacman --noconfirm -S flashrom")  # futility needs flashrom
-    elif path_exists("/usr/bin/dnf"):  # Fedora
-        bash("dnf install vboot-utils --assumeyes")  # cgpt is included in vboot-utils on fedora
-    elif path_exists("/usr/bin/zypper"):  # openSUSE
-        bash("zypper --non-interactive install vboot")
-
-
 #######################################################################################
 #                                    MISC STUFF                                       #
 #######################################################################################
