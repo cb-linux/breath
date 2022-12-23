@@ -154,12 +154,18 @@ def download_rootfs(distro_name: str, distro_version: str) -> None:
                             f"{distro_version}.tar.xz", filename="/tmp/depthboot-build/fedora-rootfs.tar.xz")
                 stop_download_progress()
             case "pop-os":
-                print_status(f"Downloading pop-os rootfs from github")
-                start_download_progress("/tmp/depthboot-build/popos-rootfs.tar.xz")
-                urlretrieve(
-                    f"https://github.com/eupnea-linux/popos-rootfs/releases/latest/download/popos-rootfs.tar.xz",
-                    filename="/tmp/depthboot-build/popos-rootfs.tar.xz")
+                print_status(f"Downloading split pop-os rootfs from github")
+                start_download_progress("/tmp/depthboot-build/popos-rootfs.split.aa")
+                urlretrieve("https://github.com/eupnea-linux/popos-rootfs/releases/latest/download/popos-rootfs."
+                            "split.aa", filename="/tmp/depthboot-build/popos-rootfs.split.aa")
                 stop_download_progress()
+                start_download_progress("/tmp/depthboot-build/popos-rootfs.split.ab")
+                urlretrieve("https://github.com/eupnea-linux/popos-rootfs/releases/latest/download/popos-rootfs."
+                            "split.ab", filename="/tmp/depthboot-build/popos-rootfs.split.ab")
+                stop_download_progress()
+                print_status("Combining split pop-os rootfs")
+                start_progress()
+                bash("cat /tmp/depthboot-build/popos-rootfs.split.?? > /tmp/depthboot-build/popos-rootfs.tar.xz")
     except URLError:
         print_error("Couldn't download rootfs. Check your internet connection and try again. If the error persists, "
                     "create an issue with the distro and version in the name")
