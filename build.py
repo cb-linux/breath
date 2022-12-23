@@ -552,18 +552,27 @@ def start_build(verbose: bool, local_path, kernel_type: str, dev_release: bool, 
 
     bash("sync")  # write all pending changes to usb
 
-    # /mnt/depthboot doesn't unmount on first try and e2fsck throws an error, therefore its unmounted twice
+    # unmount image/device from mnt
     try:
         bash("umount -lf /mnt/depthboot")  # umount mountpoint
     except subprocess.CalledProcessError as error:  # on crostini umount fails for some reason
         if verbose:
             print(error)
     sleep(5)  # wait for umount to finish
-    try:
-        bash("umount -lf /mnt/depthboot")  # umount mountpoint again
-    except subprocess.CalledProcessError as error:  # on crostini umount fails for some reason
-        if verbose:
-            print(error)
+
+    # unmount image/device completely from system
+    if build_options["device"] == "image":
+        try:
+            bash(f"umount -lf {img_mnt}p*")  # umount all partitions from image
+        except subprocess.CalledProcessError as error:  # on crostini umount fails for some reason
+            if verbose:
+                print(error)
+    else:
+        try:
+            bash(f"umount -lf {img_mnt}*")  # umount all partitions from usb/sd-card
+        except subprocess.CalledProcessError as error:  # on crostini umount fails for some reason
+            if verbose:
+                print(error)
 
     if build_options["device"] == "image":
         try:
@@ -588,7 +597,7 @@ def start_build(verbose: bool, local_path, kernel_type: str, dev_release: bool, 
             # rename the image to .bin for the chromeos recovery utility to be able to flash it
             bash(f"mv ./depthboot.img ./depthboot.bin")
 
-        bash(f"losetup -d {img_mnt}")
+        bash(f"losetup -d {img_mnt}")  # unmount image from loop device
         print_header(f"The ready-to-boot Depthboot image is located at {get_full_path('.')}/depthboot.img")
     else:
         print_header(f"USB/SD-card is ready to boot {build_options['distro_name'].capitalize()}")
