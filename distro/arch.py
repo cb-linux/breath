@@ -33,6 +33,7 @@ def config(de_name: str, distro_version: str, username: str, root_partuuid: str,
     # add repo to pacman.conf
     with open("/mnt/depthboot/etc/pacman.conf", "a") as file:
         file.write("[eupnea]\nServer = https://eupnea-linux.github.io/arch-repo/repodata/$arch\n")
+    chroot("pacman -Sy --noconfirm archlinux-keyring")
     chroot("pacman -Syyu --noconfirm")  # update the whole system
 
     print_status("Installing packages")
