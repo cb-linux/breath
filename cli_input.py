@@ -200,8 +200,8 @@ def get_user_input(skip_device: bool = False) -> dict:
 
     print_question("Which kernel type would you like to use? Usually there is no need to change this")
     while True:
-        temp_kernel_type = input("\033[94m" + "Available options: Stable(default, recommended), experimental, "
-                                              "alternative, mainline, mainline-testing \n" + "\033[0m")
+        temp_kernel_type = input("\033[94m" + "Available options: stable(default, recommended), experimental, mainline"
+                                              "(recommended), mainline-testing(not yet supported) \n" + "\033[0m")
         match temp_kernel_type.lower():
             case "" | "stable":
                 print("Stable kernel selected")
@@ -210,10 +210,6 @@ def get_user_input(skip_device: bool = False) -> dict:
             case "exp" | "experimental":
                 print("Experimental kernel selected")
                 output_dict["kernel_type"] = "exp"
-                break
-            case "alt" | "alternative":
-                print("Alternative kernel selected")
-                output_dict["kernel_type"] = "alt"
                 break
             case "main" | "mainline":
                 print("Mainline kernel selected")

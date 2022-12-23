@@ -97,14 +97,6 @@ def download_kernel(kernel_type: str, dev_release: bool, files: list = ["bzImage
                     urlretrieve(f"{url}modules-stable.tar.xz", filename="/tmp/depthboot-build/modules.tar.xz")
                 if "headers" in files:
                     urlretrieve(f"{url}headers-stable.tar.xz", filename="/tmp/depthboot-build/headers.tar.xz")
-            case "alt":
-                print_status("Downloading alt kernel")
-                if "bzImage" in files:
-                    urlretrieve(f"{url}bzImage-alt", filename="/tmp/depthboot-build/bzImage")
-                if "modules" in files:
-                    urlretrieve(f"{url}modules-alt.tar.xz", filename="/tmp/depthboot-build/modules.tar.xz")
-                if "headers" in files:
-                    urlretrieve(f"{url}headers-alt.tar.xz", filename="/tmp/depthboot-build/headers.tar.xz")
             case "exp":
                 print_status("Downloading experimental 5.15 kernel")
                 if "bzImage" in files:
