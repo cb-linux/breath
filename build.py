@@ -604,7 +604,8 @@ def start_build(verbose: bool, local_path, kernel_type: str, dev_release: bool, 
             bash(f"mv ./depthboot.img ./depthboot.bin")
 
         bash(f"losetup -d {img_mnt}")  # unmount image from loop device
-        print_header(f"The ready-to-boot Depthboot image is located at {get_full_path('.')}/depthboot.img")
+        print_header(f"The ready-to-boot {build_options['distro_name'].capitalize()} Depthboot image is located at "
+                     f"{get_full_path('.')}/depthboot.img")
     else:
         print_header(f"USB/SD-card is ready to boot {build_options['distro_name'].capitalize()}")
         print_header("It is safe to remove the USB-drive/SD-card now.")
