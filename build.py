@@ -164,9 +164,9 @@ def download_rootfs(distro_name: str, distro_version: str) -> None:
                             "split.ab", filename="/tmp/depthboot-build/popos-rootfs.split.ab")
                 stop_download_progress()
                 print_status("Combining split pop-os rootfs")
-                start_progress()
+                start_progress()  # start fake progress
                 bash("cat /tmp/depthboot-build/popos-rootfs.split.?? > /tmp/depthboot-build/popos-rootfs.tar.xz")
-                stop_progress()
+                stop_progress()  # stop fake progress
     except URLError:
         print_error("Couldn't download rootfs. Check your internet connection and try again. If the error persists, "
                     "create an issue with the distro and version in the name")
