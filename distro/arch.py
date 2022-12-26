@@ -118,6 +118,13 @@ def config(de_name: str, distro_version: str, username: str, root_partuuid: str,
     with open("/mnt/depthboot/etc/pacman.conf", "w") as conf:
         conf.writelines(temp_pacman)
 
+    # Kill the gpg-agent process, as it prevents the image from being unmounted later
+    # Find the pid of the correct gpg-agent process
+    gpg_pid = bash("ps aux | grep gpg-agent | grep -v grep | awk '{print $2}'").strip()
+    bash(f"kill {gpg_pid}")
+
+    print_status("Arch setup complete")
+
 
 # using arch-chroot for arch
 def chroot(command: str):
