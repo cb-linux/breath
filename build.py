@@ -434,6 +434,16 @@ def post_config(rebind_search: bool, de_name: str, distro_name) -> None:
         cpfile("/mnt/depthboot/usr/sbin/fixfiles.bak", "/mnt/depthboot/usr/sbin/fixfiles")
         rmfile("/mnt/depthboot/usr/sbin/fixfiles.bak")
 
+    # Clean all temporary files from image/sd-card to reduce its size
+    rmdir("/mnt/depthboot/tmp")
+    rmdir("/mnt/depthboot/var/tmp")
+    rmdir("/mnt/depthboot/var/cache")
+    rmdir("/mnt/depthboot/proc")
+    rmdir("/mnt/depthboot/run")
+    rmdir("/mnt/depthboot/sys")
+    rmdir("/mnt/depthboot/lost+found")
+    rmdir("/mnt/depthboot/dev")
+
 
 # chroot command
 def chroot(command: str) -> str:
@@ -537,18 +547,7 @@ def start_build(verbose: bool, local_path, kernel_type: str, dev_release: bool, 
 
     post_config(build_options["rebind_search"], build_options["de_name"], build_options["distro_name"])
 
-    # Post-install cleanup
-    print_status("Cleaning up host system after build")
-
-    # Clean image/sd-card of temporary files to reduce its size
-    rmdir("/mnt/depthboot/tmp")
-    rmdir("/mnt/depthboot/var/tmp")
-    rmdir("/mnt/depthboot/var/cache")
-    rmdir("/mnt/depthboot/proc")
-    rmdir("/mnt/depthboot/run")
-    rmdir("/mnt/depthboot/sys")
-    rmdir("/mnt/depthboot/lost+found")
-    rmdir("/mnt/depthboot/dev")
+    print_status("Unmounting image/device")
 
     bash("sync")  # write all pending changes to usb
 
@@ -598,7 +597,8 @@ def start_build(verbose: bool, local_path, kernel_type: str, dev_release: bool, 
             bash(f"mv ./depthboot.img ./depthboot.bin")
 
         bash(f"losetup -d {img_mnt}")  # unmount image from loop device
-        print_header(f"The ready-to-boot Depthboot image is located at {get_full_path('.')}/depthboot.img")
+        print_header(f"The ready-to-boot {build_options['distro_name'].capitalize()} Depthboot image is located at "
+                     f"{get_full_path('.')}/depthboot.img")
     else:
         print_header(f"USB/SD-card is ready to boot {build_options['distro_name'].capitalize()}")
         print_header("It is safe to remove the USB-drive/SD-card now.")
