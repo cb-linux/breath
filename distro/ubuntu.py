@@ -34,7 +34,7 @@ def config(de_name: str, distro_version: str, username: str, root_partuuid: str,
     # update apt
     chroot("apt-get update -y")
     # Install general dependencies + eupnea packages
-    chroot("apt-get install -y linux-firmware network-manager software-properties-common nano eupnea-utils "
+    chroot("apt-get install -y linux-firmware network-manager software-properties-common nano git eupnea-utils "
            "eupnea-system")
 
     print_status("Downloading and installing de, might take a while")
