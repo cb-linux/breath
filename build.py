@@ -361,7 +361,7 @@ def post_extract(build_options, kernel_type: str, kernel_version: str, dev_relea
     with open("/mnt/depthboot/etc/systemd/sleep.conf", "a") as conf:
         conf.write("SuspendState=freeze\nHibernateState=freeze\n")
 
-    # Install hwdb file to fix auto rotate being flipped
+    # Install hwdb file to fix auto rotate being flipped on some devices
     cpfile("configs/hwdb/61-sensors.hwdb", "/etc/udev/hwdb.d/61-sensors.hwdb")
     chroot("systemd-hwdb update")
 
