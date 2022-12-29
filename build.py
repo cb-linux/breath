@@ -362,7 +362,7 @@ def post_extract(build_options, kernel_type: str, kernel_version: str, dev_relea
         conf.write("SuspendState=freeze\nHibernateState=freeze\n")
 
     # Install hwdb file to fix auto rotate being flipped on some devices
-    cpfile("configs/hwdb/61-sensors.hwdb", "/etc/udev/hwdb.d/61-sensors.hwdb")
+    cpfile("configs/hwdb/61-sensor.hwdb", "/etc/udev/hwdb.d/61-sensor.hwdb")
     chroot("systemd-hwdb update")
 
     # systemd-resolved.service needed to create /etc/resolv.conf link. Not enabled by default on some distros
