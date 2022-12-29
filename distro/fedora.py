@@ -17,6 +17,8 @@ def config(de_name: str, distro_version: str, username: str, root_partuuid: str,
            f"{distro_version}.noarch.rpm")
     chroot("dnf update --refresh -y")  # update repos
     chroot("dnf upgrade -y")  # upgrade the whole system
+    # Install eupnea packages
+    chroot("dnf install -y eupnea-system eupnea-utils")
     # Install core packages
     chroot("dnf group install -y 'Core'")
     # Install firmware packages
