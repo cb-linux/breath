@@ -120,7 +120,12 @@ def config(de_name: str, distro_version: str, username: str, root_partuuid: str,
 
     # Kill the gpg-agent process, as it prevents the image from being unmounted later
     # Find the pid of the correct gpg-agent process
-    gpg_pid = bash("ps aux | grep gpg-agent | grep -v grep | awk '{print $2}'").strip()
+    for line in bash("ps aux").split("\n"):
+        if "gpg-agent --homedir /etc/pacman.d/gnupg --use-standard-socket --daemon" in line:
+            gpg_pid = line[line.find(" "):].strip()
+            gpg_pid = gpg_pid[:gpg_pid.find(" ")]
+            break
+
     bash(f"kill {gpg_pid}")
 
     print_status("Arch setup complete")
