@@ -118,15 +118,17 @@ def config(de_name: str, distro_version: str, username: str, root_partuuid: str,
     with open("/mnt/depthboot/etc/pacman.conf", "w") as conf:
         conf.writelines(temp_pacman)
 
-    # Kill the gpg-agent process, as it prevents the image from being unmounted later
-    # Find the pid of the correct gpg-agent process
+    # Kill the gpg-agent processes, as they prevent the image from being unmounted later
+    # Find the pids of the correct gpg-agent processes
+    gpg_pids = []
     for line in bash("ps aux").split("\n"):
         if "gpg-agent --homedir /etc/pacman.d/gnupg --use-standard-socket --daemon" in line:
-            gpg_pid = line[line.find(" "):].strip()
-            gpg_pid = gpg_pid[:gpg_pid.find(" ")]
-            break
+            temp_string = line[line.find(" "):].strip()
+            gpg_pids.append(temp_string[:temp_string.find(" ")])
 
-    bash(f"kill {gpg_pid}")
+    for pid in gpg_pids:
+        print(f"Killing gpg-agent proces with pid: {pid}")
+        bash(f"kill {pid}")
 
     print_status("Arch setup complete")
 
