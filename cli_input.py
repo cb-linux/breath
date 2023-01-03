@@ -125,17 +125,9 @@ def get_user_input(skip_device: bool = False) -> dict:
 
         print_question("Please set a secure password")
         while True:
-            passwd_temp = getpass("\033[94m" + "Password:" + "\033[0m")
+            passwd_temp = getpass("\033[94m" + "Password: " + "\033[0m")
             if passwd_temp == "":
                 print_warning("Password cannot be empty")
-                continue
-
-            # temporary fix for ) and ( crashing chpasswd in build.py
-            elif passwd_temp.find(")") != -1:
-                print_warning("Password cannot contain: )")
-                continue
-            elif passwd_temp.find("(") != -1:
-                print_warning("Password cannot contain: (")
                 continue
 
             else:

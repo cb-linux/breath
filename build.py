@@ -135,16 +135,17 @@ def download_rootfs(distro_name: str, distro_version: str) -> None:
             case "debian":
                 print_status("Debian is downloaded later, skipping download")
             case "arch":
-                print_status("Downloading latest arch rootfs")
+                print_status("Downloading latest arch rootfs from geo.mirror.pkgbuild.com")
                 start_download_progress("/tmp/depthboot-build/arch-rootfs.tar.gz")
                 urlretrieve("https://geo.mirror.pkgbuild.com/iso/latest/archlinux-bootstrap-x86_64.tar.gz",
                             filename="/tmp/depthboot-build/arch-rootfs.tar.gz")
                 stop_download_progress()
             case "ubuntu" | "fedora" | "pop-os":
-                print_status(f"Downloading {distro_name} rootfs, version {distro_version}")
+                print_status(f"Downloading {distro_name} rootfs, version {distro_version} from eupnea github releases")
                 start_download_progress(f"/tmp/depthboot-build/{distro_name}-rootfs.tar.xz")
-                urlretrieve(f"https://github.com/eupnea-linux/ubuntu-rootfs/releases/latest/download/{distro_name}-"
-                            f"rootfs-{distro_version}.tar.xz", filename="/tmp/depthboot-build/ubuntu-rootfs.tar.xz")
+                urlretrieve(f"https://github.com/eupnea-linux/{distro_name}-rootfs/releases/latest/download/"
+                            f"{distro_name}-rootfs-{distro_version}.tar.xz",
+                            filename=f"/tmp/depthboot-build/{distro_name}-rootfs.tar.xz")
                 stop_download_progress()
     except URLError:
         print_error("Couldn't download rootfs. Check your internet connection and try again. If the error persists, "
@@ -349,8 +350,7 @@ def post_extract(build_options, kernel_type: str, kernel_version: str, dev_relea
     if not build_options["de_name"] == "popos":
         print_status("Configuring user")
         chroot(f"useradd --create-home --shell /bin/bash {username}")
-        # TODO: Fix ) and ( crashing chpasswd
-        chroot(f'echo "{username}:{password}" | chpasswd')
+        chroot(f"echo '{username}:{password}' | chpasswd")
         match build_options["distro_name"]:
             case "ubuntu" | "debian":
                 chroot(f"usermod -aG sudo {username}")
