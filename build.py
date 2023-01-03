@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import contextlib
 from typing import Tuple
 from urllib.request import urlretrieve, urlopen
 from urllib.error import URLError
@@ -21,7 +22,6 @@ def prepare_host(de_name: str) -> None:
         bash("umount -lf /mnt/depthboot")  # umount a second time, coz first time might not work
     except subprocess.CalledProcessError:
         print("Failed to unmount /mnt/depthboot, ignore")
-        pass
     rmdir("/mnt/depthboot")
     mkdir("/mnt/depthboot", create_parents=True)
 
@@ -119,26 +119,19 @@ def download_kernel(kernel_type: str, dev_release: bool, files: list = ["bzImage
             url = "https://api.github.com/repos/eupnea-linux/mainline-kernel/releases/latest"
         else:
             url = "https://api.github.com/repos/eupnea-linux/chromeos-kernel/releases/latest"
+        stop_progress()  # stop fake progress
+        print_status("Kernel files downloaded successfully")
         return json.loads(urlopen(url).read())["tag_name"]
     except URLError:
         print_error("Failed to reach github. Check your internet connection and try again or use local files with -l")
         print_warning("Dev releases may not always be available")
         exit(1)
 
-    stop_progress()  # stop fake progress
-    print_status("Kernel files downloaded successfully")
-
 
 # download the distro rootfs
 def download_rootfs(distro_name: str, distro_version: str) -> None:
     try:
         match distro_name:
-            case "ubuntu":
-                print_status(f"Downloading ubuntu rootfs version: {distro_version} from github")
-                start_download_progress("/tmp/depthboot-build/ubuntu-rootfs.tar.xz")
-                urlretrieve(f"https://github.com/eupnea-linux/ubuntu-rootfs/releases/latest/download/ubuntu-rootfs-"
-                            f"{distro_version}.tar.xz", filename="/tmp/depthboot-build/ubuntu-rootfs.tar.xz")
-                stop_download_progress()
             case "debian":
                 print_status("Debian is downloaded later, skipping download")
             case "arch":
@@ -147,18 +140,11 @@ def download_rootfs(distro_name: str, distro_version: str) -> None:
                 urlretrieve("https://geo.mirror.pkgbuild.com/iso/latest/archlinux-bootstrap-x86_64.tar.gz",
                             filename="/tmp/depthboot-build/arch-rootfs.tar.gz")
                 stop_download_progress()
-            case "fedora":
-                print_status(f"Downloading fedora rootfs version: {distro_version} from github")
-                start_download_progress("/tmp/depthboot-build/fedora-rootfs.tar.xz")
-                urlretrieve(f"https://github.com/eupnea-linux/fedora-rootfs/releases/latest/download/fedora-rootfs-"
-                            f"{distro_version}.tar.xz", filename="/tmp/depthboot-build/fedora-rootfs.tar.xz")
-                stop_download_progress()
-            case "pop-os":
-                print_status(f"Downloading pop-os rootfs from github")
-                start_download_progress("/tmp/depthboot-build/popos-rootfs.tar.xz")
-                urlretrieve(
-                    f"https://github.com/eupnea-linux/popos-rootfs/releases/latest/download/popos-rootfs.tar.xz",
-                    filename="/tmp/depthboot-build/popos-rootfs.tar.xz")
+            case "ubuntu" | "fedora" | "pop-os":
+                print_status(f"Downloading {distro_name} rootfs, version {distro_version}")
+                start_download_progress(f"/tmp/depthboot-build/{distro_name}-rootfs.tar.xz")
+                urlretrieve(f"https://github.com/eupnea-linux/ubuntu-rootfs/releases/latest/download/{distro_name}-"
+                            f"rootfs-{distro_version}.tar.xz", filename="/tmp/depthboot-build/ubuntu-rootfs.tar.xz")
                 stop_download_progress()
     except URLError:
         print_error("Couldn't download rootfs. Check your internet connection and try again. If the error persists, "
@@ -208,10 +194,8 @@ def prepare_usb_sd(device: str, distro_name: str) -> Tuple[str, str]:
         device = f"/dev/{device}"
 
     # unmount all partitions
-    try:
+    with contextlib.suppress(subprocess.CalledProcessError):
         bash(f"umount -lf {device}*")
-    except subprocess.CalledProcessError:
-        pass
     if device.__contains__("mmcblk"):  # sd card
         return partition_and_flash_kernel(device, False, distro_name)
     else:
@@ -222,13 +206,7 @@ def partition_and_flash_kernel(mnt_point: str, write_usb: bool, distro_name: str
     print_status("Preparing device/image partition")
 
     # Determine rootfs part name
-    if write_usb:
-        # if writing to usb, then no p in partition name
-        rootfs_mnt = mnt_point + "3"
-    else:
-        # image is a loop device -> needs p in part name
-        rootfs_mnt = mnt_point + "p3"
-
+    rootfs_mnt = f"{mnt_point}3" if write_usb else f"{mnt_point}p3"
     # remove pre-existing partition table from storage device
     bash(f"wipefs -af {mnt_point}")
 
@@ -281,10 +259,6 @@ def partition_and_flash_kernel(mnt_point: str, write_usb: bool, distro_name: str
 def extract_rootfs(distro_name: str, distro_version: str) -> None:
     print_status("Extracting rootfs")
     match distro_name:
-        case "ubuntu":
-            print_status("Extracting ubuntu rootfs")
-            # --checkpoint is for printing real tar progress
-            bash("tar xfp /tmp/depthboot-build/ubuntu-rootfs.tar.xz -C /mnt/depthboot --checkpoint=.10000")
         case "debian":
             print_status("Debootstraping Debian into /mnt/depthboot")
             start_progress()  # start fake progress
@@ -302,14 +276,10 @@ def extract_rootfs(distro_name: str, distro_version: str) -> None:
             start_progress(force_show=True)  # start fake progress
             cpdir("/tmp/depthboot-build/arch-rootfs/root.x86_64/", "/mnt/depthboot/")
             stop_progress(force_show=True)  # stop fake progress
-        case "fedora":
-            print_status("Extracting fedora rootfs")
+        case "pop-os" | "ubuntu" | "fedora":
+            print_status(f"Extracting {distro_name} rootfs")
             # --checkpoint is for printing real tar progress
-            bash("tar xfp /tmp/depthboot-build/fedora-rootfs.tar.xz -C /mnt/depthboot --checkpoint=.10000")
-        case "pop-os":
-            print_status("Extracting popos rootfs")
-            # --checkpoint is for printing real tar progress
-            bash("tar xfp /tmp/depthboot-build/popos-rootfs.tar.xz -C /mnt/depthboot --checkpoint=.10000")
+            bash(f"tar xfp /tmp/depthboot-build/{distro_name}-rootfs.tar.xz -C /mnt/depthboot --checkpoint=.10000")
 
     print_status("\n" + "Rootfs extraction complete")
 
@@ -396,16 +366,12 @@ def post_extract(build_options, kernel_type: str, kernel_version: str, dev_relea
 
 
 # post extract and distro config
-def post_config(rebind_search: bool, de_name: str, distro_name) -> None:
-    if not de_name == "cli":
+def post_config(de_name: str, distro_name) -> None:
+    if de_name != "cli":
         # Add chromebook layout. Needs to be done after installing Xorg
         print_status("Backing up default keymap and setting Chromebook layout")
         cpfile("/mnt/depthboot/usr/share/X11/xkb/symbols/pc", "/mnt/depthboot/usr/share/X11/xkb/symbols/pc.default")
         cpfile("configs/xkb/xkb.chromebook", "/mnt/depthboot/usr/share/X11/xkb/symbols/pc")
-        if rebind_search:  # rebind search key to caps lock
-            print("Rebinding search key to Caps Lock")
-            cpfile("/mnt/depthboot/usr/share/X11/xkb/keycodes/evdev",
-                   "/mnt/depthboot/usr/share/X11/xkb/keycodes/evdev.default")
 
     # copy previously downloaded firmware
     print_status("Copying google firmware")
@@ -549,7 +515,7 @@ def start_build(verbose: bool, local_path, kernel_type: str, dev_release: bool, 
     distro.config(build_options["de_name"], build_options["distro_version"], build_options["username"], root_partuuid,
                   verbose)
 
-    post_config(build_options["rebind_search"], build_options["de_name"], build_options["distro_name"])
+    post_config(build_options["de_name"], build_options["distro_name"])
 
     print_status("Unmounting image/device")
 

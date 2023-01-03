@@ -17,7 +17,6 @@ def get_user_input(skip_device: bool = False) -> dict:
         "username": "localuser",
         "password": "",
         "device": "image",
-        "rebind_search": False,
         "kernel_type": ""
     }
     # Print welcome message
@@ -67,7 +66,6 @@ def get_user_input(skip_device: bool = False) -> dict:
                 break
             case "Pop!_OS":  # default
                 output_dict["distro_name"] = "pop-os"
-                output_dict["distro_version"] = "22.04"
                 break
     print(f"{output_dict['distro_name']} {output_dict['distro_version']} selected")
 
@@ -149,16 +147,6 @@ def get_user_input(skip_device: bool = False) -> dict:
                 else:
                     print_warning("Passwords do not match, please try again")
                     continue
-
-    print_question("Rebind the Search/Super/Win key to Caps Lock? (NOT RECOMMENDED)")
-    print_status("Type 'YES' to rebind. Press enter to keep old binding: ")
-
-    if input() == "YES":
-        print_status("'YES' received. Search key will be a CAPS LOCK key. Proceed...")
-        rebind_search = True
-    else:
-        rebind_search = False
-    output_dict["rebind_search"] = rebind_search
 
     while True:
         kernel_type = ia_selection("Which kernel type would you like to use? Usually there is no need to change this",
