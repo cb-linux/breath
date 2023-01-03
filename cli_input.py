@@ -165,6 +165,7 @@ def get_user_input(skip_device: bool = False) -> dict:
         
         output_dict["kernel_type"] = kernel_type.lower()
         break
+    print(f"{kernel_type.capitalize()} kernel selected")
 
     if not skip_device:
         print_status("Available devices: ")
@@ -222,10 +223,12 @@ def _draw_ia_selection(options: list, flags: list = None):
     if flags is None:
         flags = []
 
-    def _choices_print():
+    def _choices_print(highlight_choosen: bool = False):
         for i, (option, flag) in enumerate(zip_longest(options, flags, fillvalue='')):
             if i == __INDEX:
-                print(f" {__POINTED} {option} {flag}")
+                print(f" {__POINTED} {{0}}{option} {flag}{{1}}".format(
+                    *('\033[94m', '\033[0m') if highlight_choosen else ('', '')
+                ))
             else:
                 print(f" {__UNPOINTED} {option} {flag}")     
 
@@ -247,6 +250,7 @@ def _draw_ia_selection(options: list, flags: list = None):
             _choices_print()
             if key == __ENTER:
                 _choices_clear()
+                _choices_print(True)
                 break
 
     _main_loop()
