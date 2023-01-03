@@ -1,6 +1,9 @@
 from getpass import getpass
 from functions import *
 
+#I/A selection imports
+import tty, sys, termios, atexit
+from itertools import zip_longest
 
 def get_user_input(skip_device: bool = False) -> dict:
     output_dict = {
@@ -14,143 +17,93 @@ def get_user_input(skip_device: bool = False) -> dict:
         "kernel_type": ""
     }
     # Print welcome message
-    print_header("Welcome to Depthboot, formerly known as Breath")
-    print_header("This script will create a bootable Linux USB-drive/SD-card/image.")
-    print_header("The script will now ask a few questions. If you dont know what to answer, just press 'enter' and the"
-                 " recommended answer will be selected.")
-    input("(Press enter to continue)")
-    print_question("Which Linux distro(flavor) would you like to use?")
+    print_header("Welcome to Depthboot, formerly known as Breath\n"
+                 "This script will create a bootable Linux USB-drive/SD-card/image.\n"
+                 "The script will now ask a few questions. If you dont know what to answer, just press 'enter' and the\n"
+                 "recommended answer will be selected.")
+    input("Press Enter to continue...")
     while True:
-        temp_distro_name = input(
-            "\033[94m" + "Available options: Pop!_OS(default, recommended), Ubuntu, Fedora, Debian, Arch\n" + "\033[0m")
-        match temp_distro_name.lower():
-            case "ubuntu":
+        distro_name  = ia_selection("Which Linux distro (flavor) would you like to use?", 
+                                      options=["Pop!_OS", "Ubuntu", "Fedora", "Debian", "Arch"],
+                                      flags=["(default, recommended)"])
+        match distro_name:
+            case "Ubuntu":
                 output_dict["distro_name"] = "ubuntu"
-                while True:
-                    print_question("Use latest Ubuntu version?")
-                    temp_input = input("\033[94m" + "Press enter for yes(22.10), or type 'LTS' to use the latest "
-                                                    "lts version(22.04): " + "\033[0m")
-                    if temp_input == "" or temp_input == "22.10":
-                        output_dict["distro_version"] = "22.10"
-                        print("Using Ubuntu version: " + output_dict["distro_version"])
-                        break
-                    elif temp_input == "LTS" or temp_input == "lts" or temp_input == "22.04":
-                        output_dict["distro_version"] = "22.04"
-                        print("Ubuntu: " + output_dict["distro_version"] + " selected")
-                        break
-                    else:
-                        print_warning("Version not available, please choose another")
-                        continue
+
+                distro_version  = ia_selection("Which Ubuntu version would you like to use?", 
+                                                 options=["22.04", "22.10"],
+                                                 flags=["(LTS)", "(latest)"])
+                output_dict["distro_version"] = distro_version
                 break
-            case "debian":
+
+            case "Debian":
                 print_warning("Warning: The audio and some postinstall scripts are not supported on debian by default.")
-                if input("\033[94mType 'yes' to continue anyways or Press Enter to choose another distro" +
-                         "\033[0m\n") == "yes":
-                    print("Debian stable selected")
+                print_status("Type 'YES' to continue anyways or Press Enter to choose another distro: ")
+                if input() == "YES":
                     output_dict["distro_name"] = "debian"
                     output_dict["distro_version"] = "stable"
-                    # TODO: Add non stable debian versions
                     break
+                    # TODO: Add non stable debian versions
+                print("Aborting...")
                 continue
-            case "arch" | "arch btw":
-                print("Arch selected")
+            case "Arch":
                 output_dict["distro_name"] = "arch"
                 output_dict["distro_version"] = "latest"
                 break
-            case "fedora":
+            case "Fedora":
                 output_dict["distro_name"] = "fedora"
-                while True:
-                    print_question("Use latest stable Fedora version?")
-                    temp_input = input("\033[94m" + "Press enter for yes(37), or type 'beta' to use the latest "
-                                                    "beta(38):" + "\033[0m")
-                    if temp_input == "":
-                        output_dict["distro_version"] = "37"
-                        print("Using Fedora version: " + output_dict["distro_version"])
-                        break
-                    elif temp_input == "Beta" or temp_input == "beta":
-                        output_dict["distro_version"] = "38"
-                        print("Fedora: " + output_dict["distro_version"] + " selected")
-                        break
-                    else:
-                        print_warning("Version not available, please choose another")
-                        continue
+                distro_version  = ia_selection("Which Ubuntu version would you like to use?", 
+                                                 options=["37", "38"],
+                                                 flags=["(stable)", "(latest, beta)"])
+                output_dict["distro_version"] = distro_version
                 break
-            case "pop!_os" | "popos" | "pop_os" | "":  # default
-                print("Pop!_OS selected")
+            case "Pop!_OS":  # default
                 output_dict["distro_name"] = "pop-os"
                 output_dict["distro_version"] = "22.04"
                 break
-            case _:
-                print_warning("Check your spelling and try again")
-                continue
+    print(f"{distro_name} {output_dict['distro_version']} selected")
 
-    if not output_dict["distro_name"] == "pop-os":
-        print_question("Which desktop environment(Desktop GUI) would you like to use?")
+    if output_dict["distro_name"] != "pop-os":
+        de_list = ["Gnome", "KDE", "Xfce", "LXQt"]
+        flags_list = ["(default, recommended)", "(recommended)", "(recommended for weak devices)", "(recommended for weak devices)"]
+    
         match output_dict["distro_name"]:
             case "ubuntu":
-                available_de = "Gnome(default, recommended), KDE(recommended), Xfce(recommended for weak devices), " \
-                               "LXQt(recommended for weak devices), cli"
+                if output_dict["distro_version"] == "22.04":
+                    de_list.append("deepin")
             case "debian":
-                available_de = "Gnome(default, recommended), KDE(recommended), Xfce(recommended for weak device" \
-                               "s), LXQt(recommended for weak devices), budgie, cli"
+                de_list.append("budgie")
             case "arch":
-                available_de = "Gnome(default, recommended), KDE(recommended), Xfce(recommended for weak device" \
-                               "s), LXQt(recommended for weak devices), deepin, cli"
+                de_list.append("deepin")
             case "fedora":
-                available_de = "Gnome(default, recommended), KDE(recommended), Xfce(recommended for weak device" \
-                               "s), LXQt(recommended for weak devices), deepin, budgie, cli"
+                de_list.extend(["deepin", "budgie"])
+        de_list.append("cli")
 
         while True:
-            temp_de_name = input("\033[94m" + "Available options: " + available_de + "\033[0m" + "\n")
-            match temp_de_name.lower():
-                case "gnome" | "":
-                    print("Gnome selected")
-                    output_dict["de_name"] = "gnome"
+            desktop_env  = ia_selection("Which desktop environment (Desktop GUI) would you like to use?", 
+                                        options=de_list,
+                                        flags=flags_list)
+            if desktop_env == "cli":
+                print_warning("Warning: No desktop environment will be installed!")
+                print_status("Type 'YES' to continue or Press Enter to choose a desktop environment: ")
+                if input() == "YES":
+                    print_status("'YES' received. No desktop will be installed. Proceed...")
                     break
-                case "kde":
-                    print("KDE selected")
-                    output_dict["de_name"] = "kde"
-                    break
-                case "xfce":
-                    print("Xfce selected")
-                    output_dict["de_name"] = "xfce"
-                    break
-                case "lxqt":
-                    print("Lxqt selected")
-                    output_dict["de_name"] = "lxqt"
-                    break
-                case "deepin":
-                    if output_dict["distro_name"] == "debian":
-                        print_warning("Deepin is not available for Debian, please choose another DE")
-                    elif output_dict["distro_version"] == "22.10":
-                        print_warning("Deepin is not yet available on Ubuntu 22.10, please choose another DE")
-                    else:
-                        print("Deepin selected")
-                        output_dict["de_name"] = "deepin"
-                        break
-                case "budgie":
-                    print("Budgie selected")
-                    output_dict["de_name"] = "budgie"
-                    break
-                case "cli" | "none":
-                    print_warning("Warning: No desktop environment will be installed!")
-                    if input("\033[94mType 'yes' to continue or Press Enter to choose a desktop environment" +
-                             "\033[0m\n") == "yes":
-                        print("No desktop will be installed")
-                        output_dict["de_name"] = "cli"
-                        break
-                case _:
-                    print_warning("No such Desktop environment. Check your spelling and try again")
+                print("Aborting...")
+            
+            output_dict["de_name"] = desktop_env.lower()
+            break
+        print(f"{desktop_env} selected")
     else:
         # TODO: set to gnome when gnome is fixed
         output_dict["de_name"] = "popos"  # set to gnome
 
     # Gnome has a first time setup -> skip this part for gnome, as there will be a first time setup
     # TODO: set to gnome when gnome is fixed
-    if not output_dict["de_name"] == "popos":
+    if output_dict["de_name"] != "popos":
         print_question("Enter a username for the new user")
         while True:
-            output_dict["username"] = input("\033[94m" + "Username(default: 'localuser'): " + "\033[0m")
+            output_dict["username"] = input("\033[94m" + "Username (default: 'localuser'): " + "\033[0m")
             if output_dict["username"] == "":
                 print("Using 'localuser' as username")
                 output_dict["username"] = "localuser"
@@ -167,7 +120,7 @@ def get_user_input(skip_device: bool = False) -> dict:
 
         print_question("Please set a secure password")
         while True:
-            passwd_temp = getpass("\033[94m" + "Password: " + "\033[0m")
+            passwd_temp = getpass("\033[94m" + "Password:" + "\033[0m")
             if passwd_temp == "":
                 print_warning("Password cannot be empty")
                 continue
@@ -190,68 +143,115 @@ def get_user_input(skip_device: bool = False) -> dict:
                     print_warning("Passwords do not match, please try again")
                     continue
 
-    print_question("Rebind the Search/Super/Win key to Caps Lock?(NOT RECOMMENDED)")
-    if input("\033[94m" + "Type yes to rebind. Press enter to keep old binding: " "\033[0m") == "yes":
-        print("Search key will be a CAPS LOCK key")
+    print_question("Rebind the Search/Super/Win key to Caps Lock? (NOT RECOMMENDED)")
+    print_status("Type 'YES' to rebind. Press enter to keep old binding: ")
+
+    if input() == "YES":
+        print_status("'YES' received. Search key will be a CAPS LOCK key. Proceed...")
         rebind_search = True
     else:
-        print("Search key will be Super/Win key")
         rebind_search = False
+    output_dict["rebind_search"] = rebind_search
 
-    print_question("Which kernel type would you like to use? Usually there is no need to change this")
     while True:
-        temp_kernel_type = input("\033[94m" + "Available options: stable(default, recommended), experimental, mainline"
-                                              "(recommended), mainline-testing(not yet supported) \n" + "\033[0m")
-        match temp_kernel_type.lower():
-            case "" | "stable":
-                print("Stable kernel selected")
-                output_dict["kernel_type"] = "stable"
-                break
-            case "exp" | "experimental":
-                print("Experimental kernel selected")
-                output_dict["kernel_type"] = "exp"
-                break
-            case "main" | "mainline":
-                print("Mainline kernel selected")
-                output_dict["kernel_type"] = "mainline"
-                break
-            case "testing" | "mainline-testing":
-                print("Mainline testing kernel selected")
-                print_warning("Not yet implemented")
-                continue
-                # TODO: implement mainline testing kernel
-                # output_dict["kernel_type"] = "mainline-testing"
-                # break
-            case _:
-                print_warning("Check your spelling and try again")
-                continue
+        kernel_type  = ia_selection("Which kernel type would you like to use? Usually there is no need to change this", 
+                                      options=["stable", "experimental", "mainline", "mainline-testing"],
+                                      flags=["(default, recommended)", '', "(recommended)", "(not yet supported)"])
+
+        if kernel_type == "mainline-testing":
+            print_warning("Not yet implemented")
+            print("Aborting...")
+            continue
+        
+        output_dict["kernel_type"] = kernel_type.lower()
+        break
+    print(f"{kernel_type.capitalize()} kernel selected")
 
     if not skip_device:
-        while True:
-            print_status("Available devices: ")
-            usb_array = []
-            lsblk_out = bash("lsblk -nd -o NAME,MODEL,SIZE,TRAN").splitlines()
-            for line in lsblk_out:
-                # MassStorageClass is not a real device, so ignore it
-                if not line.find("usb") == -1 and line.find("0B") == -1:  # Print USB devices only with storage
-                    usb_array.append(line[:3])
-                    print(line[:-3])  # this is for the user to see the list
-            if len(usb_array) == 0:
-                print_status("No available USBs/SD-cards found. Building image file.")
-                break
-            else:
-                device = input("\033[92m" + 'Enter USB-drive/SD-card name(example: sdb) or "image" to build an image'
-                               + "\033[0m" + "\n").strip()
-                if device == "image":
+        print_status("Available devices: ")
+        usb_array = []
+        usb_info_array = []
+        lsblk_out = bash("lsblk -nd -o NAME,MODEL,SIZE,TRAN").splitlines()
+        for line in lsblk_out:
+            # MassStorageClass is not a real device, so ignore it
+            if not line.find("usb") == -1 and line.find("0B") == -1:  # Print USB devices only with storage
+                usb_array.append(line[:3])
+                usb_info_array.append(line[3:])
+        if len(usb_array) == 0:
+            print_status("No available USBs/SD-cards found. Building image file.")
+        else:
+            device = ia_selection("Select USB-drive/SD-card name or 'image' to build an image",
+                                    options=usb_array+["image"],
+                                    flags=usb_info_array+["Image to be flashed"])
+            if device == "image":
                     print("Building image instead of writing directly")
-                    break
-                elif device in usb_array:
-                    print(f"Writing directly to {device}")
-                    output_dict["device"] = device
-                    break
-                else:
-                    print_warning("No such device. Check your spelling and try again")
-                    continue
+            else:
+                print(f"Writing directly to {device}")
+                output_dict["device"] = device
 
     print_status("User input complete")
     return output_dict
+
+class KeyGetter():
+    def arm(self):
+        self.old_term = termios.tcgetattr(sys.stdin)
+        tty.setcbreak(sys.stdin)
+        
+        atexit.register(self.disarm)
+
+    def disarm(self):
+        termios.tcsetattr(sys.stdin, termios.TCSADRAIN, self.old_term)
+
+    def getch(self):
+        self.arm()
+        ch = sys.stdin.read(1)[0]
+        self.disarm()
+        return ch
+
+def ia_selection(question: str, options: list = None, flags: list = None) -> str:
+    print_question(question)
+    return _draw_ia_selection(options, flags)
+
+def _draw_ia_selection(options: list, flags: list = None):
+    __UNPOINTED = " "
+    __POINTED = ">"
+    __INDEX = 0
+    __LENGTH = len(options)
+    __ARROWS = __UP, _ = 65, 66
+    __ENTER = 10
+
+    if flags is None:
+        flags = []
+
+    def _choices_print(highlight_choosen: bool = False):
+        for i, (option, flag) in enumerate(zip_longest(options, flags, fillvalue='')):
+            if i == __INDEX:
+                print(f" {__POINTED} {{0}}{option} {flag}{{1}}".format(
+                    *('\033[94m', '\033[0m') if highlight_choosen else ('', '')
+                ))
+            else:
+                print(f" {__UNPOINTED} {option} {flag}")     
+
+    def _choices_clear():
+        print(f"\033[{__LENGTH}A\033[J", end='')
+
+    def _move_pointer(ch_ord: int):
+        nonlocal __INDEX
+        __INDEX = max(0, __INDEX-1) if ch_ord == __UP else min(__INDEX+1, __LENGTH-1)
+
+    def _main_loop():
+        kg = KeyGetter()
+        _choices_print()
+        while True:
+            key = ord(kg.getch())
+            if key in __ARROWS:
+                _move_pointer(key)
+            _choices_clear()
+            _choices_print()
+            if key == __ENTER:
+                _choices_clear()
+                _choices_print(True)
+                break
+
+    _main_loop()
+    return options[__INDEX]
