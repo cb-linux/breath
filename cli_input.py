@@ -1,7 +1,9 @@
 from getpass import getpass
 from functions import *
-from cli_artist import *
 
+#I/A selection imports
+import tty, sys, termios, atexit
+from itertools import zip_longest
 
 def get_user_input(skip_device: bool = False) -> dict:
     output_dict = {
@@ -15,26 +17,22 @@ def get_user_input(skip_device: bool = False) -> dict:
         "kernel_type": ""
     }
     # Print welcome message
-    print_header("""Welcome to Depthboot, formerly known as Breath
-                    This script will create a bootable Linux USB-drive/SD-card/image.
-                    The script will now ask a few questions. If you dont know what to answer, just press 'enter' and the
-                    recommended answer will be selected.""", flush=True)
+    print_header("Welcome to Depthboot, formerly known as Breath\n"
+                 "This script will create a bootable Linux USB-drive/SD-card/image.\n"
+                 "The script will now ask a few questions. If you dont know what to answer, just press 'enter' and the\n"
+                 "recommended answer will be selected.")
     input("Press Enter to continue...")
     while True:
-        distro_name  = print_question("Which Linux distro (flavor) would you like to use?", 
+        distro_name  = ia_selection("Which Linux distro (flavor) would you like to use?", 
                                       options=["Pop!_OS", "Ubuntu", "Fedora", "Debian", "Arch"],
-                                      flags=["(default, recommended)"],
-                                      print_selection=True,
-                                      flush=True)
+                                      flags=["(default, recommended)"])
         match distro_name:
             case "Ubuntu":
                 output_dict["distro_name"] = "ubuntu"
 
-                distro_version  = print_question("Which Ubuntu version would you like to use?", 
+                distro_version  = ia_selection("Which Ubuntu version would you like to use?", 
                                                  options=["22.04", "22.10"],
-                                                 flags=["(LTS)", "(latest)"],
-                                                 print_selection=True,
-                                                 flush=True)
+                                                 flags=["(LTS)", "(latest)"])
                 output_dict["distro_version"] = distro_version
                 break
 
@@ -42,7 +40,6 @@ def get_user_input(skip_device: bool = False) -> dict:
                 print_warning("Warning: The audio and some postinstall scripts are not supported on debian by default.")
                 print_status("Type 'YES' to continue anyways or Press Enter to choose another distro: ")
                 if input() == "YES":
-                    print_status("'YES' received. Proceed...")
                     output_dict["distro_name"] = "debian"
                     output_dict["distro_version"] = "stable"
                     break
@@ -55,17 +52,16 @@ def get_user_input(skip_device: bool = False) -> dict:
                 break
             case "Fedora":
                 output_dict["distro_name"] = "fedora"
-                distro_version  = print_question("Which Ubuntu version would you like to use?", 
+                distro_version  = ia_selection("Which Ubuntu version would you like to use?", 
                                                  options=["37", "38"],
-                                                 flags=["(stable)", "(latest, beta)"],
-                                                 print_selection=True,
-                                                 flush=True)
+                                                 flags=["(stable)", "(latest, beta)"])
                 output_dict["distro_version"] = distro_version
                 break
             case "Pop!_OS":  # default
                 output_dict["distro_name"] = "pop-os"
                 output_dict["distro_version"] = "22.04"
                 break
+    print(f"{distro_name} {output_dict['distro_version']} selected")
 
     if output_dict["distro_name"] != "pop-os":
         de_list = ["Gnome", "KDE", "Xfce", "LXQt"]
@@ -84,11 +80,9 @@ def get_user_input(skip_device: bool = False) -> dict:
         de_list.append("cli")
 
         while True:
-            desktop_env  = print_question("Which desktop environment (Desktop GUI) would you like to use?", 
+            desktop_env  = ia_selection("Which desktop environment (Desktop GUI) would you like to use?", 
                                         options=de_list,
-                                        flags=flags_list,
-                                        print_selection=True,
-                                        flush=True)
+                                        flags=flags_list)
             if desktop_env == "cli":
                 print_warning("Warning: No desktop environment will be installed!")
                 print_status("Type 'YES' to continue or Press Enter to choose a desktop environment: ")
@@ -99,6 +93,7 @@ def get_user_input(skip_device: bool = False) -> dict:
             
             output_dict["de_name"] = desktop_env.lower()
             break
+        print(f"{desktop_env} selected")
     else:
         # TODO: set to gnome when gnome is fixed
         output_dict["de_name"] = "popos"  # set to gnome
@@ -108,8 +103,7 @@ def get_user_input(skip_device: bool = False) -> dict:
     if output_dict["de_name"] != "popos":
         print_question("Enter a username for the new user")
         while True:
-            print_status("Username (default: 'localuser'): ")
-            output_dict["username"] = input()
+            output_dict["username"] = input("\033[94m" + "Username (default: 'localuser'): " + "\033[0m")
             if output_dict["username"] == "":
                 print("Using 'localuser' as username")
                 output_dict["username"] = "localuser"
@@ -126,8 +120,7 @@ def get_user_input(skip_device: bool = False) -> dict:
 
         print_question("Please set a secure password")
         while True:
-            print_status("Password: ")
-            passwd_temp = getpass()
+            passwd_temp = getpass("\033[94m" + "Password:" + "\033[0m")
             if passwd_temp == "":
                 print_warning("Password cannot be empty")
                 continue
@@ -141,8 +134,7 @@ def get_user_input(skip_device: bool = False) -> dict:
                 continue
 
             else:
-                print_status("Repeat password: ")
-                passwd_temp_repeat = getpass()
+                passwd_temp_repeat = getpass("\033[94m" + "Repeat password: " + "\033[0m")
                 if passwd_temp == passwd_temp_repeat:
                     output_dict["password"] = passwd_temp
                     print("Password set")
@@ -162,11 +154,9 @@ def get_user_input(skip_device: bool = False) -> dict:
     output_dict["rebind_search"] = rebind_search
 
     while True:
-        kernel_type  = print_question("Which kernel type would you like to use? Usually there is no need to change this", 
+        kernel_type  = ia_selection("Which kernel type would you like to use? Usually there is no need to change this", 
                                       options=["stable", "experimental", "mainline", "mainline-testing"],
-                                      flags=["(default, recommended)", '', "(recommended)", "(not yet supported)"],
-                                      print_selection=True,
-                                      flush=True)
+                                      flags=["(default, recommended)", '', "(recommended)", "(not yet supported)"])
 
         if kernel_type == "mainline-testing":
             print_warning("Not yet implemented")
@@ -178,22 +168,20 @@ def get_user_input(skip_device: bool = False) -> dict:
 
     if not skip_device:
         print_status("Available devices: ")
-        usb_names = []
-        usb_info = []
+        usb_array = []
+        usb_info_array = []
         lsblk_out = bash("lsblk -nd -o NAME,MODEL,SIZE,TRAN").splitlines()
         for line in lsblk_out:
             # MassStorageClass is not a real device, so ignore it
-            if not line.find("usb") != -1 and line.find("0B") == -1:  # Print USB devices only with storage
-                usb_names.append(line[:3])
-                usb_info.append(line[3:])
-        if not usb_names:
+            if not line.find("usb") == -1 and line.find("0B") == -1:  # Print USB devices only with storage
+                usb_array.append(line[:3])
+                usb_info_array.append(line[3:])
+        if len(usb_array) == 0:
             print_status("No available USBs/SD-cards found. Building image file.")
         else:
-            device = print_question("Select USB-drive/SD-card name or 'image' to build an image",
-                                    options=usb_names+["image"],
-                                    flags=usb_info+["Image to be flashed"],
-                                    print_selection=True,
-                                    flush=True)
+            device = ia_selection("Select USB-drive/SD-card name or 'image' to build an image",
+                                    options=usb_array+["image"],
+                                    flags=usb_info_array+["Image to be flashed"])
             if device == "image":
                     print("Building image instead of writing directly")
             else:
@@ -202,3 +190,64 @@ def get_user_input(skip_device: bool = False) -> dict:
 
     print_status("User input complete")
     return output_dict
+
+class KeyGetter():
+    def arm(self):
+        self.old_term = termios.tcgetattr(sys.stdin)
+        tty.setcbreak(sys.stdin)
+        
+        atexit.register(self.disarm)
+
+    def disarm(self):
+        termios.tcsetattr(sys.stdin, termios.TCSADRAIN, self.old_term)
+
+    def getch(self):
+        self.arm()
+        ch = sys.stdin.read(1)[0]
+        self.disarm()
+        return ch
+
+def ia_selection(question: str, options: list = None, flags: list = None) -> str:
+    print_question(question)
+    return _draw_ia_selection(options, flags)
+
+def _draw_ia_selection(options: list, flags: list = None):
+    __UNPOINTED = " "
+    __POINTED = ">"
+    __INDEX = 0
+    __LENGTH = len(options)
+    __ARROWS = __UP, _ = 65, 66
+    __ENTER = 10
+
+    if flags is None:
+        flags = []
+
+    def _choices_print():
+        for i, (option, flag) in enumerate(zip_longest(options, flags, fillvalue='')):
+            if i == __INDEX:
+                print(f" {__POINTED} {option} {flag}")
+            else:
+                print(f" {__UNPOINTED} {option} {flag}")     
+
+    def _choices_clear():
+        print(f"\033[{__LENGTH}A\033[J", end='')
+
+    def _move_pointer(ch_ord: int):
+        nonlocal __INDEX
+        __INDEX = max(0, __INDEX-1) if ch_ord == __UP else min(__INDEX+1, __LENGTH-1)
+
+    def _main_loop():
+        kg = KeyGetter()
+        _choices_print()
+        while True:
+            key = ord(kg.getch())
+            if key in __ARROWS:
+                _move_pointer(key)
+            _choices_clear()
+            _choices_print()
+            if key == __ENTER:
+                _choices_clear()
+                break
+
+    _main_loop()
+    return options[__INDEX]
