@@ -3,7 +3,6 @@ from pathlib import Path
 from time import sleep
 from threading import Thread
 import subprocess
-from urllib.request import urlretrieve
 
 verbose = False
 disable_download = False
