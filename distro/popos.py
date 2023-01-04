@@ -1,4 +1,5 @@
 from functions import *
+from urllib.request import urlretrieve
 
 
 def config(de_name: str, distro_version: str, username: str, root_partuuid: str, verbose: bool) -> None:
@@ -13,7 +14,7 @@ def config(de_name: str, distro_version: str, username: str, root_partuuid: str,
     # Add eupnea repo
     mkdir("/mnt/depthboot/usr/local/share/keyrings", create_parents=True)
     # download public key
-    urlretrieve(f"https://eupnea-linux.github.io/apt-repo/public.key",
+    urlretrieve("https://eupnea-linux.github.io/apt-repo/public.key",
                 filename="/mnt/depthboot/usr/local/share/keyrings/eupnea.key")
     with open("/mnt/depthboot/etc/apt/sources.list.d/eupnea.list", "w") as file:
         file.write("deb [signed-by=/usr/local/share/keyrings/eupnea.key] https://eupnea-linux.github.io/"
