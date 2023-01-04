@@ -66,6 +66,7 @@ def get_user_input(skip_device: bool = False) -> dict:
                 break
             case "Pop!_OS":  # default
                 output_dict["distro_name"] = "pop-os"
+                output_dict["distro_version"] = "22.04"
                 break
     print(f"{output_dict['distro_name']} {output_dict['distro_version']} selected")
 
