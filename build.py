@@ -223,7 +223,7 @@ def extract_rootfs(distro_name: str, distro_version: str) -> None:
         case "debian":
             print_status("Debootstraping Debian into /mnt/depthboot")
             # debootstrapping directly to /mnt/depthboot
-            debian_result = bash("debootstrap stable /mnt/depthboot https://deb.debian.org/debian/")
+            debian_result = bash(f"debootstrap {distro_version} /mnt/depthboot https://deb.debian.org/debian/")
             if debian_result.__contains__("Couldn't download packages:"):
                 print_error("Debian Debootstrap failed, check your internet connection or try again later")
                 exit(1)
