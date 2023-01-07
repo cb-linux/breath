@@ -70,7 +70,7 @@ def get_user_input(skip_device: bool = False) -> dict:
     print(f"{output_dict['distro_name']} {output_dict['distro_version']} selected")
 
     if output_dict["distro_name"] != "pop-os":
-        de_list = ["Gnome", "KDE", "Xfce", "LXQt", "cli"]
+        de_list = ["Gnome", "KDE", "Xfce", "LXQt", "cli/no DE"]
         flags_list = ["(recommended)", "(recommended)", "(recommended for weak devices)",
                       "(recommended for weak devices)"]
 
