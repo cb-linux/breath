@@ -477,23 +477,20 @@ def start_build(verbose: bool, local_path, kernel_type: str, dev_release: bool, 
     try:
         bash("umount -lf /mnt/depthboot")  # umount mountpoint
     except subprocess.CalledProcessError as error:  # on crostini umount fails for some reason
-        if verbose:
-            print(error)
+        pass
     sleep(5)  # wait for umount to finish
+
+    # Unmount resolv.conf
+    with contextlib.suppress(subprocess.CalledProcessError):  # on crostini umount fails for some reason
+        bash("umount -f /mnt/depthboot/etc/resolv.conf")
 
     # unmount image/device completely from system
     if build_options["device"] == "image":
-        try:
+        with contextlib.suppress(subprocess.CalledProcessError):  # on crostini umount fails for some reason
             bash(f"umount -lf {img_mnt}p*")  # umount all partitions from image
-        except subprocess.CalledProcessError as error:  # on crostini umount fails for some reason
-            if verbose:
-                print(error)
     else:
-        try:
+        with contextlib.suppress(subprocess.CalledProcessError):  # on crostini umount fails for some reason
             bash(f"umount -lf {img_mnt}*")  # umount all partitions from usb/sd-card
-        except subprocess.CalledProcessError as error:  # on crostini umount fails for some reason
-            if verbose:
-                print(error)
 
     if build_options["device"] == "image":
         try:
