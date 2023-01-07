@@ -36,17 +36,16 @@ def get_user_input(skip_device: bool = False) -> dict:
                 break
             case "Debian":
                 output_dict["distro_name"] = "debian"
-                distro_version = ia_selection("Which debian branch would you like to use?",
+                output_dict["distro_version"] = ia_selection("Which debian branch would you like to use?",
                                               options=["testing", "stable"],
                                               flags=["(recommended)", "(not recommended)"])
-                if distro_version != "stable":
+                if output_dict["distro_version"] != "stable":
                     break
                 user_selection = ia_selection(
                     "Warning: audio and some postinstall scripts are not supported on debian stable by default.",
                     options=["Use testing instead", "Choose another distro", "Continue anyways"])
                 match user_selection:
                     case "Continue anyways":
-                        output_dict["distro_version"] = "stable"
                         break
                     case "Use testing instead":
                         output_dict["distro_version"] = "testing"
