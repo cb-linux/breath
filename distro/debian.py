@@ -3,12 +3,11 @@ from functions import *
 from urllib.request import urlretrieve
 
 
-def config(de_name: str, distro_version: str, username: str, root_partuuid: str, verbose: bool) -> None:
+def config(de_name: str, distro_version: str, verbose: bool) -> None:
     set_verbose(verbose)
     print_status("Configuring Debian")
 
     print_status("Installing dependencies")
-    start_progress()  # start fake progress
     # install apt-add-repository
     chroot("apt-get update -y")
     chroot("apt-get install -y software-properties-common")
