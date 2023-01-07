@@ -356,6 +356,10 @@ def post_config(de_name: str, distro_name) -> None:
         cpfile("/mnt/depthboot/usr/sbin/fixfiles.bak", "/mnt/depthboot/usr/sbin/fixfiles")
         rmfile("/mnt/depthboot/usr/sbin/fixfiles.bak")
 
+    # Unmount resolv.conf
+    with contextlib.suppress(subprocess.CalledProcessError):  # on crostini umount fails for some reason
+        bash("umount -f /mnt/depthboot/etc/resolv.conf")
+
     # Clean all temporary files from image/sd-card to reduce its size
     rmdir("/mnt/depthboot/tmp")
     rmdir("/mnt/depthboot/var/tmp")
@@ -479,10 +483,6 @@ def start_build(verbose: bool, local_path, kernel_type: str, dev_release: bool, 
     except subprocess.CalledProcessError as error:  # on crostini umount fails for some reason
         pass
     sleep(5)  # wait for umount to finish
-
-    # Unmount resolv.conf
-    with contextlib.suppress(subprocess.CalledProcessError):  # on crostini umount fails for some reason
-        bash("umount -f /mnt/depthboot/etc/resolv.conf")
 
     # unmount image/device completely from system
     if build_options["device"] == "image":
