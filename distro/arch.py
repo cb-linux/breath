@@ -28,11 +28,9 @@ def config(de_name: str, distro_version: str, username: str, root_partuuid: str,
     with open("/mnt/depthboot/etc/pacman.d/mirrorlist", "w") as write:
         write.writelines(mirrors)
 
-    # Apply temporary fix for pacman
-    bash("mount --bind /mnt/depthboot /mnt/depthboot")
+    # temporarily comment out CheckSpace, coz Pacman fails to check available storage space when run from a chroot
     with open("/mnt/depthboot/etc/pacman.conf", "r") as conf:
         temp_pacman = conf.readlines()
-    # temporarily comment out CheckSpace, coz Pacman fails to check available storage space when run from a chroot
     temp_pacman[34] = f"#{temp_pacman[34]}"
     with open("/mnt/depthboot/etc/pacman.conf", "w") as conf:
         conf.writelines(temp_pacman)
@@ -48,7 +46,6 @@ def config(de_name: str, distro_version: str, username: str, root_partuuid: str,
     # add repo to pacman.conf
     with open("/mnt/depthboot/etc/pacman.conf", "a") as file:
         file.write("[eupnea]\nServer = https://eupnea-linux.github.io/arch-repo/repodata/$arch\n")
-    chroot("pacman -Sy --noconfirm archlinux-keyring")
     chroot("pacman -Syyu --noconfirm")  # update the whole system
 
     print_status("Installing packages")
