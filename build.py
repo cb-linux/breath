@@ -45,7 +45,9 @@ def prepare_host(de_name: str) -> None:
 
 
 # download kernel files from GitHub
-def download_kernel(kernel_type: str, dev_release: bool, files: list = ["bzImage", "modules", "headers"]) -> str:
+def download_kernel(kernel_type: str, dev_release: bool, files: list = None) -> str:
+    if files is None:
+        files = ["bzImage", "modules", "headers"]
     # select correct link
     if dev_release:
         url = "https://github.com/eupnea-linux/chromeos-kernel/releases/download/dev-build/"
@@ -246,14 +248,14 @@ def post_extract(build_options, kernel_type: str, kernel_version: str, dev_relea
     print_status("Extracting kernel modules")
     rmdir("/mnt/depthboot/lib/modules")  # remove any preinstalled modules
     mkdir("/mnt/depthboot/lib/modules")
-    extract_file(f"/tmp/depthboot-build/modules.tar.xz", "/mnt/depthboot/lib/modules/")
+    extract_file("/tmp/depthboot-build/modules.tar.xz", "/mnt/depthboot/lib/modules/")
 
     # Extract kernel headers
     print_status("Extracting kernel headers")
-    dir_kernel_version = bash(f"ls /mnt/depthboot/lib/modules/").strip()  # get modules dir name
+    dir_kernel_version = bash("ls /mnt/depthboot/lib/modules/").strip()  # get modules dir name
     rmdir(f"/mnt/depthboot/usr/src/linux-headers-{dir_kernel_version}", keep_dir=False)  # remove old headers
     mkdir(f"/mnt/depthboot/usr/src/linux-headers-{dir_kernel_version}", create_parents=True)
-    extract_file(f"/tmp/depthboot-build/headers.tar.xz", f"/mnt/depthboot/usr/src/linux-headers-{dir_kernel_version}")
+    extract_file("/tmp/depthboot-build/headers.tar.xz", f"/mnt/depthboot/usr/src/linux-headers-{dir_kernel_version}")
     # use chroot for correct symlink
     chroot(f"ln -s /usr/src/linux-headers-{dir_kernel_version}/ /lib/modules/{dir_kernel_version}/build")
 
@@ -274,7 +276,7 @@ def post_extract(build_options, kernel_type: str, kernel_version: str, dev_relea
     settings["distro_name"] = build_options["distro_name"]
     settings["distro_version"] = build_options["distro_version"]
     settings["de_name"] = build_options["de_name"]
-    if not build_options["device"] == "image":
+    if build_options["device"] != "image":
         settings["install_type"] = "direct"
     with open("/mnt/depthboot/etc/eupnea.json", "w") as settings_file:
         json.dump(settings, settings_file)
@@ -296,14 +298,13 @@ def post_extract(build_options, kernel_type: str, kernel_version: str, dev_relea
     # Enable loading modules needed for depthboot
     cpfile("configs/eupnea-modules.conf", "/mnt/depthboot/etc/modules-load.d/eupnea-modules.conf")
 
-    username = build_options["username"]  # quotes interfere with functions below
-    password = build_options["password"]  # quotes interfere with functions below
-
     # Do not pre-setup gnome, as there is a nice gui first time setup on first boot
     # TODO: Change to gnome
-    if not build_options["de_name"] == "popos":
+    if build_options["de_name"] != "popos":
         print_status("Configuring user")
+        username = build_options["username"]  # quotes interfere with functions below
         chroot(f"useradd --create-home --shell /bin/bash {username}")
+        password = build_options["password"]  # quotes interfere with functions below
         chroot(f"echo '{username}:{password}' | chpasswd")
         match build_options["distro_name"]:
             case "ubuntu" | "debian":
@@ -393,11 +394,7 @@ def start_build(verbose: bool, local_path, kernel_type: str, dev_release: bool, 
     else:  # if local path is specified, copy files from it, instead of downloading from the internet
         print_status("Copying local files to /tmp/depthboot-build")
         # clean local path string
-        if not local_path.endswith("/"):
-            local_path_posix = f"{local_path}/"
-        else:
-            local_path_posix = local_path
-
+        local_path_posix = local_path if local_path.endswith("/") else f"{local_path}/"
         # copy kernel files
         kernel_files = ["bzImage", "modules.tar.xz", "headers.tar.xz", ]
         for file in kernel_files:
@@ -443,13 +440,10 @@ def start_build(verbose: bool, local_path, kernel_type: str, dev_release: bool, 
     # Setup device
     if build_options["device"] == "image":
         output_temp = prepare_img(build_options["distro_name"], img_size)
-        img_mnt = output_temp[0]
-        root_partuuid = output_temp[1]
     else:
         output_temp = prepare_usb_sd(build_options["device"], build_options["distro_name"])
-        img_mnt = output_temp[0]
-        root_partuuid = output_temp[1]
-
+    root_partuuid = output_temp[1]
+    img_mnt = output_temp[0]
     # Extract rootfs and configure distro agnostic settings
     extract_rootfs(build_options["distro_name"], build_options["distro_version"])
     post_extract(build_options, kernel_type, kernel_version, dev_release)
@@ -477,10 +471,8 @@ def start_build(verbose: bool, local_path, kernel_type: str, dev_release: bool, 
     bash("sync")  # write all pending changes to usb
 
     # unmount image/device from mnt
-    try:
+    with contextlib.suppress(subprocess.CalledProcessError):
         bash("umount -lf /mnt/depthboot")  # umount mountpoint
-    except subprocess.CalledProcessError as error:  # on crostini umount fails for some reason
-        pass
     sleep(5)  # wait for umount to finish
 
     # unmount image/device completely from system
@@ -498,7 +490,7 @@ def start_build(verbose: bool, local_path, kernel_type: str, dev_release: bool, 
         except FileNotFoundError:  # WSL doesnt have dmi data
             product_name = ""
         # TODO: Fix shrinking on Crostini
-        if not product_name == "crosvm" and not no_shrink:
+        if product_name != "crosvm" and not no_shrink:
             # Shrink image to actual size
             print_status("Shrinking image")
             bash(f"e2fsck -fpv {img_mnt}p3")  # Force check filesystem for errors
@@ -512,7 +504,7 @@ def start_build(verbose: bool, local_path, kernel_type: str, dev_release: bool, 
             bash(f"truncate --size={actual_fs_in_bytes} ./depthboot.img")
         if product_name == "crosvm":
             # rename the image to .bin for the chromeos recovery utility to be able to flash it
-            bash(f"mv ./depthboot.img ./depthboot.bin")
+            bash("mv ./depthboot.img ./depthboot.bin")
 
         bash(f"losetup -d {img_mnt}")  # unmount image from loop device
         print_header(f"The ready-to-boot {build_options['distro_name'].capitalize()} Depthboot image is located at "
