@@ -54,6 +54,8 @@ def get_user_input(skip_device: bool = False) -> dict:
                             break
                         case "Choose another distro":
                             continue  # return to distro selection
+                else:
+                    break
             case "Arch":
                 output_dict["distro_name"] = "arch"
                 output_dict["distro_version"] = "latest"
