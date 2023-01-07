@@ -2,6 +2,7 @@
 from pathlib import Path
 from time import sleep
 from threading import Thread
+from urllib.request import urlopen, urlretrieve
 import subprocess
 
 verbose = False
@@ -22,7 +23,6 @@ def rmdir(rm_dir: str, keep_dir: bool = True) -> None:
                     unlink_files(path_to_rm)
         except FileNotFoundError:
             print(f"Couldn't remove non existent directory: {path_to_rm}, ignoring")
-            pass
 
     # convert string to Path object
     rm_dir_as_path = Path(rm_dir)
@@ -121,6 +121,7 @@ def bash(command: str) -> str:
         print(output, flush=True)
     return output
 
+
 #######################################################################################
 #                                    MISC STUFF                                       #
 #######################################################################################
@@ -148,51 +149,52 @@ def __prevent_idle():
 #######################################################################################
 #                              PROGRESS MONITOR FUNCTIONS                             #
 #######################################################################################
-def start_progress(force_show: bool = False) -> None:
-    if not force_show and verbose:
-        return
-    rmfile(".stop_progress")
-    Thread(target=__print_progress_dots, daemon=True).start()
+def extract_file(file: str, dest: str) -> None:
+    # Check if pv is installed
+    # pv is needed to display a nice progress bar
+    if not bash("which pv").strip():
+        print_status("pv is not installed, attempting to install")
+        if path_exists("/usr/bin/apt"):
+            bash("apt install pv")
+        elif path_exists("/usr/bin/dnf"):
+            bash("dnf install pv")
+        elif path_exists("/usr/bin/pacman"):
+            bash("pacman -S pv")
+        else:
+            print_error("Cannot install pv, please install manually")
+            exit(1)
+    if file.endswith(".gz"):
+        # --warning=no-unknown-keyword is to supress a warning about unknown headers in the arch rootfs
+        bash(f"pv {file} | tar xfpz - --warning=no-unknown-keyword -C {dest}")
+    elif file.endswith(".xz"):
+        bash(f"pv {file} | tar xfpJ - -C {dest}")
 
 
-def stop_progress(force_show: bool = False) -> None:
-    if not force_show and verbose:
-        return
-    open(".stop_progress", "a").close()
-    sleep(3)
-    print("\n", end="")
-
-
-def start_download_progress(file_path_str: str) -> None:
+def download_file(url: str, path: str) -> None:
+    # start monitor in a separate thread
     if not disable_download:  # for non-interactive shells only
         rmfile(".stop_download_progress")
-        Thread(target=__print_download_progress, args=(Path(file_path_str),), daemon=True).start()
+        # get total file size from server
+        total_file_size = int(urlopen(url).headers["Content-Length"])
+        Thread(target=_print_download_progress, args=(Path(path), total_file_size,), daemon=True).start()
 
+    # start download
+    urlretrieve(url=url, filename=path)
 
-def stop_download_progress() -> None:
+    # stop monitor
     open(".stop_download_progress", "a").close()
-    sleep(1)
     print("\n", end="")
 
 
-def __print_progress_dots() -> None:  # Do not call this function directly, use start_progress() instead
+def _print_download_progress(file_path: Path, total_size) -> None:
     while True:
-        if not path_exists(".stop_progress"):
-            print(".", end="", flush=True)
-            sleep(2)
-        else:
+        if path_exists(".stop_download_progress"):
             return
-
-
-def __print_download_progress(file_path: Path) -> None:
-    while True:
-        if not path_exists(".stop_download_progress"):
-            try:
-                print("\rDownloaded: " + "%.0f" % int(file_path.stat().st_size / 1048576) + "mb", end="", flush=True)
-            except FileNotFoundError:
-                sleep(0.5)  # in case download hasn't started yet
-        else:
-            return
+        try:
+            print("\rDownloading: " + "%.0f" % int(file_path.stat().st_size / 1048576) + "mb / "
+                  + "%.0f" % (total_size / 1048576) + "mb", end="", flush=True)
+        except FileNotFoundError:
+            sleep(0.5)  # in case download hasn't started yet
 
 
 #######################################################################################
