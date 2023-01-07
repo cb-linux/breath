@@ -31,38 +31,35 @@ def get_user_input(skip_device: bool = False) -> dict:
         match distro_name:
             case "Ubuntu":
                 output_dict["distro_name"] = "ubuntu"
-                distro_version = ia_selection("Which Ubuntu version would you like to use?",
-                                              options=["22.04", "22.10"],
-                                              flags=["(LTS)", "(latest)"])
-                output_dict["distro_version"] = distro_version
+                output_dict["distro_version"] = ia_selection("Which Ubuntu version would you like to use?",
+                                                             options=["22.04", "22.10"], flags=["(LTS)", "(latest)"])
                 break
             case "Debian":
                 output_dict["distro_name"] = "debian"
                 distro_version = ia_selection("Which debian branch would you like to use?",
                                               options=["testing", "stable"],
                                               flags=["(recommended)", "(not recommended)"])
-                if distro_version == "stable":
-                    user_selection = ia_selection(
-                        "Warning: audio and some postinstall scripts are not supported on debian stable by default.",
-                        options=["Use testing instead", "Choose another distro", "Continue anyways"])
-                    match user_selection:
-                        case "Continue anyways":
-                            output_dict["distro_version"] = "stable"
-                            break
-                        case "Use testing instead":
-                            output_dict["distro_version"] = "testing"
-                            break
-                        case "Choose another distro":
-                            continue  # return to distro selection
-                else:
+                if distro_version != "stable":
                     break
+                user_selection = ia_selection(
+                    "Warning: audio and some postinstall scripts are not supported on debian stable by default.",
+                    options=["Use testing instead", "Choose another distro", "Continue anyways"])
+                match user_selection:
+                    case "Continue anyways":
+                        output_dict["distro_version"] = "stable"
+                        break
+                    case "Use testing instead":
+                        output_dict["distro_version"] = "testing"
+                        break
+                    case "Choose another distro":
+                        continue  # return to distro selection
             case "Arch":
                 output_dict["distro_name"] = "arch"
                 output_dict["distro_version"] = "latest"
                 break
             case "Fedora":
                 output_dict["distro_name"] = "fedora"
-                output_dict["distro_version"] = ia_selection("Which Ubuntu version would you like to use?",
+                output_dict["distro_version"] = ia_selection("Which Fedora version would you like to use?",
                                                              options=["37", "38"],
                                                              flags=["(stable, recommended)", "(beta, unrecommended)"])
                 break
@@ -158,10 +155,10 @@ def get_user_input(skip_device: bool = False) -> dict:
         usb_info_array = []
         lsblk_out = bash("lsblk -nd -o NAME,MODEL,SIZE,TRAN").splitlines()
         for line in lsblk_out:
-            if not line.find("usb") == -1 and line.find("0B") == -1:  # Print USB devices only with storage more than 0B
+            if line.find("usb") != -1 and line.find("0B") == -1:  # Print USB devices only with storage more than 0B
                 usb_array.append(line[:3])
                 usb_info_array.append(line[3:])
-        if len(usb_array) == 0:
+        if not usb_array:
             print_status("No available USBs/SD-cards found. Building image file.")
         else:
             device = ia_selection("Select USB-drive/SD-card name or 'image' to build an image",
