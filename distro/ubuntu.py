@@ -40,7 +40,6 @@ def config(de_name: str, distro_version: str, username: str, root_partuuid: str,
            "eupnea-system")
 
     print_status("Downloading and installing de, might take a while")
-    start_progress()  # start fake progress
     match de_name:
         case "gnome":
             print_status("Installing GNOME")
@@ -88,7 +87,6 @@ def config(de_name: str, distro_version: str, username: str, root_partuuid: str,
         case _:
             print_error("Invalid desktop environment! Please create an issue")
             exit(1)
-    stop_progress()  # stop fake progress
 
     # GDM3 auto installs gnome-minimal. Gotta remove it if user didn't choose gnome
     if de_name != "gnome":

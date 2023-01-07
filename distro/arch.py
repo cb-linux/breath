@@ -6,6 +6,19 @@ def config(de_name: str, distro_version: str, username: str, root_partuuid: str,
     set_verbose(verbose)
     print_status("Configuring Arch")
 
+    # Bind-mount some directories for pacman
+    bash("mount --types proc /proc /mnt/depthboot/proc -o rw,nosuid,nodev,noexec,relatime")
+    # bash("mount --types sysfs /sys /mnt/depthboot/sys -o ro,nosuid,nodev,noexec,relatime")
+    # bash("mount --types efivarfs /sys/firmware/efi/efivars /mnt/depthboot/sys/firmware/efi/efivars -o rw,nosuid,nodev,noexec,relatime")
+    bash(
+        "mount --types devtmpfs /dev /mnt/depthboot/dev -o rw,nosuid,relatime,size=16339804k,nr_inodes=4084951,mode=755,inode64")
+    bash(
+        "mount --types devpts /dev/pts /mnt/depthboot/dev/pts -o rw,nosuid,noexec,relatime,gid=5,mode=620,ptmxmode=000")
+    bash("mount --types tmpfs /dev/shm /mnt/depthboot/dev/shm -o rw,nosuid,nodev,relatime,inode64")
+    bash(
+        "mount --types tmpfs /run /mnt/depthboot/run -o rw,nosuid,nodev,noexec,relatime,size=3280692k,mode=755,inode64")
+    bash("mount --types tmpfs /tmp /mnt/depthboot/tmp -o rw,nosuid,nodev,inode64")
+
     # Uncomment worldwide arch mirror
     with open("/mnt/depthboot/etc/pacman.d/mirrorlist", "r") as read:
         mirrors = read.readlines()
@@ -38,15 +51,11 @@ def config(de_name: str, distro_version: str, username: str, root_partuuid: str,
     chroot("pacman -Syyu --noconfirm")  # update the whole system
 
     print_status("Installing packages")
-    start_progress()  # start fake progress
     # Install basic utils + eupnea packages
     chroot("pacman -S --noconfirm base base-devel nano networkmanager xkeyboard-config linux-firmware sudo bluez "
            "bluez-utils git eupnea-utils eupnea-system cgpt-vboot-utils")
 
-    stop_progress()  # stop fake progress
-
     print_status("Downloading and installing de, might take a while")
-    start_progress()  # start fake progress
     match de_name:
         case "gnome":
             print_status("Installing GNOME")
@@ -95,7 +104,6 @@ def config(de_name: str, distro_version: str, username: str, root_partuuid: str,
             print_error("Invalid desktop environment! Please create an issue")
             exit(1)
 
-    stop_progress()  # stop fake progress
     print_status("Desktop environment setup complete")
 
     # enable networkmanager systemd service
@@ -134,9 +142,8 @@ def config(de_name: str, distro_version: str, username: str, root_partuuid: str,
     print_status("Arch setup complete")
 
 
-# using arch-chroot for arch
-def chroot(command: str):
+def chroot(command: str) -> None:
     if verbose:
-        bash(f'arch-chroot /mnt/depthboot bash -c "{command}"')
+        bash(f'chroot /mnt/depthboot /bin/bash -c "{command}"')
     else:
-        bash(f'arch-chroot /mnt/depthboot bash -c "{command}" 2>/dev/null 1>/dev/null')  # supress all output
+        bash(f'chroot /mnt/depthboot /bin/bash -c "{command}" 2>/dev/null 1>/dev/null')  # supress all output

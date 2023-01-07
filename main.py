@@ -30,24 +30,27 @@ if __name__ == "__main__":
     args = process_args()
 
     # Restart script as root
-    if not os.geteuid() == 0:
+    if os.geteuid() != 0:
         sudo_args = ['sudo', sys.executable] + sys.argv + [os.environ]
         os.execlpe('sudo', *sudo_args)
 
-    # check if cgpt and vboot are already installed
-    if path_exists("/usr/bin/vbutil_kernel") and path_exists("/usr/bin/cgpt"):
-        print_status("Cgpt and vboot already installed, skipping")
-    else:
-        print_status("Installing: vboot, cgpt")
+    # check script dependencies are already installed with which
+    try:
+        bash("which git pv parted cgpt futility")
+        print_status("Dependencies already installed, skipping")
+    except subprocess.CalledProcessError:
+        print_status("Installing dependencies")
         if path_exists("/usr/bin/apt"):  # Ubuntu + debian
-            bash("apt-get install cgpt vboot-kernel-utils -y")
+            bash("apt-get install -y git pv parted cgpt vboot-kernel-utils")
         elif path_exists("/usr/bin/pacman"):  # Arch
-            # Download prepackaged cgpt + vboot from arch-repo releases
+            # Download prepackaged cgpt + vboot from arch-repo releases as its not available in the official repos
             urlretrieve(
                 "https://github.com/eupnea-linux/arch-repo/releases/latest/download/cgpt-vboot-utils.pkg.tar.gz",
                 filename="/tmp/cgpt-vboot-utils.pkg.tar.gz")
             # Install package
             bash("pacman --noconfirm -U /tmp/cgpt-vboot-utils.pkg.tar.gz")
+            # Install other dependencies
+            bash("pacman --noconfirm -S git pv parted")
         elif path_exists("/usr/bin/dnf"):  # Fedora
             bash("dnf install vboot-utils --assumeyes")  # cgpt is included in vboot-utils on fedora
         elif path_exists("/usr/bin/zypper"):  # openSUSE
@@ -65,7 +68,7 @@ if __name__ == "__main__":
         if product_name == "crosvm" and path_exists("/usr/bin/apt"):
             user_answer = input("\033[92m" + "Python 3.10 or higher is required. Attempt to install? (Y/n)\n" +
                                 "\033[0m").lower()
-            if user_answer == "y" or user_answer == "":
+            if user_answer in ["y", ""]:
                 print_status("Switching to unstable channel")
                 # switch to unstable channel
                 with open("/etc/apt/sources.list", "r") as file:
@@ -88,14 +91,11 @@ if __name__ == "__main__":
                 bash("apt-get update -y")  # update cache back to stable channel
 
                 print_header('Please restart the script with: "./main.py"')
-                exit(1)
             else:
                 print_error("Please run the script with python 3.10 or higher")
-                exit(1)
         else:
             print_error("Please run the script with python 3.10 or higher")
-            exit(1)
-
+        exit(1)
     # import other scripts after python version check is successful
     import build
     import cli_input
@@ -127,7 +127,7 @@ if __name__ == "__main__":
         print_warning("Verbosity increased")
     if args.no_shrink:
         print_warning("Image will not be shrunk")
-    if not args.image_size[0] == 10:
+    if args.image_size[0] != 10:
         print_warning(f"Image size overridden to {args.image_size[0]}GB")
 
     # override device if specified

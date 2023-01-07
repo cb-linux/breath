@@ -1,10 +1,9 @@
 #!/usr/bin/env python3
 
 import contextlib
-from typing import Tuple
-from urllib.request import urlretrieve, urlopen
-from urllib.error import URLError
 import json
+from typing import Tuple
+from urllib.error import URLError
 
 from functions import *
 
@@ -28,21 +27,6 @@ def prepare_host(de_name: str) -> None:
     rmfile("depthboot.img")
     rmfile("kernel.flags")
 
-    # Install parted
-    if not path_exists("/usr/sbin/parted"):
-        print_status("Installing parted")
-        if path_exists("/usr/bin/apt"):  # Ubuntu + debian
-            bash("apt-get install parted -y")
-        elif path_exists("/usr/bin/pacman"):  # Arch
-            bash("pacman -S parted --noconfirm")
-        elif path_exists("/usr/bin/dnf"):  # Fedora
-            bash("dnf install parted --assumeyes")
-        elif path_exists("/usr/bin/zypper"):  # openSUSE
-            bash("zypper --non-interactive install parted")
-        else:
-            print_warning("Parted not found, please install it using your distros package manager")
-            exit(1)
-
     # install debootstrap for debian
     if de_name == "debian" and not path_exists("/usr/sbin/debootstrap"):
         print_status("Installing debootstrap")
@@ -59,22 +43,6 @@ def prepare_host(de_name: str) -> None:
                           "another distro instead of debian")
             exit(1)
 
-    # install arch-chroot for arch
-    if de_name == "arch" and not path_exists("/usr/bin/arch-chroot"):
-        print_status("Installing arch-chroot")
-        if path_exists("/usr/bin/apt"):
-            bash("apt-get install arch-install-scripts -y")
-        elif path_exists("/usr/bin/pacman"):
-            bash("pacman -S arch-install-scripts --noconfirm")
-        elif path_exists("/usr/bin/dnf"):
-            bash("dnf install arch-install-scripts --assumeyes")
-        elif path_exists("/usr/bin/zypper"):  # openSUSE
-            bash("zypper --non-interactive install arch-install-scripts")
-        else:
-            print_warning("Arch-install-scripts not found, please install it using your distros package manager or "
-                          "select another distro instead of arch")
-            exit(1)
-
 
 # download kernel files from GitHub
 def download_kernel(kernel_type: str, dev_release: bool, files: list = ["bzImage", "modules", "headers"]) -> str:
@@ -85,7 +53,6 @@ def download_kernel(kernel_type: str, dev_release: bool, files: list = ["bzImage
         url = "https://github.com/eupnea-linux/chromeos-kernel/releases/latest/download/"
 
     # download kernel files
-    start_progress()  # show fake progress
     try:
         match kernel_type:
             case "mainline":
@@ -119,7 +86,6 @@ def download_kernel(kernel_type: str, dev_release: bool, files: list = ["bzImage
             url = "https://api.github.com/repos/eupnea-linux/mainline-kernel/releases/latest"
         else:
             url = "https://api.github.com/repos/eupnea-linux/chromeos-kernel/releases/latest"
-        stop_progress()  # stop fake progress
         print_status("Kernel files downloaded successfully")
         return json.loads(urlopen(url).read())["tag_name"]
     except URLError:
@@ -136,17 +102,13 @@ def download_rootfs(distro_name: str, distro_version: str) -> None:
                 print_status("Debian is downloaded later, skipping download")
             case "arch":
                 print_status("Downloading latest arch rootfs from geo.mirror.pkgbuild.com")
-                start_download_progress("/tmp/depthboot-build/arch-rootfs.tar.gz")
-                urlretrieve("https://geo.mirror.pkgbuild.com/iso/latest/archlinux-bootstrap-x86_64.tar.gz",
-                            filename="/tmp/depthboot-build/arch-rootfs.tar.gz")
-                stop_download_progress()
+                download_file("https://geo.mirror.pkgbuild.com/iso/latest/archlinux-bootstrap-x86_64.tar.gz",
+                              "/tmp/depthboot-build/arch-rootfs.tar.gz")
             case "ubuntu" | "fedora" | "pop-os":
                 print_status(f"Downloading {distro_name} rootfs, version {distro_version} from eupnea github releases")
-                start_download_progress(f"/tmp/depthboot-build/{distro_name}-rootfs.tar.xz")
-                urlretrieve(f"https://github.com/eupnea-linux/{distro_name}-rootfs/releases/latest/download/"
-                            f"{distro_name}-rootfs-{distro_version}.tar.xz",
-                            filename=f"/tmp/depthboot-build/{distro_name}-rootfs.tar.xz")
-                stop_download_progress()
+                download_file(f"https://github.com/eupnea-linux/{distro_name}-rootfs/releases/latest/download/"
+                              f"{distro_name}-rootfs-{distro_version}.tar.xz",
+                              f"/tmp/depthboot-build/{distro_name}-rootfs.tar.xz")
     except URLError:
         print_error("Couldn't download rootfs. Check your internet connection and try again. If the error persists, "
                     "create an issue with the distro and version in the name")
@@ -156,15 +118,13 @@ def download_rootfs(distro_name: str, distro_version: str) -> None:
 # TODO: Figure out if this is actually necessary or if linux-firmware is enough
 # Download firmware for later
 def download_firmware() -> None:
-    print_status("Downloading firmware")
-    start_progress()  # start fake progress
+    print_status("Downloading chromeos firmware")
     try:
         bash("git clone --depth=1 https://chromium.googlesource.com/chromiumos/third_party/linux-firmware/ "
              "/tmp/depthboot-build/firmware")
     except URLError:
         print_error("Couldn't download firmware. Check your internet connection and try again.")
         exit(1)
-    stop_progress()  # stop fake progress
 
 
 # Create, mount, partition the img and flash the eupnea kernel
@@ -262,26 +222,19 @@ def extract_rootfs(distro_name: str, distro_version: str) -> None:
     match distro_name:
         case "debian":
             print_status("Debootstraping Debian into /mnt/depthboot")
-            start_progress()  # start fake progress
             # debootstrapping directly to /mnt/depthboot
             debian_result = bash("debootstrap stable /mnt/depthboot https://deb.debian.org/debian/")
-            stop_progress()  # stop fake progress
             if debian_result.__contains__("Couldn't download packages:"):
                 print_error("Debian Debootstrap failed, check your internet connection or try again later")
                 exit(1)
         case "arch":
             print_status("Extracting arch rootfs")
             mkdir("/tmp/depthboot-build/arch-rootfs")
-            bash("tar xfp /tmp/depthboot-build/arch-rootfs.tar.gz -C /tmp/depthboot-build/arch-rootfs "
-                 "--checkpoint=.10000")
-            start_progress(force_show=True)  # start fake progress
+            extract_file("/tmp/depthboot-build/arch-rootfs.tar.gz", "/tmp/depthboot-build/arch-rootfs")
             cpdir("/tmp/depthboot-build/arch-rootfs/root.x86_64/", "/mnt/depthboot/")
-            stop_progress(force_show=True)  # stop fake progress
         case "pop-os" | "ubuntu" | "fedora":
             print_status(f"Extracting {distro_name} rootfs")
-            # --checkpoint is for printing real tar progress
-            bash(f"tar xfp /tmp/depthboot-build/{distro_name}-rootfs.tar.xz -C /mnt/depthboot --checkpoint=.10000")
-
+            extract_file(f"/tmp/depthboot-build/{distro_name}-rootfs.tar.xz", "/mnt/depthboot")
     print_status("\n" + "Rootfs extraction complete")
 
 
@@ -293,23 +246,24 @@ def post_extract(build_options, kernel_type: str, kernel_version: str, dev_relea
     print_status("Extracting kernel modules")
     rmdir("/mnt/depthboot/lib/modules")  # remove any preinstalled modules
     mkdir("/mnt/depthboot/lib/modules")
-    bash(f"tar xpf /tmp/depthboot-build/modules.tar.xz -C /mnt/depthboot/lib/modules/ --checkpoint=.10000")
-    print("")  # break line after tar
+    extract_file(f"/tmp/depthboot-build/modules.tar.xz", "/mnt/depthboot/lib/modules/")
 
     # Extract kernel headers
     print_status("Extracting kernel headers")
     dir_kernel_version = bash(f"ls /mnt/depthboot/lib/modules/").strip()  # get modules dir name
     rmdir(f"/mnt/depthboot/usr/src/linux-headers-{dir_kernel_version}", keep_dir=False)  # remove old headers
     mkdir(f"/mnt/depthboot/usr/src/linux-headers-{dir_kernel_version}", create_parents=True)
-    bash(f"tar xpf /tmp/depthboot-build/headers.tar.xz -C /mnt/depthboot/usr/src/linux-headers-{dir_kernel_version}/ "
-         f"--checkpoint=.10000")
-    print("")  # break line after tar
-    chroot(f"ln -s /usr/src/linux-headers-{dir_kernel_version}/ "
-           f"/lib/modules/{dir_kernel_version}/build")  # use chroot for correct symlink
+    extract_file(f"/tmp/depthboot-build/headers.tar.xz", f"/mnt/depthboot/usr/src/linux-headers-{dir_kernel_version}")
+    # use chroot for correct symlink
+    chroot(f"ln -s /usr/src/linux-headers-{dir_kernel_version}/ /lib/modules/{dir_kernel_version}/build")
 
     # Create a temporary resolv.conf for internet inside the chroot
     mkdir("/mnt/depthboot/run/systemd/resolve", create_parents=True)  # dir doesnt exist coz systemd didnt run
-    cpfile("/etc/resolv.conf", "/mnt/depthboot/run/systemd/resolve/stub-resolv.conf")  # copy host resolv.conf to chroot
+    open("/mnt/depthboot/run/systemd/resolve/stub-resolv.conf", "w").close()  # create empty file for mount
+    # Bind mount host resolv.conf to chroot resolv.conf.
+    # If chroot /etc/resolv.conf is a symlink, then it will be resolved to the real file and bind mounted
+    # This is needed for internet inside the chroot
+    bash("mount --bind /etc/resolv.conf /mnt/depthboot/run/systemd/resolve/stub-resolv.conf")
 
     # create depthboot settings file for postinstall scripts to read
     with open("configs/eupnea.json", "r") as settings_file:
@@ -375,9 +329,7 @@ def post_config(de_name: str, distro_name) -> None:
 
     # copy previously downloaded firmware
     print_status("Copying google firmware")
-    start_progress(force_show=True)  # start fake progress
     cpdir("/tmp/depthboot-build/firmware", "/mnt/depthboot/lib/firmware")
-    stop_progress(force_show=True)  # stop fake progress
 
     # Fedora requires all files to be relabled for SELinux to work
     # If this is not done, SELinux will prevent users from logging in
