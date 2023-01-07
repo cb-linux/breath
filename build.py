@@ -263,7 +263,7 @@ def post_extract(build_options, kernel_type: str, kernel_version: str, dev_relea
     # Bind mount host resolv.conf to chroot resolv.conf.
     # If chroot /etc/resolv.conf is a symlink, then it will be resolved to the real file and bind mounted
     # This is needed for internet inside the chroot
-    bash("mount --bind /etc/resolv.conf /mnt/depthboot/run/systemd/resolve/stub-resolv.conf")
+    bash("mount --bind /etc/resolv.conf /mnt/depthboot/etc/resolv.conf")
 
     # create depthboot settings file for postinstall scripts to read
     with open("configs/eupnea.json", "r") as settings_file:
