@@ -22,7 +22,7 @@ def config(de_name: str, distro_version: str, verbose: bool) -> None:
     # update apt
     chroot("apt-get update")
     # Install general dependencies + eupnea packages
-    chroot("apt-get install -y git pop-gnome-initial-setup eupnea-utils eupnea-system")
+    chroot("apt-get install -y pop-gnome-initial-setup eupnea-utils eupnea-system")
 
     # Replace input-synaptics with newer input-libinput, for better touchpad support
     print_status("Upgrading touchpad drivers")
