@@ -51,7 +51,7 @@ def config(de_name: str, distro_version: str, verbose: bool) -> None:
     print_status("Installing packages")
     # Install basic utils + eupnea packages
     chroot("pacman -S --noconfirm base base-devel nano networkmanager xkeyboard-config linux-firmware sudo bluez "
-           "bluez-utils git eupnea-utils eupnea-system cgpt-vboot-utils")
+           "bluez-utils eupnea-utils eupnea-system cgpt-vboot-utils")
 
     print_status("Downloading and installing de, might take a while")
     match de_name:
