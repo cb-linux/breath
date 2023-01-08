@@ -24,8 +24,8 @@ def config(de_name: str, distro_version: str, verbose: bool) -> None:
     # update apt
     chroot("apt-get update -y")
     # Install general dependencies + eupnea packages
-    chroot("apt-get install -y network-manager sudo firmware-linux-free cloud-utils firmware-linux-nonfree "
-           "firmware-iwlwifi iw git")
+    chroot("apt-get install -y network-manager sudo firmware-linux-free firmware-linux-nonfree "
+           "firmware-iwlwifi iw")
     chroot("apt-get install -y eupnea-utils eupnea-system")
 
     print_status("Downloading and installing de, might take a while")
