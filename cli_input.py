@@ -93,7 +93,6 @@ def get_user_input(skip_device: bool = False) -> dict:
                 user_selection = ia_selection("Are you sure you want to continue?", options=["Yes", "No"], )
                 if user_selection == "Yes":
                     print_status("No desktop will be installed.")
-                    break
 
             output_dict["de_name"] = desktop_env.lower()
             break

@@ -99,7 +99,7 @@ def config(de_name: str, distro_version: str, verbose: bool) -> None:
         case "cli":
             print_status("Skipping desktop environment install")
         case _:
-            print_error("Invalid desktop environment! Please create an issue")
+            print_error(f"Invalid desktop environment: {de_name}. Please create an issue")
             exit(1)
 
     print_status("Desktop environment setup complete")
