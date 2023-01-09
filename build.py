@@ -288,13 +288,16 @@ def post_extract(build_options, kernel_type: str, kernel_version: str, dev_relea
     with open("/mnt/depthboot/etc/systemd/sleep.conf", "a") as conf:
         conf.write("SuspendState=freeze\nHibernateState=freeze\n")
 
+    print_status("Fixing screen rotation")
     # Install hwdb file to fix auto rotate being flipped on some devices
     cpfile("configs/hwdb/61-sensor.hwdb", "/mnt/depthboot/etc/udev/hwdb.d/61-sensor.hwdb")
     chroot("systemd-hwdb update")
 
+    print_status("Enabling resolved.conf systemd service")
     # systemd-resolved.service needed to create /etc/resolv.conf link. Not enabled by default on some distros
     chroot("systemctl enable systemd-resolved")
 
+    print_status("Enable modules autoloading")
     # Enable loading modules needed for depthboot
     cpfile("configs/eupnea-modules.conf", "/mnt/depthboot/etc/modules-load.d/eupnea-modules.conf")
 
