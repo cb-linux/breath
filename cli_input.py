@@ -37,8 +37,8 @@ def get_user_input(skip_device: bool = False) -> dict:
             case "Debian":
                 output_dict["distro_name"] = "debian"
                 output_dict["distro_version"] = ia_selection("Which debian branch would you like to use?",
-                                              options=["testing", "stable"],
-                                              flags=["(recommended)", "(not recommended)"])
+                                                             options=["testing", "stable"],
+                                                             flags=["(recommended)", "(not recommended)"])
                 if output_dict["distro_version"] != "stable":
                     break
                 user_selection = ia_selection(
@@ -69,9 +69,9 @@ def get_user_input(skip_device: bool = False) -> dict:
     print(f"{output_dict['distro_name']} {output_dict['distro_version']} selected")
 
     if output_dict["distro_name"] != "pop-os":
-        de_list = ["Gnome", "KDE", "Xfce", "LXQt", "cli/no DE"]
+        de_list = ["Gnome", "KDE", "Xfce", "LXQt", "cli"]
         flags_list = ["(recommended)", "(recommended)", "(recommended for weak devices)",
-                      "(recommended for weak devices)"]
+                      "(recommended for weak devices)", "No desktop environment"]
 
         match output_dict["distro_name"]:
             case "ubuntu":
