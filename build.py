@@ -187,7 +187,7 @@ def partition_and_flash_kernel(mnt_point: str, write_usb: bool, distro_name: str
 
     # write PARTUUID to kernel flags and save it as a file
     with open(f"configs/cmdlines/{distro_name}.flags", "r") as flags:
-        temp_cmdline = flags.read().replace("${USB_ROOTFS}", rootfs_partuuid).strip()
+        temp_cmdline = flags.read().replace("insert_partuuid", rootfs_partuuid).strip()
     with open("kernel.flags", "w") as config:
         config.write(temp_cmdline)
 

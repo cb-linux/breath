@@ -1,1 +1,1 @@
-console= root=PARTUUID=${USB_ROOTFS} i915.modeset=1 rootwait rw fbcon=logo-pos:center,logo-count:1 security=selinux
+console= root=PARTUUID=insert_partuuid i915.modeset=1 rootwait rw fbcon=logo-pos:center,logo-count:1 security=selinux
