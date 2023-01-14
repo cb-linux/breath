@@ -337,7 +337,7 @@ def post_config(de_name: str, distro_name) -> None:
 
     # Enable postinstall service
     print_status("Enabling postinstall service")
-    bash("systemctl enable eupnea-postinstall.service")
+    chroot("systemctl enable eupnea-postinstall.service")
 
     # Fedora requires all files to be relabled for SELinux to work
     # If this is not done, SELinux will prevent users from logging in
