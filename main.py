@@ -44,7 +44,7 @@ if __name__ == "__main__":
             bash("apt-get update -y")
             bash("apt-get install -y pv parted cgpt vboot-kernel-utils")
         elif path_exists("/usr/bin/pacman"):  # Arch
-            bash("pacman -Syy")
+            bash("pacman -Syyu --noconfirm")  # sync and update system
             # Download prepackaged cgpt + vboot from arch-repo releases as its not available in the official repos
             urlretrieve(
                 "https://github.com/eupnea-linux/arch-repo/releases/latest/download/cgpt-vboot-utils.pkg.tar.gz",
