@@ -335,6 +335,10 @@ def post_config(de_name: str, distro_name) -> None:
     print_status("Copying google firmware")
     cpdir("/tmp/depthboot-build/firmware", "/mnt/depthboot/lib/firmware")
 
+    # Enable postinstall service
+    print_status("Enabling postinstall service")
+    bash("systemctl enable eupnea-postinstall.service")
+
     # Fedora requires all files to be relabled for SELinux to work
     # If this is not done, SELinux will prevent users from logging in
     if distro_name == "fedora":
