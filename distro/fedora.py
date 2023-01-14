@@ -64,6 +64,7 @@ def config(de_name: str, distro_version: str, verbose: bool) -> None:
         chroot("systemctl set-default graphical.target")
     print_status("Desktop environment setup complete")
 
+    # TODO: Remove for v1.2.0 release
     print_status("Adding fedora modules")
     with open("/mnt/depthboot/etc/modules-load.d/eupnea-modules.conf", "a") as f:
         f.write("\n# Fedora modules\nsunrpc\n")

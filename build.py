@@ -299,6 +299,7 @@ def post_extract(build_options, kernel_type: str, kernel_version: str, dev_relea
 
     print_status("Enable modules autoloading")
     # Enable loading modules needed for depthboot
+    # TODO: Remove for v1.2.0 release
     cpfile("configs/eupnea-modules.conf", "/mnt/depthboot/etc/modules-load.d/eupnea-modules.conf")
 
     # Do not pre-setup gnome, as there is a nice gui first time setup on first boot
