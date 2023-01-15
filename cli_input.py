@@ -77,6 +77,7 @@ def get_user_input(skip_device: bool = False) -> dict:
             case "ubuntu":
                 if output_dict["distro_version"] == "22.04":
                     de_list.append("deepin")
+                de_list.append("budgie")
             case "debian":
                 de_list.append("budgie")
             case "arch":
