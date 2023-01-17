@@ -102,6 +102,10 @@ def config(de_name: str, distro_version: str, verbose: bool) -> None:
             print_error(f"Invalid desktop environment: {de_name}. Please create an issue")
             exit(1)
 
+    if de_name != "cli":
+        print_status("Installing auto-rotate service")
+        chroot("pacman -S --noconfirm iio-sensor-proxy")
+
     print_status("Desktop environment setup complete")
 
     # enable networkmanager systemd service
