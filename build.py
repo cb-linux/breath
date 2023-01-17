@@ -317,10 +317,11 @@ def post_extract(build_options, kernel_type: str, kernel_version: str, dev_relea
                 chroot(f"usermod -aG wheel {username}")
 
         # set timezone build system timezone on device
-        host_time_zone = bash("file /etc/localtime")  # read host timezone link
-        host_time_zone = host_time_zone[host_time_zone.find("/usr/share/zoneinfo/"):].strip()  # get actual timezone
-        chroot(f"ln -sf {host_time_zone} /etc/localtime")
-
+        # In some environments(Crouton), the timezone is not set -> ignore in that case
+        with contextlib.suppress(subprocess.CalledProcessError):
+            host_time_zone = bash("file /etc/localtime")  # read host timezone link
+            host_time_zone = host_time_zone[host_time_zone.find("/usr/share/zoneinfo/"):].strip()  # get actual timezone
+            chroot(f"ln -sf {host_time_zone} /etc/localtime")
         print_status("Distro agnostic configuration complete")
 
 
