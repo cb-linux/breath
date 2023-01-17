@@ -1,13 +1,8 @@
 {
-  "kernel_type": "",
-  "kernel_version": "",
-  "kernel_dev": false,
-  "depthboot_version": "1.1.0",
+  "depthboot_version": "1.1.1",
   "install_type": "image",
   "distro_name": "",
   "distro_version": "",
   "de_name": "",
-  "postinstall_version": "",
-  "audio_version": "",
   "firmware_payload": "depthcharge"
 }
