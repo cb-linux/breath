@@ -293,9 +293,11 @@ def post_extract(build_options, kernel_type: str, kernel_version: str, dev_relea
     cpfile("configs/hwdb/61-sensor.hwdb", "/mnt/depthboot/etc/udev/hwdb.d/61-sensor.hwdb")
     chroot("systemd-hwdb update")
 
-    print_status("Enabling resolved.conf systemd service")
-    # systemd-resolved.service needed to create /etc/resolv.conf link. Not enabled by default on some distros
-    chroot("systemctl enable systemd-resolved")
+    if build_options["distro_name"] == "fedora":
+        print_status("Enabling resolved.conf systemd service")
+        # systemd-resolved.service needed to create /etc/resolv.conf link. Not enabled by default on fedora
+        # on other distros networkmanager takes care of this
+        chroot("systemctl enable systemd-resolved")
 
     print_status("Enable modules autoloading")
     # Enable loading modules needed for depthboot
