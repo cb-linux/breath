@@ -91,7 +91,7 @@ def get_user_input(skip_device: bool = False) -> dict:
                                        flags=flags_list)
             if desktop_env == "cli":
                 print_warning("Warning: No desktop environment will be installed!")
-                user_selection = ia_selection("Are you sure you want to continue?", options=["Yes", "No"], )
+                user_selection = ia_selection("Are you sure you want to continue?", options=["No", "Yes"], )
                 if user_selection == "Yes":
                     print_status("No desktop will be installed.")
 
