@@ -20,7 +20,8 @@ def config(de_name: str, distro_version: str, verbose: bool) -> None:
         file.write("deb [signed-by=/usr/local/share/keyrings/eupnea.key] https://eupnea-linux.github.io/"
                    "apt-repo/debian_ubuntu kinetic main")
     # update apt
-    chroot("apt-get update")
+    chroot("apt-get update -y")
+    chroot("apt-get upgrade -y")
     # Install general dependencies + eupnea packages
     chroot("apt-get install -y pop-gnome-initial-setup eupnea-utils eupnea-system")
 

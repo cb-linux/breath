@@ -23,6 +23,7 @@ def config(de_name: str, distro_version: str, verbose: bool) -> None:
                    "apt-repo/debian_ubuntu kinetic main")
     # update apt
     chroot("apt-get update -y")
+    chroot("apt-get upgrade -y")
     # Install general dependencies + eupnea packages
     chroot("apt-get install -y network-manager sudo firmware-linux-free firmware-linux-nonfree "
            "firmware-iwlwifi iw")
