@@ -44,7 +44,7 @@ def get_user_input(skip_device: bool = False) -> dict:
                     break
                 user_selection = ia_selection(
                     "Warning: audio and some postinstall scripts are not supported on debian stable by default.",
-                    options=["Use testing instead", "Choose another distro", "Continue anyways"])
+                    options=["Use testing instead", "Choose another distro", "Continue with stable"])
                 match user_selection:
                     case "Continue with stable":
                         break
