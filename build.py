@@ -12,7 +12,7 @@ img_mnt = ""  # empty to avoid variable not defined error in exit_handler
 
 
 def exit_handler():
-    print_error("Ctrl+C detected. Cleaning machine and exiting...")
+    print_error("Exit signal received. Cleaning machine and exiting...")
     # Kill arch gpg agent if present
     print_status("Killing gpg-agent arch processes if they exist")
     gpg_pids = []
@@ -36,20 +36,11 @@ def exit_handler():
     with contextlib.suppress(subprocess.CalledProcessError):
         bash(f"umount -lf {img_mnt}*")  # umount all partitions from usb/sd-card
 
-    print_status("Deleting temporary files")
-    # Delete mountpoint
-    rmdir("/mnt/depthboot")
-    # Delete temporary directory
-    rmdir("/tmp/depthboot-build")
-    # Delete temporary files
-    rmfile("depthboot.img")
-    rmfile("kernel.flags")
-    rmfile(".stop_download_progress")
-
 
 # Clean old depthboot files from /tmp
 def prepare_host(de_name: str) -> None:
     print_status("Cleaning + preparing host system")
+    # Clean system from previous depthboot builds
     rmdir("/tmp/depthboot-build")
     mkdir("/tmp/depthboot-build", create_parents=True)
 
@@ -65,6 +56,7 @@ def prepare_host(de_name: str) -> None:
 
     rmfile("depthboot.img")
     rmfile("kernel.flags")
+    rmfile(".stop_download_progress")
 
     # install debootstrap for debian
     if de_name == "debian" and not path_exists("/usr/sbin/debootstrap"):
