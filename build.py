@@ -3,6 +3,7 @@
 import contextlib
 import atexit
 import json
+import sys
 from typing import Tuple
 from urllib.error import URLError
 
@@ -12,7 +13,11 @@ img_mnt = ""  # empty to avoid variable not defined error in exit_handler
 
 
 def exit_handler():
-    print_error("Exit signal received. Cleaning machine and exiting...")
+    # Only trigger cleanup if the user initiated the exit, not if the script exited on its own
+    exc_type = sys.exc_info()[0]
+    if exc_type != KeyboardInterrupt:
+        return
+    print_error("Ctrl+C detected. Cleaning machine and exiting...")
     # Kill arch gpg agent if present
     print_status("Killing gpg-agent arch processes if they exist")
     gpg_pids = []
