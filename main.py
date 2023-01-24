@@ -29,7 +29,7 @@ def process_args():
 
 def exit_handler():
     print_question('Run "./main.py" to start again\n'
-                   'Run "./main.py -v" for more output\n'
+                   'Run "./main.py -v" for more output in the next run\n'
                    'Run "./main.py --help" for more options')
 
 
