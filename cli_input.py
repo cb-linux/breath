@@ -22,7 +22,8 @@ def get_user_input(skip_device: bool = False) -> dict:
     # Print welcome message
     print_header("Welcome to Depthboot, formerly known as Breath\n"
                  "This script will create a bootable Linux USB-drive/SD-card/image.\n"
-                 "The script will now ask a few questions.")
+                 "The script will now ask a few questions."
+                 "You can Press Ctrl+C at any time to cancel the script.\n")
     input("Press Enter to continue...")
     while True:
         distro_name = ia_selection("Which Linux distribution (flavor) would you like to use?",
