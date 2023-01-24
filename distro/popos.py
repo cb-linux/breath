@@ -10,7 +10,7 @@ def config(de_name: str, distro_version: str, verbose: bool) -> None:
     chroot("apt-get purge -y btrfs-progs casper cifs-utils distinst distinst-v2 dmraid expect f2fs-tools fatresize "
            "gettext gparted gparted-common grub-common grub2-common kpartx kpartx-boot libdistinst libdmraid1.0.0.rc16"
            " libinih1 libnss-mymachines localechooser-data os-prober pop-installer pop-installer-casper pop-shop-casper"
-           " squashfs-tools systemd-container tcl-expect user-setup xfsprogs kernelstub")
+           " squashfs-tools systemd-container tcl-expect user-setup xfsprogs kernelstub efibootmgr")
     # Add eupnea repo
     mkdir("/mnt/depthboot/usr/local/share/keyrings", create_parents=True)
     # download public key
