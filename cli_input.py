@@ -27,7 +27,7 @@ def get_user_input(skip_device: bool = False) -> dict:
     input("Press Enter to continue...")
     while True:
         distro_name = ia_selection("Which Linux distribution (flavor) would you like to use?",
-                                   options=["Pop!_OS", "Ubuntu", "Fedora", "Debian", "Arch"],
+                                   options=["Pop!_OS", "Ubuntu", "Fedora", "Arch", "Debian"],
                                    flags=["(recommended)"])
         match distro_name:
             case "Ubuntu":
@@ -46,7 +46,7 @@ def get_user_input(skip_device: bool = False) -> dict:
                     "Warning: audio and some postinstall scripts are not supported on debian stable by default.",
                     options=["Use testing instead", "Choose another distro", "Continue anyways"])
                 match user_selection:
-                    case "Continue anyways":
+                    case "Continue with stable":
                         break
                     case "Use testing instead":
                         output_dict["distro_version"] = "testing"
