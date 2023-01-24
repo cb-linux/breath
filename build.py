@@ -1,11 +1,50 @@
 #!/usr/bin/env python3
 
 import contextlib
+import atexit
 import json
 from typing import Tuple
 from urllib.error import URLError
 
 from functions import *
+
+img_mnt = ""  # empty to avoid variable not defined error in exit_handler
+
+
+def exit_handler():
+    print_error("Ctrl+C detected. Cleaning machine and exiting...")
+    # Kill arch gpg agent if present
+    print_status("Killing gpg-agent arch processes if they exist")
+    gpg_pids = []
+    for line in bash("ps aux").split("\n"):
+        if "gpg-agent --homedir /etc/pacman.d/gnupg --use-standard-socket --daemon" in line:
+            temp_string = line[line.find(" "):].strip()
+            gpg_pids.append(temp_string[:temp_string.find(" ")])
+    for pid in gpg_pids:
+        print(f"Killing gpg-agent proces with pid: {pid}")
+        bash(f"kill {pid}")
+
+    print_status("Unmounting partitions")
+    with contextlib.suppress(subprocess.CalledProcessError):
+        bash("umount -lf /mnt/depthboot")  # umount mountpoint
+    sleep(5)  # wait for umount to finish
+
+    # unmount image/device completely from system
+    # on crostini umount fails for some reason
+    with contextlib.suppress(subprocess.CalledProcessError):
+        bash(f"umount -lf {img_mnt}p*")  # umount all partitions from image
+    with contextlib.suppress(subprocess.CalledProcessError):
+        bash(f"umount -lf {img_mnt}*")  # umount all partitions from usb/sd-card
+
+    print_status("Deleting temporary files")
+    # Delete mountpoint
+    rmdir("/mnt/depthboot")
+    # Delete temporary directory
+    rmdir("/tmp/depthboot-build")
+    # Delete temporary files
+    rmfile("depthboot.img")
+    rmfile("kernel.flags")
+    rmfile(".stop_download_progress")
 
 
 # Clean old depthboot files from /tmp
@@ -398,6 +437,7 @@ def start_build(verbose: bool, local_path, kernel_type: str, dev_release: bool, 
     if no_download_progress:
         disable_download_progress()  # disable download progress bar for non-interactive shells
     set_verbose(verbose)
+    atexit.register(exit_handler)
     print_status("Starting build")
 
     prepare_host(build_options["distro_name"])
@@ -458,6 +498,7 @@ def start_build(verbose: bool, local_path, kernel_type: str, dev_release: bool, 
     else:
         output_temp = prepare_usb_sd(build_options["device"], build_options["distro_name"])
     root_partuuid = output_temp[1]
+    global img_mnt
     img_mnt = output_temp[0]
     # Extract rootfs and configure distro agnostic settings
     extract_rootfs(build_options["distro_name"], build_options["distro_version"])
@@ -491,12 +532,11 @@ def start_build(verbose: bool, local_path, kernel_type: str, dev_release: bool, 
     sleep(5)  # wait for umount to finish
 
     # unmount image/device completely from system
-    if build_options["device"] == "image":
-        with contextlib.suppress(subprocess.CalledProcessError):  # on crostini umount fails for some reason
-            bash(f"umount -lf {img_mnt}p*")  # umount all partitions from image
-    else:
-        with contextlib.suppress(subprocess.CalledProcessError):  # on crostini umount fails for some reason
-            bash(f"umount -lf {img_mnt}*")  # umount all partitions from usb/sd-card
+    # on crostini umount fails for some reason
+    with contextlib.suppress(subprocess.CalledProcessError):
+        bash(f"umount -lf {img_mnt}p*")  # umount all partitions from image
+    with contextlib.suppress(subprocess.CalledProcessError):
+        bash(f"umount -lf {img_mnt}*")  # umount all partitions from usb/sd-card
 
     if build_options["device"] == "image":
         try:

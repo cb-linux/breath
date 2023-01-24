@@ -4,6 +4,7 @@
 import sys
 import os
 import argparse
+import atexit
 
 from functions import *
 
@@ -26,8 +27,15 @@ def process_args():
     return parser.parse_args()
 
 
+def exit_handler():
+    print_question('Run "./main.py" to start again\n'
+                   'Run "./main.py -v" for more output\n'
+                   'Run "./main.py --help" for more options')
+
+
 if __name__ == "__main__":
     args = process_args()
+    atexit.register(exit_handler)
 
     # Restart script as root
     if os.geteuid() != 0:
