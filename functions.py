@@ -189,6 +189,7 @@ def download_file(url: str, path: str) -> None:
 def _print_download_progress(file_path: Path, total_size) -> None:
     while True:
         if path_exists(".stop_download_progress"):
+            rmfile(".stop_download_progress")
             return
         try:
             print("\rDownloading: " + "%.0f" % int(file_path.stat().st_size / 1048576) + "mb / "
