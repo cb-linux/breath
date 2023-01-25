@@ -16,8 +16,7 @@ def config(de_name: str, distro_version: str, verbose: bool) -> None:
     bash("mount --types devpts /dev/pts /mnt/depthboot/dev/pts"
          " -o rw,nosuid,noexec,relatime,gid=5,mode=620,ptmxmode=000")
     bash("mount --bind /dev/shm /mnt/depthboot/dev/shm")
-    bash("mount --types tmpfs /run /mnt/depthboot/run"
-         " -o rw,nosuid,nodev,noexec,relatime,size=3280692k,mode=755,inode64")
+    bash("mount --bind /run /mnt/depthboot/run")
     bash("mount --bind /tmp /mnt/depthboot/tmp")
 
     # Uncomment worldwide arch mirror
