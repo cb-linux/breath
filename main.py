@@ -44,13 +44,13 @@ if __name__ == "__main__":
 
     # check script dependencies are already installed with which
     try:
-        bash("which pv parted cgpt futility")
+        bash("which pv xz parted cgpt futility")
         print_status("Dependencies already installed, skipping")
     except subprocess.CalledProcessError:
         print_status("Installing dependencies")
         if path_exists("/usr/bin/apt"):  # Ubuntu + debian
             bash("apt-get update -y")
-            bash("apt-get install -y pv parted cgpt vboot-kernel-utils")
+            bash("apt-get install -y pv xz-utils parted cgpt vboot-kernel-utils")
         elif path_exists("/usr/bin/pacman"):  # Arch
             bash("pacman -Syyu --noconfirm")  # sync and update system
             # Download prepackaged cgpt + vboot from arch-repo releases as its not available in the official repos
@@ -60,12 +60,12 @@ if __name__ == "__main__":
             # Install package
             bash("pacman --noconfirm -U /tmp/cgpt-vboot-utils.pkg.tar.gz")
             # Install other dependencies
-            bash("pacman --noconfirm -S pv parted")
+            bash("pacman --noconfirm -S pv xz parted")
         elif path_exists("/usr/bin/dnf"):  # Fedora
             bash("dnf update -y")
-            bash("dnf install vboot-utils parted pv --assumeyes")  # cgpt is included in vboot-utils on fedora
+            bash("dnf install vboot-utils parted pv xz --assumeyes")  # cgpt is included in vboot-utils on fedora
         elif path_exists("/usr/bin/zypper"):  # openSUSE
-            bash("zypper --non-interactive install vboot parted pv")
+            bash("zypper --non-interactive install vboot parted pv xz")
 
     # Check python version
     if sys.version_info < (3, 10):  # python 3.10 or higher is required
