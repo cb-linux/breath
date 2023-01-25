@@ -15,10 +15,10 @@ def config(de_name: str, distro_version: str, verbose: bool) -> None:
          "-o rw,nosuid,relatime,size=16339804k,nr_inodes=4084951,mode=755,inode64")
     bash("mount --types devpts /dev/pts /mnt/depthboot/dev/pts"
          " -o rw,nosuid,noexec,relatime,gid=5,mode=620,ptmxmode=000")
-    bash("mount --types tmpfs /dev/shm /mnt/depthboot/dev/shm -o rw,nosuid,nodev,relatime,inode64")
+    bash("mount --bind /dev/shm /mnt/depthboot/dev/shm")
     bash("mount --types tmpfs /run /mnt/depthboot/run"
          " -o rw,nosuid,nodev,noexec,relatime,size=3280692k,mode=755,inode64")
-    bash("mount --types tmpfs /tmp /mnt/depthboot/tmp -o rw,nosuid,nodev,inode64")
+    bash("mount --bind /tmp /mnt/depthboot/tmp")
 
     # Uncomment worldwide arch mirror
     with open("/mnt/depthboot/etc/pacman.d/mirrorlist", "r") as read:
