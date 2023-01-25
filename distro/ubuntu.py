@@ -40,6 +40,22 @@ def config(de_name: str, distro_version: str, verbose: bool) -> None:
     chroot("apt-get install -y linux-firmware network-manager software-properties-common nano eupnea-utils "
            "eupnea-system")
 
+    print_status("Installing zram")
+    # Install zram
+    # The apt postinstall of this zram packages tries to modload zram which is not possible in a chroot -> ignore errors
+    with contextlib.suppress(subprocess.CalledProcessError):
+        chroot("apt-get install -y systemd-zram-generator")
+    # Edit the postinstall script to force success
+    with open("/mnt/depthboot/var/lib/dpkg/info/systemd-zram-generator.postinst", "r") as file:
+        config = file.read()
+    with open("/mnt/depthboot/var/lib/dpkg/info/systemd-zram-generator.postinst", "w") as file:
+        file.write("#!/bin/sh\nexit 0\n")
+    # Rerun dpkg configuration for package to be recognized as installed
+    chroot("dpkg --configure systemd-zram-generator")
+    # Restore postinstall script
+    with open("/mnt/depthboot/var/lib/dpkg/info/systemd-zram-generator.postinst", "w") as file:
+        file.write(config)
+
     print_status("Downloading and installing de, might take a while")
     match de_name:
         case "gnome":

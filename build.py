@@ -261,10 +261,16 @@ def extract_rootfs(distro_name: str, distro_version: str) -> None:
         case "debian":
             print_status("Debootstraping Debian into /mnt/depthboot")
             # debootstrapping directly to /mnt/depthboot
-            debian_result = bash(f"debootstrap {distro_version} /mnt/depthboot https://deb.debian.org/debian/")
-            if debian_result.__contains__("Couldn't download packages:"):
+            debian_result = bash("debootstrap stable /mnt/depthboot https://deb.debian.org/debian/")
+            if debian_result.__contains__("Couldn't download packages:") or debian_result.__contains__(
+                    "W: Failure trying to run:"):
                 print_error("Debian Debootstrap failed, check your internet connection or try again later")
                 exit(1)
+            if distro_version == "testing":
+                # replace stable with bookworm in sources.list
+                with open("/mnt/depthboot/etc/apt/sources.list", "r") as sources:
+                    sources_list = sources.read().replace("stable", "bookworm")
+                    sources_list = sources_list.replace("buster", "bookworm")
         case "arch":
             print_status("Extracting arch rootfs")
             mkdir("/tmp/depthboot-build/arch-rootfs")

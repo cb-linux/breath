@@ -51,7 +51,7 @@ def config(de_name: str, distro_version: str, verbose: bool) -> None:
     print_status("Installing packages")
     # Install basic utils + eupnea packages
     chroot("pacman -S --noconfirm base base-devel nano networkmanager xkeyboard-config linux-firmware sudo bluez "
-           "bluez-utils eupnea-utils eupnea-system cgpt-vboot-utils")
+           "bluez-utils eupnea-utils eupnea-system cgpt-vboot-utils zram-generator")
 
     print_status("Downloading and installing de, might take a while")
     match de_name:
@@ -112,6 +112,8 @@ def config(de_name: str, distro_version: str, verbose: bool) -> None:
     chroot("systemctl enable NetworkManager.service")
     # Enable bluetooth systemd service
     chroot("systemctl enable bluetooth")
+    # Add zram config
+    cpfile("configs/zram/zram-generator.conf", "/mnt/depthboot/etc/systemd/zram-generator.conf")
 
     # Configure sudo
     with open("/mnt/depthboot/etc/sudoers", "r") as conf:
