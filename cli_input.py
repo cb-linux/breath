@@ -1,12 +1,11 @@
-from getpass import getpass
-from functions import *
-
-# I/A selection imports
-import tty
+import atexit
 import sys
 import termios
-import atexit
+import tty
+from getpass import getpass
 from itertools import zip_longest
+
+from functions import *
 
 
 def get_user_input(skip_device: bool = False) -> dict:
@@ -70,10 +69,9 @@ def get_user_input(skip_device: bool = False) -> dict:
     print(f"{output_dict['distro_name']} {output_dict['distro_version']} selected")
 
     if output_dict["distro_name"] != "pop-os":
-        de_list = ["Gnome", "KDE", "Xfce", "LXQt", "cli"]
+        de_list = ["Gnome", "KDE", "Xfce", "LXQt"]
         flags_list = ["(recommended)", "(recommended)", "(recommended for weak devices)",
-                      "(recommended for weak devices)", "(no desktop environment)"]
-
+                      "(recommended for weak devices)"]
         match output_dict["distro_name"]:
             case "ubuntu":
                 if output_dict["distro_version"] == "22.04":
@@ -82,9 +80,11 @@ def get_user_input(skip_device: bool = False) -> dict:
             case "debian":
                 de_list.append("budgie")
             case "arch":
-                de_list.append("deepin")
+                de_list.extend(["deepin", "budgie"])
             case "fedora":
                 de_list.extend(["deepin", "budgie"])
+        de_list.append("cli")  # add at the end for better ux
+        flags_list.append("(no desktop environment)")
 
         while True:
             desktop_env = ia_selection("Which desktop environment (Desktop GUI) would you like to use?",
@@ -142,8 +142,8 @@ def get_user_input(skip_device: bool = False) -> dict:
 
     while True:
         kernel_type = ia_selection("Which kernel type would you like to use? Usually there is no need to change this",
-                                   options=["stable", "experimental", "mainline"],
-                                   flags=["(default, recommended)", '', "(recommended)"])
+                                   options=["stable", "experimental", "mainline"],  # options=["mainline", "chromeos"],
+                                   flags=["(default, recommended)", "(recommended for some devices)"])
 
         output_dict["kernel_type"] = kernel_type.lower()
         break

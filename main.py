@@ -28,14 +28,16 @@ def process_args():
 
 
 def exit_handler():
-    print_question('Run "./main.py" to start again\n'
-                   'Run "./main.py -v" for more output in the next run\n'
-                   'Run "./main.py --help" for more options')
+    if not script_finished:
+        print_question('Run "./main.py" to start again\n'
+                       'Run "./main.py -v" for more output in the next run\n'
+                       'Run "./main.py --help" for more options')
 
 
 if __name__ == "__main__":
     args = process_args()
     atexit.register(exit_handler)
+    script_finished = False
 
     # Restart script as root
     if os.geteuid() != 0:
@@ -151,3 +153,4 @@ if __name__ == "__main__":
     build.start_build(verbose=args.verbose, local_path=args.local_path, kernel_type=user_input["kernel_type"],
                       dev_release=args.dev_build, build_options=user_input, no_shrink=args.no_shrink,
                       img_size=args.image_size[0])
+    script_finished = True
