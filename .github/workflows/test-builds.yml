@@ -152,7 +152,7 @@ jobs:
         uses: easimon/maximize-build-space@master
         with:
           temp-reserve-mb: 11264
-          swap-size-mb: 1
+          swap-size-mb: 1000
           remove-dotnet: 'true'
           remove-android: 'true'
           remove-haskell: 'true'
@@ -166,7 +166,7 @@ jobs:
         run: sudo apt-get install -y cgpt vboot-kernel-utils parted
 
       - name: Copy testing script to root
-        run: cp ./.github/scripts/build-tests/popos-test.py popos-test.py
+        run: cp ./.github/scripts/build-tests/pop-os-test.py pop-os-test.py
 
       - name: Testing PopOS build
         run: sudo python3 ./popos-test.py
@@ -174,7 +174,7 @@ jobs:
       - name: Uploading results as artifact
         uses: actions/upload-artifact@v2
         with:
-          name: results-popos
+          name: results-pop-os
           retention-days: 1
           path: |
             results.txt
