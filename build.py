@@ -261,16 +261,11 @@ def extract_rootfs(distro_name: str, distro_version: str) -> None:
         case "debian":
             print_status("Debootstraping Debian into /mnt/depthboot")
             # debootstrapping directly to /mnt/depthboot
-            debian_result = bash("debootstrap stable /mnt/depthboot https://deb.debian.org/debian/")
+            debian_result = bash(f"debootstrap {distro_version} /mnt/depthboot https://deb.debian.org/debian/")
             if debian_result.__contains__("Couldn't download packages:") or debian_result.__contains__(
                     "W: Failure trying to run:"):
                 print_error("Debian Debootstrap failed, check your internet connection or try again later")
                 exit(1)
-            if distro_version == "testing":
-                # replace stable with bookworm in sources.list
-                with open("/mnt/depthboot/etc/apt/sources.list", "r") as sources:
-                    sources_list = sources.read().replace("stable", "bookworm")
-                    sources_list = sources_list.replace("buster", "bookworm")
         case "arch":
             print_status("Extracting arch rootfs")
             mkdir("/tmp/depthboot-build/arch-rootfs")
@@ -283,7 +278,7 @@ def extract_rootfs(distro_name: str, distro_version: str) -> None:
 
 
 # Configure distro agnostic options
-def post_extract(build_options, kernel_type: str, kernel_version: str, dev_release: bool) -> None:
+def post_extract(build_options) -> None:
     print_status("Applying distro agnostic configuration")
 
     # Extract modules
@@ -432,7 +427,7 @@ def chroot(command: str) -> str:
 
 
 # The main build script
-def start_build(verbose: bool, local_path, kernel_type: str, dev_release: bool, build_options, img_size: int = 10,
+def start_build(verbose: bool, local_path, dev_release: bool, build_options, img_size: int = 10,
                 no_download_progress: bool = False, no_shrink: bool = False) -> None:
     if no_download_progress:
         disable_download_progress()  # disable download progress bar for non-interactive shells
@@ -443,7 +438,7 @@ def start_build(verbose: bool, local_path, kernel_type: str, dev_release: bool, 
     prepare_host(build_options["distro_name"])
 
     if local_path is None:  # default
-        kernel_version = download_kernel(kernel_type, dev_release)
+        kernel_version = download_kernel(build_options["kernel_type"], dev_release)
         download_rootfs(build_options["distro_name"], build_options["distro_version"])
         download_firmware()
     else:  # if local path is specified, copy files from it, instead of downloading from the internet
@@ -458,7 +453,7 @@ def start_build(verbose: bool, local_path, kernel_type: str, dev_release: bool, 
                 kernel_version = "unknown"
             except FileNotFoundError:
                 print_error(f"File {file} not found in {local_path}, attempting to download")
-                kernel_version = download_kernel(kernel_type, dev_release, [file])
+                kernel_version = download_kernel(build_options["kernel_type"], dev_release, [file])
 
         # copy distro agnostic files
         dirs = {
@@ -502,7 +497,7 @@ def start_build(verbose: bool, local_path, kernel_type: str, dev_release: bool, 
     img_mnt = output_temp[0]
     # Extract rootfs and configure distro agnostic settings
     extract_rootfs(build_options["distro_name"], build_options["distro_version"])
-    post_extract(build_options, kernel_type, kernel_version, dev_release)
+    post_extract(build_options)
 
     match build_options["distro_name"]:
         case "ubuntu":
