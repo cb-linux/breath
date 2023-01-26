@@ -312,9 +312,6 @@ def post_extract(build_options, kernel_type: str, kernel_version: str, dev_relea
     # create depthboot settings file for postinstall scripts to read
     with open("configs/eupnea.json", "r") as settings_file:
         settings = json.load(settings_file)
-    settings["kernel_type"] = kernel_type
-    settings["kernel_version"] = kernel_version
-    settings["kernel_dev"] = dev_release
     settings["distro_name"] = build_options["distro_name"]
     settings["distro_version"] = build_options["distro_version"]
     settings["de_name"] = build_options["de_name"]
