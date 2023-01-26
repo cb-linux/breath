@@ -169,7 +169,7 @@ jobs:
         run: cp ./.github/scripts/build-tests/pop-os-test.py pop-os-test.py
 
       - name: Testing PopOS build
-        run: sudo python3 ./popos-test.py
+        run: sudo python3 ./pop-os-test.py
 
       - name: Uploading results as artifact
         uses: actions/upload-artifact@v2
