@@ -26,7 +26,7 @@ if __name__ == "__main__":
     failed_distros = []
 
     # Start testing
-    for version in ["stable", "testing"]:
+    for version in ["22.04", "22.10"]:
         testing_dict["distro_version"] = version
         for de_name in available_des:
             testing_dict["de_name"] = de_name
