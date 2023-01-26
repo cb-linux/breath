@@ -10,7 +10,6 @@ def config(de_name: str, distro_version: str, verbose: bool) -> None:
     print_status("Installing dependencies")
     # install apt-add-repository
     chroot("apt-get update -y")
-    chroot("apt-get upgrade -y")
     chroot("apt-get install -y software-properties-common")
     # add non-free repos
     chroot("add-apt-repository -y non-free")
@@ -22,7 +21,9 @@ def config(de_name: str, distro_version: str, verbose: bool) -> None:
     with open("/mnt/depthboot/etc/apt/sources.list.d/eupnea.list", "w") as file:
         file.write("deb [signed-by=/usr/local/share/keyrings/eupnea.key] https://eupnea-linux.github.io/"
                    "apt-repo/debian_ubuntu kinetic main")
-
+    # update apt
+    chroot("apt-get update -y")
+    chroot("apt-get upgrade -y")
     # Install general dependencies + eupnea packages
     chroot("apt-get install -y network-manager sudo firmware-linux-free firmware-linux-nonfree "
            "firmware-iwlwifi iw")
