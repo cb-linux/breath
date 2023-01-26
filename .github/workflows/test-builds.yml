@@ -1,7 +1,7 @@
 name: Testing builds
 on:
-#  push:
-#    branches: [ "main" ]
+  schedule:
+    - cron: "10 0 * * *" # run at the start of every day after functions.py is updated
   workflow_dispatch:
 
 concurrency:
@@ -30,10 +30,10 @@ jobs:
         run: sudo apt-get install -y cgpt vboot-kernel-utils parted
 
       - name: Copy testing script to root
-        run: cp ./.github/repo-scripts/build-tests/ubuntu-test.py ubuntu-test.py
+        run: cp ./.github/scripts/build-tests/ubuntu-test.py ubuntu-test.py
 
       - name: Testing Ubuntu builds
-        run: python3 ./ubuntu-test.py
+        run: sudo python3 ./ubuntu-test.py
 
       - name: Uploading results as artifact
         uses: actions/upload-artifact@v2
@@ -64,10 +64,10 @@ jobs:
         run: sudo apt-get install -y cgpt vboot-kernel-utils parted debootstrap
 
       - name: Copy testing script to root
-        run: cp ./.github/repo-scripts/build-tests/debian-test.py debian-test.py
+        run: cp ./.github/scripts/build-tests/debian-test.py debian-test.py
 
       - name: Testing Debian builds
-        run: python3 ./debian-test.py
+        run: sudo python3 ./debian-test.py
 
       - name: Uploading results as artifact
         uses: actions/upload-artifact@v2
@@ -98,10 +98,10 @@ jobs:
         run: sudo apt-get install -y cgpt vboot-kernel-utils parted arch-install-scripts
 
       - name: Copy testing script to root
-        run: cp ./.github/repo-scripts/build-tests/arch-test.py arch-test.py
+        run: cp ./.github/scripts/build-tests/arch-test.py arch-test.py
 
       - name: Testing Arch builds
-        run: python3 ./arch-test.py
+        run: sudo python3 ./arch-test.py
 
       - name: Uploading results as artifact
         uses: actions/upload-artifact@v2
@@ -132,10 +132,10 @@ jobs:
         run: sudo apt-get install -y cgpt vboot-kernel-utils parted
 
       - name: Copy testing script to root
-        run: cp ./.github/repo-scripts/build-tests/fedora-test.py fedora-test.py
+        run: cp ./.github/scripts/build-tests/fedora-test.py fedora-test.py
 
       - name: Testing Fedora builds
-        run: python3 ./fedora-test.py
+        run: sudo python3 ./fedora-test.py
 
       - name: Uploading results as artifact
         uses: actions/upload-artifact@v2
@@ -145,7 +145,7 @@ jobs:
           path: |
             results.txt
 
-    test-popos:
+    test-pop-os:
       runs-on: ubuntu-22.04
       steps:
         - name: Maximizing build space
@@ -166,10 +166,10 @@ jobs:
           run: sudo apt-get install -y cgpt vboot-kernel-utils parted
 
         - name: Copy testing script to root
-          run: cp ./.github/repo-scripts/build-tests/popos-test.py popos-test.py
+          run: cp ./.github/scripts/build-tests/popos-test.py popos-test.py
 
         - name: Testing PopOS build
-          run: python3 ./popos-test.py
+          run: sudo python3 ./popos-test.py
 
         - name: Uploading results as artifact
           uses: actions/upload-artifact@v2
@@ -180,7 +180,7 @@ jobs:
               results.txt
 
   evaluate-results:
-    needs: [ test-ubuntu, test-debian, test-arch, test-fedora, test-popos ]
+    needs: [ test-ubuntu, test-debian, test-arch, test-fedora, test-pop-os ]
     runs-on: ubuntu-22.04
     steps:
       - name: Checking out repository code
