@@ -142,7 +142,7 @@ def get_user_input(skip_device: bool = False) -> dict:
 
     while True:
         kernel_type = ia_selection("Which kernel type would you like to use? Usually there is no need to change this",
-                                   options=["stable", "experimental", "mainline"],  # options=["mainline", "chromeos"],
+                                   options=["mainline", "stable"],  # options=["mainline", "chromeos"],
                                    flags=["(default, recommended)", "(recommended for some devices)"])
 
         output_dict["kernel_type"] = kernel_type.lower()
