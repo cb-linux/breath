@@ -145,39 +145,39 @@ jobs:
           path: |
             results.txt
 
-    test-pop-os:
-      runs-on: ubuntu-22.04
-      steps:
-        - name: Maximizing build space
-          uses: easimon/maximize-build-space@master
-          with:
-            temp-reserve-mb: 11264
-            swap-size-mb: 1
-            remove-dotnet: 'true'
-            remove-android: 'true'
-            remove-haskell: 'true'
+  test-pop-os:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Maximizing build space
+        uses: easimon/maximize-build-space@master
+        with:
+          temp-reserve-mb: 11264
+          swap-size-mb: 1
+          remove-dotnet: 'true'
+          remove-android: 'true'
+          remove-haskell: 'true'
 
-        - name: Checking out repository code
-          uses: actions/checkout@v3
-          with:
-            fetch-depth: 1
+      - name: Checking out repository code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 1
 
-        - name: Installing dependencies
-          run: sudo apt-get install -y cgpt vboot-kernel-utils parted
+      - name: Installing dependencies
+        run: sudo apt-get install -y cgpt vboot-kernel-utils parted
 
-        - name: Copy testing script to root
-          run: cp ./.github/scripts/build-tests/popos-test.py popos-test.py
+      - name: Copy testing script to root
+        run: cp ./.github/scripts/build-tests/popos-test.py popos-test.py
 
-        - name: Testing PopOS build
-          run: sudo python3 ./popos-test.py
+      - name: Testing PopOS build
+        run: sudo python3 ./popos-test.py
 
-        - name: Uploading results as artifact
-          uses: actions/upload-artifact@v2
-          with:
-            name: results-popos
-            retention-days: 1
-            path: |
-              results.txt
+      - name: Uploading results as artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: results-popos
+          retention-days: 1
+          path: |
+            results.txt
 
   evaluate-results:
     needs: [ test-ubuntu, test-debian, test-arch, test-fedora, test-pop-os ]
