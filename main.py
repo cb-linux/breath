@@ -29,8 +29,8 @@ def process_args():
 
 def exit_handler():
     if not script_finished:
-        print_question('Run "./main.py" to start again\n'
-                       'Run "./main.py -v" for more output in the next run\n'
+        print_error("Script exited unexpectedly")
+        print_question('Run "./main.py -v" to restart with more verbose output\n'
                        'Run "./main.py --help" for more options')
 
 
