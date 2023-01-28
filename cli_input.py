@@ -83,8 +83,7 @@ def get_user_input(skip_device: bool = False) -> dict:
                 de_list.extend(["deepin", "budgie"])
             case "fedora":
                 de_list.extend(["deepin", "budgie"])
-        de_list.append("cli")  # add at the end for better ux
-        flags_list.append("(no desktop environment)")
+        de_list.append("cli (no DE)")  # add at the end for better ux
 
         while True:
             desktop_env = ia_selection("Which desktop environment (Desktop GUI) would you like to use?",
