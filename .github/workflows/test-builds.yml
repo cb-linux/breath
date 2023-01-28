@@ -27,7 +27,7 @@ jobs:
           fetch-depth: 1
 
       - name: Installing dependencies
-        run: sudo apt-get install -y cgpt vboot-kernel-utils parted
+        run: sudo apt-get install -y cgpt vboot-kernel-utils parted pv
 
       - name: Copy testing script to root
         run: cp ./.github/scripts/build-tests/ubuntu-test.py ubuntu-test.py
@@ -61,7 +61,7 @@ jobs:
           fetch-depth: 1
 
       - name: Installing dependencies
-        run: sudo apt-get install -y cgpt vboot-kernel-utils parted debootstrap
+        run: sudo apt-get install -y cgpt vboot-kernel-utils parted debootstrap pv
 
       - name: Copy testing script to root
         run: cp ./.github/scripts/build-tests/debian-test.py debian-test.py
@@ -95,7 +95,7 @@ jobs:
           fetch-depth: 1
 
       - name: Installing dependencies
-        run: sudo apt-get install -y cgpt vboot-kernel-utils parted arch-install-scripts
+        run: sudo apt-get install -y cgpt vboot-kernel-utils parted pv
 
       - name: Copy testing script to root
         run: cp ./.github/scripts/build-tests/arch-test.py arch-test.py
@@ -129,7 +129,7 @@ jobs:
           fetch-depth: 1
 
       - name: Installing dependencies
-        run: sudo apt-get install -y cgpt vboot-kernel-utils parted
+        run: sudo apt-get install -y cgpt vboot-kernel-utils parted pv
 
       - name: Copy testing script to root
         run: cp ./.github/scripts/build-tests/fedora-test.py fedora-test.py
@@ -163,7 +163,7 @@ jobs:
           fetch-depth: 1
 
       - name: Installing dependencies
-        run: sudo apt-get install -y cgpt vboot-kernel-utils parted
+        run: sudo apt-get install -y cgpt vboot-kernel-utils parted pv
 
       - name: Copy testing script to root
         run: cp ./.github/scripts/build-tests/pop-os-test.py pop-os-test.py
