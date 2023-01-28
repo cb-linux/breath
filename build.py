@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
-import contextlib
 import atexit
+import contextlib
 import json
 import sys
 from typing import Tuple
@@ -128,7 +128,8 @@ def download_kernel(kernel_type: str, dev_release: bool, files: list = None) -> 
         return json.loads(urlopen(url).read())["tag_name"]
     except URLError:
         print_error("Failed to reach github. Check your internet connection and try again or use local files with -l")
-        print_warning("Dev releases may not always be available")
+        if dev_release:
+            print_warning("Dev releases may not always be available")
         exit(1)
 
 
