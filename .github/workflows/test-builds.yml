@@ -148,14 +148,14 @@ jobs:
   test-pop-os:
     runs-on: ubuntu-22.04
     steps:
-      - name: Maximizing build space
-        uses: easimon/maximize-build-space@master
-        with:
-          temp-reserve-mb: 11264
-          swap-size-mb: 1000
-          remove-dotnet: 'true'
-          remove-android: 'true'
-          remove-haskell: 'true'
+  #    - name: Maximizing build space
+   #     uses: easimon/maximize-build-space@master
+  #      with:
+  #        temp-reserve-mb: 11264
+ #         swap-size-mb: 1000
+    #      remove-dotnet: 'true'
+    #      remove-android: 'true'
+  #        remove-haskell: 'true'
 
       - name: Checking out repository code
         uses: actions/checkout@v3
