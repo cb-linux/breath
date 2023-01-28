@@ -1,12 +1,12 @@
 # FILE SOURCE: https://github.com/apacelus/python-os-functions
-from pathlib import Path
-from time import sleep
-from threading import Thread
-from urllib.request import urlopen, urlretrieve
 import subprocess
+from pathlib import Path
+from threading import Thread
+from time import sleep
+from urllib.request import urlopen, urlretrieve
 
 verbose = False
-disable_download = False
+no_download_progress = False
 
 
 #######################################################################################
@@ -133,8 +133,8 @@ def set_verbose(new_state: bool) -> None:
 
 # This is for non-interactive shells
 def disable_download_progress() -> None:
-    global disable_download
-    disable_download = True
+    global no_download_progress
+    no_download_progress = True
 
 
 def prevent_idle() -> None:
@@ -147,22 +147,142 @@ def __prevent_idle():
 
 
 #######################################################################################
-#                              PROGRESS MONITOR FUNCTIONS                             #
+#                              PACKAGE MANAGER PROGRESS MONITOR FUNCTIONS             #
 #######################################################################################
+# TO AVOID ISSUES: Sync all repos before calling package manager functions
+# The functions below, will start a thread to monitor the progress of their respective package managers
+
+def track_apt(path_to_log: str) -> None:
+    Thread(target=_track_apt, args=(path_to_log,), daemon=True).start()
+
+
+def track_dnf(path_to_log) -> None:
+    Thread(target=_track_dnf, args=(path_to_log,), daemon=True).start()
+
+
+def track_pacman(path_to_log) -> None:
+    # The actual start of this function is at the bottom
+    def _track_pacman() -> None:
+        # As funny as it may sound in python, this function is optimized for performance, due to the huge amount of
+        # disk I/O Therefore some functions could be shorter, but that might increase the already relatively huge load.
+        # wait for install to start
+        while not path_exists(path_to_log):
+            sleep(0.1)
+        # wait for total package amount to appear in log
+        stop = False
+        while not stop:
+            sleep(1)
+            with open(path_to_log, "r") as file:
+                log = file.readlines()
+                for line in log:
+                    if "Old Version  New Version             Net Change  Download Size" in line:
+                        total_packages = int(line.strip().split(" ")[1][1:-1])
+                        stop = True
+                        break
+
+        # wait and find line where packages start to download
+        # Pacman might be resolving dependencies, so we need to wait for that to finish
+        stop = False
+        while not stop:
+            sleep(1)
+            with open(path_to_log, "r") as file:
+                log = file.readlines()
+                for line in log:
+                    if ":: Retrieving packages..." in line:
+                        download_start_index = log.index(line) + 1
+                        stop = True
+                        break
+
+        # Print download progress
+        stop = False
+        downloaded_functions = []
+        while not stop:
+            sleep(1)
+            with open(path_to_log, "r") as file:
+                log = file.readlines()
+                for line in log[download_start_index:]:  # check lines after the start index to increase performance
+                    if ":: Processing package changes..." in line:  # pacman is preparing to install packages
+                        install_start_index = log.index(line) + 1
+                        stop = True
+                        break
+                    package = line.strip()[:-15]
+                    if package not in downloaded_functions:
+                        print(f"Downloading {package}, ({len(downloaded_functions)}/{total_packages})", end="\r",
+                              flush=True)
+                        downloaded_functions.append(package)
+
+        # Print install progress
+        stop = False
+        installed_packages = []
+        while not stop:
+            sleep(1)
+            with open(path_to_log, "r") as file:
+                log = file.readlines()
+                for line in log[
+                            install_start_index:]:  # only check lines after the install start to increase performance
+                    if ":: Running post-transaction hooks..." in line:  # pacman is preparing to run post install hooks
+                        post_install_start_index = log.index(line) + 1
+                        stop = True
+                        break
+                    if "installing " in line:
+                        package = line.strip()[11:-3]
+                        if package not in installed_packages:
+                            print(f"Installing package {package}, ({len(installed_packages)}/{total_packages})",
+                                  end="\r",
+                                  flush=True)
+                            installed_packages.append(package)
+
+        # Monitor postinstall hooks
+        # Don't print the full output, as it might include "scary"-ish messages
+        stop = False
+        while not stop:
+            sleep(1)
+            with open(path_to_log, "r") as file:
+                log = file.readlines()
+                for line in log[post_install_start_index:]:
+                    # pacman has no final success message, so we have to manually check if the install is finished
+                    if not line.startswith("("):  # if the line doesn't start with a number, it's not relevant for us
+                        continue
+                    temp_line = line.strip().split(" ")[0]
+                    # check if this is the last line by comparing the numbers inside the brackets
+                    if temp_line[1:-1].split("/")[0] == temp_line[1:-1].split("/")[1]:
+                        print("Installation finished", flush=True)
+                        stop = True
+                        break
+                    print(f"Running postinstall hooks: {temp_line}", end="\r", flush=True)
+                    installed_packages.append(package)
+
+    Thread(target=_track_pacman, daemon=True).start()
+
+
+# Track progress of apt/apt-get
+def _track_apt(path_to_log) -> None:
+    pass
+
+
+# Track progress of dnf
+def _track_dnf(path_to_log) -> None:
+    pass
+
+
+#######################################################################################
+#                              FILE PROGRESS MONITOR FUNCTIONS                        #
+#######################################################################################
+
 def extract_file(file: str, dest: str) -> None:
-    # Check if pv is installed
-    # pv is needed to display a nice progress bar
-    if not bash("which pv").strip():
-        print_status("pv is not installed, attempting to install")
-        if path_exists("/usr/bin/apt"):
-            bash("apt install pv")
-        elif path_exists("/usr/bin/dnf"):
-            bash("dnf install pv")
-        elif path_exists("/usr/bin/pacman"):
-            bash("pacman -S pv")
-        else:
-            print_error("Cannot install pv, please install manually")
-            exit(1)
+    try:
+        bash("which pv")
+    except subprocess.CalledProcessError:
+        global no_download_progress
+        no_download_progress = True
+    if no_download_progress:  # for non-interactive shells only
+        if file.endswith(".gz"):
+            # --warning=no-unknown-keyword is to supress a warning about unknown headers in the arch rootfs
+            bash(f"tar xfpz {file} --warning=no-unknown-keyword -C {dest}")
+        elif file.endswith(".xz"):
+            bash(f"tar xfpJ {file} -C {dest}")
+        return
+
     if file.endswith(".gz"):
         # --warning=no-unknown-keyword is to supress a warning about unknown headers in the arch rootfs
         bash(f"pv {file} | tar xfpz - --warning=no-unknown-keyword -C {dest}")
@@ -172,11 +292,15 @@ def extract_file(file: str, dest: str) -> None:
 
 def download_file(url: str, path: str) -> None:
     # start monitor in a separate thread
-    if not disable_download:  # for non-interactive shells only
-        rmfile(".stop_download_progress")
-        # get total file size from server
-        total_file_size = int(urlopen(url).headers["Content-Length"])
-        Thread(target=_print_download_progress, args=(Path(path), total_file_size,), daemon=True).start()
+    if no_download_progress:  # for non-interactive shells only
+        # start download
+        urlretrieve(url=url, filename=path)
+        return
+
+    rmfile(".stop_download_progress")
+    # get total file size from server
+    total_file_size = int(urlopen(url).headers["Content-Length"])
+    Thread(target=_print_download_progress, args=(Path(path), total_file_size,), daemon=True).start()
 
     # start download
     urlretrieve(url=url, filename=path)
