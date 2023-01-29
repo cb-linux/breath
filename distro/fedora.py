@@ -9,11 +9,6 @@ def config(de_name: str, distro_version: str, verbose: bool) -> None:
     chroot(f"dnf install -y --releasever={distro_version} fedora-release")  # update repos list
     # Add eupnea repo
     chroot("dnf config-manager --add-repo https://eupnea-linux.github.io/rpm-repo/eupnea.repo")
-    # Add RPMFusion repos
-    chroot(f"dnf install -y https://download1.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-"
-           f"{distro_version}.noarch.rpm")
-    chroot(f"dnf install -y https://download1.rpmfusion.org/free/fedora/rpmfusion-free-release-"
-           f"{distro_version}.noarch.rpm")
     chroot("dnf update --refresh -y")  # update repos
     chroot("dnf upgrade -y")  # upgrade the whole system
     # Install eupnea packages
