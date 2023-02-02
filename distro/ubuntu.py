@@ -60,22 +60,16 @@ def config(de_name: str, distro_version: str, verbose: bool) -> None:
     match de_name:
         case "gnome":
             print_status("Installing GNOME")
-            chroot(
-                "apt-get install -y ubuntu-desktop gnome-software epiphany-browser"
-            )
+            chroot("apt-get install -y ubuntu-desktop gnome-software epiphany-browser")
         case "kde":
             print_status("Installing KDE")
-            chroot(
-                "DEBIAN_FRONTEND=noninteractive apt-get install -y kde-standard plasma-workspace-wayland "
-                "sddm-theme-breeze"
-            )
+            chroot("DEBIAN_FRONTEND=noninteractive apt-get install -y kde-standard plasma-workspace-wayland "
+                   "sddm-theme-breeze")
         case "xfce":
             print_status("Installing Xfce")
             # install xfce without heavy unnecessary packages
-            chroot(
-                "apt-get install -y xubuntu-desktop gimp- gnome-font-viewer- gnome-mines- gnome-sudoku- gucharmap-"
-                " hexchat- libreoffice-*- mate-calc- pastebinit- synaptic- thunderbird- transmission-gtk-"
-            )
+            chroot("apt-get install -y xubuntu-desktop gimp- gnome-font-viewer- gnome-mines- gnome-sudoku- gucharmap-"
+                   " hexchat- libreoffice-*- mate-calc- pastebinit- synaptic- thunderbird- transmission-gtk-")
             chroot("apt-get install -y nano gnome-software epiphany-browser")
         case "lxqt":
             print_status("Installing LXQt")
@@ -95,10 +89,8 @@ def config(de_name: str, distro_version: str, verbose: bool) -> None:
         case "budgie":
             print_status("Installing Budgie")
             # do not install tex-common, it breaks the installation
-            chroot(
-                "DEBIAN_FRONTEND=noninteractive apt-get install -y lightdm lightdm-gtk-greeter ubuntu-budgie-desktop"
-                " tex-common-"
-            )
+            chroot("DEBIAN_FRONTEND=noninteractive apt-get install -y lightdm lightdm-gtk-greeter ubuntu-budgie-desktop"
+                   " tex-common-")
         case "cli":
             print_status("Skipping desktop environment install")
         case _:
