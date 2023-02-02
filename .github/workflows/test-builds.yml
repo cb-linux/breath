@@ -148,14 +148,14 @@ jobs:
   test-pop-os:
     runs-on: ubuntu-22.04
     steps:
-  #    - name: Maximizing build space
-   #     uses: easimon/maximize-build-space@master
-  #      with:
-  #        temp-reserve-mb: 11264
- #         swap-size-mb: 1000
-    #      remove-dotnet: 'true'
-    #      remove-android: 'true'
-  #        remove-haskell: 'true'
+      #    - name: Maximizing build space
+      #     uses: easimon/maximize-build-space@master
+      #      with:
+      #        temp-reserve-mb: 11264
+      #         swap-size-mb: 1000
+      #      remove-dotnet: 'true'
+      #      remove-android: 'true'
+      #        remove-haskell: 'true'
 
       - name: Checking out repository code
         uses: actions/checkout@v3
@@ -194,7 +194,7 @@ jobs:
       - name: Evaluating results
         # This checks if any of the results files are non-empty and fails if one is
         run: |
-          for file in ./results-*/results.txt
+          for file in ./results-*/results*.txt
           do 
             if [ -s $file ]
               then
@@ -203,3 +203,19 @@ jobs:
                 exit 1
             fi
           done
+
+      - name: Combining sizes into one json file
+        run: python3 ./.github/scripts/build-tests/combine_sizes.py
+
+      - uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          # Optional. Commit message for the created commit.
+          # Defaults to "Apply automatic changes"
+          commit_message: Update os_sizes.json
+
+          # Optional glob pattern of files which should be added to the commit
+          # Defaults to all (.)
+          # See the `pathspec`-documentation for git
+          # - https://git-scm.com/docs/git-add#Documentation/git-add.txt-ltpathspecgt82308203
+          # - https://git-scm.com/docs/gitglossary#Documentation/gitglossary.txt-aiddefpathspecapathspec
+          file_pattern: 'os_sizes.json'

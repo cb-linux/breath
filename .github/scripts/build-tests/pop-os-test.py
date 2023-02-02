@@ -1,3 +1,6 @@
+import json
+from pathlib import Path
+
 import build
 
 
@@ -22,16 +25,36 @@ if __name__ == "__main__":
         "kernel_type": "mainline"
     }
     failed_distros = []
+    size_dict = {}
 
     # Start testing
     print_header("Testing PopOS")
+    retry = True
     try:
         build.start_build(verbose=True, local_path=None, dev_release=False, build_options=testing_dict,
-                          no_download_progress=True, no_shrink=True)
+                          no_download_progress=True)
+        # calculate shrunk image size in gb and round it to 2 decimal places
+        size_dict["cosmic-gnome"] = round(Path("./depthboot.img").stat().st_size / 1073741824, 1)
     except Exception as e:
         print_error(str(e))
         print_error("Failed to build PopOS")
         failed_distros.append("pop-os")
+        size_dict["cosmic-gnome"] = 0.0
+    except SystemExit:
+        if retry:
+            print_error("Failed to build PopOS, retrying")
+            retry = False
+            build.start_build(verbose=True, local_path=None, dev_release=False, build_options=testing_dict,
+                              no_download_progress=True)
+            # calculate shrunk image size in gb and round it to 2 decimal places
+            size_dict["cosmic-gnome"] = round(Path("./depthboot.img").stat().st_size / 1073741824, 1)
+        else:
+            print_error("Failed twice to build PopOS")
+            failed_distros.append("pop-os")
+            size_dict["cosmic-gnome"] = 0.0
 
-    with open("results.txt", "w") as f:
+    with open("results_pop-os.txt", "w") as f:
         f.write(str(failed_distros))
+
+    with open("sizes_pop-os.json", "w") as file:
+        json.dump(size_dict, file)
