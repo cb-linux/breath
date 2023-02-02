@@ -41,7 +41,8 @@ jobs:
           name: results-ubuntu
           retention-days: 1
           path: |
-            results.txt
+            results_*.txt
+            sizes_*.json
 
   test-debian:
     runs-on: ubuntu-22.04
@@ -75,7 +76,8 @@ jobs:
           name: results-debian
           retention-days: 1
           path: |
-            results.txt
+            results_*.txt
+            sizes_*.json
 
   test-arch:
     runs-on: ubuntu-22.04
@@ -109,7 +111,8 @@ jobs:
           name: results-arch
           retention-days: 1
           path: |
-            results.txt
+            results_*.txt
+            sizes_*.json
 
   test-fedora:
     runs-on: ubuntu-22.04
@@ -143,7 +146,8 @@ jobs:
           name: results-fedora
           retention-days: 1
           path: |
-            results.txt
+            results_*.txt
+            sizes_*.json
 
   test-pop-os:
     runs-on: ubuntu-22.04
@@ -177,7 +181,8 @@ jobs:
           name: results-pop-os
           retention-days: 1
           path: |
-            results.txt
+            results_*.txt
+            sizes_*.json
 
   evaluate-results:
     needs: [ test-ubuntu, test-debian, test-arch, test-fedora, test-pop-os ]
