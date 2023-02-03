@@ -30,7 +30,6 @@ if __name__ == "__main__":
 
     # Start testing
     for de_name in available_des:
-        retry = True
         testing_dict["de_name"] = de_name
         print_header(f"Testing Fedora + {de_name}")
         try:
@@ -44,14 +43,14 @@ if __name__ == "__main__":
             failed_distros.append(de_name)
             size_dict[de_name] = 0
         except SystemExit:
-            if retry:
-                print_error(f"Failed to build Fedora + {de_name}, retrying")
-                retry = False
+            print_error(f"Failed to build Fedora + {de_name}, retrying")
+            try:
                 build.start_build(verbose=True, local_path=None, dev_release=False, build_options=testing_dict,
                                   no_download_progress=True)
                 # calculate shrunk image size in gb and round it to 2 decimal places
                 size_dict[de_name] = round(Path("./depthboot.img").stat().st_size / 1073741824, 1)
-            else:
+            except (Exception, SystemExit) as e:
+                print_error(str(e))
                 print_error(f"Failed twice to build Fedora + {de_name}")
                 failed_distros.append(de_name)
                 size_dict[de_name] = 0

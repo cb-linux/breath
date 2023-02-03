@@ -29,7 +29,6 @@ if __name__ == "__main__":
 
     # Start testing
     print_header("Testing PopOS")
-    retry = True
     try:
         build.start_build(verbose=True, local_path=None, dev_release=False, build_options=testing_dict,
                           no_download_progress=True)
@@ -41,16 +40,16 @@ if __name__ == "__main__":
         failed_distros.append("pop-os")
         size_dict["cosmic-gnome"] = 0.0
     except SystemExit:
-        if retry:
-            print_error("Failed to build PopOS, retrying")
-            retry = False
+        print_error("Failed to build PopOS, retrying")
+        try:
             build.start_build(verbose=True, local_path=None, dev_release=False, build_options=testing_dict,
                               no_download_progress=True)
             # calculate shrunk image size in gb and round it to 2 decimal places
             size_dict["cosmic-gnome"] = round(Path("./depthboot.img").stat().st_size / 1073741824, 1)
-        else:
+        except (Exception, SystemExit) as e:
+            print_error(str(e))
             print_error("Failed twice to build PopOS")
-            failed_distros.append("pop-os")
+            failed_distros.append("cosmic-gnome")
             size_dict["cosmic-gnome"] = 0.0
 
     with open("results_pop-os.txt", "w") as f:
