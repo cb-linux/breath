@@ -108,6 +108,7 @@ if __name__ == "__main__":
                 print_error("Please run the script with python 3.10 or higher")
         else:
             print_error("Please run the script with python 3.10 or higher")
+        script_finished = True
         exit(0)
     # import other scripts after python version check is successful
     import build
