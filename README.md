@@ -34,6 +34,10 @@ You can alternatively use [EupneaOS](https://github.com/eupnea-linux/eupnea-os) 
   until its archival in late Aug 2022.
 * All Eupnea Project icons were made by [Inderix](https://github.com/Inderix).
 
+## Join our Revolt server:
+
+https://rvlt.gg/6YxHB2Cz
+
 ## Join our Discord server:
 
 [<img src="https://discordapp.com/api/guilds/994245999822381076/widget.png?style=banner2" alt="Discord banner"></img>](https://discord.gg/jxXb2PwzYz)
