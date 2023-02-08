@@ -196,6 +196,9 @@ jobs:
       - name: Downloading result artifacts
         uses: actions/download-artifact@v3
 
+      - name: Combining sizes into one json file
+        run: python3 ./.github/scripts/build-tests/combine_sizes.py
+
       - name: Evaluating results
         # This checks if any of the results files are non-empty and fails if one is
         run: |
@@ -208,9 +211,6 @@ jobs:
                 exit 1
             fi
           done
-
-      - name: Combining sizes into one json file
-        run: python3 ./.github/scripts/build-tests/combine_sizes.py
 
       - uses: stefanzweifel/git-auto-commit-action@v4
         with:
