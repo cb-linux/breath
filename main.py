@@ -36,6 +36,9 @@ def exit_handler():
 
 if __name__ == "__main__":
     args = process_args()
+    if args.dev_build:
+        print_error("Dev builds are not supported currently")
+        exit(1)
     atexit.register(exit_handler)
     script_finished = False
 
@@ -50,24 +53,30 @@ if __name__ == "__main__":
         print_status("Dependencies already installed, skipping")
     except subprocess.CalledProcessError:
         print_status("Installing dependencies")
-        if path_exists("/usr/bin/apt"):  # Ubuntu + debian
-            bash("apt-get update -y")
-            bash("apt-get install -y pv xz-utils parted cgpt vboot-kernel-utils")
-        elif path_exists("/usr/bin/pacman"):  # Arch
-            bash("pacman -Syyu --noconfirm")  # sync and update system
+        with open("/etc/os-release", "r") as os:
+            distro = os.read()
+        if distro.__contains__("Arch Linux"):
+            bash("pacman -S --noconfirm --needed debootstrap")
             # Download prepackaged cgpt + vboot from arch-repo releases as its not available in the official repos
-            urlretrieve(
-                "https://github.com/eupnea-linux/arch-repo/releases/latest/download/cgpt-vboot-utils.pkg.tar.gz",
-                filename="/tmp/cgpt-vboot-utils.pkg.tar.gz")
-            # Install package
+            # Makepkg is too much of a hassle to use here as it requires a non-root user
+            urlretrieve("https://github.com/eupnea-linux/arch-repo/releases/latest/download/cgpt-vboot"
+                        "-utils.pkg.tar.gz", filename="/tmp/cgpt-vboot-utils.pkg.tar.gz")
+            # Install downloaded package
             bash("pacman --noconfirm -U /tmp/cgpt-vboot-utils.pkg.tar.gz")
             # Install other dependencies
             bash("pacman --noconfirm -S pv xz parted")
-        elif path_exists("/usr/bin/dnf"):  # Fedora
-            bash("dnf update -y")
-            bash("dnf install vboot-utils parted pv xz --assumeyes")  # cgpt is included in vboot-utils on fedora
-        elif path_exists("/usr/bin/zypper"):  # openSUSE
-            bash("zypper --non-interactive install vboot parted pv xz")
+        elif distro.__contains__("Void"):
+            bash("xbps-install -y pv xz parted cgpt vboot-utils")
+        elif distro.__contains__("Ubuntu") or distro.__contains__("Debian"):
+            bash("apt-get install -y pv xz-utils parted cgpt vboot-kernel-utils")
+        elif distro.__contains__("SUSE"):
+            bash("zypper --non-interactive install vboot parted pv xz")  # cgpt is included in vboot-utils on fedora
+        elif distro.__contains__("Fedora"):
+            bash("dnf install -y vboot-utils parted pv xz")  # cgpt is included in vboot-utils on fedora
+        else:
+            print_warning("Debootstrap not found, please install it using your distros package manager or select "
+                          "another distro instead of debian")
+            exit(1)
 
     # Check python version
     if sys.version_info < (3, 10):  # python 3.10 or higher is required

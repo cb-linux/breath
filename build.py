@@ -66,14 +66,18 @@ def prepare_host(de_name: str) -> None:
     # install debootstrap for debian
     if de_name == "debian" and not path_exists("/usr/sbin/debootstrap"):
         print_status("Installing debootstrap")
-        if path_exists("/usr/bin/apt"):
-            bash("apt-get install debootstrap -y")
-        elif path_exists("/usr/bin/pacman"):
-            bash("pacman -S debootstrap --noconfirm")
-        elif path_exists("/usr/bin/dnf"):
-            bash("dnf install debootstrap --assumeyes")
-        elif path_exists("/usr/bin/zypper"):  # openSUSE
+        with open("/etc/os-release", "r") as os:
+            distro = os.read()
+        if distro.__contains__("Arch Linux"):
+            bash("pacman -S --noconfirm --needed debootstrap")
+        elif distro.__contains__("Void"):
+            bash("xbps-install -y debootstrap")
+        elif distro.__contains__("Ubuntu") or distro.__contains__("Debian"):
+            bash("apt-get install -y debootstrap")
+        elif distro.__contains__("SUSE"):
             bash("zypper --non-interactive install debootstrap")
+        elif distro.__contains__("Fedora"):
+            bash("dnf install -y debootstrap")
         else:
             print_warning("Debootstrap not found, please install it using your distros package manager or select "
                           "another distro instead of debian")
@@ -493,7 +497,6 @@ def start_build(verbose: bool, local_path, dev_release: bool, build_options, img
         output_temp = prepare_img(build_options["distro_name"], img_size)
     else:
         output_temp = prepare_usb_sd(build_options["device"], build_options["distro_name"])
-    root_partuuid = output_temp[1]
     global img_mnt
     img_mnt = output_temp[0]
     # Extract rootfs and configure distro agnostic settings
