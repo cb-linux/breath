@@ -80,7 +80,9 @@ def get_user_input(skip_device: bool = False) -> dict:
             case "debian":
                 de_list.append("budgie")
             case "arch":
-                de_list.extend(["deepin", "budgie"])
+                # Deepin is currently broken on arch
+                # de_list.extend(["deepin", "budgie"])
+                de_list.append("budgie")
             case "fedora":
                 de_list.extend(["deepin", "budgie"])
         de_list.append("cli")  # add at the end for better ux
