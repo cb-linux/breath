@@ -200,11 +200,11 @@ jobs:
         run: python3 ./.github/scripts/build-tests/combine_sizes.py
 
       - name: Evaluating results
-        # This checks if any of the results files are non-empty and fails if one is
+        # Check if the results are not empty and stop whole workflow if they are
         run: |
           for file in ./results-*/results*.txt
           do 
-            if [ -s $file ]
+            if [ "$(cat $file)" != "[]" ]
               then
                 echo "Build test failed for $file"
                 cat $file
