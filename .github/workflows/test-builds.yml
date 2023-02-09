@@ -199,19 +199,6 @@ jobs:
       - name: Combining sizes into one json file
         run: python3 ./.github/scripts/build-tests/combine_sizes.py
 
-      - name: Evaluating results
-        # Check if the results are not empty and stop whole workflow if they are
-        run: |
-          for file in ./results-*/results*.txt
-          do 
-            if [ "$(cat $file)" != "[]" ]
-              then
-                echo "Build test failed for $file"
-                cat $file
-                exit 1
-            fi
-          done
-
       - uses: stefanzweifel/git-auto-commit-action@v4
         with:
           # Optional. Commit message for the created commit.
@@ -224,3 +211,16 @@ jobs:
           # - https://git-scm.com/docs/git-add#Documentation/git-add.txt-ltpathspecgt82308203
           # - https://git-scm.com/docs/gitglossary#Documentation/gitglossary.txt-aiddefpathspecapathspec
           file_pattern: 'os_sizes.json'
+
+      - name: Evaluating results
+        # Check if the results are not empty and fail the whole workflow if they are
+        run: |
+          for file in ./results-*/results*.txt
+          do 
+            if [ "$(cat $file)" != "[]" ]
+              then
+                echo "Build test failed for $file"
+                cat $file
+                exit 1
+            fi
+          done
