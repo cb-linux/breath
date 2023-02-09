@@ -97,6 +97,12 @@ def config(de_name: str, distro_version: str, verbose: bool) -> None:
             print_error("Invalid desktop environment! Please create an issue")
             exit(1)
 
+    if de_name != "cli":
+        # Replace input-synaptics with newer input-libinput, for better touchpad support
+        print_status("Upgrading touchpad drivers")
+        chroot("apt-get remove -y xserver-xorg-input-synaptics")
+        chroot("apt-get install -y xserver-xorg-input-libinput")
+
     # GDM3 auto installs gnome-minimal. Gotta remove it if user didn't choose gnome
     if de_name != "gnome":
         rmfile("/mnt/depthboot/usr/share/xsessions/ubuntu.desktop")
@@ -107,11 +113,6 @@ def config(de_name: str, distro_version: str, verbose: bool) -> None:
     with contextlib.suppress(FileNotFoundError):
         cpfile("/mnt/depthboot/usr/share/doc/util-linux/examples/securetty", "/mnt/depthboot/etc/securetty")
     print_status("Desktop environment setup complete")
-
-    # Replace input-synaptics with newer input-libinput, for better touchpad support
-    print_status("Upgrading touchpad drivers")
-    chroot("apt-get remove -y xserver-xorg-input-synaptics")
-    chroot("apt-get install -y xserver-xorg-input-libinput")
 
     print_status("Ubuntu setup complete")
 

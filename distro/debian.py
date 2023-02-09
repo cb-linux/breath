@@ -62,6 +62,10 @@ def config(de_name: str, distro_version: str, verbose: bool) -> None:
     if de_name != "cli":
         # Set system to boot to gui
         chroot("systemctl set-default graphical.target")
+        # Replace input-synaptics with newer input-libinput, for better touchpad support
+        print_status("Upgrading touchpad drivers")
+        chroot("apt-get remove -y xserver-xorg-input-synaptics")
+        chroot("apt-get install -y xserver-xorg-input-libinput")
 
     # GDM3 auto installs gnome-minimal. Remove it if user didn't choose gnome
     if de_name != "gnome":
@@ -73,11 +77,6 @@ def config(de_name: str, distro_version: str, verbose: bool) -> None:
     with contextlib.suppress(FileNotFoundError):
         cpfile("/mnt/depthboot/usr/share/doc/util-linux/examples/securetty", "/mnt/depthboot/etc/securetty")
     print_status("Desktop environment setup complete")
-
-    # Replace input-synaptics with newer input-libinput, for better touchpad support
-    print_status("Upgrading touchpad drivers")
-    chroot("apt-get remove -y xserver-xorg-input-synaptics")
-    chroot("apt-get install -y xserver-xorg-input-libinput")
 
     # TODO: Pre-update python3 to 3.10 on stable
     # Pre-updating to python3.10 breaks the gnome first time installer...
