@@ -513,7 +513,7 @@ def start_build(verbose: bool, local_path, dev_release: bool, build_options, img
         case "fedora":
             import distro.fedora as distro
         case "pop-os":
-            import distro.popos as distro
+            import distro.pop_os as distro
         case _:
             print_error("DISTRO NAME NOT FOUND! Please create an issue")
             exit(1)
