@@ -36,7 +36,7 @@ jobs:
         run: sudo python3 ./ubuntu-test.py
 
       - name: Uploading results as artifact
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: results-ubuntu
           retention-days: 1
@@ -71,7 +71,7 @@ jobs:
         run: sudo python3 ./debian-test.py
 
       - name: Uploading results as artifact
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: results-debian
           retention-days: 1
@@ -106,7 +106,7 @@ jobs:
         run: sudo python3 ./arch-test.py
 
       - name: Uploading results as artifact
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: results-arch
           retention-days: 1
@@ -141,7 +141,7 @@ jobs:
         run: sudo python3 ./fedora-test.py
 
       - name: Uploading results as artifact
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: results-fedora
           retention-days: 1
@@ -176,7 +176,7 @@ jobs:
         run: sudo python3 ./pop-os-test.py
 
       - name: Uploading results as artifact
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: results-pop-os
           retention-days: 1

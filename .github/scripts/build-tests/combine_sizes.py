@@ -8,7 +8,8 @@ if __name__ == "__main__":
     for file in files:
         with open(file) as f:
             data = json.load(f)
-        all_sizes[file[6:-5]] = data
+        distro_name = file.split("/")[2][6:-5]
+        all_sizes[distro_name] = data
 
     with open("os_sizes.json", "w") as f:
         json.dump(all_sizes, f)

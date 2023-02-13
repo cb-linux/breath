@@ -24,7 +24,7 @@ if __name__ == "__main__":
         "device": "image",
         "kernel_type": "mainline"
     }
-    available_des = ["gnome", "kde", "xfce", "lxqt", "budgie", "cli"] # deepin
+    available_des = ["gnome", "kde", "xfce", "lxqt", "budgie", "cli"]  # deepin
     failed_distros = []
     size_dict = {}
 
