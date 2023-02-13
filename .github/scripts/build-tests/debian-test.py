@@ -29,9 +29,7 @@ if __name__ == "__main__":
     size_dict = {}
 
     # Start testing
-    # Testing fails bootstrap
-    # for version in ["stable", "testing"]:
-    for version in ["stable"]:
+    for version in ["stable", "testing"]:
         testing_dict["distro_version"] = version
         for de_name in available_des:
             testing_dict["de_name"] = de_name
