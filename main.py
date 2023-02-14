@@ -212,3 +212,4 @@ if __name__ == "__main__":
 
     build.start_build(verbose=args.verbose, local_path=args.local_path, dev_release=args.dev_build,
                       build_options=user_input, no_shrink=args.no_shrink, img_size=args.image_size[0])
+    sys.exit(0)
