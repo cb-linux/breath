@@ -26,9 +26,13 @@ if __name__ == "__main__":
 
     # Calculate average sizes
     for distro in all_sizes:
+        total_GB = 0
+        total_amount = 0
         for key in all_sizes[distro]:
-            # add average size to dict under key "average"
-            all_sizes[distro]["average"] = sum(all_sizes[distro][key]) / len(all_sizes[distro][key])
+            total_GB += all_sizes[distro][key]
+            total_amount += 1
+        # calculate average size and cast to 1 decimal place
+        all_sizes[distro]["average"] = round(total_GB / total_amount, 1)
 
     with open("os_sizes.json", "w") as f:
         json.dump(all_sizes, f)
