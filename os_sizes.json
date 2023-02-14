@@ -1,1 +1,56 @@
-{"arch": {"gnome": 6.1, "kde": 5.9, "xfce": 3.6, "lxqt": 5.0, "budgie": 3.7, "cli": 2.8}, "debian_stable": {"gnome": 0, "kde": 0, "xfce": 0, "lxqt": 0, "budgie": 0, "cli": 0}, "ubuntu_22.10": {"gnome": 6.3, "kde": 6.1, "xfce": 6.0, "lxqt": 5.1, "budgie": 6.0, "deepin": 3.9, "cli": 3.0}, "ubuntu_22.04": {"gnome": 6.2, "kde": 6.1, "xfce": 5.9, "lxqt": 5.1, "budgie": 6.1, "deepin": 7.7, "cli": 3.0}, "fedora": {"gnome": 7.7, "kde": 7.3, "xfce": 5.8, "lxqt": 6.5, "deepin": 6.5, "budgie": 0, "cli": 0}, "pop-os": {"cosmic-gnome": 7.5}}
+{
+  "arch_": {
+    "gnome": 6.1,
+    "kde": 5.9,
+    "xfce": 3.6,
+    "lxqt": 5.0,
+    "budgie": 3.7,
+    "cli": 2.8
+  },
+  "debian_stable": {
+    "gnome": 0,
+    "kde": 0,
+    "xfce": 0,
+    "lxqt": 0,
+    "budgie": 0,
+    "cli": 0
+  },
+  "debian_testing": {
+    "gnome": 0,
+    "kde": 0,
+    "xfce": 0,
+    "lxqt": 0,
+    "budgie": 0,
+    "cli": 0
+  },
+  "ubuntu_22.10": {
+    "gnome": 6.3,
+    "kde": 6.1,
+    "xfce": 6.0,
+    "lxqt": 5.1,
+    "budgie": 6.0,
+    "deepin": 3.9,
+    "cli": 3.0
+  },
+  "ubuntu_22.04": {
+    "gnome": 6.2,
+    "kde": 6.1,
+    "xfce": 5.9,
+    "lxqt": 5.1,
+    "budgie": 6.1,
+    "deepin": 7.7,
+    "cli": 3.0
+  },
+  "fedora_": {
+    "gnome": 7.7,
+    "kde": 7.3,
+    "xfce": 5.8,
+    "lxqt": 6.5,
+    "deepin": 6.5,
+    "budgie": 6.2,
+    "cli": 3.0
+  },
+  "pop-os": {
+    "cosmic-gnome": 7.5
+  }
+}
