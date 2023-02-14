@@ -12,6 +12,7 @@ from functions import *
 img_mnt = ""  # empty to avoid variable not defined error in exit_handler
 
 
+# the exit handler with user messages is in main.py
 def exit_handler():
     # Only trigger cleanup if the user initiated the exit, not if the script exited on its own
     exc_type = sys.exc_info()[0]
@@ -81,7 +82,7 @@ def prepare_host(de_name: str) -> None:
         else:
             print_warning("Debootstrap not found, please install it using your distros package manager or select "
                           "another distro instead of debian")
-            exit(1)
+            sys.exit(1)
 
 
 # download kernel files from GitHub
@@ -134,7 +135,7 @@ def download_kernel(kernel_type: str, dev_release: bool, files: list = None) -> 
         print_error("Failed to reach github. Check your internet connection and try again or use local files with -l")
         if dev_release:
             print_warning("Dev releases may not always be available")
-        exit(1)
+        sys.exit(1)
 
 
 # download the distro rootfs
@@ -155,7 +156,7 @@ def download_rootfs(distro_name: str, distro_version: str) -> None:
     except URLError:
         print_error("Couldn't download rootfs. Check your internet connection and try again. If the error persists, "
                     "create an issue with the distro and version in the name")
-        exit(1)
+        sys.exit(1)
 
 
 # TODO: Figure out if this is actually necessary or if linux-firmware is enough
@@ -182,7 +183,7 @@ def prepare_img(distro_name: str, img_size) -> Tuple[str, str]:
     mnt_point = bash("losetup -f --show depthboot.img")
     if mnt_point == "":
         print_error("Failed to mount image")
-        exit(1)
+        sys.exit(1)
     return partition_and_flash_kernel(mnt_point, False, distro_name)
 
 
@@ -270,7 +271,7 @@ def extract_rootfs(distro_name: str, distro_version: str) -> None:
             if debian_result.__contains__("Couldn't download packages:") or debian_result.__contains__(
                     "W: Failure trying to run:"):
                 print_error("Debian Debootstrap failed, check your internet connection or try again later")
-                exit(1)
+                sys.exit(1)
         case "arch":
             print_status("Extracting arch rootfs")
             mkdir("/tmp/depthboot-build/arch-rootfs")
@@ -516,7 +517,7 @@ def start_build(verbose: bool, local_path, dev_release: bool, build_options, img
             import distro.pop_os as distro
         case _:
             print_error("DISTRO NAME NOT FOUND! Please create an issue")
-            exit(1)
+            sys.exit(1)
     distro.config(build_options["de_name"], build_options["distro_version"], verbose)
 
     post_config(build_options["de_name"], build_options["distro_name"])

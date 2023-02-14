@@ -8,6 +8,9 @@ import atexit
 
 from functions import *
 
+global user_cancelled
+user_cancelled = False
+
 
 # parse arguments from the cli. Only for testing/advanced use. All other parameters are handled by cli_input.py
 def process_args():
@@ -27,20 +30,51 @@ def process_args():
     return parser.parse_args()
 
 
+def expand_storage():
+    print_question()
+
+
+class ExitHooks(object):
+    def __init__(self):
+        self.exit_code = None
+
+    def hook(self):
+        self._orig_exit = sys.exit
+        self._orig_exc_handler = self.exc_handler
+        sys.exit = self.exit
+        sys.excepthook = self.exc_handler
+
+    def exit(self, code=0):
+        self.exit_code = code
+        self._orig_exit(code)
+
+    def exc_handler(self, exc_type, exc, *args):
+        if exc_type == KeyboardInterrupt:
+            global user_cancelled
+            user_cancelled = True
+        self._orig_exc_handler(self, exc_type, exc, *args)
+
+
 def exit_handler():
-    if not script_finished:
-        print_error("Script exited unexpectedly")
+    if user_cancelled:
+        print_error("User cancelled, exiting")
+        return
+    if hooks.exit_code not in [0, 1]:  # ignore normal exit codes
+        print_error("Script exited unexpectedly, please open an issue on GitHub/Discord/Revolt")
         print_question('Run "./main.py -v" to restart with more verbose output\n'
                        'Run "./main.py --help" for more options')
 
 
 if __name__ == "__main__":
+    # override sys.exit to catch exit codes
+    hooks = ExitHooks()
+    hooks.hook()
+    atexit.register(exit_handler)
+
     args = process_args()
     if args.dev_build:
         print_error("Dev builds are not supported currently")
-        exit(1)
-    atexit.register(exit_handler)
-    script_finished = False
+        sys.exit(1)
 
     # Restart script as root
     if os.geteuid() != 0:
@@ -81,7 +115,7 @@ if __name__ == "__main__":
         else:
             print_warning("Debootstrap not found, please install it using your distros package manager or select "
                           "another distro instead of debian")
-            exit(1)
+            sys.exit(1)
 
     # Check python version
     if sys.version_info < (3, 10):  # python 3.10 or higher is required
@@ -118,12 +152,9 @@ if __name__ == "__main__":
                 bash("apt-get update -y")  # update cache back to stable channel
 
                 print_header('Please restart the script with: "./main.py"')
-            else:
-                print_error("Please run the script with python 3.10 or higher")
-        else:
-            print_error("Please run the script with python 3.10 or higher")
-        script_finished = True
-        exit(0)
+                sys.exit(0)
+        print_error("Please run the script with python 3.10 or higher")
+        sys.exit(1)
     # import other scripts after python version check is successful
     import build
     import cli_input
@@ -143,7 +174,7 @@ if __name__ == "__main__":
             print_error("Failed to prepare Crostini")
             print_error("Please run the Crostini specific instructions before running this script")
             print("https://eupnea-linux.github.io/main.html#/extra-pages/crostini")
-            exit(1)
+            sys.exit(1)
         open("/tmp/.crostini-fixed", "a").close()
 
     # parse arguments
@@ -177,8 +208,7 @@ if __name__ == "__main__":
             print_status("Size of /tmp increased")
         else:
             print_error("Please free up space in /tmp")
-            exit(1)
+            sys.exit(1)
 
     build.start_build(verbose=args.verbose, local_path=args.local_path, dev_release=args.dev_build,
                       build_options=user_input, no_shrink=args.no_shrink, img_size=args.image_size[0])
-    script_finished = True
