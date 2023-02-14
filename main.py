@@ -165,6 +165,20 @@ if __name__ == "__main__":
     else:
         user_input = cli_input.get_user_input()  # get normal user input
 
+    # Check if there is enough space in /tmp
+    avail_space = int(bash("df -h --output=avail /tmp").split(" ")[1][:-1])  # get available space in /tmp as int in GB
+
+    if user_input["device"] == "image" and avail_space < 11:
+        print_error("Not enough space in /tmp to build image. At least 5GB is required")
+        user_answer = input("\033[92m" + "Attempt to increase size of /tmp? (Y/n)\n" + "\033[0m").lower()
+        if user_answer in ["y", ""]:
+            print_status("Increasing size of /tmp")
+            bash("mount -o remount,size=5G /tmp")
+            print_status("Size of /tmp increased")
+        else:
+            print_error("Please free up space in /tmp")
+            exit(1)
+
     build.start_build(verbose=args.verbose, local_path=args.local_path, dev_release=args.dev_build,
                       build_options=user_input, no_shrink=args.no_shrink, img_size=args.image_size[0])
     script_finished = True
