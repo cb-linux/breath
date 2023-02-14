@@ -150,6 +150,13 @@ def get_user_input(skip_device: bool = False) -> dict:
         break
     print(f"{kernel_type} kernel selected")
 
+    # Check if usb reading is possible
+    try:
+        open("/sys/dev/block", "r").close()
+    except FileNotFoundError:
+        print_warning("Couldn't read usb devices. Building image file.")
+        skip_device = True
+
     if not skip_device:
         print_status("Available devices: ")
         usb_array = []
