@@ -217,7 +217,15 @@ def partition_and_flash_kernel(mnt_point: str, write_usb: bool, distro_name: str
 
     # format as per depthcharge requirements,
     # READ: https://wiki.gentoo.org/wiki/Creating_bootable_media_for_depthcharge_based_devices
-    bash(f"parted -s {mnt_point} mklabel gpt")
+    try:
+        bash(f"parted -s {mnt_point} mklabel gpt")
+    # TODO: Only show this prompt when parted throws: "we have been unable to inform the kernel of the change"
+    # TODO: Check if partprob-ing the drive could fix this error
+    except subprocess.CalledProcessError:
+        print_error("Failed to create partition table. Try physically unplugging and replugging the USB/SD-card.")
+        print_question("If you chose the image option or are seeing this message the second time, create an issue on "
+                       "GitHub/Discord/Revolt")
+        sys.exit(1)
     bash(f"parted -s -a optimal {mnt_point} unit mib mkpart Kernel 1 65")  # kernel partition
     bash(f"parted -s -a optimal {mnt_point} unit mib mkpart Kernel 65 129")  # reserve kernel partition
     bash(f"parted -s -a optimal {mnt_point} unit mib mkpart Root 129 100%")  # rootfs partition
