@@ -32,10 +32,6 @@ def process_args():
     return parser.parse_args()
 
 
-def expand_storage():
-    print_question()
-
-
 class ExitHooks(object):
     def __init__(self):
         self.exit_code = None
