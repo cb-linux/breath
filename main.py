@@ -23,6 +23,8 @@ def process_args():
                         help="Print more output")
     parser.add_argument("--no-shrink", action="store_true", dest="no_shrink", default=False,
                         help="Do not shrink image")
+    parser.add_argument("--skip-size-check", action="store_true", dest="skip_size_check", default=False,
+                        help="Do not check available disk space")
     parser.add_argument("--image-size", "-i", dest="image_size", type=int, nargs=1, default=[10],
                         help="Override image size(default: 10GB)")
     parser.add_argument("--dev", action="store_true", dest="dev_build", default=False,
@@ -197,14 +199,14 @@ if __name__ == "__main__":
         user_input = cli_input.get_user_input()  # get normal user input
 
     # Check if there is enough space in /tmp
-    avail_space = int(bash("df -h --output=avail /tmp").split(" ")[1][:-1])  # get available space in /tmp as int in GB
+    avail_space = float(bash("df -h --output=avail /tmp").split(" ")[1][:-1])  # read tmp size in GB
 
-    if user_input["device"] == "image" and avail_space < 11:
-        print_error("Not enough space in /tmp to build image. At least 5GB is required")
+    if user_input["device"] == "image" and avail_space < 13.0 and not args.skip_size_check:
+        print_error("Not enough space in /tmp to build image. At least 13GB is required")
         user_answer = input("\033[92m" + "Attempt to increase size of /tmp? (Y/n)\n" + "\033[0m").lower()
         if user_answer in ["y", ""]:
             print_status("Increasing size of /tmp")
-            bash("mount -o remount,size=5G /tmp")
+            bash("mount -o remount,size=13G /tmp")
             print_status("Size of /tmp increased")
         else:
             print_error("Please free up space in /tmp")
