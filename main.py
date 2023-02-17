@@ -195,7 +195,7 @@ if __name__ == "__main__":
         user_input = cli_input.get_user_input()  # get normal user input
 
     # Check if there is enough space in /tmp
-    avail_space = float(bash("df -h --output=avail /tmp").split(" ")[-1][:-1])  # read tmp size in GB
+    avail_space = float(bash("df -h --output=avail /tmp").replace(",", ".").split(" ")[-1][:-1])  # read tmp size in GB
 
     if user_input["device"] == "image" and avail_space < 13.0 and not args.skip_size_check:
         print_error("Not enough space in /tmp to build image. At least 13GB is required")
