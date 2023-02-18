@@ -138,18 +138,6 @@ def download_rootfs(distro_name: str, distro_version: str) -> None:
         sys.exit(1)
 
 
-# TODO: Figure out if this is actually necessary or if linux-firmware is enough
-# Download firmware for later
-def download_firmware() -> None:
-    print_status("Downloading chromeos firmware")
-    try:
-        bash("git clone --depth=1 https://chromium.googlesource.com/chromiumos/third_party/linux-firmware/ "
-             "/tmp/depthboot-build/firmware")
-    except URLError:
-        print_error("Couldn't download firmware. Check your internet connection and try again.")
-        exit(1)
-
-
 # Create, mount, partition the img and flash the eupnea kernel
 def prepare_img(distro_name: str, img_size) -> Tuple[str, str]:
     print_status("Preparing image")
@@ -425,7 +413,7 @@ def start_build(verbose: bool, local_path, dev_release: bool, build_options, img
     if local_path is None:  # default
         kernel_version = download_kernel(build_options["kernel_type"], dev_release)
         download_rootfs(build_options["distro_name"], build_options["distro_version"])
-        download_firmware()
+        # download_firmware()
     else:  # if local path is specified, copy files from it, instead of downloading from the internet
         print_status("Copying local files to /tmp/depthboot-build")
         # clean local path string
@@ -440,16 +428,16 @@ def start_build(verbose: bool, local_path, dev_release: bool, build_options, img
                 print_error(f"File {file} not found in {local_path}, attempting to download")
                 kernel_version = download_kernel(build_options["kernel_type"], dev_release, [file])
 
-        # copy distro agnostic files
-        dirs = {
-            "firmware": download_firmware,
-        }
-        for directory in dirs:
-            try:
-                cpdir(f"{local_path_posix}{directory}", f"/tmp/depthboot-build/{directory}")
-            except FileNotFoundError:
-                print_error(f"Directory {directory} not found in {local_path}, attempting to download")
-                dirs[directory]()
+        # # copy distro agnostic files
+        # dirs = {
+        #     "firmware": download_firmware,
+        # }
+        # for directory in dirs:
+        #     try:
+        #         cpdir(f"{local_path_posix}{directory}", f"/tmp/depthboot-build/{directory}")
+        #     except FileNotFoundError:
+        #         print_error(f"Directory {directory} not found in {local_path}, attempting to download")
+        #         dirs[directory]()
 
         # copy distro rootfs
         distro_rootfs = {
