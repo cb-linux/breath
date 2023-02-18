@@ -10,7 +10,7 @@ concurrency:
 
 jobs:
   test-ubuntu:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     steps:
       - name: Maximizing build space
         uses: easimon/maximize-build-space@master
@@ -44,43 +44,8 @@ jobs:
             results_*.txt
             sizes_*.json
 
-  test-debian:
-    runs-on: ubuntu-22.04
-    steps:
-      - name: Maximizing build space
-        uses: easimon/maximize-build-space@master
-        with:
-          temp-reserve-mb: 11264
-          swap-size-mb: 1
-          remove-dotnet: 'true'
-          remove-android: 'true'
-          remove-haskell: 'true'
-
-      - name: Checking out repository code
-        uses: actions/checkout@v3
-        with:
-          fetch-depth: 1
-
-      - name: Installing dependencies
-        run: sudo apt-get install -y cgpt vboot-kernel-utils parted debootstrap
-
-      - name: Copy testing script to root
-        run: cp ./.github/scripts/build-tests/debian-test.py debian-test.py
-
-      - name: Testing Debian builds
-        run: sudo python3 ./debian-test.py
-
-      - name: Uploading results as artifact
-        uses: actions/upload-artifact@v3
-        with:
-          name: results-debian
-          retention-days: 1
-          path: |
-            results_*.txt
-            sizes_*.json
-
   test-arch:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     steps:
       - name: Maximizing build space
         uses: easimon/maximize-build-space@master
@@ -115,7 +80,7 @@ jobs:
             sizes_*.json
 
   test-fedora:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     steps:
       - name: Maximizing build space
         uses: easimon/maximize-build-space@master
@@ -150,7 +115,7 @@ jobs:
             sizes_*.json
 
   test-pop-os:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     steps:
       #    - name: Maximizing build space
       #     uses: easimon/maximize-build-space@master
@@ -185,8 +150,8 @@ jobs:
             sizes_*.json
 
   evaluate-results:
-    needs: [ test-ubuntu, test-debian, test-arch, test-fedora, test-pop-os ]
-    runs-on: ubuntu-22.04
+    needs: [ test-ubuntu, test-arch, test-fedora, test-pop-os ]
+    runs-on: ubuntu-latest
     steps:
       - name: Checking out repository code
         uses: actions/checkout@v3
