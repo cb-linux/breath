@@ -64,25 +64,6 @@ def prepare_host(de_name: str) -> None:
     rmfile("kernel.flags")
     rmfile(".stop_download_progress")
 
-    # install debootstrap for debian
-    if de_name == "debian" and not path_exists("/usr/sbin/debootstrap"):
-        print_status("Installing debootstrap")
-        with open("/etc/os-release", "r") as os:
-            distro = os.read()
-        if distro.__contains__("Arch Linux"):
-            bash("pacman -S --noconfirm --needed debootstrap")
-        elif distro.__contains__("Void"):
-            bash("xbps-install -y debootstrap")
-        elif distro.__contains__("Ubuntu") or distro.__contains__("Debian"):
-            bash("apt-get install -y debootstrap")
-        elif distro.__contains__("SUSE"):
-            bash("zypper --non-interactive install debootstrap")
-        elif distro.__contains__("Fedora"):
-            bash("dnf install -y debootstrap")
-        else:
-            print_warning("Debootstrap not found, please install it using your distros package manager or select "
-                          "another distro instead of debian")
-            sys.exit(1)
 
 
 # download kernel files from GitHub
@@ -142,8 +123,6 @@ def download_kernel(kernel_type: str, dev_release: bool, files: list = None) -> 
 def download_rootfs(distro_name: str, distro_version: str) -> None:
     try:
         match distro_name:
-            case "debian":
-                print_status("Debian is downloaded later, skipping download")
             case "arch":
                 print_status("Downloading latest arch rootfs from geo.mirror.pkgbuild.com")
                 download_file("https://geo.mirror.pkgbuild.com/iso/latest/archlinux-bootstrap-x86_64.tar.gz",
@@ -272,14 +251,6 @@ def partition_and_flash_kernel(mnt_point: str, write_usb: bool, distro_name: str
 def extract_rootfs(distro_name: str, distro_version: str) -> None:
     print_status("Extracting rootfs")
     match distro_name:
-        case "debian":
-            print_status("Debootstraping Debian into /mnt/depthboot")
-            # debootstrapping directly to /mnt/depthboot
-            debian_result = bash(f"debootstrap {distro_version} /mnt/depthboot https://deb.debian.org/debian/")
-            if debian_result.__contains__("Couldn't download packages:") or debian_result.__contains__(
-                    "W: Failure trying to run:"):
-                print_error("Debian Debootstrap failed, check your internet connection or try again later")
-                sys.exit(1)
         case "arch":
             print_status("Extracting arch rootfs")
             mkdir("/tmp/depthboot-build/arch-rootfs")
@@ -361,7 +332,7 @@ def post_extract(build_options) -> None:
         password = build_options["password"]  # quotes interfere with functions below
         chroot(f"echo '{username}:{password}' | chpasswd")
         match build_options["distro_name"]:
-            case "ubuntu" | "debian":
+            case "ubuntu":
                 chroot(f"usermod -aG sudo {username}")
             case "arch" | "fedora":
                 chroot(f"usermod -aG wheel {username}")
@@ -484,7 +455,6 @@ def start_build(verbose: bool, local_path, dev_release: bool, build_options, img
         distro_rootfs = {
             # distro_name:[cp function type,filename]
             "ubuntu": [cpfile, "ubuntu-rootfs.tar.xz"],
-            "debian": [cpdir, "debian"],
             "arch": [cpfile, "arch-rootfs.tar.gz"],
             "fedora": [cpfile, "fedora-rootfs.tar.xz"],
             "pop-os": [cpfile, "pop-os.iso"]
@@ -515,8 +485,6 @@ def start_build(verbose: bool, local_path, dev_release: bool, build_options, img
     match build_options["distro_name"]:
         case "ubuntu":
             import distro.ubuntu as distro
-        case "debian":
-            import distro.debian as distro
         case "arch":
             import distro.arch as distro
         case "fedora":

@@ -26,7 +26,7 @@ def get_user_input(skip_device: bool = False) -> dict:
     input("Press Enter to continue...")
     while True:
         distro_name = ia_selection("Which Linux distribution (flavor) would you like to use?",
-                                   options=["Pop!_OS", "Ubuntu", "Fedora", "Arch", "Debian"],
+                                   options=["Pop!_OS", "Ubuntu", "Fedora", "Arch"],
                                    flags=["(recommended)"])
         match distro_name:
             case "Ubuntu":
@@ -34,24 +34,6 @@ def get_user_input(skip_device: bool = False) -> dict:
                 output_dict["distro_version"] = ia_selection("Which Ubuntu version would you like to use?",
                                                              options=["22.04", "22.10"], flags=["(LTS)", "(latest)"])
                 break
-            case "Debian":
-                output_dict["distro_name"] = "debian"
-                output_dict["distro_version"] = ia_selection("Which debian branch would you like to use?",
-                                                             options=["testing", "stable"],
-                                                             flags=["(recommended)", "(not recommended)"])
-                if output_dict["distro_version"] != "stable":
-                    break
-                user_selection = ia_selection(
-                    "Warning: audio and some postinstall scripts are not supported on debian stable by default.",
-                    options=["Use testing instead", "Choose another distro", "Continue with stable"])
-                match user_selection:
-                    case "Continue with stable":
-                        break
-                    case "Use testing instead":
-                        output_dict["distro_version"] = "testing"
-                        break
-                    case "Choose another distro":
-                        continue  # return to distro selection
             case "Arch":
                 output_dict["distro_name"] = "arch"
                 output_dict["distro_version"] = "latest"
@@ -76,8 +58,6 @@ def get_user_input(skip_device: bool = False) -> dict:
             case "ubuntu":
                 if output_dict["distro_version"] == "22.04":
                     de_list.append("deepin")
-                de_list.append("budgie")
-            case "debian":
                 de_list.append("budgie")
             case "arch":
                 # Deepin is currently broken on arch
