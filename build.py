@@ -342,10 +342,6 @@ def post_config(de_name: str, distro_name) -> None:
         cpfile("/mnt/depthboot/usr/share/X11/xkb/symbols/pc", "/mnt/depthboot/usr/share/X11/xkb/symbols/pc.default")
         cpfile("configs/xkb/xkb.chromebook", "/mnt/depthboot/usr/share/X11/xkb/symbols/pc")
 
-    # copy previously downloaded firmware
-    print_status("Copying google firmware")
-    cpdir("/tmp/depthboot-build/firmware", "/mnt/depthboot/lib/firmware")
-
     # Enable postinstall service
     print_status("Enabling postinstall service")
     chroot("systemctl enable eupnea-postinstall.service")
@@ -413,7 +409,6 @@ def start_build(verbose: bool, local_path, dev_release: bool, build_options, img
     if local_path is None:  # default
         kernel_version = download_kernel(build_options["kernel_type"], dev_release)
         download_rootfs(build_options["distro_name"], build_options["distro_version"])
-        # download_firmware()
     else:  # if local path is specified, copy files from it, instead of downloading from the internet
         print_status("Copying local files to /tmp/depthboot-build")
         # clean local path string
@@ -426,18 +421,7 @@ def start_build(verbose: bool, local_path, dev_release: bool, build_options, img
                 kernel_version = "unknown"
             except FileNotFoundError:
                 print_error(f"File {file} not found in {local_path}, attempting to download")
-                kernel_version = download_kernel(build_options["kernel_type"], dev_release, [file])
-
-        # # copy distro agnostic files
-        # dirs = {
-        #     "firmware": download_firmware,
-        # }
-        # for directory in dirs:
-        #     try:
-        #         cpdir(f"{local_path_posix}{directory}", f"/tmp/depthboot-build/{directory}")
-        #     except FileNotFoundError:
-        #         print_error(f"Directory {directory} not found in {local_path}, attempting to download")
-        #         dirs[directory]()
+                download_kernel(build_options["kernel_type"], dev_release, [file])
 
         # copy distro rootfs
         distro_rootfs = {
