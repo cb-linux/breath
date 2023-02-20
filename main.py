@@ -87,9 +87,8 @@ if __name__ == "__main__":
         print_status("Installing dependencies")
         with open("/etc/os-release", "r") as os:
             distro = os.read()
-        if distro.__contains__("Arch Linux"):
+        if distro.lower().__contains__("arch"):  # might accidentally catch architecture stuff
             bash("pacman -Sy")  # sync repos
-            bash("pacman -S --noconfirm --needed debootstrap")
             # Download prepackaged cgpt + vboot from arch-repo releases as its not available in the official repos
             # Makepkg is too much of a hassle to use here as it requires a non-root user
             urlretrieve("https://github.com/eupnea-linux/arch-repo/releases/latest/download/cgpt-vboot"
@@ -98,21 +97,21 @@ if __name__ == "__main__":
             bash("pacman --noconfirm -U /tmp/cgpt-vboot-utils.pkg.tar.gz")
             # Install other dependencies
             bash("pacman --noconfirm -S pv xz parted")
-        elif distro.__contains__("Void"):
+        elif distro.lower().__contains__("void"):
             bash("xbps-install -y --sync")
             bash("xbps-install -y pv xz parted cgpt vboot-utils")
-        elif distro.__contains__("Ubuntu") or distro.__contains__("Debian"):
+        elif distro.lower().__contains__("ubuntu") or distro.__contains__("debian"):
             bash("apt-get update -y")  # sync repos
             bash("apt-get install -y pv xz-utils parted cgpt vboot-kernel-utils")
-        elif distro.__contains__("SUSE"):
+        elif distro.lower().__contains__("suse"):
             bash("zypper --non-interactive refresh")  # sync repos
             bash("zypper --non-interactive install vboot parted pv xz")  # cgpt is included in vboot-utils on fedora
-        elif distro.__contains__("Fedora"):
+        elif distro.lower().__contains__("fedora"):
             bash("dnf update -y")  # sync repos
             bash("dnf install -y vboot-utils parted pv xz")  # cgpt is included in vboot-utils on fedora
         else:
-            print_warning("Debootstrap not found, please install it using your distros package manager or select "
-                          "another distro instead of debian")
+            print_warning("Script dependencies not found, please install the following packages with your package "
+                          "manager: which pv xz parted cgpt futility")
             sys.exit(1)
 
     # Check python version
