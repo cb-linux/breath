@@ -9,10 +9,6 @@ if __name__ == "__main__":
         with open(file) as f:
             data = json.load(f)
         distro_name = file.split("/")[2][6:-5]
-        # The latter scripts require an underscore at the end of the distro name
-        # -> add it to distros that don't have subversions
-        if not distro_name.__contains__("_"):
-            distro_name = f"{distro_name}_"
         all_sizes[distro_name] = data
 
     # Sometimes the builder script fails due to a network error -> the size is 0 -> replace with old size

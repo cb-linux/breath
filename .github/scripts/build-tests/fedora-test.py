@@ -55,8 +55,8 @@ if __name__ == "__main__":
                 failed_distros.append(de_name)
                 size_dict[de_name] = 0
 
-    with open("results_fedora.txt", "w") as f:
+    with open("results_fedora_37.txt", "w") as f:
         f.write(str(failed_distros))
 
-    with open("sizes_fedora.json", "w") as file:
+    with open("sizes_fedora_37.json", "w") as file:
         json.dump(size_dict, file)
