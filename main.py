@@ -87,7 +87,8 @@ if __name__ == "__main__":
         print_status("Installing dependencies")
         with open("/etc/os-release", "r") as os:
             distro = os.read()
-        if distro.lower().__contains__("arch"):  # might accidentally catch architecture stuff
+        if distro.lower().__contains__(
+                "arch"):  # might accidentally catch architecture stuff, but needed to catch arch derivatives
             bash("pacman -Sy")  # sync repos
             # Download prepackaged cgpt + vboot from arch-repo releases as its not available in the official repos
             # Makepkg is too much of a hassle to use here as it requires a non-root user
