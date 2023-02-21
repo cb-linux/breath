@@ -52,8 +52,8 @@ if __name__ == "__main__":
             failed_distros.append("cosmic-gnome")
             size_dict["cosmic-gnome"] = 0.0
 
-    with open("results_pop-os_.txt", "w") as f:
+    with open("results_pop-os_22.04.txt", "w") as f:
         f.write(str(failed_distros))
 
-    with open("sizes_pop-os_.json", "w") as file:
+    with open("sizes_pop-os_22.04.json", "w") as file:
         json.dump(size_dict, file)
