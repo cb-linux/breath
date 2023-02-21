@@ -33,7 +33,7 @@
     "cli": 2.9,
     "average": 5.1
   },
-  "arch_": {
+  "arch_latest": {
     "gnome": 5.9,
     "kde": 5.6,
     "xfce": 3.3,
