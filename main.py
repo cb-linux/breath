@@ -100,7 +100,7 @@ if __name__ == "__main__":
         elif distro.lower().__contains__("void"):
             bash("xbps-install -y --sync")
             bash("xbps-install -y pv xz parted cgpt vboot-utils")
-        elif distro.lower().__contains__("ubuntu") or distro.__contains__("debian"):
+        elif distro.lower().__contains__("ubuntu") or distro.lower().__contains__("debian"):
             bash("apt-get update -y")  # sync repos
             bash("apt-get install -y pv xz-utils parted cgpt vboot-kernel-utils")
         elif distro.lower().__contains__("suse"):
