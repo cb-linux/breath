@@ -74,8 +74,9 @@ def get_user_input(skip_device: bool = False) -> dict:
             if desktop_env == "cli":
                 print_warning("Warning: No desktop environment will be installed!")
                 user_selection = ia_selection("Are you sure you want to continue?", options=["No", "Yes"], )
-                if user_selection == "Yes":
+                if user_selection == "No":
                     print_status("No desktop will be installed.")
+                    continue
 
             output_dict["de_name"] = desktop_env.lower()
             break
