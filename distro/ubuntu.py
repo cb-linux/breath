@@ -39,8 +39,9 @@ def config(de_name: str, distro_version: str, verbose: bool) -> None:
     # Install general dependencies + eupnea packages
     chroot("apt-get install -y linux-firmware network-manager software-properties-common nano eupnea-utils "
            "eupnea-system")
-    # Install libasound2 backport
-    chroot("apt-get install -y libasound2-eupnea")
+    # Install libasound2 backport on jammy
+    if distro_version == " 22.04":
+        chroot("apt-get install -y libasound2-eupnea")
 
     print_status("Installing zram, ignore apt errors")
     # Install zram
