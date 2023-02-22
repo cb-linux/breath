@@ -18,7 +18,7 @@ def config(de_name: str, distro_version: str, verbose: bool) -> None:
                 filename="/mnt/depthboot/usr/local/share/keyrings/eupnea.key")
     with open("/mnt/depthboot/etc/apt/sources.list.d/eupnea.list", "w") as file:
         file.write("deb [signed-by=/usr/local/share/keyrings/eupnea.key] https://eupnea-linux.github.io/"
-                   "apt-repo/debian_ubuntu kinetic main")
+                   "apt-repo/debian_ubuntu jammy main")
     # update apt
     chroot("apt-get update -y")
     chroot("apt-get upgrade -y")

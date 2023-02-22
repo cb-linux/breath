@@ -32,13 +32,15 @@ def config(de_name: str, distro_version: str, verbose: bool) -> None:
                 filename="/mnt/depthboot/usr/local/share/keyrings/eupnea.key")
     with open("/mnt/depthboot/etc/apt/sources.list.d/eupnea.list", "w") as file:
         file.write("deb [signed-by=/usr/local/share/keyrings/eupnea.key] https://eupnea-linux.github.io/"
-                   "apt-repo/debian_ubuntu kinetic main")
+                   f"apt-repo/debian_ubuntu {ubuntu_versions_codenames[distro_version]} main")
     # update apt
     chroot("apt-get update -y")
     chroot("apt-get upgrade -y")
     # Install general dependencies + eupnea packages
     chroot("apt-get install -y linux-firmware network-manager software-properties-common nano eupnea-utils "
            "eupnea-system")
+    # Install libasound2 backport
+    bash("apt-get install -y libasound2-eupnea")
 
     print_status("Installing zram")
     # Install zram
