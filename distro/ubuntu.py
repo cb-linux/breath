@@ -40,9 +40,9 @@ def config(de_name: str, distro_version: str, verbose: bool) -> None:
     chroot("apt-get install -y linux-firmware network-manager software-properties-common nano eupnea-utils "
            "eupnea-system")
     # Install libasound2 backport
-    bash("apt-get install -y libasound2-eupnea")
+    chroot("apt-get install -y libasound2-eupnea")
 
-    print_status("Installing zram")
+    print_status("Installing zram, ignore apt errors")
     # Install zram
     # The apt postinstall of this zram packages tries to modload zram which is not possible in a chroot -> ignore errors
     with contextlib.suppress(subprocess.CalledProcessError):
