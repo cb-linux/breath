@@ -10,7 +10,6 @@ def config(de_name: str, distro_version: str, verbose: bool) -> None:
     # Add eupnea repo
     chroot("dnf config-manager --add-repo https://eupnea-linux.github.io/rpm-repo/eupnea.repo")
     chroot("dnf update --refresh -y")  # update repos
-    chroot("dnf upgrade -y")  # upgrade the whole system
     # Install eupnea packages
     chroot("dnf install -y eupnea-system eupnea-utils")
     # Install core packages
