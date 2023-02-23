@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 # This script will later become the gui. For now, it's a simple wrapper for the build script.
 
-import sys
-import os
 import argparse
 import atexit
+import os
+import sys
 
 from functions import *
 
@@ -38,6 +38,7 @@ class ExitHooks(object):
 
     def hook(self):
         self._orig_exit = sys.exit
+        self._orig_excepthook = sys.excepthook
         self._orig_exc_handler = self.exc_handler
         sys.exit = self.exit
         sys.excepthook = self.exc_handler
@@ -50,7 +51,8 @@ class ExitHooks(object):
         if exc_type == KeyboardInterrupt:
             global user_cancelled
             user_cancelled = True
-        self._orig_exc_handler(self, exc_type, exc, *args)
+        else:
+            sys.__excepthook__(exc_type, exc, *args)
 
 
 def exit_handler():
