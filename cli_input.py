@@ -54,7 +54,8 @@ def get_user_input(skip_device: bool = False) -> dict:
                                                              options=["37", "38"],
                                                              flags=[f"~{os_sizes['fedora_37']['average']}GB "
                                                                     f"(stable, recommended)",
-                                                                    "~?GB (beta, unrecommended)"])
+                                                                    f"~{os_sizes['fedora_38']['average']}GB"
+                                                                    " (beta, unrecommended)"])
                 break
             case "Pop!_OS":  # default
                 output_dict["distro_name"] = "pop-os"
