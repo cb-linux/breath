@@ -115,7 +115,7 @@ def download_rootfs(distro_name: str, distro_version: str) -> None:
                     "https://github.com/eupnea-linux/popos-rootfs/releases/latest/download/pop-os-rootfs-22.04.split.aa",
                     "/tmp/depthboot-build/popos-rootfs.split.ab")
                 print_status("Combining split pop-os rootfs, might take a while")
-                bash("cat /tmp/depthboot-build/popos-rootfs.split.?? > /tmp/depthboot-build/popos-rootfs.tar.xz")
+                bash("cat /tmp/depthboot-build/popos-rootfs.split.?? > /tmp/depthboot-build/pop-os-rootfs.tar.xz")
     except URLError:
         print_error("Couldn't download rootfs. Check your internet connection and try again. If the error persists, "
                     "create an issue with the distro and version in the name")
