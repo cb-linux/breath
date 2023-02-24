@@ -57,7 +57,7 @@ class ExitHooks(object):
 
 def exit_handler():
     if user_cancelled:
-        print_error("User cancelled, exiting")
+        print_error("\nUser cancelled, exiting")
         return
     if hooks.exit_code not in [0, 1]:  # ignore normal exit codes
         print_error("Script exited unexpectedly, please open an issue on GitHub/Discord/Revolt")
