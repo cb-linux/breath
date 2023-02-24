@@ -1,7 +1,7 @@
 from functions import *
 
 
-def config(de_name: str, distro_version: str, verbose: bool) -> None:
+def config(de_name: str, distro_version: str, verbose: bool, kernel_version: str) -> None:
     set_verbose(verbose)
     print_status("Configuring Fedora")
 
@@ -12,6 +12,11 @@ def config(de_name: str, distro_version: str, verbose: bool) -> None:
     chroot("dnf update --refresh -y")  # update repos
     # Install eupnea packages
     chroot("dnf install -y eupnea-system eupnea-utils")
+    # Install kernel
+    if kernel_version == "mainline":
+        chroot("dnf install -y eupnea-mainline-kernel")
+    elif kernel_version == "chromeos":
+        chroot("dnf install -y eupnea-chromeos-kernel")
     # Install core packages
     chroot("dnf group install -y 'Core'")
     # Install firmware packages

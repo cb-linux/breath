@@ -4,7 +4,7 @@ import os
 from functions import *
 
 
-def config(de_name: str, distro_version: str, verbose: bool) -> None:
+def config(de_name: str, distro_version: str, verbose: bool, kernel_version: str) -> None:
     set_verbose(verbose)
     print_status("Configuring Ubuntu")
 
@@ -42,6 +42,12 @@ def config(de_name: str, distro_version: str, verbose: bool) -> None:
     # Install libasound2 backport on jammy
     if distro_version == " 22.04":
         chroot("apt-get install -y libasound2-eupnea")
+
+    # Install kernel
+    if kernel_version == "mainline":
+        chroot("apt-get install -y eupnea-mainline-kernel")
+    elif kernel_version == "chromeos":
+        chroot("apt-get install -y eupnea-chromeos-kernel")
 
     print_status("Installing zram, ignore apt errors")
     # Install zram

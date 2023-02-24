@@ -2,7 +2,7 @@ from functions import *
 from urllib.request import urlretrieve
 
 
-def config(de_name: str, distro_version: str, verbose: bool) -> None:
+def config(de_name: str, distro_version: str, verbose: bool, kernel_version: str) -> None:
     set_verbose(verbose)
     print_status("Configuring Pop!_OS")
 
@@ -24,6 +24,12 @@ def config(de_name: str, distro_version: str, verbose: bool) -> None:
     chroot("apt-get upgrade -y")
     # Install general dependencies + eupnea packages
     chroot("apt-get install -y pop-gnome-initial-setup eupnea-utils eupnea-system")
+
+    # Install kernel
+    if kernel_version == "mainline":
+        chroot("apt-get install -y eupnea-mainline-kernel")
+    elif kernel_version == "chromeos":
+        chroot("apt-get install -y eupnea-chromeos-kernel")
 
     # Replace input-synaptics with newer input-libinput, for better touchpad support
     print_status("Upgrading touchpad drivers")

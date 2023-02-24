@@ -2,7 +2,7 @@ from functions import *
 from urllib.request import urlretrieve
 
 
-def config(de_name: str, distro_version: str, verbose: bool) -> None:
+def config(de_name: str, distro_version: str, verbose: bool, kernel_version: str) -> None:
     set_verbose(verbose)
     print_status("Configuring Arch")
 
@@ -38,6 +38,11 @@ def config(de_name: str, distro_version: str, verbose: bool) -> None:
     # Install basic utils + eupnea packages
     chroot("pacman -S --noconfirm base base-devel nano networkmanager xkeyboard-config linux-firmware sudo bluez "
            "bluez-utils eupnea-utils eupnea-system cgpt-vboot-utils zram-generator")
+    # Install kernel
+    if kernel_version == "mainline":
+        chroot("pacman -S --noconfirm eupnea-mainline-kernel")
+    elif kernel_version == "chromeos":
+        chroot("pacman -S --noconfirm eupnea-chromeos-kernel")
 
     print_status("Downloading and installing de, might take a while")
     match de_name:

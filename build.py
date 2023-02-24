@@ -65,53 +65,26 @@ def prepare_host(de_name: str) -> None:
     rmfile(".stop_download_progress")
 
 
-
-# download kernel files from GitHub
-def download_kernel(kernel_type: str, dev_release: bool, files: list = None) -> str:
+def download_kernel(kernel_type: str, dev_release: bool, files: list = None) -> None:
     if files is None:
-        files = ["bzImage", "modules", "headers"]
-    # select correct link
+        files = ["bzImage"]
+
     if dev_release:
-        url = "https://github.com/eupnea-linux/chromeos-kernel/releases/download/dev-build/"
+        urls = {
+            "mainline": "https://github.com/eupnea-linux/mainline-kernel/releases/download/dev-build/",
+            "chromeos": "https://github.com/eupnea-linux/chromeos-kernel/releases/download/dev-build/"
+        }
     else:
-        url = "https://github.com/eupnea-linux/chromeos-kernel/releases/latest/download/"
+        urls = {
+            "mainline": "https://github.com/eupnea-linux/mainline-kernel/releases/latest/download/",
+            "chromeos": "https://github.com/eupnea-linux/chromeos-kernel/releases/latest/download/"
+        }
 
-    # download kernel files
     try:
-        match kernel_type:
-            case "mainline":
-                print_status("Downloading mainline kernel")
-                url = "https://github.com/eupnea-linux/mainline-kernel/releases/latest/download/"
-                if "bzImage" in files:
-                    urlretrieve(f"{url}bzImage-stable", filename="/tmp/depthboot-build/bzImage")
-                if "modules" in files:
-                    urlretrieve(f"{url}modules-stable.tar.xz", filename="/tmp/depthboot-build/modules.tar.xz")
-                if "headers" in files:
-                    urlretrieve(f"{url}headers-stable.tar.xz", filename="/tmp/depthboot-build/headers.tar.xz")
-            case "exp":
-                print_status("Downloading experimental 5.15 kernel")
-                if "bzImage" in files:
-                    urlretrieve(f"{url}bzImage-exp", filename="/tmp/depthboot-build/bzImage")
-                if "modules" in files:
-                    urlretrieve(f"{url}modules-exp.tar.xz", filename="/tmp/depthboot-build/modules.tar.xz")
-                if "headers" in files:
-                    urlretrieve(f"{url}headers-exp.tar.xz", filename="/tmp/depthboot-build/headers.tar.xz")
-            case "stable":
-                print_status("Downloading stable 5.10 kernel")
-                if "bzImage" in files:
-                    urlretrieve(f"{url}bzImage-stable", filename="/tmp/depthboot-build/bzImage")
-                if "modules" in files:
-                    urlretrieve(f"{url}modules-stable.tar.xz", filename="/tmp/depthboot-build/modules.tar.xz")
-                if "headers" in files:
-                    urlretrieve(f"{url}headers-stable.tar.xz", filename="/tmp/depthboot-build/headers.tar.xz")
+        print_status(f"Downloading {kernel_type} kernel")
+        if "bzImage" in files:
+            urlretrieve(f"{urls[kernel_type]}bzImage", filename="/tmp/depthboot-build/bzImage")
 
-        print_status("Getting kernel version")
-        if kernel_type == "mainline":
-            url = "https://api.github.com/repos/eupnea-linux/mainline-kernel/releases/latest"
-        else:
-            url = "https://api.github.com/repos/eupnea-linux/chromeos-kernel/releases/latest"
-        print_status("Kernel files downloaded successfully")
-        return json.loads(urlopen(url).read())["tag_name"]
     except URLError:
         print_error("Failed to reach github. Check your internet connection and try again or use local files with -l")
         if dev_release:
@@ -253,22 +226,6 @@ def extract_rootfs(distro_name: str, distro_version: str) -> None:
 # Configure distro agnostic options
 def post_extract(build_options) -> None:
     print_status("Applying distro agnostic configuration")
-
-    # Extract modules
-    print_status("Extracting kernel modules")
-    rmdir("/mnt/depthboot/lib/modules")  # remove any preinstalled modules
-    mkdir("/mnt/depthboot/lib/modules")
-    extract_file("/tmp/depthboot-build/modules.tar.xz", "/mnt/depthboot/lib/modules/")
-
-    # Extract kernel headers
-    print_status("Extracting kernel headers")
-    dir_kernel_version = bash("ls /mnt/depthboot/lib/modules/").strip()  # get modules dir name
-    rmdir(f"/mnt/depthboot/usr/src/linux-headers-{dir_kernel_version}", keep_dir=False)  # remove old headers
-    mkdir(f"/mnt/depthboot/usr/src/linux-headers-{dir_kernel_version}", create_parents=True)
-    extract_file("/tmp/depthboot-build/headers.tar.xz", f"/mnt/depthboot/usr/src/linux-headers-{dir_kernel_version}")
-    # use chroot for correct symlink
-    chroot(f"ln -s /usr/src/linux-headers-{dir_kernel_version}/ /lib/modules/{dir_kernel_version}/build")
-
     # Create a temporary resolv.conf for internet inside the chroot
     mkdir("/mnt/depthboot/run/systemd/resolve", create_parents=True)  # dir doesnt exist coz systemd didnt run
     open("/mnt/depthboot/run/systemd/resolve/stub-resolv.conf", "w").close()  # create empty file for mount
@@ -300,16 +257,14 @@ def post_extract(build_options) -> None:
     cpfile("configs/hwdb/61-sensor.hwdb", "/mnt/depthboot/etc/udev/hwdb.d/61-sensor.hwdb")
     chroot("systemd-hwdb update")
 
+    print_status("Cleaning /boot")
+    rmdir("/mnt/depthboot/boot")  # clean stock kernels from /boot
+
     if build_options["distro_name"] == "fedora":
         print_status("Enabling resolved.conf systemd service")
         # systemd-resolved.service needed to create /etc/resolv.conf link. Not enabled by default on fedora
         # on other distros networkmanager takes care of this
         chroot("systemctl enable systemd-resolved")
-
-    print_status("Enable modules autoloading")
-    # Enable loading modules needed for depthboot
-    # TODO: Remove for v1.2.0 release
-    cpfile("configs/eupnea-modules.conf", "/mnt/depthboot/etc/modules-load.d/eupnea-modules.conf")
 
     # Do not pre-setup gnome, as there is a nice gui first time setup on first boot
     # TODO: Change to gnome
@@ -407,7 +362,7 @@ def start_build(verbose: bool, local_path, dev_release: bool, build_options, img
     prepare_host(build_options["distro_name"])
 
     if local_path is None:  # default
-        kernel_version = download_kernel(build_options["kernel_type"], dev_release)
+        download_kernel(build_options["kernel_type"], dev_release)
         download_rootfs(build_options["distro_name"], build_options["distro_version"])
     else:  # if local path is specified, copy files from it, instead of downloading from the internet
         print_status("Copying local files to /tmp/depthboot-build")
@@ -418,7 +373,6 @@ def start_build(verbose: bool, local_path, dev_release: bool, build_options, img
         for file in kernel_files:
             try:
                 cpfile(f"{local_path_posix}{file}", f"/tmp/depthboot-build/{file}")
-                kernel_version = "unknown"
             except FileNotFoundError:
                 print_error(f"File {file} not found in {local_path}, attempting to download")
                 download_kernel(build_options["kernel_type"], dev_release, [file])
