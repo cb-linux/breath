@@ -17,8 +17,10 @@ def process_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('-p', '--local-path', dest="local_path",
                         help="Prefer local files instead of downloading from the internet(not recommended).")
-    parser.add_argument('-d', '--device', dest="device_override",
+    parser.add_argument('--device', dest="device_override",
                         help="Specify device to direct write. Skips the device selection question.")
+    parser.add_argument("--show-device-selection", action="store_true", dest="device_selection", default=False,
+                        help="Show device selection menu instead of automatically building image")
     parser.add_argument("-v", "--verbose", action="store_true", dest="verbose", default=False,
                         help="Print more output")
     parser.add_argument("--no-shrink", action="store_true", dest="no_shrink", default=False,
@@ -190,9 +192,11 @@ if __name__ == "__main__":
         print_warning(f"Image size overridden to {args.image_size[0]}GB")
 
     # override device if specified
-    if args.device_override is not None:
+    if not args.device_selection:
         user_input = cli_input.get_user_input(skip_device=True)  # get user input
-        user_input["device"] = args.device_override  # override device
+        user_input["device"] = "image"
+        if args.device_override is not None:
+            user_input["device"] = args.device_override  # override device
     else:
         user_input = cli_input.get_user_input()  # get normal user input
 
