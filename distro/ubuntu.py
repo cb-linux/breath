@@ -127,7 +127,4 @@ def config(de_name: str, distro_version: str, verbose: bool, kernel_version: str
 
 
 def chroot(command: str) -> None:
-    if verbose:
-        bash(f'chroot /mnt/depthboot /bin/bash -c "{command}"')
-    else:
-        bash(f'chroot /mnt/depthboot /bin/bash -c "{command}" 2>/dev/null 1>/dev/null')  # supress all output
+    bash(f'chroot /mnt/depthboot /bin/bash -c "{command}" 2>/dev/null 1>/dev/null')  # supress all output
