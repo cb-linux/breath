@@ -36,7 +36,7 @@ def config(de_name: str, distro_version: str, verbose: bool, kernel_version: str
 
     print_status("Installing packages")
     # Install basic utils
-    chroot("pacman -S --noconfirm base base-devel nano networkmanager xkeyboard-config linux-firmware sudo bluez "
+    chroot("pacman -S --noconfirm --needed base base-devel nano networkmanager xkeyboard-config linux-firmware sudo bluez "
            "bluez-utils python3 cgpt-vboot-utils zram-generator")
     # install eupnea packages after installing python3
     chroot("pacman -S --noconfirm eupnea-utils eupnea-system")
