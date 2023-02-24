@@ -83,7 +83,7 @@ def download_kernel(kernel_type: str, dev_release: bool, files: list = None) -> 
     try:
         print_status(f"Downloading {kernel_type} kernel")
         if "bzImage" in files:
-            urlretrieve(f"{urls[kernel_type]}bzImage", filename="/tmp/depthboot-build/bzImage")
+            download_file(f"{urls[kernel_type]}bzImage", "/tmp/depthboot-build/bzImage")
 
     except URLError:
         print_error("Failed to reach github. Check your internet connection and try again or use local files with -l")
@@ -420,7 +420,7 @@ def start_build(verbose: bool, local_path, dev_release: bool, build_options, img
         case _:
             print_error("DISTRO NAME NOT FOUND! Please create an issue")
             sys.exit(1)
-    distro.config(build_options["de_name"], build_options["distro_version"], verbose)
+    distro.config(build_options["de_name"], build_options["distro_version"], verbose, build_options["kernel_type"])
 
     post_config(build_options["de_name"], build_options["distro_name"])
 
