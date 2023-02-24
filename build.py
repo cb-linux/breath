@@ -100,11 +100,22 @@ def download_rootfs(distro_name: str, distro_version: str) -> None:
                 print_status("Downloading latest arch rootfs from geo.mirror.pkgbuild.com")
                 download_file("https://geo.mirror.pkgbuild.com/iso/latest/archlinux-bootstrap-x86_64.tar.gz",
                               "/tmp/depthboot-build/arch-rootfs.tar.gz")
-            case "ubuntu" | "fedora" | "pop-os":
+            case "ubuntu" | "fedora":
                 print_status(f"Downloading {distro_name} rootfs, version {distro_version} from eupnea github releases")
                 download_file(f"https://github.com/eupnea-linux/{distro_name}-rootfs/releases/latest/download/"
                               f"{distro_name}-rootfs-{distro_version}.tar.xz",
                               f"/tmp/depthboot-build/{distro_name}-rootfs.tar.xz")
+            case "pop-os":
+                print_status("Downloading pop-os rootfs from eupnea github releases, part 1/2")
+                download_file(
+                    "https://github.com/eupnea-linux/popos-rootfs/releases/latest/download/popos-rootfs.split.aa",
+                    "/tmp/depthboot-build/popos-rootfs.split.aa")
+                print_status("Downloading pop-os rootfs from eupnea github releases, part 2/2")
+                download_file(
+                    "https://github.com/eupnea-linux/popos-rootfs/releases/latest/download/popos-rootfs.split.aa",
+                    "/tmp/depthboot-build/popos-rootfs.split.ab")
+                print_status("Combining split pop-os rootfs, might take a while")
+                bash("cat /tmp/depthboot-build/popos-rootfs.split.?? > /tmp/depthboot-build/popos-rootfs.tar.xz")
     except URLError:
         print_error("Couldn't download rootfs. Check your internet connection and try again. If the error persists, "
                     "create an issue with the distro and version in the name")
