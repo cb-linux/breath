@@ -108,11 +108,11 @@ def download_rootfs(distro_name: str, distro_version: str) -> None:
             case "pop-os":
                 print_status("Downloading pop-os rootfs from eupnea github releases, part 1/2")
                 download_file(
-                    "https://github.com/eupnea-linux/popos-rootfs/releases/latest/download/popos-rootfs.split.aa",
+                    "https://github.com/eupnea-linux/popos-rootfs/releases/latest/download/popos-rootfs-22.04.split.aa",
                     "/tmp/depthboot-build/popos-rootfs.split.aa")
                 print_status("Downloading pop-os rootfs from eupnea github releases, part 2/2")
                 download_file(
-                    "https://github.com/eupnea-linux/popos-rootfs/releases/latest/download/popos-rootfs.split.aa",
+                    "https://github.com/eupnea-linux/popos-rootfs/releases/latest/download/popos-rootfs-22.04.split.aa",
                     "/tmp/depthboot-build/popos-rootfs.split.ab")
                 print_status("Combining split pop-os rootfs, might take a while")
                 bash("cat /tmp/depthboot-build/popos-rootfs.split.?? > /tmp/depthboot-build/popos-rootfs.tar.xz")
