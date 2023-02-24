@@ -122,6 +122,10 @@ def bash(command: str) -> str:
     return output
 
 
+def chroot(command: str) -> str:
+    return bash(f'chroot /mnt/depthboot /bin/bash -c "{command}"')
+
+
 #######################################################################################
 #                                    MISC STUFF                                       #
 #######################################################################################
