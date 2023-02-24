@@ -67,7 +67,3 @@ def config(de_name: str, distro_version: str, verbose: bool, kernel_version: str
     cpfile("configs/zram/zram-generator.conf", "/mnt/depthboot/etc/systemd/zram-generator.conf")
 
     print_status("Fedora setup complete")
-
-
-def chroot(command: str) -> None:
-    bash(f'chroot /mnt/depthboot /bin/bash -c "{command}" 2>/dev/null 1>/dev/null')  # supress all output

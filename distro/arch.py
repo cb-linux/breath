@@ -36,8 +36,9 @@ def config(de_name: str, distro_version: str, verbose: bool, kernel_version: str
 
     print_status("Installing packages")
     # Install basic utils
-    chroot("pacman -S --noconfirm --needed base base-devel nano networkmanager xkeyboard-config linux-firmware sudo bluez "
-           "bluez-utils python3 cgpt-vboot-utils zram-generator")
+    chroot(
+        "pacman -S --noconfirm --needed base base-devel nano networkmanager xkeyboard-config linux-firmware sudo bluez "
+        "bluez-utils python3 cgpt-vboot-utils zram-generator")
     # install eupnea packages after installing python3
     chroot("pacman -S --noconfirm eupnea-utils eupnea-system")
     # Install kernel
@@ -137,7 +138,3 @@ def config(de_name: str, distro_version: str, verbose: bool, kernel_version: str
         bash(f"kill {pid}")
 
     print_status("Arch setup complete")
-
-
-def chroot(command: str) -> None:
-    bash(f'chroot /mnt/depthboot /bin/bash -c "{command}" 2>/dev/null 1>/dev/null')  # supress all output
