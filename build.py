@@ -277,27 +277,24 @@ def post_extract(build_options) -> None:
         # on other distros networkmanager takes care of this
         chroot("systemctl enable systemd-resolved")
 
-    # Do not pre-setup gnome, as there is a nice gui first time setup on first boot
-    # TODO: Change to gnome
-    if build_options["de_name"] != "popos":
-        print_status("Configuring user")
-        username = build_options["username"]  # quotes interfere with functions below
-        chroot(f"useradd --create-home --shell /bin/bash {username}")
-        password = build_options["password"]  # quotes interfere with functions below
-        chroot(f"echo '{username}:{password}' | chpasswd")
-        match build_options["distro_name"]:
-            case "ubuntu":
-                chroot(f"usermod -aG sudo {username}")
-            case "arch" | "fedora":
-                chroot(f"usermod -aG wheel {username}")
+    print_status("Configuring user")
+    username = build_options["username"]  # quotes interfere with functions below
+    chroot(f"useradd --create-home --shell /bin/bash {username}")
+    password = build_options["password"]  # quotes interfere with functions below
+    chroot(f"echo '{username}:{password}' | chpasswd")
+    match build_options["distro_name"]:
+        case "ubuntu" | "pop-os":
+            chroot(f"usermod -aG sudo {username}")
+        case "arch" | "fedora":
+            chroot(f"usermod -aG wheel {username}")
 
-        # set timezone build system timezone on device
-        # In some environments(Crouton), the timezone is not set -> ignore in that case
-        with contextlib.suppress(subprocess.CalledProcessError):
-            host_time_zone = bash("file /etc/localtime")  # read host timezone link
-            host_time_zone = host_time_zone[host_time_zone.find("/usr/share/zoneinfo/"):].strip()  # get actual timezone
-            chroot(f"ln -sf {host_time_zone} /etc/localtime")
-        print_status("Distro agnostic configuration complete")
+    # set timezone build system timezone on device
+    # In some environments(Crouton), the timezone is not set -> ignore in that case
+    with contextlib.suppress(subprocess.CalledProcessError):
+        host_time_zone = bash("file /etc/localtime")  # read host timezone link
+        host_time_zone = host_time_zone[host_time_zone.find("/usr/share/zoneinfo/"):].strip()  # get actual timezone
+        chroot(f"ln -sf {host_time_zone} /etc/localtime")
+    print_status("Distro agnostic configuration complete")
 
 
 # post extract and distro config

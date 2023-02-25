@@ -106,45 +106,41 @@ def get_user_input(skip_device: bool = False) -> dict:
             break
         print(f"{desktop_env} selected")
     else:
-        # TODO: set to gnome when gnome is fixed
-        output_dict["de_name"] = "popos"  # set to gnome
+        output_dict["de_name"] = "cosmic-gnome"
 
-    # Gnome has a first time setup -> skip this part for gnome, as there will be a first time setup
-    # TODO: set to gnome when gnome is fixed
-    if output_dict["de_name"] != "popos":
-        print_question("Enter a username for the new user")
-        while True:
-            output_dict["username"] = input("\033[94m" + "Username (default: 'localuser'): " + "\033[0m")
-            if output_dict["username"] == "":
-                print("Using 'localuser' as username")
-                output_dict["username"] = "localuser"
+    print_question("Enter a username for the new user")
+    while True:
+        output_dict["username"] = input("\033[94m" + "Username (default: 'localuser'): " + "\033[0m")
+        if output_dict["username"] == "":
+            print("Using 'localuser' as username")
+            output_dict["username"] = "localuser"
+            break
+        found_invalid_char = False
+        for char in output_dict["username"]:
+            if char not in "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789._-":
+                print_warning(f"Username contains invalid character: {char}")
+                found_invalid_char = True
                 break
-            found_invalid_char = False
-            for char in output_dict["username"]:
-                if char not in "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789._-":
-                    print_warning(f"Username contains invalid character: {char}")
-                    found_invalid_char = True
-                    break
-            if not found_invalid_char:
-                print(f"Using {output_dict['username']} as username")
+        if not found_invalid_char:
+            print(f"Using {output_dict['username']} as username")
+            break
+
+    print_question("Please set a secure password")
+    while True:
+        passwd_temp = getpass("\033[94m" + "Password: " + "\033[0m")
+        if passwd_temp == "":
+            print_warning("Password cannot be empty")
+            continue
+
+        else:
+            passwd_temp_repeat = getpass("\033[94m" + "Repeat password: " + "\033[0m")
+            if passwd_temp == passwd_temp_repeat:
+                output_dict["password"] = passwd_temp
+                print("Password set")
                 break
-
-        print_question("Please set a secure password")
-        while True:
-            passwd_temp = getpass("\033[94m" + "Password: " + "\033[0m")
-            if passwd_temp == "":
-                print_warning("Password cannot be empty")
-                continue
-
             else:
-                passwd_temp_repeat = getpass("\033[94m" + "Repeat password: " + "\033[0m")
-                if passwd_temp == passwd_temp_repeat:
-                    output_dict["password"] = passwd_temp
-                    print("Password set")
-                    break
-                else:
-                    print_warning("Passwords do not match, please try again")
-                    continue
+                print_warning("Passwords do not match, please try again")
+                continue
 
     while True:
         kernel_type = ia_selection("Which kernel type would you like to use? Usually there is no need to change this",

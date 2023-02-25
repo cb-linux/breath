@@ -23,7 +23,7 @@ def config(de_name: str, distro_version: str, verbose: bool, kernel_version: str
     chroot("apt-get update -y")
     chroot("apt-get upgrade -y")
     # Install general dependencies + eupnea packages
-    chroot("apt-get install -y pop-gnome-initial-setup eupnea-utils eupnea-system")
+    chroot("apt-get install -y eupnea-utils eupnea-system")
 
     # Install kernel
     if kernel_version == "mainline":
