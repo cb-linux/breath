@@ -107,13 +107,11 @@ def download_rootfs(distro_name: str, distro_version: str) -> None:
                               f"/tmp/depthboot-build/{distro_name}-rootfs.tar.xz")
             case "pop-os":
                 print_status("Downloading pop-os rootfs from eupnea github releases, part 1/2")
-                download_file(
-                    "https://github.com/eupnea-linux/popos-rootfs/releases/latest/download/pop-os-rootfs-22.04.split.aa",
-                    "/tmp/depthboot-build/pop-os-rootfs.split.aa")
+                download_file("https://github.com/eupnea-linux/pop-os-rootfs/releases/latest/download/pop-os-rootfs-"
+                              "22.04.split.aa", "/tmp/depthboot-build/pop-os-rootfs.split.aa")
                 print_status("Downloading pop-os rootfs from eupnea github releases, part 2/2")
-                download_file(
-                    "https://github.com/eupnea-linux/popos-rootfs/releases/latest/download/pop-os-rootfs-22.04.split.ab",
-                    "/tmp/depthboot-build/pop-os-rootfs.split.ab")
+                download_file("https://github.com/eupnea-linux/pop-os-rootfs/releases/latest/download/pop-os-rootfs"
+                              "-22.04.split.ab", "/tmp/depthboot-build/pop-os-rootfs.split.ab")
                 print_status("Combining split pop-os rootfs, might take a while")
                 bash("cat /tmp/depthboot-build/pop-os-rootfs.split.?? > /tmp/depthboot-build/pop-os-rootfs.tar.xz")
     except URLError:
