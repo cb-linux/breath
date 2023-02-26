@@ -196,8 +196,8 @@ def partition_and_flash_kernel(mnt_point: str, write_usb: bool, distro_name: str
         else:
             print_error('Received unexpected distro_name when attempting to build kernel flags')
             sys.exit(1)
-        with open("kernel.flags", "w") as config:
-            config.write(_get_flags(distro_name))
+    with open("kernel.flags", "w") as config:
+        config.write(_get_flags(distro_name))
 
     print_status("Flashing kernel to device/image")
     # Sign kernel
