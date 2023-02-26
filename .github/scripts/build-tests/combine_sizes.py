@@ -20,20 +20,26 @@ if __name__ == "__main__":
             if all_sizes[distro][key] == 0:
                 all_sizes[distro][key] = old_sizes[distro][key]
 
-    # Calculate average sizes
+    # # Calculate average sizes
+    # for distro in all_sizes:
+    #     total_GB = 0
+    #     total_amount = 0
+    #     for key in all_sizes[distro]:
+    #         total_GB += all_sizes[distro][key]
+    #         total_amount += 1
+    #     # calculate average size and cast to 1 decimal place
+    #     all_sizes[distro]["average"] = round(total_GB / total_amount, 1)
+
+    # Calculate raw DE sizes
     for distro in all_sizes:
-        total_GB = 0
-        total_amount = 0
         for key in all_sizes[distro]:
-            total_GB += all_sizes[distro][key]
-            total_amount += 1
-        # calculate average size and cast to 1 decimal place
-        all_sizes[distro]["average"] = round(total_GB / total_amount, 1)
+            if key != "cli":
+                all_sizes[distro][key] = all_sizes[distro][key] - all_sizes[distro]["cli"]
 
     # Calculate average sizes for distros with multiple versions
     all_sizes["ubuntu_average"] = round(
-        (all_sizes["ubuntu_22.04"]["average"] + all_sizes["ubuntu_22.10"]["average"]) / 2, 1)
-    all_sizes["fedora_average"] = round((all_sizes["fedora_37"]["average"] + all_sizes["fedora_38"]["average"]) / 2, 1)
+        (all_sizes["ubuntu_22.04"]["cli"] + all_sizes["ubuntu_22.10"]["cli"]) / 2, 1)
+    all_sizes["fedora_average"] = round((all_sizes["fedora_37"]["cli"] + all_sizes["fedora_38"]["cli"]) / 2, 1)
 
     with open("os_sizes.json", "w") as f:
         json.dump(all_sizes, f)

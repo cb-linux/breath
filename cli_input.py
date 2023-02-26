@@ -33,16 +33,16 @@ def get_user_input(skip_device: bool = False) -> dict:
     while True:
         distro_name = ia_selection("Which Linux distribution (flavor) would you like to use?",
                                    options=["Pop!_OS", "Ubuntu", "Fedora", "Arch"],
-                                   flags=[f"~{os_sizes['pop-os_22.04']['average']}GB (recommended)",
-                                          f"~{os_sizes['ubuntu_average']}GB", f"~{os_sizes['fedora_37']['average']}GB",
-                                          f"~{os_sizes['arch_latest']['average']}GB"])
+                                   flags=[f"{os_sizes['pop-os_22.04']['cosmic-gnome']}GB (recommended)",
+                                          f"~{os_sizes['ubuntu_average']}GB", f"~{os_sizes['fedora_average']}GB",
+                                          f"{os_sizes['arch_latest']['cli']}GB"])
         match distro_name:
             case "Ubuntu":
                 output_dict["distro_name"] = "ubuntu"
                 output_dict["distro_version"] = ia_selection("Which Ubuntu version would you like to use?",
                                                              options=["22.04", "22.10"], flags=[
-                        f"~{os_sizes['ubuntu_22.04']['average']}GB (LTS version)",
-                        f"~{os_sizes['ubuntu_22.10']['average']}GB (latest)"])
+                        f"{os_sizes['ubuntu_22.04']['cli']}GB (LTS version)",
+                        f"{os_sizes['ubuntu_22.10']['cli']}GB (latest)"])
                 break
             case "Arch":
                 output_dict["distro_name"] = "arch"
@@ -52,9 +52,9 @@ def get_user_input(skip_device: bool = False) -> dict:
                 output_dict["distro_name"] = "fedora"
                 output_dict["distro_version"] = ia_selection("Which Fedora version would you like to use?",
                                                              options=["37", "38"],
-                                                             flags=[f"~{os_sizes['fedora_37']['average']}GB "
+                                                             flags=[f"~{os_sizes['fedora_37']['cli']}GB "
                                                                     f"(stable, recommended)",
-                                                                    f"~{os_sizes['fedora_38']['average']}GB"
+                                                                    f"~{os_sizes['fedora_38']['cli']}GB"
                                                                     " (beta, unrecommended)"])
                 break
             case "Pop!_OS":  # default
@@ -67,29 +67,29 @@ def get_user_input(skip_device: bool = False) -> dict:
 
     if output_dict["distro_name"] != "pop-os":
         de_list = ["Gnome", "KDE", "Xfce", "LXQt"]
-        flags_list = [f"(recommended) ~{os_sizes[temp_distro_name]['gnome']}GB",
-                      f"(recommended) ~{os_sizes[temp_distro_name]['kde']}GB",
-                      f"(recommended for weak devices) ~{os_sizes[temp_distro_name]['xfce']}GB",
-                      f"(recommended for weak devices) ~{os_sizes[temp_distro_name]['lxqt']}GB"]
+        flags_list = [f"(recommended) +{os_sizes[temp_distro_name]['gnome']}GB",
+                      f"(recommended) +{os_sizes[temp_distro_name]['kde']}GB",
+                      f"(recommended for weak devices) +{os_sizes[temp_distro_name]['xfce']}GB",
+                      f"(recommended for weak devices) +{os_sizes[temp_distro_name]['lxqt']}GB"]
         match output_dict["distro_name"]:
             case "ubuntu":
                 if output_dict["distro_version"] == "22.04":
                     de_list.append("deepin")
-                    flags_list.append(f"~{os_sizes[temp_distro_name]['deepin']}GB")
+                    flags_list.append(f"+{os_sizes[temp_distro_name]['deepin']}GB")
                 de_list.append("budgie")
-                flags_list.append(f"~{os_sizes[temp_distro_name]['budgie']}GB")
+                flags_list.append(f"+{os_sizes[temp_distro_name]['budgie']}GB")
             case "arch":
                 # Deepin is currently broken on arch
                 # de_list.extend(["deepin", "budgie"])
                 de_list.append("budgie")
-                flags_list.append(f"~{os_sizes[temp_distro_name]['budgie']}GB")
+                flags_list.append(f"+{os_sizes[temp_distro_name]['budgie']}GB")
             case "fedora":
                 de_list.extend(["deepin", "budgie"])
-                flags_list.append(f"~{os_sizes[temp_distro_name]['deepin']}GB")
-                flags_list.append(f"~{os_sizes[temp_distro_name]['budgie']}GB")
+                flags_list.append(f"+{os_sizes[temp_distro_name]['deepin']}GB")
+                flags_list.append(f"+{os_sizes[temp_distro_name]['budgie']}GB")
 
         de_list.append("cli")  # add at the end for better ux
-        flags_list.append(f"~{os_sizes[temp_distro_name]['cli']}GB")
+        flags_list.append(f"+0GB")
 
         while True:
             desktop_env = ia_selection("Which desktop environment (Desktop GUI) would you like to use?",
