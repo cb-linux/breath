@@ -25,6 +25,8 @@ def process_args():
                         help="Print more output")
     parser.add_argument("--no-shrink", action="store_true", dest="no_shrink", default=False,
                         help="Do not shrink image")
+    parser.add_argument("--verbose-kernel", action="store_true", dest="verbose_kernel", default=False,
+                        help="Set loglevel=15 in cmdline for visible kernel logs on boot")
     parser.add_argument("--skip-size-check", action="store_true", dest="skip_size_check", default=False,
                         help="Do not check available disk space")
     parser.add_argument("--image-size", "-i", dest="image_size", type=int, nargs=1, default=[10],

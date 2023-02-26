@@ -121,7 +121,7 @@ def download_rootfs(distro_name: str, distro_version: str) -> None:
 
 
 # Create, mount, partition the img and flash the eupnea kernel
-def prepare_img(distro_name: str, img_size) -> Tuple[str, str]:
+def prepare_img(distro_name: str, img_size, verbose_kernel: bool) -> Tuple[str, str]:
     print_status("Preparing image")
     try:
         bash(f"fallocate -l {img_size}G depthboot.img")
@@ -133,11 +133,11 @@ def prepare_img(distro_name: str, img_size) -> Tuple[str, str]:
     if mnt_point == "":
         print_error("Failed to mount image")
         sys.exit(1)
-    return partition_and_flash_kernel(mnt_point, False, distro_name)
+    return partition_and_flash_kernel(mnt_point, False, distro_name, verbose_kernel)
 
 
 # Prepare USB/SD-card
-def prepare_usb_sd(device: str, distro_name: str) -> Tuple[str, str]:
+def prepare_usb_sd(device: str, distro_name: str, verbose_kernel: bool) -> Tuple[str, str]:
     print_status("Preparing USB/SD-card")
 
     # fix device name if needed
@@ -151,12 +151,13 @@ def prepare_usb_sd(device: str, distro_name: str) -> Tuple[str, str]:
     with contextlib.suppress(subprocess.CalledProcessError):
         bash(f"umount -lf {device}*")
     if device.__contains__("mmcblk"):  # sd card
-        return partition_and_flash_kernel(device, False, distro_name)
+        return partition_and_flash_kernel(device, False, distro_name, verbose_kernel)
     else:
-        return partition_and_flash_kernel(device, True, distro_name)
+        return partition_and_flash_kernel(device, True, distro_name, verbose_kernel)
 
 
-def partition_and_flash_kernel(mnt_point: str, write_usb: bool, distro_name: str) -> Tuple[str, str]:
+def partition_and_flash_kernel(mnt_point: str, write_usb: bool, distro_name: str, verbose_kernel: bool) -> Tuple[
+    str, str]:
     print_status("Preparing device/image partition")
 
     # Determine rootfs part name
@@ -190,6 +191,8 @@ def partition_and_flash_kernel(mnt_point: str, write_usb: bool, distro_name: str
         base_string += ' security=apparmor'
     if distro_name == 'fedora':
         base_string += ' security=selinux'
+    if verbose_kernel:
+        base_string = base_string.replace("console=", "loglevel=15")
     with open("kernel.flags", "w") as config:
         config.write(base_string.replace("insert_partuuid", rootfs_partuuid))
 
@@ -356,7 +359,7 @@ def post_config(de_name: str, distro_name) -> None:
 
 # The main build script
 def start_build(verbose: bool, local_path, dev_release: bool, build_options, img_size: int = 10,
-                no_download_progress: bool = False, no_shrink: bool = False) -> None:
+                no_download_progress: bool = False, no_shrink: bool = False, verbose_kernel: bool = False) -> None:
     if no_download_progress:
         disable_download_progress()  # disable download progress bar for non-interactive shells
     set_verbose(verbose)
@@ -403,9 +406,9 @@ def start_build(verbose: bool, local_path, dev_release: bool, build_options, img
 
     # Setup device
     if build_options["device"] == "image":
-        output_temp = prepare_img(build_options["distro_name"], img_size)
+        output_temp = prepare_img(build_options["distro_name"], img_size, verbose_kernel)
     else:
-        output_temp = prepare_usb_sd(build_options["device"], build_options["distro_name"])
+        output_temp = prepare_usb_sd(build_options["device"], build_options["distro_name"], verbose_kernel)
     global img_mnt
     img_mnt = output_temp[0]
     # Extract rootfs and configure distro agnostic settings
