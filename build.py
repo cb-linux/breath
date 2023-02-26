@@ -185,10 +185,13 @@ def partition_and_flash_kernel(mnt_point: str, write_usb: bool, distro_name: str
     rootfs_partuuid = bash(f"blkid -o value -s PARTUUID {rootfs_mnt}")
 
     # write PARTUUID to kernel flags and save it as a file
-    with open(f"configs/cmdlines/{distro_name}.flags", "r") as flags:
-        temp_cmdline = flags.read().replace("insert_partuuid", rootfs_partuuid).strip()
+    base_string = "console= root=PARTUUID=insert_partuuid i915.modeset=1 rootwait rw fbcon=logo-pos:center,logo-count:1"
+    if distro_name in {"pop-os", "ubuntu"}:
+        base_string += ' security=apparmor'
+    if distro_name == 'fedora':
+        base_string += ' security=selinux'
     with open("kernel.flags", "w") as config:
-        config.write(temp_cmdline)
+        config.write(base_string.replace("insert_partuuid", rootfs_partuuid))
 
     print_status("Flashing kernel to device/image")
     # Sign kernel
