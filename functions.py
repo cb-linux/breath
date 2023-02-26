@@ -1,4 +1,3 @@
-# FILE SOURCE: https://github.com/apacelus/python-os-functions
 import subprocess
 from pathlib import Path
 from threading import Thread
