@@ -185,10 +185,19 @@ def partition_and_flash_kernel(mnt_point: str, write_usb: bool, distro_name: str
     rootfs_partuuid = bash(f"blkid -o value -s PARTUUID {rootfs_mnt}")
 
     # write PARTUUID to kernel flags and save it as a file
-    with open(f"configs/cmdlines/{distro_name}.flags", "r") as flags:
-        temp_cmdline = flags.read().replace("insert_partuuid", rootfs_partuuid).strip()
-    with open("kernel.flags", "w") as config:
-        config.write(temp_cmdline)
+    def _get_flags(distro_name):
+        base_string = "console= root=PARTUUID=insert_partuuid i915.modeset=1 rootwait rw fbcon=logo-pos:center,logo-count:1"
+        if distro_name == 'arch':
+            return base_string
+        elif distro_name in ('debian', 'pop-os', 'ubuntu'):
+            return base_string + ' security=apparmor'
+        elif distro_name == 'fedora':
+            return base_string + ' security=selinux'
+        else:
+            print_error('Received unexpected distro_name when attempting to build kernel flags')
+            sys.exit(1)
+        with open("kernel.flags", "w") as config:
+            config.write(_get_flags(distro_name))
 
     print_status("Flashing kernel to device/image")
     # Sign kernel
