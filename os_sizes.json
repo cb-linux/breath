@@ -1,1 +1,51 @@
-{"fedora_37": {"gnome": 5.4, "kde": 5.1, "xfce": 3.5000000000000004, "lxqt": 4.199999999999999, "deepin": 4.1, "budgie": 1.4, "cli": 1.9}, "fedora_38": {"gnome": 5.8, "kde": 5.3, "xfce": 3.8999999999999995, "lxqt": 4.5, "deepin": 4.2, "budgie": 1.5999999999999999, "cli": 1.7}, "pop-os_22.04": {"cosmic-gnome": 10.0}, "ubuntu_22.04": {"gnome": 3.1, "kde": 3.1, "xfce": 2.6999999999999997, "lxqt": 2.0000000000000004, "budgie": 3.1, "deepin": 4.6, "cli": 2.9}, "ubuntu_22.10": {"gnome": 3.3, "kde": 3.1000000000000005, "xfce": 2.9000000000000004, "lxqt": 2.9000000000000004, "budgie": 3.1000000000000005, "deepin": 0.9000000000000004, "cli": 2.8}, "arch_latest": {"gnome": 3.7, "kde": 3.3, "xfce": 2.0, "lxqt": 2.3, "budgie": 1.2999999999999998, "cli": 2.2}, "ubuntu_average": 2.8, "fedora_average": 1.8}
+{
+  "fedora_37": {
+    "gnome": 0.0,
+    "kde": 0.0,
+    "xfce": 0.0,
+    "lxqt": 0.0,
+    "deepin": 0.0,
+    "budgie": 0.0,
+    "cli": 0.0
+  },
+  "fedora_38": {
+    "gnome": 0.0,
+    "kde": 0.0,
+    "xfce": 0.0,
+    "lxqt": 0.0,
+    "deepin": 0.0,
+    "budgie": 0.0,
+    "cli": 0.0
+  },
+  "pop-os_22.04": {
+    "cosmic-gnome": 0.0
+  },
+  "ubuntu_22.04": {
+    "gnome": 0.0,
+    "kde": 0.0,
+    "xfce": 0.0,
+    "lxqt": 0.0,
+    "budgie": 0.0,
+    "deepin": 0.0,
+    "cli": 0.0
+  },
+  "ubuntu_22.10": {
+    "gnome": 0.0,
+    "kde": 0.0,
+    "xfce": 0.0,
+    "lxqt": 0.0,
+    "budgie": 0.0,
+    "deepin": 0.0,
+    "cli": 0.0
+  },
+  "arch_latest": {
+    "gnome": 0.0,
+    "kde": 0.0,
+    "xfce": 0.0,
+    "lxqt": 0.0,
+    "budgie": 0.0,
+    "cli": 0.0
+  },
+  "ubuntu_average": 0.0,
+  "fedora_average": 0.0
+}

@@ -14,12 +14,12 @@ if __name__ == "__main__":
 
     # Sometimes the builder script fails due to a network error -> the size is 0 -> replace with old size
     # open old sizes file
-    with open("os_sizes.json", "r") as f:
-        old_sizes = json.load(f)
-    for distro in all_sizes:
-        for key in all_sizes[distro]:
-            if all_sizes[distro][key] == 0:
-                all_sizes[distro][key] = old_sizes[distro][key]
+    # with open("os_sizes.json", "r") as f:
+    #     old_sizes = json.load(f)
+    # for distro in all_sizes:
+    #     for key in all_sizes[distro]:
+    #         if all_sizes[distro][key] == 0:
+    #             all_sizes[distro][key] = old_sizes[distro][key]
 
     # # Calculate average sizes
     # for distro in all_sizes:
@@ -36,7 +36,7 @@ if __name__ == "__main__":
         for key in all_sizes[distro]:
             if key != "cli":
                 with contextlib.suppress(KeyError):  # the distro_average dicts obv dont have a cli key
-                    all_sizes[distro][key] = all_sizes[distro][key] - all_sizes[distro]["cli"]
+                    all_sizes[distro][key] = round(all_sizes[distro][key] - all_sizes[distro]["cli"] / 2, 1)
 
     # Calculate average sizes for distros with multiple versions
     all_sizes["ubuntu_average"] = round(
