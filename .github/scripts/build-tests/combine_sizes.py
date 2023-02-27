@@ -1,3 +1,4 @@
+import contextlib
 import json
 import glob
 
@@ -32,9 +33,9 @@ if __name__ == "__main__":
 
     # Calculate raw DE sizes
     for distro in all_sizes:
-        if not distro == "pop-os":
-            for key in all_sizes[distro]:
-                if key != "cli":
+        for key in all_sizes[distro]:
+            if key != "cli":
+                with contextlib.suppress(KeyError):  # the distro_average dicts obv dont have a cli key
                     all_sizes[distro][key] = all_sizes[distro][key] - all_sizes[distro]["cli"]
 
     # Calculate average sizes for distros with multiple versions
