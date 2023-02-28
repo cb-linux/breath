@@ -1,3 +1,4 @@
+import contextlib
 import subprocess
 from pathlib import Path
 from threading import Thread
@@ -43,7 +44,7 @@ def rmfile(file: str, force: bool = False) -> None:
     if force:  # for symbolic links
         Path(file).unlink(missing_ok=True)
     file_as_path = Path(file)
-    if file_as_path.exists():
+    with contextlib.suppress(FileNotFoundError):
         file_as_path.unlink()
 
 
