@@ -39,9 +39,6 @@ def config(de_name: str, distro_version: str, verbose: bool, kernel_version: str
     # Install general dependencies + eupnea packages
     chroot("apt-get install -y linux-firmware network-manager software-properties-common nano eupnea-utils "
            "eupnea-system")
-    # Install libasound2 backport on jammy
-    if distro_version == "22.04":
-        chroot("apt-get install -y libasound2-eupnea")
 
     # Install kernel
     if kernel_version == "mainline":
@@ -111,6 +108,10 @@ def config(de_name: str, distro_version: str, verbose: bool, kernel_version: str
         print_status("Upgrading touchpad drivers")
         chroot("apt-get remove -y xserver-xorg-input-synaptics")
         chroot("apt-get install -y xserver-xorg-input-libinput")
+
+        # Install libasound2 backport on jammy
+        if distro_version == "22.04":
+            chroot("apt-get install -y libasound2-eupnea")
 
     # GDM3 auto installs gnome-minimal. Gotta remove it if user didn't choose gnome
     if de_name != "gnome":
