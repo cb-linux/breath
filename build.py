@@ -261,7 +261,7 @@ def post_extract(build_options) -> None:
         json.dump(settings, settings_file)
 
     print_status("Fixing sleep")
-    # disable hibernation aka S3 sleep, READ more: https://eupnea-linux.github.io/main.html#/pages/bootlock
+    # disable hibernation aka S3 sleep, READ more: https://eupnea-linux.github.io/docs/chromebook/bootlock
     # This fix is removed if the user installs to internal
     mkdir("/mnt/depthboot/etc/systemd/")  # just in case systemd path doesn't exist
     with open("/mnt/depthboot/etc/systemd/sleep.conf", "a") as conf:

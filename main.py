@@ -177,7 +177,7 @@ if __name__ == "__main__":
         except subprocess.CalledProcessError:
             print_error("Failed to prepare Crostini")
             print_error("Please run the Crostini specific instructions before running this script")
-            print("https://eupnea-linux.github.io/main.html#/extra-pages/crostini")
+            print("https://eupnea-linux.github.io/docs/extra/crostini")
             sys.exit(1)
         open("/tmp/.crostini-fixed", "a").close()
 
