@@ -301,7 +301,6 @@ def download_file(url: str, path: str) -> None:
         urlretrieve(url=url, filename=path)
         return
 
-    rmfile(".stop_download_progress")
     # get total file size from server
     total_file_size = int(urlopen(url).headers["Content-Length"])
     Thread(target=_print_download_progress, args=(Path(path), total_file_size,), daemon=True).start()
