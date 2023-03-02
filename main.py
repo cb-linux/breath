@@ -140,6 +140,7 @@ if __name__ == "__main__":
                     original_sources = file.readlines()
                 sources = original_sources
                 sources[1] = sources[1].replace("bullseye", "unstable")
+                sources[1] = sources[1].replace("buster", "unstable") # Some crostinis are on buster
                 with open("/etc/apt/sources.list", "w") as file:
                     file.writelines(sources)
 
