@@ -185,14 +185,14 @@ jobs:
         run: |
           for file in ./results-*/*-results.txt
           do 
-            if [ "$(cat $file)" != "[]" ]
+            if [ "$(cat $file)" == "0.0" ]
               then
                 echo $file >> ./failed-results.txt
             fi
+          done
           if [ -s ./failed-results.txt ]
             then
               echo "Failed to build the following images:"
                 cat ./failed-results.txt
                 exit 1
           fi
-          done
