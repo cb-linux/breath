@@ -34,7 +34,7 @@ jobs:
         run: sudo apt-get install -y cgpt vboot-kernel-utils parted
 
       - name: Copy testing script to root
-        run: cp ./.github/scripts/build-image ./build-image.py
+        run: cp ./.github/scripts/build-image.py ./build-image.py
 
       - name: Testing Ubuntu builds
         run: sudo python3 ./build-image.py ubuntu ${{ matrix.version }} ${{ matrix.de_name }}
