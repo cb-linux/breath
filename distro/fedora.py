@@ -5,6 +5,14 @@ def config(de_name: str, distro_version: str, verbose: bool, kernel_version: str
     set_verbose(verbose)
     print_status("Configuring Fedora")
 
+    # Tweak dnf config to enable multithreaded downloads
+    with open("/mnt/depthboot/etc/dnf/dnf.conf", "r") as f:
+        og_dnf_conf = f.read()
+    new_dnf_conf = og_dnf_conf.replace("installonly_limit=3", "installonly_limit=0")
+    new_dnf_conf += "\nfastestmirror=True\nmax_parallel_downloads=10\n"
+    with open("/mnt/depthboot/etc/dnf/dnf.conf", "w") as f:
+        f.write(new_dnf_conf)
+
     print("Installing dependencies")
     chroot(f"dnf install -y --releasever={distro_version} fedora-release")  # update repos list
     # Add eupnea repo
@@ -65,5 +73,9 @@ def config(de_name: str, distro_version: str, verbose: bool, kernel_version: str
 
     # Add zram config
     cpfile("configs/zram/zram-generator.conf", "/mnt/depthboot/etc/systemd/zram-generator.conf")
+
+    # Restore dnf config
+    with open("/mnt/depthboot/etc/dnf/dnf.conf", "w") as f:
+        f.write(og_dnf_conf)
 
     print_status("Fedora setup complete")
