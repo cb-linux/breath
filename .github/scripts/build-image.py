@@ -57,5 +57,5 @@ if __name__ == "__main__":
             print_error(f"Failed twice to build {args.distro_name} + {args.distro_version} + {args.de_name}")
             image_size = 0
 
-    with open(f"{args.distro_name}-{args.distro_version}-{args.de_name}-results.txt", "w") as f:
+    with open(f"{args.distro_name}_{args.distro_version}_{args.de_name}_results.txt", "w") as f:
         f.write(str(image_size))

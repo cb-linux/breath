@@ -9,9 +9,9 @@ if __name__ == "__main__":
     for file in files:
         with open(file, "r") as f:
             data = f.read()
-        distro_name = file.split("/")[2].split("-")[0]
-        distro_version = file.split("/")[2].split("-")[1]
-        de_name = file.split("/")[2].split("-")[2]
+        distro_name = file.split("/")[2].split("_")[0]
+        distro_version = file.split("/")[2].split("_")[1]
+        de_name = file.split("/")[2].split("_")[2]
         try:
             all_sizes[f"{distro_name}_{distro_version}"][de_name] = float(data)
         except KeyError:

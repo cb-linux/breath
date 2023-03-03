@@ -42,7 +42,7 @@ jobs:
       - name: Uploading result as artifact
         uses: actions/upload-artifact@v3
         with:
-          name: results-ubuntu-${{ matrix.version }}-${{ matrix.de_name }}
+          name: results_ubuntu_${{ matrix.version }}_${{ matrix.de_name }}
           retention-days: 1
           path: |
             *-results.txt
@@ -79,7 +79,7 @@ jobs:
       - name: Uploading result as artifact
         uses: actions/upload-artifact@v3
         with:
-          name: results-arch-latest-${{ matrix.de_name }}
+          name: results_arch_latest_${{ matrix.de_name }}
           retention-days: 1
           path: |
             *-results.txt
@@ -117,7 +117,7 @@ jobs:
       - name: Uploading result as artifact
         uses: actions/upload-artifact@v3
         with:
-          name: results-fedora-${{ matrix.version }}-${{ matrix.de_name }}
+          name: results_fedora_${{ matrix.version }}_${{ matrix.de_name }}
           retention-days: 1
           path: |
             *-results.txt
@@ -142,7 +142,7 @@ jobs:
       - name: Uploading result as artifact
         uses: actions/upload-artifact@v3
         with:
-          name: results-pop-os-22.04-cosmic-gnome
+          name: results_pop-os_22.04_cosmic-gnome
           retention-days: 1
           path: |
             *-results.txt
@@ -183,16 +183,16 @@ jobs:
       - name: Evaluating results
         # Check if the results are not empty and fail the whole workflow if they are
         run: |
-          for file in ./results-*/*-results.txt
+          for file in ./results_*/*_results.txt
           do 
             if [ "$(cat $file)" == "0.0" ]
               then
-                echo $file >> ./failed-results.txt
+                echo $file >> ./failed_results.txt
             fi
           done
-          if [ -s ./failed-results.txt ]
+          if [ -s ./failed_results.txt ]
             then
               echo "Failed to build the following images:"
-                cat ./failed-results.txt
+                cat ./failed_results.txt
                 exit 1
           fi
