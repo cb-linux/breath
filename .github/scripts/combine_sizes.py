@@ -12,7 +12,7 @@ if __name__ == "__main__":
         distro_name = file.split("/")[2].split("-")[0]
         distro_version = file.split("/")[2].split("-")[1]
         de_name = file.split("/")[2].split("-")[2]
-        all_sizes[distro_name][distro_version][de_name] = float(data)
+        all_sizes[f"{distro_name}_{distro_version}"][de_name] = float(data)
 
     # Sometimes the builder script fails due to a network error -> the size is 0 -> replace with old size
     # open old sizes file
