@@ -10,6 +10,10 @@ concurrency:
 
 jobs:
   test-ubuntu:
+    strategy:
+      matrix:
+        version: [ "22.04", "22.10" ]
+        de_name: [ "gnome", "kde", "xfce", "lxqt", "budgie", "deepin", "cli" ]
     runs-on: ubuntu-latest
     steps:
       - name: Maximizing build space
@@ -30,21 +34,23 @@ jobs:
         run: sudo apt-get install -y cgpt vboot-kernel-utils parted
 
       - name: Copy testing script to root
-        run: cp ./.github/scripts/build-tests/ubuntu-test.py ubuntu-test.py
+        run: cp ./.github/scripts/build-image ./build-image.py
 
       - name: Testing Ubuntu builds
-        run: sudo python3 ./ubuntu-test.py
+        run: sudo python3 ./build-image.py ubuntu ${{ matrix.version }} ${{ matrix.de_name }}
 
-      - name: Uploading results as artifact
+      - name: Uploading result as artifact
         uses: actions/upload-artifact@v3
         with:
-          name: results-ubuntu
+          name: results-ubuntu-${{ matrix.version }}-${{ matrix.de_name }}
           retention-days: 1
           path: |
-            results_*.txt
-            sizes_*.json
+            *-results.txt
 
   test-arch:
+    strategy:
+      matrix:
+        de_name: [ "gnome", "kde", "xfce", "lxqt", "budgie", "cli" ]  # deepin
     runs-on: ubuntu-latest
     steps:
       - name: Maximizing build space
@@ -65,21 +71,24 @@ jobs:
         run: sudo apt-get install -y cgpt vboot-kernel-utils parted
 
       - name: Copy testing script to root
-        run: cp ./.github/scripts/build-tests/arch-test.py arch-test.py
+        run: cp ./.github/scripts/build-image ./build-image.py
 
       - name: Testing Arch builds
-        run: sudo python3 ./arch-test.py
+        run: sudo python3 ./build-image.py arch latest ${{ matrix.de_name }}
 
-      - name: Uploading results as artifact
+      - name: Uploading result as artifact
         uses: actions/upload-artifact@v3
         with:
-          name: results-arch
+          name: results-arch-latest-${{ matrix.de_name }}
           retention-days: 1
           path: |
-            results_*.txt
-            sizes_*.json
+            *-results.txt
 
   test-fedora:
+    strategy:
+      matrix:
+        version: [ "37", "38" ]
+        de_name: [ "gnome", "kde", "xfce", "lxqt", "deepin", "budgie", "cli" ]
     runs-on: ubuntu-latest
     steps:
       - name: Maximizing build space
@@ -100,32 +109,22 @@ jobs:
         run: sudo apt-get install -y cgpt vboot-kernel-utils parted
 
       - name: Copy testing script to root
-        run: cp ./.github/scripts/build-tests/fedora-test.py fedora-test.py
+        run: cp ./.github/scripts/build-image ./build-image.py
 
       - name: Testing Fedora builds
-        run: sudo python3 ./fedora-test.py
+        run: sudo python3 ./build-image.py fedora ${{ matrix.version }} ${{ matrix.de_name }}
 
-      - name: Uploading results as artifact
+      - name: Uploading result as artifact
         uses: actions/upload-artifact@v3
         with:
-          name: results-fedora
+          name: results-fedora-${{ matrix.version }}-${{ matrix.de_name }}
           retention-days: 1
           path: |
-            results_*.txt
-            sizes_*.json
+            *-results.txt
 
   test-pop-os:
     runs-on: ubuntu-latest
     steps:
-      #    - name: Maximizing build space
-      #     uses: easimon/maximize-build-space@master
-      #      with:
-      #        temp-reserve-mb: 11264
-      #         swap-size-mb: 1000
-      #      remove-dotnet: 'true'
-      #      remove-android: 'true'
-      #        remove-haskell: 'true'
-
       - name: Checking out repository code
         uses: actions/checkout@v3
         with:
@@ -135,19 +134,18 @@ jobs:
         run: sudo apt-get install -y cgpt vboot-kernel-utils parted
 
       - name: Copy testing script to root
-        run: cp ./.github/scripts/build-tests/pop-os-test.py pop-os-test.py
+        run: cp ./.github/scripts/build-image ./build-image.py
 
       - name: Testing PopOS build
-        run: sudo python3 ./pop-os-test.py
+        run: sudo python3 ./build-image.py pop-os 22.04 cosmic-gnome
 
-      - name: Uploading results as artifact
+      - name: Uploading result as artifact
         uses: actions/upload-artifact@v3
         with:
-          name: results-pop-os
+          name: results-pop-os-22.04-cosmic-gnome
           retention-days: 1
           path: |
-            results_*.txt
-            sizes_*.json
+            *-results.txt
 
   evaluate-results:
     needs: [ test-ubuntu, test-arch, test-fedora, test-pop-os ]
@@ -162,7 +160,7 @@ jobs:
         uses: actions/download-artifact@v3
 
       - name: Combining sizes into one json file
-        run: python3 ./.github/scripts/build-tests/combine_sizes.py
+        run: python3 ./.github/scripts/combine_sizes.py
 
       - uses: stefanzweifel/git-auto-commit-action@v4
         with:

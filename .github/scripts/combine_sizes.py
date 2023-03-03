@@ -4,13 +4,15 @@ import glob
 
 if __name__ == "__main__":
     # open the sizes files in each result's directory
-    files = glob.glob("./results-*/sizes*.json")
+    files = glob.glob("./results-*/*-results.txt")
     all_sizes = {}
     for file in files:
-        with open(file) as f:
-            data = json.load(f)
-        distro_name = file.split("/")[2][6:-5]
-        all_sizes[distro_name] = data
+        with open(file, "r") as f:
+            data = f.read()
+        distro_name = file.split("/")[2].split("-")[0]
+        distro_version = file.split("/")[2].split("-")[1]
+        de_name = file.split("/")[2].split("-")[2]
+        all_sizes[distro_name][distro_version][de_name] = int(data)
 
     # Sometimes the builder script fails due to a network error -> the size is 0 -> replace with old size
     # open old sizes file
@@ -35,7 +37,7 @@ if __name__ == "__main__":
     for distro in all_sizes:
         for key in all_sizes[distro]:
             if key != "cli":
-                with contextlib.suppress(KeyError):  # the distro_average dicts obv dont have a cli key
+                with contextlib.suppress(KeyError):  # the distro_average dicts obv don't have a cli key
                     all_sizes[distro][key] = round(all_sizes[distro][key] - all_sizes[distro]["cli"] / 2, 1)
 
     # Calculate average sizes for distros with multiple versions
