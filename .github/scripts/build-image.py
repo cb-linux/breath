@@ -1,4 +1,5 @@
-#!/usr/bin/env python3
+# This script is purely for automatic purposes, it is not meant to be used by end users.
+
 import argparse
 from pathlib import Path
 
