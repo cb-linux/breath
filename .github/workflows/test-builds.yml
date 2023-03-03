@@ -45,7 +45,7 @@ jobs:
           name: results_ubuntu_${{ matrix.version }}_${{ matrix.de_name }}
           retention-days: 1
           path: |
-            *-results.txt
+            *_results.txt
 
   test-arch:
     strategy:
@@ -82,7 +82,7 @@ jobs:
           name: results_arch_latest_${{ matrix.de_name }}
           retention-days: 1
           path: |
-            *-results.txt
+            *_results.txt
 
   test-fedora:
     strategy:
@@ -120,7 +120,7 @@ jobs:
           name: results_fedora_${{ matrix.version }}_${{ matrix.de_name }}
           retention-days: 1
           path: |
-            *-results.txt
+            *_results.txt
 
   test-pop-os:
     runs-on: ubuntu-latest
@@ -145,7 +145,7 @@ jobs:
           name: results_pop-os_22.04_cosmic-gnome
           retention-days: 1
           path: |
-            *-results.txt
+            *_results.txt
 
   evaluate-results:
     needs: [ test-ubuntu, test-arch, test-fedora, test-pop-os ]
