@@ -16,7 +16,8 @@ if __name__ == "__main__":
             all_sizes[f"{distro_name}_{distro_version}"][de_name] = float(data)
         except KeyError:
             all_sizes[f"{distro_name}_{distro_version}"] = {de_name: float(data)}
-
+    print_status(all-sizes)
+    exit(1)
     # Sometimes the builder script fails due to a network error -> the size is 0 -> replace with old size
     # open old sizes file
     # with open("os_sizes.json", "r") as f:
