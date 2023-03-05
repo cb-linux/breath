@@ -344,7 +344,7 @@ def post_config(de_name: str, distro_name) -> None:
 
     # Unmount resolv.conf
     with contextlib.suppress(subprocess.CalledProcessError):
-        bash("umount -fl /mnt/depthboot/etc/resolv.conf")
+        bash("umount -flR /mnt/depthboot/etc/resolv.conf")
 
     # Clean all temporary files from image/sd-card to reduce its size
     rmdir("/mnt/depthboot/tmp")
