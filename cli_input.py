@@ -21,9 +21,9 @@ def get_user_input(skip_device: bool = False) -> dict:
     }
     # Print welcome message
     print_header("Welcome to Depthboot, formerly known as Breath\n"
-                 "This script will create a bootable Linux USB-drive/SD-card/image.\n"
-                 "The script will now ask a few questions.\n"
-                 "You can Press Ctrl+C at any time to cancel the script.")
+                 "This script will create a bootable Linux image.\n"
+                 "You can Press Ctrl+C at any time to stop the script.\n"
+                 "Select the default options if you are unsure.")
     input("Press Enter to continue...")
 
     # open os_sizes.json
