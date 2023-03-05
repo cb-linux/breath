@@ -4,7 +4,7 @@ import glob
 
 if __name__ == "__main__":
     # open the sizes files in each result's directory
-    files = glob.glob("./results-*/*-results.txt")
+    files = glob.glob("./results_*/*_results.txt")
     all_sizes = {}
     for file in files:
         with open(file, "r") as f:
