@@ -140,7 +140,7 @@ if __name__ == "__main__":
                     original_sources = file.readlines()
                 sources = original_sources
                 sources[1] = sources[1].replace("bullseye", "unstable")
-                sources[1] = sources[1].replace("buster", "unstable") # Some crostinis are on buster
+                sources[1] = sources[1].replace("buster", "unstable")  # Some crostinis are on buster
                 with open("/etc/apt/sources.list", "w") as file:
                     file.writelines(sources)
 
@@ -217,6 +217,7 @@ if __name__ == "__main__":
             print_error("Please free up space in /tmp or use --skip-size-check to ignore this check")
             sys.exit(1)
 
-    build.start_build(verbose=args.verbose, local_path=args.local_path, dev_release=args.dev_build,
-                      build_options=user_input, no_shrink=args.no_shrink, img_size=args.image_size[0])
+    build.start_build(verbose=args.verbose, verbose_kernel=args.verbose_kernel, local_path=args.local_path,
+                      dev_release=args.dev_build, build_options=user_input, no_shrink=args.no_shrink,
+                      img_size=args.image_size[0])
     sys.exit(0)
