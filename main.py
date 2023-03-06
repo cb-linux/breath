@@ -15,8 +15,8 @@ user_cancelled = False
 # parse arguments from the cli. Only for testing/advanced use. All other parameters are handled by cli_input.py
 def process_args():
     parser = argparse.ArgumentParser()
-    parser.add_argument('-p', '--local-path', dest="local_path",
-                        help="Prefer local files instead of downloading from the internet(not recommended).")
+    parser.add_argument('-p', dest="local_path",
+                        help="Use files from provided path before downloading from the internet")
     parser.add_argument('--device', dest="device_override",
                         help="Specify device to direct write. Skips the device selection question.")
     parser.add_argument("--show-device-selection", action="store_true", dest="device_selection", default=False,
@@ -29,7 +29,7 @@ def process_args():
                         help="Set loglevel=15 in cmdline for visible kernel logs on boot")
     parser.add_argument("--skip-size-check", action="store_true", dest="skip_size_check", default=False,
                         help="Do not check available disk space")
-    parser.add_argument("--image-size", "-i", dest="image_size", type=int, nargs=1, default=[10],
+    parser.add_argument("-i", dest="image_size", type=int, nargs=1, default=[10],
                         help="Override image size(default: 10GB)")
     parser.add_argument("--dev", action="store_true", dest="dev_build", default=False,
                         help="Use latest dev build. May be unstable.")
