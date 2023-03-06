@@ -85,6 +85,11 @@ if __name__ == "__main__":
         sudo_args = ['sudo', sys.executable] + sys.argv + [os.environ]
         os.execlpe('sudo', *sudo_args)
 
+    # PATH vars are inherited in chroots -> check if the current path has /usr/sbin, as some systems dont have that var
+    # but some chroot distros expect them to be set
+    if not os.environ.get("PATH").__contains__("/usr/sbin"):
+        os.environ["PATH"] += ":/usr/sbin"
+
     # check script dependencies are already installed with which
     try:
         bash("which pv xz parted cgpt futility")
