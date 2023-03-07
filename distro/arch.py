@@ -69,7 +69,7 @@ def config(de_name: str, distro_version: str, verbose: bool, kernel_version: str
             # xfce does not have any audio servers as dependencies -> manually install pipewire
             chroot("pacman -S --noconfirm xfce4 xfce4-goodies xorg xorg-server lightdm lightdm-gtk-greeter network-"
                    "manager-applet nm-connection-editor xfce4-pulseaudio-plugin pavucontrol pipewire gnome-software "
-                   "firefox")
+                   "firefox wireplumber")
             chroot("systemctl enable lightdm.service")
         case "lxqt":
             print_status("Installing LXQt")
