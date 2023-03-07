@@ -51,7 +51,7 @@ def config(de_name: str, distro_version: str, verbose: bool, kernel_version: str
     match de_name:
         case "gnome":
             print_status("Installing GNOME")
-            chroot("pacman -S --noconfirm gnome gnome-extra gnome-initial-setup")
+            chroot("pacman -S --noconfirm gnome gnome-extra")
             chroot("systemctl enable gdm.service")
         case "kde":
             print_status("Installing KDE")
@@ -65,7 +65,7 @@ def config(de_name: str, distro_version: str, verbose: bool, kernel_version: str
         case "xfce":
             print_status("Installing Xfce")
             # no wayland support in xfce
-            # xfce doesnt have proper audio settings and uses pavucontrol instead
+            # xfce doesn't have proper audio settings and uses pavucontrol instead
             # xfce does not have any audio servers as dependencies -> manually install pipewire
             chroot("pacman -S --noconfirm xfce4 xfce4-goodies xorg xorg-server lightdm lightdm-gtk-greeter network-"
                    "manager-applet nm-connection-editor xfce4-pulseaudio-plugin pavucontrol pipewire gnome-software "
