@@ -30,6 +30,7 @@ if __name__ == "__main__":
     build_args.local_path = None
     build_args.dev_build = False
     build_args.download_progress = True
+    build_args.image_size = 10
     testing_dict = {
         "distro_name": args.distro_name,
         "distro_version": args.distro_version,
