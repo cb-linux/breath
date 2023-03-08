@@ -361,6 +361,7 @@ def post_config(de_name: str, distro_name) -> None:
 #                 no_download_progress: bool = False, no_shrink: bool = False, verbose_kernel: bool = False) -> None:
 
 def start_build(build_options: dict, args: argparse.Namespace) -> None:
+    print(args)
     if args.download_progress:
         disable_download_progress()  # disable download progress bar for non-interactive shells
     set_verbose(args.verbose)
