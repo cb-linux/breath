@@ -24,6 +24,10 @@ def process_args():
 
 if __name__ == "__main__":
     args = process_args()
+    args.verbose = True
+    args.local_path = None
+    args.dev_release = False
+    args.download_progress = True
     testing_dict = {
         "distro_name": args.distro_name,
         "distro_version": args.distro_version,
@@ -37,8 +41,7 @@ if __name__ == "__main__":
     # Start testing
     print_header(f"Testing {args.distro_name} + {args.distro_version} + {args.de_name}")
     try:
-        build.start_build(verbose=True, local_path=None, dev_release=False, build_options=testing_dict,
-                          no_download_progress=True)
+        build.start_build(build_options=testing_dict, args=args)
         # calculate shrunk image size in gb and round it to 2 decimal places
         image_size = round(Path("./depthboot.img").stat().st_size / 1073741824, 1)
     except Exception as e:
@@ -48,8 +51,7 @@ if __name__ == "__main__":
     except SystemExit:
         print_error(f"Unexpected error, retrying: {args.distro_name} + {args.distro_version} + {args.de_name}")
         try:
-            build.start_build(verbose=True, local_path=None, dev_release=False, build_options=testing_dict,
-                              no_download_progress=True)
+            build.start_build(build_options=testing_dict, args=args)
             # calculate shrunk image size in gb and round it to 2 decimal places
             image_size = round(Path("./depthboot.img").stat().st_size / 1073741824, 1)
         except (Exception, SystemExit) as e:

@@ -15,24 +15,22 @@ user_cancelled = False
 # parse arguments from the cli. Only for testing/advanced use. All other parameters are handled by cli_input.py
 def process_args():
     parser = argparse.ArgumentParser()
+    # action="store_true" makes the arg a flag and sets it to True if the argument is passed, without needing a value
     parser.add_argument('-p', dest="local_path",
                         help="Use files from provided path before downloading from the internet")
     parser.add_argument('--device', dest="device_override",
                         help="Specify device to direct write. Skips the device selection question.")
-    parser.add_argument("--show-device-selection", action="store_true", dest="device_selection", default=False,
+    parser.add_argument("--show-device-selection", dest="device_selection", action="store_true",
                         help="Show device selection menu instead of automatically building image")
-    parser.add_argument("-v", "--verbose", action="store_true", dest="verbose", default=False,
-                        help="Print more output")
-    parser.add_argument("--no-shrink", action="store_true", dest="no_shrink", default=False,
-                        help="Do not shrink image")
-    parser.add_argument("--verbose-kernel", action="store_true", dest="verbose_kernel", default=False,
+    parser.add_argument("-v", "--verbose", dest="verbose", help="Print more output", action="store_true")
+    parser.add_argument("--no-shrink", dest="no_shrink", help="Do not shrink image", action="store_true")
+    parser.add_argument("--verbose-kernel", dest="verbose_kernel", action="store_true",
                         help="Set loglevel=15 in cmdline for visible kernel logs on boot")
-    parser.add_argument("--skip-size-check", action="store_true", dest="skip_size_check", default=False,
+    parser.add_argument("--skip-size-check", dest="skip_size_check", action="store_true",
                         help="Do not check available disk space")
     parser.add_argument("-i", dest="image_size", type=int, nargs=1, default=[10],
                         help="Override image size(default: 10GB)")
-    parser.add_argument("--dev", action="store_true", dest="dev_build", default=False,
-                        help="Use latest dev build. May be unstable.")
+    parser.add_argument("--dev", dest="dev_build", action="store_true", help="Use latest dev build. May be unstable.")
     return parser.parse_args()
 
 
@@ -222,7 +220,5 @@ if __name__ == "__main__":
             print_error("Please free up space in /tmp or use --skip-size-check to ignore this check")
             sys.exit(1)
 
-    build.start_build(verbose=args.verbose, verbose_kernel=args.verbose_kernel, local_path=args.local_path,
-                      dev_release=args.dev_build, build_options=user_input, no_shrink=args.no_shrink,
-                      img_size=args.image_size[0])
+    build.start_build(build_options=user_input, args=args)
     sys.exit(0)

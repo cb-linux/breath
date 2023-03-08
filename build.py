@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
-
+import argparse
 import atexit
-import contextlib
 import json
 import sys
 from typing import Tuple
@@ -358,31 +357,33 @@ def post_config(de_name: str, distro_name) -> None:
 
 
 # The main build script
-def start_build(verbose: bool, local_path, dev_release: bool, build_options, img_size: int = 10,
-                no_download_progress: bool = False, no_shrink: bool = False, verbose_kernel: bool = False) -> None:
+# def start_build(verbose: bool, local_path, dev_release: bool, build_options, img_size: int = 10,
+#                 no_download_progress: bool = False, no_shrink: bool = False, verbose_kernel: bool = False) -> None:
+
+def start_build(build_options: dict, args: argparse.Namespace) -> None:
     if no_download_progress:
         disable_download_progress()  # disable download progress bar for non-interactive shells
-    set_verbose(verbose)
+    set_verbose(args.verbose)
     atexit.register(exit_handler)
     print_status("Starting build")
 
     prepare_host(build_options["distro_name"])
 
-    if local_path is None:  # default
-        download_kernel(build_options["kernel_type"], dev_release)
+    if args.local_path is None:  # default
+        download_kernel(build_options["kernel_type"], args.dev_build)
         download_rootfs(build_options["distro_name"], build_options["distro_version"])
     else:  # if local path is specified, copy files from it, instead of downloading from the internet
         print_status("Copying local files to /tmp/depthboot-build")
         # clean local path string
-        local_path_posix = local_path if local_path.endswith("/") else f"{local_path}/"
+        local_path_posix = args.local_path if args.local_path.endswith("/") else f"{args.local_path}/"
         # copy kernel files
         kernel_files = ["bzImage", "modules.tar.xz", "headers.tar.xz", ]
         for file in kernel_files:
             try:
                 cpfile(f"{local_path_posix}{file}", f"/tmp/depthboot-build/{file}")
             except FileNotFoundError:
-                print_error(f"File {file} not found in {local_path}, attempting to download")
-                download_kernel(build_options["kernel_type"], dev_release, [file])
+                print_error(f"File {file} not found in {args.local_path}, attempting to download")
+                download_kernel(build_options["kernel_type"], args.dev_build, [file])
 
         # copy distro rootfs
         distro_rootfs = {
@@ -400,15 +401,15 @@ def start_build(verbose: bool, local_path, dev_release: bool, build_options, img
                 f"{local_path_posix}{distro_rootfs[build_options['distro_name']][1]}",
                 f"/tmp/depthboot-build/{distro_rootfs[build_options['distro_name']][1]}")
         except FileNotFoundError:
-            print_error(f"File {distro_rootfs[build_options['distro_name']][1]} not found in {local_path}, "
+            print_error(f"File {distro_rootfs[build_options['distro_name']][1]} not found in {args.local_path}, "
                         f"attempting to download")
             download_rootfs(build_options["distro_name"], build_options["distro_version"])
 
     # Setup device
     if build_options["device"] == "image":
-        output_temp = prepare_img(build_options["distro_name"], img_size, verbose_kernel)
+        output_temp = prepare_img(build_options["distro_name"], args.image_size[0], args.verbose_kernel)
     else:
-        output_temp = prepare_usb_sd(build_options["device"], build_options["distro_name"], verbose_kernel)
+        output_temp = prepare_usb_sd(build_options["device"], build_options["distro_name"], args.verbose_kernel)
     global img_mnt
     img_mnt = output_temp[0]
     # Extract rootfs and configure distro agnostic settings
@@ -454,7 +455,7 @@ def start_build(verbose: bool, local_path, dev_release: bool, build_options, img
         except FileNotFoundError:  # WSL doesnt have dmi data
             product_name = ""
         # TODO: Fix shrinking on Crostini
-        if product_name != "crosvm" and not no_shrink:
+        if product_name != "crosvm" and not args.no_shrink:
             # Shrink image to actual size
             print_status("Shrinking image")
             bash(f"e2fsck -fpv {img_mnt}p3")  # Force check filesystem for errors
