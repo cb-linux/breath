@@ -28,7 +28,7 @@ if __name__ == "__main__":
     build_args = argparse.Namespace()
     build_args.verbose = True
     build_args.local_path = None
-    build_args.dev_release = False
+    build_args.dev_build = False
     build_args.download_progress = True
     testing_dict = {
         "distro_name": args.distro_name,
