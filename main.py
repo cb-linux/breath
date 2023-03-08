@@ -23,6 +23,8 @@ def process_args():
     parser.add_argument("--show-device-selection", dest="device_selection", action="store_true",
                         help="Show device selection menu instead of automatically building image")
     parser.add_argument("-v", "--verbose", dest="verbose", help="Print more output", action="store_true")
+    parser.add_argument("--no-download-progress", dest="download_progress", action="store_true",
+                        help="Do not print download/extraction progress")
     parser.add_argument("--no-shrink", dest="no_shrink", help="Do not shrink image", action="store_true")
     parser.add_argument("--verbose-kernel", dest="verbose_kernel", action="store_true",
                         help="Set loglevel=15 in cmdline for visible kernel logs on boot")
