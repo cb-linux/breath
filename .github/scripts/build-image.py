@@ -1,6 +1,7 @@
 # This script is purely for automatic purposes, it is not meant to be used by end users.
 
 import argparse
+import sys
 from pathlib import Path
 
 import build
@@ -24,10 +25,11 @@ def process_args():
 
 if __name__ == "__main__":
     args = process_args()
-    args.verbose = True
-    args.local_path = None
-    args.dev_release = False
-    args.download_progress = True
+    build_args = argparse.Namespace()
+    build_args.verbose = True
+    build_args.local_path = None
+    build_args.dev_release = False
+    build_args.download_progress = True
     testing_dict = {
         "distro_name": args.distro_name,
         "distro_version": args.distro_version,
@@ -41,7 +43,7 @@ if __name__ == "__main__":
     # Start testing
     print_header(f"Testing {args.distro_name} + {args.distro_version} + {args.de_name}")
     try:
-        build.start_build(build_options=testing_dict, args=args)
+        build.start_build(build_options=testing_dict, args=build_args)
         # calculate shrunk image size in gb and round it to 2 decimal places
         image_size = round(Path("./depthboot.img").stat().st_size / 1073741824, 1)
     except Exception as e:
@@ -51,7 +53,7 @@ if __name__ == "__main__":
     except SystemExit:
         print_error(f"Unexpected error, retrying: {args.distro_name} + {args.distro_version} + {args.de_name}")
         try:
-            build.start_build(build_options=testing_dict, args=args)
+            build.start_build(build_options=testing_dict, args=build_args)
             # calculate shrunk image size in gb and round it to 2 decimal places
             image_size = round(Path("./depthboot.img").stat().st_size / 1073741824, 1)
         except (Exception, SystemExit) as e:
