@@ -27,6 +27,7 @@ if __name__ == "__main__":
     args = process_args()
     build_args = argparse.Namespace()
     build_args.verbose = True
+    build_args.verbose_kernel = True
     build_args.local_path = None
     build_args.dev_build = False
     build_args.download_progress = True
