@@ -14,6 +14,7 @@ def config(de_name: str, distro_version: str, verbose: bool, kernel_version: str
         f.write(new_dnf_conf)
 
     print("Installing dependencies")
+    chroot(f"dnf install -y --releasever={distro_version} fedora-release")  # update repos list
     # Add eupnea repo
     chroot("dnf config-manager --add-repo https://eupnea-linux.github.io/rpm-repo/eupnea.repo")
     chroot("dnf update --refresh -y")  # update repos
