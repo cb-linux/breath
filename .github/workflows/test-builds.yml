@@ -185,7 +185,7 @@ jobs:
         run: |
           for file in ./results_*/*_results.txt
           do 
-            if [ "$(cat $file)" == "0.0" ]
+            if [ "$(cat $file)" == "0" ]
               then
                 echo $file >> ./failed_results.txt
             fi
