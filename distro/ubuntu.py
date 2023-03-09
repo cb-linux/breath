@@ -66,11 +66,11 @@ def config(de_name: str, distro_version: str, verbose: bool, kernel_version: str
     match de_name:
         case "gnome":
             print_status("Installing GNOME")
-            chroot("apt-get install -y ubuntu-desktop gnome-software epiphany-browser")
+            chroot("apt-get install -y ubuntu-desktop gnome-software epiphany-browser wireplumber")
         case "kde":
             print_status("Installing KDE")
             chroot("DEBIAN_FRONTEND=noninteractive apt-get install -y kde-standard plasma-workspace-wayland "
-                   "sddm-theme-breeze")
+                   "sddm-theme-breeze wireplumber")
         case "xfce":
             print_status("Installing Xfce")
             # install xfce without heavy unnecessary packages
