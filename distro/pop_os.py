@@ -21,6 +21,27 @@ def config(de_name: str, distro_version: str, verbose: bool, kernel_version: str
                    "apt-repo/debian_ubuntu jammy main")
     # update apt
     chroot("apt-get update -y")
+
+    # system76-acpi-dkms is preinstalled but needs an update
+    # The apt postinstall of system76-acpi-dkms tries to run update-initramfs which is not possible in a chroot ->
+    # reinstall system76-acpi-dkms to ignore the postinstall script
+    print_status("Reinstalling system76-acpi-dkms, ignore apt errors")
+    # remove postinstall script as it will fail if run inside a chroot
+    rmfile("/mnt/depthboot/var/lib/dpkg/info/system76-acpi-dkms.prerm")
+    chroot("sudo apt-get remove -y system76-acpi-dkms")
+    with contextlib.suppress(subprocess.CalledProcessError):
+        chroot("sudo apt-get install -y system76-acpi-dkms")
+    # Edit the postinstall script to force success
+    with open("/mnt/depthboot/var/lib/dpkg/info/system76-acpi-dkms.postinst", "r") as file:
+        config = file.read()
+    with open("/mnt/depthboot/var/lib/dpkg/info/system76-acpi-dkms.postinst", "w") as file:
+        file.write("#!/bin/sh\nexit 0\n")
+    # Rerun dpkg configuration for package to be recognized as installed
+    chroot("dpkg --configure system76-acpi-dkms")
+    # Restore postinstall script
+    with open("/mnt/depthboot/var/lib/dpkg/info/system76-acpi-dkms.postinst", "w") as file:
+        file.write(config)
+
     chroot("apt-get upgrade -y")
     # Install general dependencies + eupnea packages
     chroot("apt-get install -y eupnea-utils eupnea-system")
