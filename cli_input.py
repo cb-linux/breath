@@ -58,6 +58,8 @@ def get_user_input(skip_device: bool = False) -> dict:
                                                                     " (beta, unrecommended)"])
                 break
             case "Pop!_OS":  # default
+                print_error("Pop!_OS is currently broken")
+                sys.exit(0)
                 output_dict["distro_name"] = "pop-os"
                 output_dict["distro_version"] = "22.04"
                 break
