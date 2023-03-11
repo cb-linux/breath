@@ -1,7 +1,7 @@
 name: Testing builds
 on:
   schedule:
-    - cron: "10 0 * * *" # run at the start of every day after functions.py is updated
+    - cron: "0 3 * * *" # run at the start of every day after functions.py is updated
   workflow_dispatch:
 
 concurrency:
