@@ -392,11 +392,8 @@ def start_build(build_options: dict, args: argparse.Namespace) -> None:
             "ubuntu": [cpfile, "ubuntu-rootfs.tar.xz"],
             "arch": [cpfile, "arch-rootfs.tar.gz"],
             "fedora": [cpfile, "fedora-rootfs.tar.xz"],
-            "pop-os": [cpfile, "pop-os.iso"]
+            "pop-os": [cpfile, "pop-os-rootfs.tar.xz"],
         }
-        if build_options["distro_name"] == "pop-os":
-            # symlink instead of copying whole iso
-            bash(f"ln -s {local_path_posix}pop-os.iso /tmp/depthboot-build/pop-os.iso")
         try:
             distro_rootfs[build_options["distro_name"]][0](
                 f"{local_path_posix}{distro_rootfs[build_options['distro_name']][1]}",
