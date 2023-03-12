@@ -383,7 +383,7 @@ def start_build(build_options: dict, args: argparse.Namespace) -> None:
             try:
                 cpfile(f"{local_path_posix}{file}", f"/tmp/depthboot-build/{file}")
             except FileNotFoundError:
-                print_error(f"File {file} not found in {args.local_path}, attempting to download")
+                print_warning(f"File {file} not found in {args.local_path}, attempting to download")
                 download_kernel(build_options["kernel_type"], args.dev_build, [file])
 
         # copy distro rootfs
@@ -399,7 +399,7 @@ def start_build(build_options: dict, args: argparse.Namespace) -> None:
                 f"{local_path_posix}{distro_rootfs[build_options['distro_name']][1]}",
                 f"/tmp/depthboot-build/{distro_rootfs[build_options['distro_name']][1]}")
         except FileNotFoundError:
-            print_error(f"File {distro_rootfs[build_options['distro_name']][1]} not found in {args.local_path}, "
+            print_warning(f"File {distro_rootfs[build_options['distro_name']][1]} not found in {args.local_path}, "
                         f"attempting to download")
             download_rootfs(build_options["distro_name"], build_options["distro_version"])
 
