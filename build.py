@@ -337,13 +337,13 @@ def post_config(de_name: str, distro_name) -> None:
         cpfile("/mnt/depthboot/usr/sbin/fixfiles.bak", "/mnt/depthboot/usr/sbin/fixfiles")
         rmfile("/mnt/depthboot/usr/sbin/fixfiles.bak")
 
-    # Unmount everything
-    with contextlib.suppress(subprocess.CalledProcessError):
-        bash("umount -flR /mnt/depthboot/*")  # recursive unmount
-
     # Unmount resolv.conf
     with contextlib.suppress(subprocess.CalledProcessError):
         bash("umount -flR /mnt/depthboot/etc/resolv.conf")
+
+    # Unmount everything
+    with contextlib.suppress(subprocess.CalledProcessError):
+        bash("umount -flR /mnt/depthboot/*")  # recursive unmount
 
     # Clean all temporary files from image/sd-card to reduce its size
     rmdir("/mnt/depthboot/tmp")
@@ -400,7 +400,7 @@ def start_build(build_options: dict, args: argparse.Namespace) -> None:
                 f"/tmp/depthboot-build/{distro_rootfs[build_options['distro_name']][1]}")
         except FileNotFoundError:
             print_warning(f"File {distro_rootfs[build_options['distro_name']][1]} not found in {args.local_path}, "
-                        f"attempting to download")
+                          f"attempting to download")
             download_rootfs(build_options["distro_name"], build_options["distro_version"])
 
     # Setup device
