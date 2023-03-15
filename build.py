@@ -337,13 +337,8 @@ def post_config(de_name: str, distro_name) -> None:
         cpfile("/mnt/depthboot/usr/sbin/fixfiles.bak", "/mnt/depthboot/usr/sbin/fixfiles")
         rmfile("/mnt/depthboot/usr/sbin/fixfiles.bak")
 
-    # Unmount resolv.conf
-    with contextlib.suppress(subprocess.CalledProcessError):
-        bash("umount -flR /mnt/depthboot/etc/resolv.conf")
-
     # Unmount everything
-    with contextlib.suppress(subprocess.CalledProcessError):
-        bash("umount -flR /mnt/depthboot/*")  # recursive unmount
+    bash("umount -fR /mnt/depthboot/*")  # recursive unmount
 
     # Clean all temporary files from image/sd-card to reduce its size
     rmdir("/mnt/depthboot/tmp")
