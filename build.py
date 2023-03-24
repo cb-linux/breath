@@ -108,8 +108,8 @@ def download_rootfs(distro_name: str, distro_version: str) -> None:
                 print_status("Downloading pop-os rootfs from eupnea github releases")
                 download_file("https://github.com/eupnea-linux/pop-os-rootfs/releases/latest/download/pop-os-rootfs-"
                               "22.04.split.aa", "/tmp/depthboot-build/pop-os-rootfs.split.aa")
-                #print_status("Downloading pop-os rootfs from eupnea github releases, part 2/2")
-                #download_file("https://github.com/eupnea-linux/pop-os-rootfs/releases/latest/download/pop-os-rootfs"
+                # print_status("Downloading pop-os rootfs from eupnea github releases, part 2/2")
+                # download_file("https://github.com/eupnea-linux/pop-os-rootfs/releases/latest/download/pop-os-rootfs"
                 #              "-22.04.split.ab", "/tmp/depthboot-build/pop-os-rootfs.split.ab")
                 print_status("Combining split pop-os rootfs, might take a while")
                 bash("cat /tmp/depthboot-build/pop-os-rootfs.split.?? > /tmp/depthboot-build/pop-os-rootfs.tar.xz")
@@ -185,7 +185,8 @@ def partition_and_flash_kernel(mnt_point: str, write_usb: bool, distro_name: str
     rootfs_partuuid = bash(f"blkid -o value -s PARTUUID {rootfs_mnt}")
 
     # write PARTUUID to kernel flags and save it as a file
-    base_string = "console= root=PARTUUID=insert_partuuid i915.modeset=1 rootwait rw fbcon=logo-pos:center,logo-count:1"
+    base_string = "console= root=PARTUUID=insert_partuuid i915.modeset=1 rootwait rw mem_sleep_default=deep " \
+                  "fbcon=logo-pos:center,logo-count:1"
     if distro_name in {"pop-os", "ubuntu"}:
         base_string += ' security=apparmor'
     if distro_name == 'fedora':
@@ -258,13 +259,6 @@ def post_extract(build_options) -> None:
         settings["install_type"] = "direct"
     with open("/mnt/depthboot/etc/eupnea.json", "w") as settings_file:
         json.dump(settings, settings_file)
-
-    print_status("Fixing sleep")
-    # disable hibernation aka S3 sleep, READ more: https://eupnea-linux.github.io/docs/chromebook/bootlock
-    # This fix is removed if the user installs to internal
-    mkdir("/mnt/depthboot/etc/systemd/")  # just in case systemd path doesn't exist
-    with open("/mnt/depthboot/etc/systemd/sleep.conf", "a") as conf:
-        conf.write("SuspendState=freeze\nHibernateState=freeze\n")
 
     print_status("Fixing screen rotation")
     # Install hwdb file to fix auto rotate being flipped on some devices
