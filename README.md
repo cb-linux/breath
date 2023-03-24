@@ -1,8 +1,10 @@
 # ⚠️ Project Archived
 
-Due to the burden of active maintenance on everything from the boot process to desktop environments, I'm discontinuing this project to work on more engaging projects. The [Discord](https://discord.gg/djGdQczudU) will always be open for discussions over Breath and for the enthusiasts that do (or would like to) understand the codebase.
+See https://eupnea-linux.github.io/ for an awesome fork of Breath!
 
-Apacelus has a revival of the project located [here](https://eupnea-linux.github.io/). You can find more information on the Discord.
+Due to the burden of active maintenance on everything from the boot process to desktop environments, I'm discontinuing this project to work on more engaging projects. The #breath channel on the [Discord](https://discord.gg/djGdQczudU) will always be open for discussions over Breath and for the enthusiasts that do (or would like to) understand the codebase.
+
+Apacelus has a revival of the project located [here](https://eupnea-linux.github.io/).
 
 <details>
 <summary>View the archived content</summary>
