@@ -33,6 +33,8 @@ def process_args():
     parser.add_argument("-i", dest="image_size", type=int, nargs=1, default=[10],
                         help="Override image size(default: 10GB)")
     parser.add_argument("--dev", dest="dev_build", action="store_true", help="Use latest dev build. May be unstable.")
+    parser.add_argument("--skip-commit-check", dest="skip_commit_check", action="store_true",
+                        help="Do not check if local commit hash matches remote commit hash")
     return parser.parse_args()
 
 
@@ -168,6 +170,12 @@ if __name__ == "__main__":
     # import other scripts after python version check is successful
     import build
     import cli_input
+
+    # check if running the latest version fo the script
+    if not args.skip_commit_check and bash("git rev-parse HEAD") != bash("git ls-remote origin HEAD").split("\t")[0]:
+        print_error("You are not running the latest version of the script. Please update with 'git pull'")
+        print_status("This check can be skipped by running the script with the '--skip-commit-check' flag")
+        sys.exit(1)
 
     # Check if running under crostini
     try:
