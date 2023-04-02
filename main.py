@@ -217,18 +217,29 @@ if __name__ == "__main__":
         user_input = cli_input.get_user_input()  # get normal user input
 
     # Check if there is enough space in /tmp
-    avail_space = float(bash("df -h --output=avail /tmp").replace(",", ".").split(" ")[-1][:-1])  # read tmp size in GB
+    avail_space = int(bash("BLOCK_SIZE=m df --output=avail /tmp").split("\n")[1][:-1])  # read tmp size in MB
+    restore_tmp = False
 
-    if user_input["device"] == "image" and avail_space < 13.0 and not args.skip_size_check:
+    if user_input["device"] == "image" and avail_space < 13000 and not args.skip_size_check:
         print_error("Not enough space in /tmp to build image. At least 13GB is required")
-        user_answer = input("\033[92m" + "Attempt to increase size of /tmp? (Y/n)\n" + "\033[0m").lower()
-        if user_answer in ["y", ""]:
-            print_status("Increasing size of /tmp")
-            bash("mount -o remount,size=13G /tmp")
-            print_status("Size of /tmp increased")
+        # check if /tmp is a tmpfs mount
+        if bash("df --output=fstype /tmp").__contains__("tpmfs"):
+            user_answer = input("\033[92m" + "Remount /tmp to increase its size? (Y/n)\n" + "\033[0m").lower()
+            if user_answer in ["y", ""]:
+                print_status("Increasing size of /tmp")
+                bash("mount -o remount,size=13G /tmp")
+                print_status("Size of /tmp increased")
+                restore_tmp = True
+            else:
+                print_error("Please free up space in /tmp")
+                print("Use --skip-size-check to ignore this check")
+                sys.exit(1)
         else:
-            print_error("Please free up space in /tmp or use --skip-size-check to ignore this check")
-            sys.exit(1)
+            print_error("Allocate more storage to the container/vm if possible or clear /tmp or use another system")
+            print("Use --skip-size-check to ignore this check")
 
     build.start_build(build_options=user_input, args=args)
+    if restore_tmp:  # restore /tmp size if it was changed
+        print_status("Restoring size of /tmp")
+        bash(f"mount -o remount,size={avail_space}M /tmp")
     sys.exit(0)
