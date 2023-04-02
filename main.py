@@ -183,7 +183,7 @@ if __name__ == "__main__":
             product_name = file.read().strip()
     except FileNotFoundError:
         product_name = ""  # WSL has no dmi data
-    if product_name == "crosvm" and not path_exists("/tmp/.crostini-fixed"):
+    if product_name == "crosvm":
         print_warning("Crostini detected. Preparing Crostini")
         # TODO: Translate to python
         try:
@@ -193,7 +193,6 @@ if __name__ == "__main__":
             print_error("Please run the Crostini specific instructions before running this script")
             print("https://eupnea-linux.github.io/docs/extra/crostini")
             sys.exit(1)
-        open("/tmp/.crostini-fixed", "a").close()
 
     # parse arguments
     if args.dev_build:

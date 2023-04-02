@@ -1,5 +1,5 @@
 mount -t devtmpfs /dev /dev
-ln -s /proc/self/fd /dev/fd
+ln -sf /proc/self/fd /dev/
 cd /sys/fs/cgroup/
 if [ ! -d devices ]; then
   mkdir -p devices
