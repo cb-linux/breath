@@ -223,7 +223,7 @@ if __name__ == "__main__":
     if user_input["device"] == "image" and avail_space < 13000 and not args.skip_size_check:
         print_error("Not enough space in /tmp to build image. At least 13GB is required")
         # check if /tmp is a tmpfs mount
-        if bash("df --output=fstype /tmp").__contains__("tpmfs"):
+        if bash("df --output=fstype /tmp").__contains__("tmpfs"):
             user_answer = input("\033[92m" + "Remount /tmp to increase its size? (Y/n)\n" + "\033[0m").lower()
             if user_answer in ["y", ""]:
                 print_status("Increasing size of /tmp")
@@ -237,6 +237,7 @@ if __name__ == "__main__":
         else:
             print_error("Allocate more storage to the container/vm if possible or clear /tmp or use another system")
             print("Use --skip-size-check to ignore this check")
+            sys.exit(1)
 
     build.start_build(build_options=user_input, args=args)
     if restore_tmp:  # restore /tmp size if it was changed
