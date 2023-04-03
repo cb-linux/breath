@@ -1,4 +1,7 @@
-#!/usr/bin/bash
+#!/bin/bash
+
+# SOURCE: https://github.com/SELinuxProject/selinux/blob/master/policycoreutils/scripts/fixfiles
+
 # fixfiles
 #
 # Script to restore labels on a SELinux box
@@ -47,9 +50,9 @@ FS="`cat /proc/self/mounts | sort | uniq | awk '{print $2}'`"
 for i in $FS; do
 	if [ `useseclabel` -ge 0 ]
 	then
-		grep " $i " /proc/self/mounts | awk '{print $4}' | egrep --silent '(^|,)seclabel(,|$)' && echo $i
+		grep " $i " /proc/self/mounts | awk '{print $4}' | grep -E --silent '(^|,)seclabel(,|$)' && echo $i
 	else
-		grep " $i " /proc/self/mounts | grep -v "context=" | egrep --silent '(ext[234]| ext4dev | gfs2 | xfs | jfs | btrfs )' && echo $i
+		grep " $i " /proc/self/mounts | grep -v "context=" | grep -E --silent '(ext[234]| ext4dev | gfs2 | xfs | jfs | btrfs )' && echo $i
 	fi
 done
 }
@@ -57,14 +60,14 @@ done
 get_rw_labeled_mounts() {
 FS=`get_all_labeled_mounts | sort | uniq`
 for i in $FS; do
-	grep " $i " /proc/self/mounts | awk '{print $4}' | egrep --silent '(^|,)rw(,|$)' && echo $i
+	grep " $i " /proc/self/mounts | awk '{print $4}' | grep -E --silent '(^|,)rw(,|$)' && echo $i
 done
 }
 
 get_ro_labeled_mounts() {
 FS=`get_all_labeled_mounts | sort | uniq`
 for i in $FS; do
-	grep " $i " /proc/self/mounts | awk '{print $4}' | egrep --silent '(^|,)ro(,|$)' && echo $i
+	grep " $i " /proc/self/mounts | awk '{print $4}' | grep -E --silent '(^|,)ro(,|$)' && echo $i
 done
 }
 
@@ -110,7 +113,6 @@ exclude_dirs_from_relabelling() {
 fullFlag=0
 BOOTTIME=""
 VERBOSE="-p"
-[ -t 1 ] || VERBOSE=""
 FORCEFLAG=""
 THREADS=""
 RPMFILES=""
@@ -179,7 +181,7 @@ if [ -f ${PREFC} -a -x /usr/bin/diff ]; then
 	sed -r -e 's,:s0, ,g' $FC | sort -u | \
 	/usr/bin/diff -b ${PREFCTEMPFILE} - | \
 	    grep '^[<>]'|cut -c3-| grep ^/ | \
-	    egrep -v '(^/home|^/root|^/tmp)' |\
+	    grep -Ev '(^/home|^/root|^/tmp)' |\
 	sed -r -e 's,[[:blank:]].*,,g' \
 	       -e 's|\(([/[:alnum:]]+)\)\?|{\1,}|g' \
 	       -e 's|([/[:alnum:]])\?|{\1,}|g' \
@@ -209,6 +211,25 @@ rpmlist() {
 rpm -q --qf '[%{FILESTATES} %{FILENAMES}\n]' "$1" | grep '^0 ' | cut -f2- -d ' '
 [ ${PIPESTATUS[0]} != 0 ] && echo "$1 not found" >/dev/stderr
 }
+
+# unmount tmp bind mount before exit
+umount_TMP_MOUNT() {
+	if [ -n "$TMP_MOUNT" ]; then
+	     umount "${TMP_MOUNT}${m}" || exit 130
+	     rm -rf "${TMP_MOUNT}" || echo "Error cleaning up."
+	fi
+	exit 130
+}
+
+fix_labels_on_mountpoint() {
+	test -z ${TMP_MOUNT+x} && echo "Unable to find temporary directory!" && exit 1
+	mkdir -p "${TMP_MOUNT}${m}" || exit 1
+	mount --bind "${m}" "${TMP_MOUNT}${m}" || exit 1
+	${SETFILES} ${VERBOSE} ${EXCLUDEDIRS} ${FORCEFLAG} ${THREADS} $* -q ${FC} -r "${TMP_MOUNT}" "${TMP_MOUNT}${m}"
+	umount "${TMP_MOUNT}${m}" || exit 1
+	rm -rf "${TMP_MOUNT}" || echo "Error cleaning up."
+}
+export -f fix_labels_on_mountpoint
 
 #
 # restore
@@ -255,14 +276,15 @@ case "$RESTORE_MODE" in
 	        # we bind mount so we can fix the labels of files that have already been
 	        # mounted over
 	        for m in `echo $FILESYSTEMSRW`; do
-	            TMP_MOUNT="$(mktemp -d)"
-	            test -z ${TMP_MOUNT+x} && echo "Unable to find temporary directory!" && exit 1
-
-	            mkdir -p "${TMP_MOUNT}${m}" || exit 1
-	            mount --bind "${m}" "${TMP_MOUNT}${m}" || exit 1
-	            ${SETFILES} ${VERBOSE} ${EXCLUDEDIRS} ${FORCEFLAG} ${THREADS} $* -q ${FC} -r "${TMP_MOUNT}" "${TMP_MOUNT}${m}"
-	            umount "${TMP_MOUNT}${m}" || exit 1
-	            rm -rf "${TMP_MOUNT}" || echo "Error cleaning up."
+	            TMP_MOUNT="$(mktemp -p /run -d fixfiles.XXXXXXXXXX)"
+	            export SETFILES VERBOSE EXCLUDEDIRS FORCEFLAG THREADS FC TMP_MOUNT m
+	            if type unshare &> /dev/null; then
+	                unshare -m bash -c "fix_labels_on_mountpoint $*" || exit $?
+	            else
+	                trap umount_TMP_MOUNT EXIT
+	                fix_labels_on_mountpoint $*
+	                trap EXIT
+	            fi
 	        done;
 	    fi
 	else
@@ -273,7 +295,7 @@ case "$RESTORE_MODE" in
 	fi
 	echo "Cleaning up labels on /tmp"
 	rm -rf /tmp/gconfd-* /tmp/pulse-* /tmp/orbit-*
-
+  # The 2 lines below are changed to run this script in chroots
 	UNDEFINED="unlabeled_t"
 	UNLABELED="unlabeled_t"
 	find /tmp \( -context "*:${UNLABELED}*" -o -context "*:${UNDEFINED}*" \) \( -type s -o -type p \) -delete
@@ -349,7 +371,7 @@ usage() {
 	echo $"""
 Usage: $0 [-v] [-F] [-M] [-f] [-T nthreads] relabel
 or
-Usage: $0 [-v] [-F] [-B | -N time ]  [-T nthreads] { check | restore | verify }
+Usage: $0 [-v] [-F] [-B | -N time ] [-T nthreads] { check | restore | verify }
 or
 Usage: $0 [-v] [-F] [-T nthreads] { check | restore | verify } dir/file ...
 or
