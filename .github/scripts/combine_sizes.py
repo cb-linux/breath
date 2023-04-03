@@ -49,4 +49,4 @@ if __name__ == "__main__":
     all_sizes["fedora_average"] = round((all_sizes["fedora_37"]["cli"] + all_sizes["fedora_38"]["cli"]) / 2, 1)
 
     with open("os_sizes.json", "w") as f:
-        json.dump(all_sizes, f)
+        json.dump(all_sizes, f, indent=2, sort_keys=True)
