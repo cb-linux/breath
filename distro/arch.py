@@ -100,8 +100,8 @@ def config(de_name: str, distro_version: str, verbose: bool, kernel_version: str
             exit(1)
 
     if de_name != "cli":
-        print_status("Installing auto-rotate service")
-        chroot("pacman -S --noconfirm iio-sensor-proxy")
+        print_status("Installing auto-rotate service, keyd")
+        chroot("pacman -S --noconfirm iio-sensor-proxy keyd")
 
     print_status("Desktop environment setup complete")
 

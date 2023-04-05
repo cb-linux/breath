@@ -22,8 +22,8 @@ def config(de_name: str, distro_version: str, verbose: bool, kernel_version: str
     # update apt
     chroot("apt-get update -y")
     chroot("apt-get upgrade -y")
-    # Install general dependencies + eupnea packages
-    chroot("apt-get install -y eupnea-utils eupnea-system")
+    # Install eupnea packages
+    chroot("apt-get install -y eupnea-utils eupnea-system keyd")
 
     # Install kernel
     if kernel_version == "mainline":

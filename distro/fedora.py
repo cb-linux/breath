@@ -69,6 +69,8 @@ def config(de_name: str, distro_version: str, verbose: bool, kernel_version: str
     if de_name != "cli":
         # Set system to boot to gui
         chroot("systemctl set-default graphical.target")
+        # install keyd
+        chroot("dnf install -y keyd")
     print_status("Desktop environment setup complete")
 
     # Add zram config

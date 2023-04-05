@@ -108,7 +108,7 @@ def download_rootfs(distro_name: str, distro_version: str) -> None:
                 print_status("Downloading pop-os rootfs from eupnea github releases")
                 download_file("https://github.com/eupnea-linux/pop-os-rootfs/releases/latest/download/pop-os-rootfs-"
                               "22.04.split.aa", "/tmp/depthboot-build/pop-os-rootfs.split.aa")
-                # print_status("Downloading pop-os rootfs from eupnea github releases, part 2/2")
+                # print_status("Downloading pop-os rootfs from eupnea GitHub releases, part 2/2")
                 # download_file("https://github.com/eupnea-linux/pop-os-rootfs/releases/latest/download/pop-os-rootfs"
                 #              "-22.04.split.ab", "/tmp/depthboot-build/pop-os-rootfs.split.ab")
                 print_status("Combining split pop-os rootfs, might take a while")
@@ -296,12 +296,6 @@ def post_extract(build_options) -> None:
 
 # post extract and distro config
 def post_config(de_name: str, distro_name) -> None:
-    if de_name != "cli":
-        # Add chromebook layout. Needs to be done after installing Xorg
-        print_status("Backing up default keymap and setting Chromebook layout")
-        cpfile("/mnt/depthboot/usr/share/X11/xkb/symbols/pc", "/mnt/depthboot/usr/share/X11/xkb/symbols/pc.default")
-        cpfile("configs/xkb/xkb.chromebook", "/mnt/depthboot/usr/share/X11/xkb/symbols/pc")
-
     # Enable postinstall service
     print_status("Enabling postinstall service")
     chroot("systemctl enable eupnea-postinstall.service")

@@ -108,6 +108,8 @@ def config(de_name: str, distro_version: str, verbose: bool, kernel_version: str
         print_status("Upgrading touchpad drivers")
         chroot("apt-get remove -y xserver-xorg-input-synaptics")
         chroot("apt-get install -y xserver-xorg-input-libinput")
+        print_status("Installing keyd")
+        chroot("apt-get install -y keyd")
 
         # Install libasound2 backport on jammy
         if distro_version == "22.04":
