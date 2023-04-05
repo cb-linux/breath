@@ -76,6 +76,8 @@ if __name__ == "__main__":
     hooks = ExitHooks()
     hooks.hook()
     atexit.register(exit_handler)
+    # set locale env var to supress locale warnings in package managers
+    os.environ["LC_ALL"] = "C"
 
     args = process_args()
     if args.dev_build:
