@@ -8,20 +8,20 @@
     "xfce": 4.1
   },
   "fedora_37": {
-    "budgie": 2.2,
-    "cli": 2.3,
-    "deepin": 5.4,
+    "budgie": 2.3,
+    "cli": 2.2,
+    "deepin": 5.5,
     "gnome": 6.6,
     "kde": 6.2,
-    "lxqt": 5.2,
+    "lxqt": 5.3,
     "xfce": 4.6
   },
   "fedora_38": {
     "budgie": 2.5,
     "cli": 2.0,
-    "deepin": 5.5,
+    "deepin": 5.6,
     "gnome": 6.7,
-    "kde": 6.2,
+    "kde": 6.3,
     "lxqt": 5.5,
     "xfce": 4.9
   },
@@ -41,10 +41,10 @@
   "ubuntu_22.10": {
     "budgie": 5.4,
     "cli": 3.7,
-    "deepin": 2.7,
-    "gnome": 5.6,
+    "deepin": 2.9,
+    "gnome": 5.7,
     "kde": 5.3,
-    "lxqt": 6.5,
+    "lxqt": 6.6,
     "xfce": 5.2
   },
   "ubuntu_average": 3.7
