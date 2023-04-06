@@ -32,9 +32,10 @@ def get_user_input(skip_device: bool = False) -> dict:
 
     while True:
         distro_name = ia_selection("Which Linux distribution (flavor) would you like to use?",
-                                   options=["Pop!_OS", "Ubuntu", "Fedora", "Arch"],
-                                   flags=[f"{os_sizes['pop-os_22.04']['cosmic-gnome']}GB (recommended)",
-                                          f"~{os_sizes['ubuntu_average']}GB", f"~{os_sizes['fedora_average']}GB",
+                                   options=["Fedora", "Ubuntu", "Pop!_OS", "Arch"],
+                                   flags=[f"~{os_sizes['fedora_average']}GB (recommended)",
+                                          f"~{os_sizes['ubuntu_average']}GB",
+                                          f"{os_sizes['pop-os_22.04']['cosmic-gnome']}GB",
                                           f"{os_sizes['arch_latest']['cli']}GB"])
         match distro_name:
             case "Ubuntu":
