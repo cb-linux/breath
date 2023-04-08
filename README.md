@@ -1,9 +1,10 @@
 # Depthboot: your **Chromebook**, your way
 
 Choose between a variety of common Linux distributions and desktop environments to create a bootable image for any
-64-bit Chromebook.
+[supported](https://eupnea-linux.github.io/docs/project/supported-devices) 64-bit Chromebook, without modifying
+firmware.
 <h1><a href="https://eupnea-linux.github.io/docs/depthboot/requirements">Get started here</a></h1>
-Due to licensing restraints, Depthboot cannot be distributed as an iso. Instead, it has to be built locally.
+[Due to licensing restraints, Depthboot cannot be distributed as an iso](https://eupnea-linux.github.io/faq#why-is-sharing-depthboot-images-illegal). Instead, it has to be built locally.
 
 You can alternatively use [EupneaOS](https://github.com/eupnea-linux/eupnea-os) which offers pre-built ISOs.
 
@@ -24,12 +25,14 @@ You can alternatively use [EupneaOS](https://github.com/eupnea-linux/eupnea-os) 
 * Hardware support matches ChromeOS.
 * Extensive audio support, with active development to bring further support.
 
+[Read more](https://eupnea-linux.github.io/docs/chromebook/firmware-comparison)
+
 ## [Supported devices](https://eupnea-linux.github.io/docs/depthboot/supported-devices)
 
 ## Credit
 
 * Depthboot is based on [Breath](https://github.com/cb-linux/breath) by MilkyDeveloper. Breath was active from Apr 2021
-  until its archival in late Aug 2022.
+  until it's archival in late Aug 2022.
 * All Eupnea Project icons were made by [Inderix](https://github.com/Inderix).
 
 ## Join our Revolt server:
