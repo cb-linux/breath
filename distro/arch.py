@@ -49,6 +49,14 @@ def config(de_name: str, distro_version: str, verbose: bool, kernel_version: str
 
     print_status("Downloading and installing de, might take a while")
     match de_name:
+
+        case "cinnamon":
+            print_status("Installing CINNAMON")
+            chroot("pacman -S --noconfirm cinnamon lightdm lightdm-gtk-greeter")
+            chroot("pacman -S --noconfirm xed xreader metacity gnome-shell")
+            chroot("pacman -S --noconfirm system-config-printer gnome-keyring blueberry")
+            chroot("systemctl enable lightdm.service")
+            chroot("systemctl enable NetworkManager.service")
         case "gnome":
             print_status("Installing GNOME")
             chroot("pacman -S --noconfirm gnome gnome-extra")
