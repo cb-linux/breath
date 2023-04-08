@@ -4,7 +4,7 @@
     "cli": 3.0,
     "gnome": 5.4,
     "kde": 5.1,
-	 "cinnamon": 5.0,
+    "cinnamon": 5.0,
     "lxqt": 4.5,
     "xfce": 4.1
   },

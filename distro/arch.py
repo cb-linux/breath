@@ -52,8 +52,8 @@ def config(de_name: str, distro_version: str, verbose: bool, kernel_version: str
 
         case "cinnamon":
             print_status("Installing CINNAMON")
-            chroot("pacman -S --noconfirm cinnamon lightdm lightdm-gtk-greeter")
-            chroot("pacman -S --noconfirm xed xreader metacity gnome-shell")
+            chroot("pacman -S --noconfirm cinnamon cinnamon-translations lightdm lightdm-gtk-greeter")
+            chroot("pacman -S --noconfirm xed xreader metacity gnome-shell gnome-therminal")
             chroot("pacman -S --noconfirm system-config-printer gnome-keyring blueberry")
             chroot("systemctl enable lightdm.service")
             chroot("systemctl enable NetworkManager.service")
