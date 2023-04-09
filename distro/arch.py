@@ -116,7 +116,10 @@ def config(de_name: str, distro_version: str, verbose: bool, kernel_version: str
     with open("/mnt/depthboot/etc/sudoers", "r") as conf:
         temp_sudoers = conf.readlines()
     # uncomment wheel group
-    temp_sudoers[84] = temp_sudoers[84][2:]
+    # sometimes the line seems to change -> dynamically find the line
+    for line in temp_sudoers:
+        if line.__contains__("# %wheel ALL=(ALL:ALL) ALL"):
+            temp_sudoers[temp_sudoers.index(line)] = line[2:]
     with open("/mnt/depthboot/etc/sudoers", "w") as conf:
         conf.writelines(temp_sudoers)
 
