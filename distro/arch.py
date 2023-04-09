@@ -116,7 +116,7 @@ def config(de_name: str, distro_version: str, verbose: bool, kernel_version: str
     # for some reason, the sudoers file sometimes gets reset to default
     # -> create file in /etc/sudoers.d instead to preserve changes
     with open("/mnt/depthboot/etc/sudoers.d/wheel.conf", "w") as conf:
-        conf.write("%wheel ALL=(ALL) ALL")  # enable wheel group to use sudo
+        conf.write("%wheel ALL=(ALL:ALL) ALL")  # enable wheel group to use sudo
 
     print_status("Restoring pacman config")
     with open("/mnt/depthboot/etc/pacman.conf", "r") as conf:
