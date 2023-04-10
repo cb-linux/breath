@@ -183,6 +183,7 @@ def partition_and_flash_kernel(mnt_point: str, write_usb: bool, distro_name: str
 
     # get uuid of rootfs partition
     rootfs_partuuid = bash(f"blkid -o value -s PARTUUID {rootfs_mnt}")
+    print_status(f"Rootfs partition UUID: {rootfs_partuuid}")
 
     # write PARTUUID to kernel flags and save it as a file
     base_string = "console= root=PARTUUID=insert_partuuid i915.modeset=1 rootwait rw mem_sleep_default=deep " \
@@ -248,11 +249,22 @@ def post_extract(build_options) -> None:
     # If chroot /etc/resolv.conf is a symlink, then it will be resolved to the real file and bind mounted
     # This is needed for internet inside the chroot
     bash("mount --bind /etc/resolv.conf /mnt/depthboot/etc/resolv.conf")
+
     # the following mounts are mostly unneeded, but will produce a lot of warnings if not mounted
     # even though the resulting image will work as intended and won't have any issues
-    bash("mount --bind /dev /mnt/depthboot/dev")
-    bash("mount --bind /dev/pts /mnt/depthboot/dev/pts")
-    bash("mount --bind /proc /mnt/depthboot/proc")
+    # mounting the full directories results in broken host systems -> only mount what's explicitly needed
+
+    # systemd needs /proc to not throw warnings
+    bash("mount --types proc /proc /mnt/depthboot/proc")
+
+    # pacman needs the /dev/fd to not throw warnings
+    # check if link already exists, if not, create it
+    if not path_exists("/mnt/depthboot/dev/fd"):
+        bash("cd /mnt/depthboot && ln -s /proc/self/fd ./dev/fd")
+
+    # create new /dev/pts for apt to be able to write logs and not throw warnings
+    mkdir("/mnt/depthboot/dev/pts", create_parents=True)
+    bash("mount --types devpts devpts /mnt/depthboot/dev/pts")
 
     # create depthboot settings file for postinstall scripts to read
     with open("configs/eupnea.json", "r") as settings_file:
@@ -426,17 +438,12 @@ def start_build(build_options: dict, args: argparse.Namespace) -> None:
 
     bash("sync")  # write all pending changes to usb
 
-    # unmount image/device from mnt
-    with contextlib.suppress(subprocess.CalledProcessError):
-        bash("umount -lf /mnt/depthboot")  # umount mountpoint
-    sleep(5)  # wait for umount to finish
-
     # unmount image/device completely from system
     # on crostini umount fails for some reason
     with contextlib.suppress(subprocess.CalledProcessError):
-        bash(f"umount -lf {img_mnt}p*")  # umount all partitions from image
+        bash(f"umount -lR {img_mnt}p*")  # umount all partitions from image
     with contextlib.suppress(subprocess.CalledProcessError):
-        bash(f"umount -lf {img_mnt}*")  # umount all partitions from usb/sd-card
+        bash(f"umount -lR {img_mnt}*")  # umount all partitions from usb/sd-card
 
     if build_options["device"] == "image":
         try:
