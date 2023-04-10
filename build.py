@@ -128,7 +128,13 @@ def prepare_img(distro_name: str, img_size, verbose_kernel: bool) -> Tuple[str, 
         bash(f"dd if=/dev/zero of=depthboot.img status=progress bs=1024 count={img_size * 1000000}")
 
     print_status("Mounting empty image")
-    mnt_point = bash("losetup -f --show depthboot.img")
+    try:
+        mnt_point = bash("losetup -f --show depthboot.img")
+    except subprocess.CalledProcessError as e:
+        if not bash("systemd-detect-virt").lower().__contains__("wsl"):  # if not running WSL, the error is unexpected
+            raise e
+        print_error("Losetup failed. Make sure you are using WSL version 2 aka WSL2.")
+        sys.exit(1)
     if mnt_point == "":
         print_error("Failed to mount image")
         sys.exit(1)
