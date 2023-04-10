@@ -46,7 +46,7 @@ def config(de_name: str, distro_version: str, verbose: bool, kernel_version: str
     elif kernel_version == "chromeos":
         chroot("apt-get install -y eupnea-chromeos-kernel")
 
-    print_status("Installing zram, ignore apt errors")
+    print_status("Installing zram, ignore dpkg errors")
     # Install zram
     # The apt postinstall of this zram packages tries to modload zram which is not possible in a chroot -> ignore errors
     with contextlib.suppress(subprocess.CalledProcessError):
