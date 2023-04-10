@@ -248,6 +248,11 @@ def post_extract(build_options) -> None:
     # If chroot /etc/resolv.conf is a symlink, then it will be resolved to the real file and bind mounted
     # This is needed for internet inside the chroot
     bash("mount --bind /etc/resolv.conf /mnt/depthboot/etc/resolv.conf")
+    # the following mounts are mostly unneeded, but will produce a lot of warnings if not mounted
+    # even though the resulting image will work as intended and won't have any issues
+    bash("mount --bind /dev /mnt/depthboot/dev")
+    bash("mount --bind /dev/pts /mnt/depthboot/dev/pts")
+    bash("mount --bind /proc /mnt/depthboot/proc")
 
     # create depthboot settings file for postinstall scripts to read
     with open("configs/eupnea.json", "r") as settings_file:
