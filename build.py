@@ -310,6 +310,9 @@ def post_config(de_name: str, distro_name) -> None:
     if distro_name == "fedora":
         print_status("Relabeling files for SELinux")
 
+        # The following script needs some specific files in /proc -> unmount /proc
+        bash("umount -lR /mnt/depthboot/proc")
+
         # copy /proc files needed for fixfiles
         mkdir("/mnt/depthboot/proc/self")
         cpfile("configs/selinux/mounts", "/mnt/depthboot/proc/self/mounts")
