@@ -356,6 +356,10 @@ def start_build(build_options: dict, args: argparse.Namespace) -> None:
     atexit.register(exit_handler)
     print_status("Starting build")
 
+    print_status("Creating temporary build directory + mount point")
+    mkdir("/tmp/depthboot-build", create_parents=True)
+    mkdir("/mnt/depthboot", create_parents=True)
+
     if args.local_path is None:  # default
         download_kernel(build_options["kernel_type"], args.dev_build)
         download_rootfs(build_options["distro_name"], build_options["distro_version"])

@@ -226,7 +226,6 @@ if __name__ == "__main__":
     # Clean system from previous depthboot builds
     print_status("Removing old depthboot build files")
     rmdir("/tmp/depthboot-build")
-    mkdir("/tmp/depthboot-build", create_parents=True)
 
     print_status("Unmounting old depthboot mounts if present")
     try:
@@ -236,7 +235,6 @@ if __name__ == "__main__":
     except subprocess.CalledProcessError:
         print("Failed to unmount /mnt/depthboot, ignore")
     rmdir("/mnt/depthboot")
-    mkdir("/mnt/depthboot", create_parents=True)
 
     rmfile("depthboot.img")
     rmfile("kernel.flags")
