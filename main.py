@@ -86,6 +86,9 @@ if __name__ == "__main__":
 
     # Restart script as root
     if os.geteuid() != 0:
+        print_header("The script requires root privileges to mount the image/device and write to it, "
+                     "as well as for installing dependencies on the build system")
+        print_status("Requesting root privileges...")
         sudo_args = ['sudo', sys.executable] + sys.argv + [os.environ]
         os.execlpe('sudo', *sudo_args)
 
