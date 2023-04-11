@@ -57,7 +57,9 @@ def config(de_name: str, distro_version: str, verbose: bool, kernel_version: str
     with open("/mnt/depthboot/var/lib/dpkg/info/systemd-zram-generator.postinst", "w") as file:
         file.write("#!/bin/sh\nexit 0\n")
     # Rerun dpkg configuration for package to be recognized as installed
-    chroot("dpkg --configure systemd-zram-generator")
+    # for some reason on some systems dpkg says that the package is already installed -> ignore it
+    with contextlib.suppress(subprocess.CalledProcessError):
+        chroot("dpkg --configure systemd-zram-generator")
     # Restore postinstall script
     with open("/mnt/depthboot/var/lib/dpkg/info/systemd-zram-generator.postinst", "w") as file:
         file.write(config)
