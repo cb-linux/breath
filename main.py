@@ -86,6 +86,9 @@ if __name__ == "__main__":
 
     # Restart script as root
     if os.geteuid() != 0:
+        print_header("The script requires root privileges to mount the image/device and write to it, "
+                     "as well as for installing dependencies on the build system")
+        print_status("Requesting root privileges...")
         sudo_args = ['sudo', sys.executable] + sys.argv + [os.environ]
         os.execlpe('sudo', *sudo_args)
 
@@ -196,6 +199,9 @@ if __name__ == "__main__":
             print("https://eupnea-linux.github.io/docs/extra/crostini")
             sys.exit(1)
 
+    # clear terminal, but keep any previous output so the user can scroll up to see it
+    print("\033[H\033[2J", end="")
+
     # parse arguments
     if args.dev_build:
         print_warning("Using dev release")
@@ -216,6 +222,25 @@ if __name__ == "__main__":
             user_input["device"] = args.device_override  # override device
     else:
         user_input = cli_input.get_user_input()  # get normal user input
+
+    # Clean system from previous depthboot builds
+    print_status("Removing old depthboot build files")
+    rmdir("/tmp/depthboot-build")
+    mkdir("/tmp/depthboot-build", create_parents=True)
+
+    print_status("Unmounting old depthboot mounts if present")
+    try:
+        bash("umount -lf /mnt/depthboot")  # just in case
+        sleep(5)  # wait for umount to finish
+        bash("umount -lf /mnt/depthboot")  # umount a second time, coz first time might not work
+    except subprocess.CalledProcessError:
+        print("Failed to unmount /mnt/depthboot, ignore")
+    rmdir("/mnt/depthboot")
+    mkdir("/mnt/depthboot", create_parents=True)
+
+    rmfile("depthboot.img")
+    rmfile("kernel.flags")
+    rmfile(".stop_download_progress")
 
     # Check if there is enough space in /tmp
     avail_space = int(bash("BLOCK_SIZE=m df --output=avail /tmp").split("\n")[1][:-1])  # read tmp size in MB

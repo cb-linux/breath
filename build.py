@@ -42,28 +42,6 @@ def exit_handler():
         bash(f"umount -lf {img_mnt}*")  # umount all partitions from usb/sd-card
 
 
-# Clean old depthboot files from /tmp
-def prepare_host(de_name: str) -> None:
-    print_status("Cleaning + preparing host system")
-    # Clean system from previous depthboot builds
-    rmdir("/tmp/depthboot-build")
-    mkdir("/tmp/depthboot-build", create_parents=True)
-
-    print_status("Creating mount points")
-    try:
-        bash("umount -lf /mnt/depthboot")  # just in case
-        sleep(5)  # wait for umount to finish
-        bash("umount -lf /mnt/depthboot")  # umount a second time, coz first time might not work
-    except subprocess.CalledProcessError:
-        print("Failed to unmount /mnt/depthboot, ignore")
-    rmdir("/mnt/depthboot")
-    mkdir("/mnt/depthboot", create_parents=True)
-
-    rmfile("depthboot.img")
-    rmfile("kernel.flags")
-    rmfile(".stop_download_progress")
-
-
 def download_kernel(kernel_type: str, dev_release: bool, files: list = None) -> None:
     if files is None:
         files = ["bzImage"]
@@ -128,7 +106,13 @@ def prepare_img(distro_name: str, img_size, verbose_kernel: bool) -> Tuple[str, 
         bash(f"dd if=/dev/zero of=depthboot.img status=progress bs=1024 count={img_size * 1000000}")
 
     print_status("Mounting empty image")
-    mnt_point = bash("losetup -f --show depthboot.img")
+    try:
+        mnt_point = bash("losetup -f --show depthboot.img")
+    except subprocess.CalledProcessError as e:
+        if not bash("systemd-detect-virt").lower().__contains__("wsl"):  # if not running WSL, the error is unexpected
+            raise e
+        print_error("Losetup failed. Make sure you are using WSL version 2 aka WSL2.")
+        sys.exit(1)
     if mnt_point == "":
         print_error("Failed to mount image")
         sys.exit(1)
@@ -183,6 +167,7 @@ def partition_and_flash_kernel(mnt_point: str, write_usb: bool, distro_name: str
 
     # get uuid of rootfs partition
     rootfs_partuuid = bash(f"blkid -o value -s PARTUUID {rootfs_mnt}")
+    print_status(f"Rootfs partition UUID: {rootfs_partuuid}")
 
     # write PARTUUID to kernel flags and save it as a file
     base_string = "console= root=PARTUUID=insert_partuuid i915.modeset=1 rootwait rw mem_sleep_default=deep " \
@@ -249,6 +234,22 @@ def post_extract(build_options) -> None:
     # This is needed for internet inside the chroot
     bash("mount --bind /etc/resolv.conf /mnt/depthboot/etc/resolv.conf")
 
+    # the following mounts are mostly unneeded, but will produce a lot of warnings if not mounted
+    # even though the resulting image will work as intended and won't have any issues
+    # mounting the full directories results in broken host systems -> only mount what's explicitly needed
+
+    # systemd needs /proc to not throw warnings
+    bash("mount --types proc /proc /mnt/depthboot/proc")
+
+    # pacman needs the /dev/fd to not throw warnings
+    # check if link already exists, if not, create it
+    if not path_exists("/mnt/depthboot/dev/fd"):
+        bash("cd /mnt/depthboot && ln -s /proc/self/fd ./dev/fd")
+
+    # create new /dev/pts for apt to be able to write logs and not throw warnings
+    mkdir("/mnt/depthboot/dev/pts", create_parents=True)
+    bash("mount --types devpts devpts /mnt/depthboot/dev/pts")
+
     # create depthboot settings file for postinstall scripts to read
     with open("configs/eupnea.json", "r") as settings_file:
         settings = json.load(settings_file)
@@ -305,6 +306,9 @@ def post_config(de_name: str, distro_name) -> None:
     if distro_name == "fedora":
         print_status("Relabeling files for SELinux")
 
+        # The following script needs some specific files in /proc -> unmount /proc
+        bash("umount -lR /mnt/depthboot/proc")
+
         # copy /proc files needed for fixfiles
         mkdir("/mnt/depthboot/proc/self")
         cpfile("configs/selinux/mounts", "/mnt/depthboot/proc/self/mounts")
@@ -351,8 +355,6 @@ def start_build(build_options: dict, args: argparse.Namespace) -> None:
     set_verbose(args.verbose)
     atexit.register(exit_handler)
     print_status("Starting build")
-
-    prepare_host(build_options["distro_name"])
 
     if args.local_path is None:  # default
         download_kernel(build_options["kernel_type"], args.dev_build)
@@ -418,17 +420,12 @@ def start_build(build_options: dict, args: argparse.Namespace) -> None:
 
     bash("sync")  # write all pending changes to usb
 
-    # unmount image/device from mnt
-    with contextlib.suppress(subprocess.CalledProcessError):
-        bash("umount -lf /mnt/depthboot")  # umount mountpoint
-    sleep(5)  # wait for umount to finish
-
     # unmount image/device completely from system
     # on crostini umount fails for some reason
     with contextlib.suppress(subprocess.CalledProcessError):
-        bash(f"umount -lf {img_mnt}p*")  # umount all partitions from image
+        bash(f"umount -lR {img_mnt}p*")  # umount all partitions from image
     with contextlib.suppress(subprocess.CalledProcessError):
-        bash(f"umount -lf {img_mnt}*")  # umount all partitions from usb/sd-card
+        bash(f"umount -lR {img_mnt}*")  # umount all partitions from usb/sd-card
 
     if build_options["device"] == "image":
         try:

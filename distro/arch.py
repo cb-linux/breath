@@ -119,12 +119,10 @@ def config(de_name: str, distro_version: str, verbose: bool, kernel_version: str
     cpfile("configs/zram/zram-generator.conf", "/mnt/depthboot/etc/systemd/zram-generator.conf")
 
     # Configure sudo
-    with open("/mnt/depthboot/etc/sudoers", "r") as conf:
-        temp_sudoers = conf.readlines()
-    # uncomment wheel group
-    temp_sudoers[84] = temp_sudoers[84][2:]
-    with open("/mnt/depthboot/etc/sudoers", "w") as conf:
-        conf.writelines(temp_sudoers)
+    # for some reason, the sudoers file sometimes gets reset to default
+    # -> create file in /etc/sudoers.d instead to preserve changes
+    with open("/mnt/depthboot/etc/sudoers.d/wheel_conf", "w") as conf:
+        conf.write("%wheel ALL=(ALL:ALL) ALL")  # enable wheel group to use sudo
 
     print_status("Restoring pacman config")
     with open("/mnt/depthboot/etc/pacman.conf", "r") as conf:
