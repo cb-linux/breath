@@ -49,14 +49,6 @@ def config(de_name: str, distro_version: str, verbose: bool, kernel_version: str
 
     print_status("Downloading and installing de, might take a while")
     match de_name:
-
-        case "cinnamon":
-            print_status("Installing CINNAMON")
-            chroot("pacman -S --noconfirm cinnamon cinnamon-translations lightdm lightdm-gtk-greeter")
-            chroot("pacman -S --noconfirm xed xreader gnome-therminal")
-            chroot("pacman -S --noconfirm system-config-printer gnome-keyring blueberry")
-            chroot("systemctl enable lightdm.service")
-            chroot("systemctl enable NetworkManager.service")
         case "gnome":
             print_status("Installing GNOME")
             chroot("pacman -S --noconfirm gnome gnome-extra")
@@ -101,6 +93,12 @@ def config(de_name: str, distro_version: str, verbose: bool, kernel_version: str
             # remove broken gnome xsessions
             chroot("rm /usr/share/xsessions/gnome.desktop")
             chroot("rm /usr/share/xsessions/gnome-xorg.desktop")
+        case "cinnamon":
+            print_status("Installing Cinnamon")
+            chroot("pacman -S --noconfirm cinnamon cinnamon-translations lightdm lightdm-gtk-greeter xed xreader "
+                   "gnome-terminal system-config-printer gnome-keyring blueberry")
+            chroot("systemctl enable lightdm.service")
+            chroot("systemctl enable NetworkManager.service")
         case "cli":
             print_status("Skipping desktop environment install")
         case _:
