@@ -58,6 +58,9 @@ def config(de_name: str, distro_version: str, verbose: bool, kernel_version: str
             print_status("Installing Budgie")
             chroot("dnf install -y budgie-desktop lightdm lightdm-gtk xorg-x11-server-Xorg gnome-terminal firefox "
                    "gnome-software nemo")
+        case "cinnamon":
+            print_status("Installing Cinnamon")
+            chroot("dnf group install -y 'Cinnamon Desktop'")
         case "cli":
             print_status("Skipping desktop environment install")
             # install network tui

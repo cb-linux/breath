@@ -93,6 +93,12 @@ def config(de_name: str, distro_version: str, verbose: bool, kernel_version: str
             # remove broken gnome xsessions
             chroot("rm /usr/share/xsessions/gnome.desktop")
             chroot("rm /usr/share/xsessions/gnome-xorg.desktop")
+        case "cinnamon":
+            print_status("Installing Cinnamon")
+            chroot("pacman -S --noconfirm cinnamon cinnamon-translations lightdm lightdm-gtk-greeter xed xreader "
+                   "gnome-terminal system-config-printer gnome-keyring blueberry")
+            chroot("systemctl enable lightdm.service")
+            chroot("systemctl enable NetworkManager.service")
         case "cli":
             print_status("Skipping desktop environment install")
         case _:

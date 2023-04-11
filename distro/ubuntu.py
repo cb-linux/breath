@@ -99,6 +99,9 @@ def config(de_name: str, distro_version: str, verbose: bool, kernel_version: str
             # do not install tex-common, it breaks the installation
             chroot("DEBIAN_FRONTEND=noninteractive apt-get install -y lightdm lightdm-gtk-greeter ubuntu-budgie-desktop"
                    " tex-common-")
+        case "cinnamon":
+            print_status("Installing Cinnamon")
+            chroot("apt-get install -y cinnamon-desktop-environment")
         case "cli":
             print_status("Skipping desktop environment install")
         case _:
