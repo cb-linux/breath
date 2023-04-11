@@ -42,28 +42,6 @@ def exit_handler():
         bash(f"umount -lf {img_mnt}*")  # umount all partitions from usb/sd-card
 
 
-# Clean old depthboot files from /tmp
-def prepare_host(de_name: str) -> None:
-    print_status("Cleaning + preparing host system")
-    # Clean system from previous depthboot builds
-    rmdir("/tmp/depthboot-build")
-    mkdir("/tmp/depthboot-build", create_parents=True)
-
-    print_status("Creating mount points")
-    try:
-        bash("umount -lf /mnt/depthboot")  # just in case
-        sleep(5)  # wait for umount to finish
-        bash("umount -lf /mnt/depthboot")  # umount a second time, coz first time might not work
-    except subprocess.CalledProcessError:
-        print("Failed to unmount /mnt/depthboot, ignore")
-    rmdir("/mnt/depthboot")
-    mkdir("/mnt/depthboot", create_parents=True)
-
-    rmfile("depthboot.img")
-    rmfile("kernel.flags")
-    rmfile(".stop_download_progress")
-
-
 def download_kernel(kernel_type: str, dev_release: bool, files: list = None) -> None:
     if files is None:
         files = ["bzImage"]
@@ -377,8 +355,6 @@ def start_build(build_options: dict, args: argparse.Namespace) -> None:
     set_verbose(args.verbose)
     atexit.register(exit_handler)
     print_status("Starting build")
-
-    prepare_host(build_options["distro_name"])
 
     if args.local_path is None:  # default
         download_kernel(build_options["kernel_type"], args.dev_build)
