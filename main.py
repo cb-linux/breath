@@ -199,6 +199,9 @@ if __name__ == "__main__":
             print("https://eupnea-linux.github.io/docs/extra/crostini")
             sys.exit(1)
 
+    # clear terminal, but keep any previous output so the user can scroll up to see it
+    print("\033[H\033[2J", end="")
+
     # parse arguments
     if args.dev_build:
         print_warning("Using dev release")
