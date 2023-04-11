@@ -38,13 +38,29 @@ def config(de_name: str, distro_version: str, verbose: bool, kernel_version: str
     chroot("apt-get upgrade -y")
     # Install general dependencies + eupnea packages
     chroot("apt-get install -y linux-firmware network-manager software-properties-common nano eupnea-utils "
-           "eupnea-system systemd-zram-generator")
+           "eupnea-system")
 
     # Install kernel
     if kernel_version == "mainline":
         chroot("apt-get install -y eupnea-mainline-kernel")
     elif kernel_version == "chromeos":
         chroot("apt-get install -y eupnea-chromeos-kernel")
+
+    print_status("Installing zram, ignore dpkg errors")
+    # Install zram
+    # The apt postinstall of this zram packages tries to modload zram which is not possible in a chroot -> ignore errors
+    with contextlib.suppress(subprocess.CalledProcessError):
+        chroot("apt-get install -y systemd-zram-generator")
+    # Edit the postinstall script to force success
+    with open("/mnt/depthboot/var/lib/dpkg/info/systemd-zram-generator.postinst", "r") as file:
+        config = file.read()
+    with open("/mnt/depthboot/var/lib/dpkg/info/systemd-zram-generator.postinst", "w") as file:
+        file.write("#!/bin/sh\nexit 0\n")
+    # Rerun dpkg configuration for package to be recognized as installed
+    chroot("dpkg --configure systemd-zram-generator")
+    # Restore postinstall script
+    with open("/mnt/depthboot/var/lib/dpkg/info/systemd-zram-generator.postinst", "w") as file:
+        file.write(config)
 
     print_status("Downloading and installing de, might take a while")
     match de_name:
