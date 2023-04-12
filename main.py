@@ -216,12 +216,12 @@ if __name__ == "__main__":
 
     # override device if specified
     if not args.device_selection:
-        user_input = cli_input.get_user_input(skip_device=True)  # get user input
+        user_input = cli_input.get_user_input(args.verbose_kernel, skip_device=True)  # get user input
         user_input["device"] = "image"
         if args.device_override is not None:
             user_input["device"] = args.device_override  # override device
     else:
-        user_input = cli_input.get_user_input()  # get normal user input
+        user_input = cli_input.get_user_input(args.verbose_kernel)  # get normal user input
 
     # Clean system from previous depthboot builds
     print_status("Removing old depthboot build files")

@@ -9,7 +9,7 @@ from itertools import zip_longest
 from functions import *
 
 
-def get_user_input(skip_device: bool = False) -> dict:
+def get_user_input(verbose_kernel: bool, skip_device: bool = False) -> dict:
     output_dict = {
         "distro_name": "",
         "distro_version": "",
@@ -99,6 +99,10 @@ def get_user_input(skip_device: bool = False) -> dict:
                                        flags=flags_list)
             if desktop_env == "cli":
                 print_warning("Warning: No desktop environment will be installed!")
+                if verbose_kernel:
+                    print_error("High verbosity kernel messages will print to TTY making it practically unusable.")
+                print_header("If you plan to install an unsupported desktop environment, make sure to specify it "
+                             "in /etc/eupnea.json after installation. Consider making a pr with support for this DE.")
                 user_selection = ia_selection("Are you sure you want to continue?", options=["No", "Yes"], )
                 if user_selection == "No":
                     print_status("No desktop will be installed.")
