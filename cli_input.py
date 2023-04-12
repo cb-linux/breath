@@ -72,7 +72,7 @@ def get_user_input(skip_device: bool = False) -> dict:
                       f"(recommended) +{os_sizes[temp_distro_name]['kde']}GB",
                       f"(recommended for weak devices) +{os_sizes[temp_distro_name]['xfce']}GB",
                       f"(recommended for weak devices) +{os_sizes[temp_distro_name]['lxqt']}GB",
-                      f"{os_sizes[temp_distro_name]['cinnamon']}GB"]
+                      f"+{os_sizes[temp_distro_name]['cinnamon']}GB"]
         match output_dict["distro_name"]:
             case "ubuntu":
                 if output_dict["distro_version"] == "22.04":
