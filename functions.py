@@ -376,6 +376,7 @@ verbose = False
 # on import check if pv is installed and set global variable
 try:
     bash("which pv")
+    no_extract_progress = False
 except subprocess.CalledProcessError:
     no_extract_progress = True
 no_download_progress = not sys.stdout.isatty()  # disable download progress if terminal is not interactive
