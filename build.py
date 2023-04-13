@@ -2,6 +2,7 @@
 import argparse
 import atexit
 import json
+import os
 import sys
 from typing import Tuple
 from urllib.error import URLError
@@ -42,10 +43,7 @@ def exit_handler():
         bash(f"umount -lf {img_mnt}*")  # umount all partitions from usb/sd-card
 
 
-def download_kernel(kernel_type: str, dev_release: bool, files: list = None) -> None:
-    if files is None:
-        files = ["bzImage"]
-
+def download_kernel(kernel_type: str, dev_release: bool, download_modules_header: bool) -> None:
     if dev_release:
         urls = {
             "mainline": "https://github.com/eupnea-linux/mainline-kernel/releases/download/dev-build/",
@@ -59,9 +57,12 @@ def download_kernel(kernel_type: str, dev_release: bool, files: list = None) -> 
 
     try:
         print_status(f"Downloading {kernel_type} kernel")
-        if "bzImage" in files:
-            download_file(f"{urls[kernel_type]}bzImage", "/tmp/depthboot-build/bzImage")
-
+        download_file(f"{urls[kernel_type]}bzImage", "/tmp/depthboot-build/bzImage")
+        if download_modules_header:
+            print_status(f"Downloading {kernel_type} modules")
+            download_file(f"{urls[kernel_type]}modules.tar.xz", "/tmp/depthboot-build/modules.tar.xz")
+            print_status(f"Downloading {kernel_type} headers")
+            download_file(f"{urls[kernel_type]}headers.tar.xz", "/tmp/depthboot-build/headers.tar.xz")
     except URLError:
         print_error("Failed to reach github. Check your internet connection and try again or use local files with -l")
         if dev_release:
@@ -220,54 +221,146 @@ def extract_rootfs(distro_name: str, distro_version: str) -> None:
         case "pop-os" | "ubuntu" | "fedora":
             print_status(f"Extracting {distro_name} rootfs")
             extract_file(f"/tmp/depthboot-build/{distro_name}-rootfs.tar.xz", "/mnt/depthboot")
+        case "generic":
+            def prompt_user_for_rootfs():
+                while True:
+                    # user read for path autocompletion
+                    user_rootfs_path = bash('read -e -p "\033[92mPlease manually extract the rootfs and provide the '
+                                            'path to the root directory:\n\033[0m" var ; echo $var')
+                    if user_rootfs_path.endswith("/"):
+                        user_rootfs_path = user_rootfs_path[:-1]
+                    # we could check for more dirs but this should be enough
+                    if not path_exists(f"{user_rootfs_path}/usr") or not path_exists(f"{user_rootfs_path}/bin"):
+                        print_error("Path does not contain a rootfs. Verify that you are entering the full path, "
+                                    "without any shortcuts (i.e. ~ for home, etc)")
+                        continue
+                    return user_rootfs_path
+
+            print_status("Starting generic rootfs extraction")
+            # ask user for path to iso
+            while True:
+                print_warning("You will need a full iso of the distro. Netboot (etc.) images will not work.")
+                # user read for path autocompletion
+                iso_path = bash('read -e -p "\033[92mEnter full path to the ISO file:\n\033[0m" var ; echo $var')
+                if not path_exists(iso_path) or not iso_path.endswith(".iso"):
+                    print_error("File does not exist or is not an iso file. Verify that you are entering the full path,"
+                                " without any shortcuts (i.e. ~ for home, etc)")
+                    continue
+                break
+            # mount iso
+            print_status("Mounting iso")
+            iso_loop_dev = bash(f"losetup -fP --show {iso_path}")
+            mkdir("/tmp/depthboot-build/iso-mount")
+            bash(f"mount {iso_loop_dev}p1 /tmp/depthboot-build/iso-mount -o ro")
+            # search for rootfs
+            print_status("Searching for squashfs")
+            file_path = ""
+            for dirpath, dirnames, filenames in os.walk("/tmp/depthboot-build/iso-mount"):
+                if "squashfs.img" in filenames:
+                    file_path = os.path.join(dirpath, "squashfs.img")
+                    print(f"Found squashfs.img at {file_path}")
+                    break
+                elif "filesystem.squashfs" in filenames:
+                    file_path = os.path.join(dirpath, "filesystem.squashfs")
+                    print(f"Found filesystem.squashfs at {file_path}")
+                    break
+            if not file_path:
+                print_error("Could not find squashfs in iso")
+                cpdir(prompt_user_for_rootfs(), "/mnt/depthboot")
+            else:
+                # extract rootfs
+                print_status("Extracting squashfs")
+                mkdir("/tmp/depthboot-build/squashfs-extract")
+                # use os.system to show progress immediately
+                os.system(f"unsquashfs -d /tmp/depthboot-build/squashfs-extract {file_path}")
+
+                # check if a real rootfs was extracted or an img file
+                if path_exists("/tmp/depthboot-build/squashfs-extract/usr") and path_exists(
+                        "/tmp/depthboot-build/squashfs-extract/bin"):
+                    print_status("Found rootfs in squashfs, copying to image/device")
+                    cpdir("/tmp/depthboot-build/squashfs-extract/", "/mnt/depthboot")
+                else:
+                    # find img file
+                    print_status("Searching for img file in extracted squashfs")
+                    img_file_path = ""
+                    for dirpath, dirnames, filenames in os.walk("/tmp/depthboot-build/squashfs-extract"):
+                        for file in filenames:
+                            if file.endswith(".img"):
+                                img_file_path = os.path.join(dirpath, file)
+                                print(f"Found rootfs img at {img_file_path}")
+                                break
+                    if not img_file_path:
+                        print_error("Could not find rootfs img in squashfs")
+                        cpdir(prompt_user_for_rootfs(), "/mnt/depthboot")
+                    else:
+                        # mount img file
+                        print_status("Mounting img file")
+                        img_loop_dev = bash(f"losetup -fP --show {img_file_path}")
+                        mkdir("/tmp/depthboot-build/img-mount")
+                        bash(f"mount {img_loop_dev} /tmp/depthboot-build/img-mount -o ro")
+                        # search for rootfs
+                        print_status("Searching for rootfs inside img")
+                        img_rootfs_path = ""
+                        for dirpath, dirnames, filenames in os.walk("/tmp/depthboot-build/img-mount"):
+                            if "usr" in dirnames and "bin" in dirnames:
+                                img_rootfs_path = dirpath
+                                print(f"Found rootfs at {img_rootfs_path}")
+                                break
+                        if not img_rootfs_path:
+                            print_error("Could not find rootfs inside img")
+                            cpdir(prompt_user_for_rootfs(), "/mnt/depthboot")
+                        else:
+                            cpdir(img_rootfs_path, "/mnt/depthboot")
+
     print_status("\n" + "Rootfs extraction complete")
 
 
 # Configure distro agnostic options
 def post_extract(build_options) -> None:
     print_status("Applying distro agnostic configuration")
-    # Create a temporary resolv.conf for internet inside the chroot
-    mkdir("/mnt/depthboot/run/systemd/resolve", create_parents=True)  # dir doesnt exist coz systemd didnt run
-    open("/mnt/depthboot/run/systemd/resolve/stub-resolv.conf", "w").close()  # create empty file for mount
-    # Bind mount host resolv.conf to chroot resolv.conf.
-    # If chroot /etc/resolv.conf is a symlink, then it will be resolved to the real file and bind mounted
-    # This is needed for internet inside the chroot
-    bash("mount --bind /etc/resolv.conf /mnt/depthboot/etc/resolv.conf")
+    if build_options["distro_name"] != "generic":
+        # Create a temporary resolv.conf for internet inside the chroot
+        mkdir("/mnt/depthboot/run/systemd/resolve", create_parents=True)  # dir doesnt exist coz systemd didnt run
+        open("/mnt/depthboot/run/systemd/resolve/stub-resolv.conf", "w").close()  # create empty file for mount
+        # Bind mount host resolv.conf to chroot resolv.conf.
+        # If chroot /etc/resolv.conf is a symlink, then it will be resolved to the real file and bind mounted
+        # This is needed for internet inside the chroot
+        bash("mount --bind /etc/resolv.conf /mnt/depthboot/etc/resolv.conf")
 
-    # the following mounts are mostly unneeded, but will produce a lot of warnings if not mounted
-    # even though the resulting image will work as intended and won't have any issues
-    # mounting the full directories results in broken host systems -> only mount what's explicitly needed
+        # the following mounts are mostly unneeded, but will produce a lot of warnings if not mounted
+        # even though the resulting image will work as intended and won't have any issues
+        # mounting the full directories results in broken host systems -> only mount what's explicitly needed
 
-    # systemd needs /proc to not throw warnings
-    bash("mount --types proc /proc /mnt/depthboot/proc")
+        # systemd needs /proc to not throw warnings
+        bash("mount --types proc /proc /mnt/depthboot/proc")
 
-    # pacman needs the /dev/fd to not throw warnings
-    # check if link already exists, if not, create it
-    if not path_exists("/mnt/depthboot/dev/fd"):
-        bash("cd /mnt/depthboot && ln -s /proc/self/fd ./dev/fd")
+        # pacman needs the /dev/fd to not throw warnings
+        # check if link already exists, if not, create it
+        if not path_exists("/mnt/depthboot/dev/fd"):
+            bash("cd /mnt/depthboot && ln -s /proc/self/fd ./dev/fd")
 
-    # create new /dev/pts for apt to be able to write logs and not throw warnings
-    mkdir("/mnt/depthboot/dev/pts", create_parents=True)
-    bash("mount --types devpts devpts /mnt/depthboot/dev/pts")
+        # create new /dev/pts for apt to be able to write logs and not throw warnings
+        mkdir("/mnt/depthboot/dev/pts", create_parents=True)
+        bash("mount --types devpts devpts /mnt/depthboot/dev/pts")
 
-    # create depthboot settings file for postinstall scripts to read
-    with open("configs/eupnea.json", "r") as settings_file:
-        settings = json.load(settings_file)
-    settings["distro_name"] = build_options["distro_name"]
-    settings["distro_version"] = build_options["distro_version"]
-    settings["de_name"] = build_options["de_name"]
-    if build_options["device"] != "image":
-        settings["install_type"] = "direct"
-    with open("/mnt/depthboot/etc/eupnea.json", "w") as settings_file:
-        json.dump(settings, settings_file)
+        # create depthboot settings file for postinstall scripts to read
+        with open("configs/eupnea.json", "r") as settings_file:
+            settings = json.load(settings_file)
+        settings["distro_name"] = build_options["distro_name"]
+        settings["distro_version"] = build_options["distro_version"]
+        settings["de_name"] = build_options["de_name"]
+        if build_options["device"] != "image":
+            settings["install_type"] = "direct"
+        with open("/mnt/depthboot/etc/eupnea.json", "w") as settings_file:
+            json.dump(settings, settings_file)
 
-    print_status("Fixing screen rotation")
-    # Install hwdb file to fix auto rotate being flipped on some devices
-    cpfile("configs/hwdb/61-sensor.hwdb", "/mnt/depthboot/etc/udev/hwdb.d/61-sensor.hwdb")
-    chroot("systemd-hwdb update")
+        print_status("Fixing screen rotation")
+        # Install hwdb file to fix auto rotate being flipped on some devices
+        cpfile("configs/hwdb/61-sensor.hwdb", "/mnt/depthboot/etc/udev/hwdb.d/61-sensor.hwdb")
+        chroot("systemd-hwdb update")
 
-    print_status("Cleaning /boot")
-    rmdir("/mnt/depthboot/boot")  # clean stock kernels from /boot
+        print_status("Cleaning /boot")
+        rmdir("/mnt/depthboot/boot")  # clean stock kernels from /boot
 
     if build_options["distro_name"] == "fedora":
         print_status("Enabling resolved.conf systemd service")
@@ -280,11 +373,16 @@ def post_extract(build_options) -> None:
     chroot(f"useradd --create-home --shell /bin/bash {username}")
     password = build_options["password"]  # quotes interfere with functions below
     chroot(f"echo '{username}:{password}' | chpasswd")
-    match build_options["distro_name"]:
-        case "ubuntu" | "pop-os":
-            chroot(f"usermod -aG sudo {username}")
-        case "arch" | "fedora":
-            chroot(f"usermod -aG wheel {username}")
+    with open("/mnt/depthboot/etc/group", "r") as group_file:
+        group_lines = group_file.readlines()
+    for line in group_lines:
+        match line.split(":")[0]:
+            case "sudo":
+                chroot(f"usermod -aG sudo {username}")
+            case "wheel":
+                chroot(f"usermod -aG wheel {username}")
+            case "doas":
+                chroot(f"usermod -aG doas {username}")
 
     # set timezone build system timezone on device
     # In some environments(Crouton), the timezone is not set -> ignore in that case
@@ -298,9 +396,10 @@ def post_extract(build_options) -> None:
 
 # post extract and distro config
 def post_config(de_name: str, distro_name) -> None:
-    # Enable postinstall service
-    print_status("Enabling postinstall service")
-    chroot("systemctl enable eupnea-postinstall.service")
+    if distro_name != "generic":
+        # Enable postinstall service
+        print_status("Enabling postinstall service")
+        chroot("systemctl enable eupnea-postinstall.service")
 
     # if local path option was used, we need to extract modules and headers to the rootfs
     if path_exists("/tmp/depthboot-build/modules.tar.xz"):
@@ -366,7 +465,7 @@ def start_build(build_options: dict, args: argparse.Namespace) -> None:
     mkdir("/mnt/depthboot", create_parents=True)
 
     if args.local_path is None:  # default
-        download_kernel(build_options["kernel_type"], args.dev_build)
+        download_kernel(build_options["kernel_type"], args.dev_build, build_options["distro_name"] == "generic")
         download_rootfs(build_options["distro_name"], build_options["distro_version"])
     else:  # if local path is specified, copy files from it, instead of downloading from the internet
         print_status("Copying local files to /tmp/depthboot-build")
@@ -378,16 +477,17 @@ def start_build(build_options: dict, args: argparse.Namespace) -> None:
             try:
                 cpfile(f"{local_path_posix}{file}", f"/tmp/depthboot-build/{file}")
             except FileNotFoundError:
-                print_warning(f"File {file} not found in {args.local_path}, attempting to download")
-                download_kernel(build_options["kernel_type"], args.dev_build, [file])
+                print_error(f"File {file} not found in {args.local_path}, downloading kernel files as usual")
+                download_kernel(build_options["kernel_type"], args.dev_build, build_options["distro_name"] == "generic")
+                break
 
         # copy distro rootfs
         distro_rootfs = {
-            # distro_name:[cp function type,filename]
             "ubuntu": [cpfile, "ubuntu-rootfs.tar.xz"],
             "arch": [cpfile, "arch-rootfs.tar.gz"],
             "fedora": [cpfile, "fedora-rootfs.tar.xz"],
             "pop-os": [cpfile, "pop-os-rootfs.tar.xz"],
+            "generic": [cpfile, "generic-rootfs.tar.xz"],
         }
         try:
             distro_rootfs[build_options["distro_name"]][0](
@@ -419,9 +519,9 @@ def start_build(build_options: dict, args: argparse.Namespace) -> None:
         case "pop-os":
             import distro.pop_os as distro
         case _:
-            print_error("DISTRO NAME NOT FOUND! Please create an issue")
-            sys.exit(1)
-    distro.config(build_options["de_name"], build_options["distro_version"], verbose, build_options["kernel_type"])
+            print_status("Generic install, skipping distro specific configuration")
+    with contextlib.suppress(UnboundLocalError):
+        distro.config(build_options["de_name"], build_options["distro_version"], verbose, build_options["kernel_type"])
 
     post_config(build_options["de_name"], build_options["distro_name"])
 
@@ -435,6 +535,17 @@ def start_build(build_options: dict, args: argparse.Namespace) -> None:
         bash(f"umount -lR {img_mnt}p*")  # umount all partitions from image
     with contextlib.suppress(subprocess.CalledProcessError):
         bash(f"umount -lR {img_mnt}*")  # umount all partitions from usb/sd-card
+
+    # unmount any isos/images from /tmp/depthboot-build
+    with contextlib.suppress(subprocess.CalledProcessError):
+        bash("umount -lR /tmp/depthboot-build/*")
+
+    # inform users about existence of system installers on the iso files
+    if build_options["distro_name"] == "generic":
+        print_header("Generic ISOs usually include a system installer. Do not use it, as it will try to install the "
+                     "distro in a traditional way. Instead, use 'install-to-internal' from the eupnea-utils repo if you"
+                     " wish to install your distro to the internal disk or just use it on the usb stick/SD-card.")
+        input("\033[92m" + "Press Enter to continue" + "\033[0m")
 
     if build_options["device"] == "image":
         try:

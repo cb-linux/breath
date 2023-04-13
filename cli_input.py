@@ -14,7 +14,7 @@ def get_user_input(verbose_kernel: bool, skip_device: bool = False) -> dict:
         "distro_name": "",
         "distro_version": "",
         "de_name": "",
-        "username": "localuser",
+        "username": "",
         "password": "",
         "device": "image",
         "kernel_type": ""
@@ -32,11 +32,12 @@ def get_user_input(verbose_kernel: bool, skip_device: bool = False) -> dict:
 
     while True:
         distro_name = ia_selection("Which Linux distribution (flavor) would you like to use?",
-                                   options=["Fedora", "Ubuntu", "Pop!_OS", "Arch"],
+                                   options=["Fedora", "Ubuntu", "Pop!_OS", "Arch", "Generic ISO"],
                                    flags=[f"~{os_sizes['fedora_average']}GB (recommended)",
                                           f"~{os_sizes['ubuntu_average']}GB",
                                           f"{os_sizes['pop-os_22.04']['cosmic-gnome']}GB",
-                                          f"{os_sizes['arch_latest']['cli']}GB"])
+                                          f"{os_sizes['arch_latest']['cli']}GB",
+                                          "(NOT recommended)"])
         match distro_name:
             case "Ubuntu":
                 output_dict["distro_name"] = "ubuntu"
@@ -58,15 +59,41 @@ def get_user_input(verbose_kernel: bool, skip_device: bool = False) -> dict:
                                                                     f"~{os_sizes['fedora_38']['cli']}GB"
                                                                     " (beta, unrecommended)"])
                 break
-            case "Pop!_OS":  # default
+            case "Pop!_OS":
                 output_dict["distro_name"] = "pop-os"
                 output_dict["distro_version"] = "22.04"
+                break
+            case "Generic ISO":
+                print_error("Please strongly consider using a supported distro, as generic ISO installs are not "
+                            "optimized in any way. Generic installs will not get any kernel updates or Chromebook "
+                            "specific fixes from the Eupnea team.")
+                print_error("Keep in mind that this will not create a live iso, but rather a real system install, "
+                            "which can be optionally installed to internal or be used from the usb/sd card directly.")
+                while True:
+                    user_selection = ia_selection("Are you sure you want to continue?", options=["No", "Yes"], )
+                    if user_selection == "No":
+                        print_warning("Exiting...")
+                        print_header('Restart the script with: "./main.py" if you want to use a supported distro.')
+                        sys.exit(0)
+                    break
+                print_error("Generic ISO installs are not supported by the Eupnea team. Issues/support tickets for "
+                            "generic installs will not be auto-closed immediately.")
+                while True:
+                    user_selection = ia_selection("Are you sure you want to continue?", options=["No", "Yes"], )
+                    if user_selection == "No":
+                        print_warning("Exiting...")
+                        print_header('Restart the script with: "./main.py" if you want to use a supported distro.')
+                        sys.exit(0)
+                    break
+                output_dict["distro_name"] = "generic"
+                output_dict["distro_version"] = "generic"
+                output_dict["de_name"] = "generic"
                 break
     print(f"{output_dict['distro_name']} {output_dict['distro_version']} selected")
 
     temp_distro_name = f'{output_dict["distro_name"]}_{output_dict["distro_version"]}'
 
-    if output_dict["distro_name"] != "pop-os":
+    if output_dict["distro_name"] not in ["pop-os", "generic"]:
         de_list = ["Gnome", "KDE", "Xfce", "LXQt", "Cinnamon"]
         flags_list = [f"(recommended) +{os_sizes[temp_distro_name]['gnome']}GB",
                       f"(recommended) +{os_sizes[temp_distro_name]['kde']}GB",
@@ -111,7 +138,7 @@ def get_user_input(verbose_kernel: bool, skip_device: bool = False) -> dict:
             output_dict["de_name"] = desktop_env.lower()
             break
         print(f"{desktop_env} selected")
-    else:
+    elif output_dict["distro_name"] == "pop-os":
         output_dict["de_name"] = "cosmic-gnome"
 
     print_question("Enter a username for the new user")

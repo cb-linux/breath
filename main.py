@@ -223,6 +223,8 @@ if __name__ == "__main__":
 
     # Clean system from previous depthboot builds
     print_status("Removing old depthboot build files")
+    with contextlib.suppress(subprocess.CalledProcessError):
+        bash("umount -lR /tmp/depthboot-build/*")  # get rid of any mounts from previous generic iso builds
     rmdir("/tmp/depthboot-build")
 
     print_status("Unmounting old depthboot mounts if present")
