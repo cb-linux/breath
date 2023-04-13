@@ -19,16 +19,16 @@
     "xfce": 4.6
   },
   "fedora_38": {
-    "budgie": 2.5,
-    "cinnamon": 7.1,
-    "cli": 2.1,
+    "budgie": 2.4,
+    "cinnamon": 7.0,
+    "cli": 2.0,
     "deepin": 5.5,
     "gnome": 6.7,
-    "kde": 6.2,
-    "lxqt": 5.5,
+    "kde": 6.1,
+    "lxqt": 5.4,
     "xfce": 4.8
   },
-  "fedora_average": 2.2,
+  "fedora_average": 2.1,
   "pop-os_22.04": {
     "cosmic-gnome": 8.4
   },
