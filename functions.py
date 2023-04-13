@@ -372,11 +372,10 @@ def print_header(message: str) -> None:
     print("\033[95m" + message + "\033[0m", flush=True)
 
 
+verbose = False
 # on import check if pv is installed and set global variable
 try:
     bash("which pv")
 except subprocess.CalledProcessError:
     no_extract_progress = True
-
-verbose = False
 no_download_progress = not sys.stdout.isatty()  # disable download progress if terminal is not interactive
