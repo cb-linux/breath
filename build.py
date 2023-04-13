@@ -3,7 +3,6 @@ import argparse
 import atexit
 import json
 import os
-import sys
 from typing import Tuple
 from urllib.error import URLError
 
@@ -225,8 +224,8 @@ def extract_rootfs(distro_name: str, distro_version: str) -> None:
             def prompt_user_for_rootfs():
                 while True:
                     # user read for path autocompletion
-                    user_rootfs_path = bash('read -e -p "\033[92mPlease manually extract the rootfs and provide the '
-                                            'path to the root directory:\n\033[0m" var ; echo $var')
+                    user_rootfs_path = input("\033[92m" + "Please manually extract the rootfs and provide the path "
+                                                          "to the root directory:\n" + "\033[0m")
                     if user_rootfs_path.endswith("/"):
                         user_rootfs_path = user_rootfs_path[:-1]
                     # we could check for more dirs but this should be enough
@@ -241,7 +240,7 @@ def extract_rootfs(distro_name: str, distro_version: str) -> None:
             while True:
                 print_warning("You will need a full iso of the distro. Netboot (etc.) images will not work.")
                 # user read for path autocompletion
-                iso_path = bash('read -e -p "\033[92mEnter full path to the ISO file:\n\033[0m" var ; echo $var')
+                iso_path = input("\033[92m" + "Enter full path to the ISO file:\n" + "\033[0m")
                 if not path_exists(iso_path) or not iso_path.endswith(".iso"):
                     print_error("File does not exist or is not an iso file. Verify that you are entering the full path,"
                                 " without any shortcuts (i.e. ~ for home, etc)")
