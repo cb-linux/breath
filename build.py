@@ -292,6 +292,15 @@ def post_extract(build_options) -> None:
         host_time_zone = bash("file /etc/localtime")  # read host timezone link
         host_time_zone = host_time_zone[host_time_zone.find("/usr/share/zoneinfo/"):].strip()  # get actual timezone
         chroot(f"ln -sf {host_time_zone} /etc/localtime")
+
+    # if local path option was used, we need to extract modules and headers to the rootfs
+    if path_exists("/tmp/depthboot-build/modules.tar.xz"):
+        print_status("Extracting kernel modules from local path")
+        extract_file("/tmp/depthboot-build/modules.tar.xz", "/mnt/depthboot/lib/modules/")
+    if path_exists("/tmp/depthboot-build/headers.tar.xz"):
+        print_status("Extracting kernel headers from local path")
+        extract_file("/tmp/depthboot-build/headers.tar.xz", "/mnt/depthboot/usr/src/")
+
     print_status("Distro agnostic configuration complete")
 
 
