@@ -30,7 +30,6 @@ if __name__ == "__main__":
     build_args.verbose_kernel = True
     build_args.local_path = None
     build_args.dev_build = False
-    build_args.download_progress = True
     build_args.no_shrink = False
     build_args.image_size = [10]
     testing_dict = {

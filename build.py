@@ -344,14 +344,10 @@ def post_config(de_name: str, distro_name) -> None:
     rmdir("/mnt/depthboot/dev")
 
 
-# The main build script
-# def start_build(verbose: bool, local_path, dev_release: bool, build_options, img_size: int = 10,
-#                 no_download_progress: bool = False, no_shrink: bool = False, verbose_kernel: bool = False) -> None:
-
+# the main build function
 def start_build(build_options: dict, args: argparse.Namespace) -> None:
-    print(args)
-    if args.download_progress:
-        disable_download_progress()  # disable download progress bar for non-interactive shells
+    if args.verbose:
+        print(args)
     set_verbose(args.verbose)
     atexit.register(exit_handler)
     print_status("Starting build")
