@@ -1,12 +1,10 @@
 import contextlib
 import subprocess
+import sys
 from pathlib import Path
 from threading import Thread
 from time import sleep
 from urllib.request import urlopen, urlretrieve
-
-verbose = False
-no_download_progress = False
 
 
 #######################################################################################
@@ -133,12 +131,6 @@ def chroot(command: str) -> str:
 def set_verbose(new_state: bool) -> None:
     global verbose
     verbose = new_state
-
-
-# This is for non-interactive shells
-def disable_download_progress() -> None:
-    global no_download_progress
-    no_download_progress = True
 
 
 def prevent_idle() -> None:
@@ -274,12 +266,14 @@ def _track_dnf(path_to_log) -> None:
 #######################################################################################
 
 def extract_file(file: str, dest: str) -> None:
-    try:
-        bash("which pv")
-    except subprocess.CalledProcessError:
-        global no_download_progress
-        no_download_progress = True
-    if no_download_progress:  # for non-interactive shells only
+    """
+    Extract a compressed file using tar and use pv to show progress if pv is installed.
+
+    :param file: A string representing the full path to the compressed file to be extracted.
+    :param dest: A string representing the full destination directory where the extracted files will be extracted to.
+    :return: None
+    """
+    if no_extract_progress:  # for non-interactive shells only
         if file.endswith(".gz"):
             # --warning=no-unknown-keyword is to supress a warning about unknown headers in the arch rootfs
             bash(f"tar xfpz {file} --warning=no-unknown-keyword -C {dest}")
@@ -376,3 +370,13 @@ def print_question(message: str) -> None:
 
 def print_header(message: str) -> None:
     print("\033[95m" + message + "\033[0m", flush=True)
+
+
+# on import check if pv is installed and set global variable
+try:
+    bash("which pv")
+except subprocess.CalledProcessError:
+    no_extract_progress = True
+
+verbose = False
+no_download_progress = not sys.stdout.isatty()  # disable download progress if terminal is not interactive
