@@ -79,7 +79,7 @@ def get_user_input(verbose_kernel: bool, skip_device: bool = False) -> dict:
                 print_error("Generic ISO installs are not supported by the Eupnea team. Issues/support tickets for "
                             "generic installs will not be auto-closed immediately.\n"
                             "This script does NOT guarantee that the image will boot and you might have to manually "
-                            "debug and fix the issue YOURSELF")
+                            "debug and fix the issue **YOURSELF**")
                 while True:
                     user_selection = ia_selection("Are you sure you want to continue?", options=["No", "Yes"], )
                     if user_selection == "No":
