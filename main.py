@@ -263,6 +263,35 @@ if __name__ == "__main__":
             print("Use --skip-size-check to ignore this check")
             sys.exit(1)
 
+    if user_input["distro_name"] == "generic":
+        # check if unsquashfs is already installed with which
+        try:
+            bash("which unsquashfs")
+            print_status("unsquashfs already installed, skipping")
+        except subprocess.CalledProcessError:
+            print_status("Installing unsquashfs")
+            with open("/etc/os-release", "r") as os:
+                distro = os.read()
+            if distro.lower().__contains__(
+                    "arch"):  # might accidentally catch architecture stuff, but needed to catch arch derivatives
+                bash("pacman -Sy")  # sync repos
+                bash("pacman --noconfirm -S squashfs-tools")
+            elif distro.lower().__contains__("void"):
+                bash("xbps-install -y --sync")
+                bash("xbps-install -y squashfs-tools")
+            elif distro.lower().__contains__("ubuntu") or distro.lower().__contains__("debian"):
+                bash("apt-get update -y")  # sync repos
+                bash("apt-get install -y squashfs-tools")
+            elif distro.lower().__contains__("suse"):
+                bash("zypper --non-interactive refresh")  # sync repos
+                bash("zypper --non-interactive install squashfs-tools")
+            elif distro.lower().__contains__("fedora"):
+                bash("dnf update -y")  # sync repos
+                bash("dnf install -y squashfs-tools")
+            else:
+                print_warning("unsquashfs not found, please install it with your package manager")
+                sys.exit(1)
+
     build.start_build(build_options=user_input, args=args)
     if restore_tmp:  # restore /tmp size if it was changed
         print_status("Restoring size of /tmp")
