@@ -543,7 +543,7 @@ def start_build(build_options: dict, args: argparse.Namespace) -> None:
     if build_options["distro_name"] == "generic":
         print_header("Generic ISOs usually include a system installer. Do not use it, as it will try to install the "
                      "distro in a traditional way. Instead, use 'install-to-internal' from the eupnea-utils repo if you"
-                     " wish to install your distro to the internal disk or just use it on the usb stick/SD-card.")
+                     " wish to install your distro to the internal disk.")
         input("\033[92m" + "Press Enter to continue" + "\033[0m")
 
     if build_options["device"] == "image":
