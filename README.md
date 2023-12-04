@@ -1,4 +1,4 @@
-# ⚠️ Project Archived hello apacelus
+# ⚠️ Project Archived
 
 See https://eupnea-linux.github.io/ for an awesome fork of Breath!
 
