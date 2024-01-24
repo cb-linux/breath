@@ -1,10 +1,10 @@
 # ⚠️ Project Archived
 
-See https://eupnea-linux.github.io/ for an awesome fork of Breath!
+> Do not use https://eupnea-linux.github.io/ as an alternative to Breath. There has been shoddy maintenance with no plans forward. Apacelus, the lead maintainer of this, has also started drama with the Chrultrabook server and their superior UEFI solution. There are far more talented individuals working on the correct solution, mainlining, such as WeirdTreeThing who initially worked on Breath's audio and shortly with Apacelus.
+
+Head to [MrChromebox's website](https://mrchromebox.tech/) and have fun with almost full mainline compatibility! This project operated for 2 years as a stopgap and a complete solution until said changes were merged and looked at by kernel developers and AVS was added.
 
 Due to the burden of active maintenance on everything from the boot process to desktop environments, I'm discontinuing this project to work on more engaging projects. The [Discord](https://discord.gg/Hb3GWSEA) will always be open for discussions over Breath and for the enthusiasts that do (or would like to) understand the codebase.
-
-Apacelus has a revival of the project located [here](https://eupnea-linux.github.io/).
 
 <details>
 <summary>View the archived content</summary>
